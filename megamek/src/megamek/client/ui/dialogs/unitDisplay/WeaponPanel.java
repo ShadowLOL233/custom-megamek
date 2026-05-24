@@ -77,6 +77,7 @@ import megamek.common.board.Coords;
 import megamek.common.compute.Compute;
 import megamek.common.enums.WeaponSortOrder;
 import megamek.common.equipment.AmmoMounted;
+import megamek.common.equipment.ArmorType;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.AmmoType.AmmoTypeEnum;
 import megamek.common.equipment.AmmoType.Munitions;
@@ -985,9 +986,11 @@ public class WeaponPanel extends PicMap implements ListSelectionListener, Action
             }
         }
 
-        if ((((en instanceof Mek) || (en instanceof Aero)) && en.isStealthActive())
-              || en.isNullSigActive() || en.isVoidSigActive()) {
-            currentHeatBuildup += 10; // active stealth/null sig/void sig heat
+        if (((en instanceof Mek) || (en instanceof Aero)) && en.isStealthActive()) {
+            currentHeatBuildup += ArmorType.forEntity(en).getStealthHeat(); // active stealth heat
+        }
+        if (en.isNullSigActive() || en.isVoidSigActive()) {
+            currentHeatBuildup += 10; // active null sig/void sig heat
         }
 
         if ((en instanceof Mek) && en.isChameleonShieldOn()) {

@@ -48,6 +48,7 @@ import megamek.client.ui.clientGUI.calculationReport.CalculationReport;
 import megamek.common.alphaStrike.ASDamage;
 import megamek.common.alphaStrike.AlphaStrikeElement;
 import megamek.common.alphaStrike.BattleForceSUA;
+import megamek.common.equipment.ArmorType;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponType;
@@ -130,7 +131,7 @@ class ASAeroDamageConverter extends ASDamageConverter {
 
     @Override
     protected int getHeatGeneration(boolean onlyRear, boolean onlyLongRange) {
-        int totalHeat = entity.hasWorkingMisc(MiscType.F_STEALTH) ? 10 : 0;
+        int totalHeat = entity.hasWorkingMisc(MiscType.F_STEALTH) ? ArmorType.forEntity(entity).getStealthHeat() : 0;
         for (Mounted<?> mount : weaponsList) {
             totalHeat += weaponHeat(mount, onlyRear, onlyLongRange);
         }

@@ -474,6 +474,9 @@ public class MekSummaryCache {
             int[] alt = new int[3];
             Arrays.fill(alt, e.getTechLevel());
             ms.setAltTypes(alt);
+        } else if (e.isOuterSphere()) {
+            int osLevel = e.getTechLevel();
+            ms.setAltTypes(new int[] { osLevel, osLevel, osLevel });
         } else if (e.isClan()) {
             ms.setAltTypes(new int[] { TechConstants.T_CLAN_TW, TechConstants.T_CLAN_ADVANCED,
                                        TechConstants.T_CLAN_EXPERIMENTAL });

@@ -40,6 +40,7 @@ import java.io.Serial;
 
 import megamek.common.HitData;
 import megamek.common.RangeType;
+import megamek.common.Report;
 import megamek.common.ToHitData;
 import megamek.common.actions.WeaponAttackAction;
 import megamek.common.battleArmor.BattleArmor;
@@ -48,6 +49,7 @@ import megamek.common.equipment.WeaponType;
 import megamek.common.game.Game;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.OptionsConstants;
+import megamek.common.units.Entity;
 import megamek.common.units.Infantry;
 import megamek.server.totalWarfare.TWGameManager;
 
@@ -128,7 +130,49 @@ public class EnergyWeaponHandler extends WeaponHandler {
         }
 
         toReturn = applyGlancingBlowModifier(toReturn, target.isConventionalInfantry());
+
+        // OS PFD: -10% to all energy weapons (PPCs handled separately in PPCHandler)
+        if ((target instanceof Entity) && ((Entity) target).hasActiveOSPFD()) {
+            toReturn = Math.max(toReturn * 0.9, 1.0);
+            addPFDActivationReport((Entity) target, ((Entity) target).getOSPFDRounds(), 1251, 1252);
+        }
+
+        // OS Adv. PFD: -20% to all energy weapons (PPCs handled separately in PPCHandler)
+        if ((target instanceof Entity) && ((Entity) target).hasActiveOSAdvPFD()) {
+            toReturn = Math.max(toReturn * 0.8, 1.0);
+            addPFDActivationReport((Entity) target, ((Entity) target).getOSAdvPFDRounds(), 1255, 1256);
+        }
+
         return (int) Math.ceil(toReturn);
+    }
+
+    /**
+     * Adds a PFD/Adv. PFD activation report to {@code calcDmgPerHitReport}.
+     * Shows "overload check active" if {@code currentRounds >= 8}, otherwise
+     * shows how many rounds remain before the overload check begins.
+     *
+     * @param targetEntity    the entity whose PFD is active
+     * @param currentRounds   how many consecutive rounds the PFD has been on
+     * @param reportIdActive  report number to use when overload check is already running
+     * @param reportIdCountdown report number to use when countdown is still ongoing
+     */
+    protected void addPFDActivationReport(Entity targetEntity, int currentRounds,
+                                          int reportIdActive, int reportIdCountdown) {
+        int roundsRemaining = 8 - currentRounds;
+        Report r;
+        if (roundsRemaining <= 0) {
+            r = new Report(reportIdActive);
+            r.subject = subjectId;
+            r.indent(2);
+            r.addDesc(targetEntity);
+        } else {
+            r = new Report(reportIdCountdown);
+            r.subject = subjectId;
+            r.indent(2);
+            r.addDesc(targetEntity);
+            r.add(roundsRemaining);
+        }
+        calcDmgPerHitReport.add(r);
     }
 
 }

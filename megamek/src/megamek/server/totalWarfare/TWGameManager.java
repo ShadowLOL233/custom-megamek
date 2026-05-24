@@ -7235,8 +7235,14 @@ public class TWGameManager extends AbstractGameManager {
                               (te.hasArmoredChassis() && (te.getBARRating(hit.getLocation()) > 9))) {
                             critRollMod -= 2;
                         }
-                        if ((te.getArmorType(hit.getLocation()) == EquipmentType.T_ARMOR_HARDENED) &&
-                              (te.getArmor(hit.getLocation()) > 0)) {
+                        int armorTypeAtLoc = te.getArmorType(hit.getLocation());
+                        if ((armorTypeAtLoc == EquipmentType.T_ARMOR_HARDENED
+                              || armorTypeAtLoc == EquipmentType.T_ARMOR_OS_IMP_HARDENED
+                              || armorTypeAtLoc == EquipmentType.T_ARMOR_OS_HARDENED_FF
+                              || armorTypeAtLoc == EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FF
+                              || armorTypeAtLoc == EquipmentType.T_ARMOR_OS_ADV_HARDENED_FF
+                              || armorTypeAtLoc == EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FERRO_LAMELLOR)
+                              && (te.getArmor(hit.getLocation()) > 0)) {
                             critRollMod -= 2;
                         }
                         vPhaseReport.addAll(criticalEntity(te,
@@ -13773,15 +13779,25 @@ public class TWGameManager extends AbstractGameManager {
 
             // On a roll of 10+ a lance hitting a mek/Vehicle can cause 1 point of
             // internal damage
+            int lanceArmorType = te.getArmorType(hit.getLocation());
             // PLAYTEST3 Ferro-lam is no longer immune to AP. ABA/APA is.
+            // OS hardened armor variants block the lance like standard Hardened armor.
             if (caa.getClub().getType().hasFlag(MiscTypeFlag.S_LANCE) &&
                   (te.getArmor(hit) > 0) &&
-                  (te.getArmorType(hit.getLocation()) != EquipmentType.T_ARMOR_HARDENED)) {
-                // PLAYTEST3 Ferro_Lam does not block the lance in playtest3, but APA/ABA does
+                  (lanceArmorType != EquipmentType.T_ARMOR_HARDENED) &&
+                  (lanceArmorType != EquipmentType.T_ARMOR_OS_IMP_HARDENED) &&
+                  (lanceArmorType != EquipmentType.T_ARMOR_OS_HARDENED_FF) &&
+                  (lanceArmorType != EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FF) &&
+                  (lanceArmorType != EquipmentType.T_ARMOR_OS_ADV_HARDENED_FF) &&
+                  (lanceArmorType != EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FERRO_LAMELLOR)) {
+                // PLAYTEST3 Ferro_Lam does not block the lance in playtest3, but APA/ABA does.
+                // OS Ferro-Lamellor variants follow standard Ferro-Lamellor behavior.
                 if ((!game.getOptions().booleanOption(OptionsConstants.PLAYTEST_3)
-                      && te.getArmorType(hit.getLocation()) != EquipmentType.T_ARMOR_FERRO_LAMELLOR)
+                      && lanceArmorType != EquipmentType.T_ARMOR_FERRO_LAMELLOR
+                      && lanceArmorType != EquipmentType.T_ARMOR_OS_FERRO_LAMELLOR
+                      && lanceArmorType != EquipmentType.T_ARMOR_OS_HEAVY_FERRO_LAMELLOR)
                       || (game.getOptions().booleanOption(OptionsConstants.PLAYTEST_3)
-                      && te.getArmorType(hit.getLocation()) != EquipmentType.T_ARMOR_ANTI_PENETRATIVE_ABLATION)) {
+                      && lanceArmorType != EquipmentType.T_ARMOR_ANTI_PENETRATIVE_ABLATION)) {
                     Roll diceRoll2 = Compute.rollD6(2);
                     // Pierce checking report
                     r = new Report(4021);
@@ -16789,6 +16805,144 @@ public class TWGameManager extends AbstractGameManager {
     }
 
     /**
+     * Resolve OS EARS (Emergency Armor Repair System) repairs at end of round.
+     * Triggers on:
+     *   (A) 30+ total round damage → distribute repair points evenly across all damaged armor locations
+     *   (B) 15+ damage to a single location → concentrate repair on those locations
+     * Each trigger costs one charge; both can fire in the same round (2 charges total).
+     * Repair amount per trigger = 5% of total armor capacity, rounded to nearest integer.
+     */
+    void resolveEARSRepairs() {
+        Report r;
+        for (Entity entity : game.inGameTWEntities()) {
+            if (!(entity instanceof Mek me)) {
+                continue;
+            }
+            // Skip units without EARS equipment or with destroyed components
+            // (charges may still be 0 if both triggers fire with 1 charge left — handled below)
+            boolean hasEarsEquipment = me.getMisc().stream()
+                  .anyMatch(m -> m.getType().hasFlag(MiscType.F_EARS));
+            boolean allComponentsIntact = me.getMisc().stream()
+                  .noneMatch(m -> m.getType().hasFlag(MiscType.F_EARS_COMPONENT) && m.isDestroyed());
+            if (!hasEarsEquipment || !allComponentsIntact) {
+                continue;
+            }
+
+            int totalArmor = me.getTotalOArmor();
+            int repairPerTrigger = Math.max(1, (int) Math.round(totalArmor * 0.10));
+
+            boolean triggerA = me.damageThisRound >= 30;
+            // Collect locations that took 15+ damage for trigger B
+            List<Integer> heavyHitLocs = new ArrayList<>();
+            for (int loc = 0; loc < me.locations(); loc++) {
+                if (loc == Mek.LOC_HEAD) continue;
+                if (me.getLocationDamageThisRound(loc) >= 15) {
+                    heavyHitLocs.add(loc);
+                }
+            }
+            boolean triggerB = !heavyHitLocs.isEmpty();
+
+            if (!triggerA && !triggerB) {
+                continue;
+            }
+
+            // Trigger A: spread repairs evenly across all damaged armor locations
+            if (triggerA) {
+                if (me.getEarsCharges() <= 0) {
+                    // Out of charges — warn that the trigger could not execute
+                    r = new Report(9856);
+                    r.subject = me.getId();
+                    r.addDesc(entity);
+                    addReport(r);
+                } else {
+                    r = new Report(9853);
+                    r.subject = me.getId();
+                    r.addDesc(entity);
+                    r.add(me.damageThisRound);
+                    addReport(r);
+                    me.setEarsCharges(me.getEarsCharges() - 1);
+
+                    // Collect all locations with damaged armor
+                    List<Integer> damagedLocs = new ArrayList<>();
+                    for (int loc = 0; loc < me.locations(); loc++) {
+                        if (loc == Mek.LOC_HEAD) continue;
+                        int current = me.getArmor(loc);
+                        if (current >= 0 && current < me.getOArmor(loc)) {
+                            damagedLocs.add(loc);
+                        }
+                    }
+                    if (!damagedLocs.isEmpty()) {
+                        int pointsEach = repairPerTrigger / damagedLocs.size();
+                        int remainder = repairPerTrigger % damagedLocs.size();
+                        for (int i = 0; i < damagedLocs.size(); i++) {
+                            int loc = damagedLocs.get(i);
+                            int points = pointsEach + (i < remainder ? 1 : 0);
+                            int repaired = Math.min(points, me.getOArmor(loc) - me.getArmor(loc));
+                            if (repaired > 0) {
+                                me.setArmor(me.getArmor(loc) + repaired, loc);
+                                r = new Report(9855);
+                                r.subject = me.getId();
+                                r.indent(1);
+                                r.add(repaired);
+                                r.add(me.getLocationAbbr(loc));
+                                r.add(me.getEarsCharges());
+                                addReport(r);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Trigger B: concentrate repairs on heavily-hit locations (>=15 damage this round)
+            if (triggerB) {
+                if (me.getEarsCharges() <= 0) {
+                    r = new Report(9856);
+                    r.subject = me.getId();
+                    r.addDesc(entity);
+                    addReport(r);
+                } else {
+                    // Build a comma-separated location list for the activation message
+                    StringBuilder locNames = new StringBuilder();
+                    for (int i = 0; i < heavyHitLocs.size(); i++) {
+                        if (i > 0) locNames.append(", ");
+                        int loc = heavyHitLocs.get(i);
+                        locNames.append(me.getLocationAbbr(loc))
+                              .append(" (").append(me.getLocationDamageThisRound(loc)).append(")");
+                    }
+                    r = new Report(9854);
+                    r.subject = me.getId();
+                    r.addDesc(entity);
+                    r.add(locNames.toString());
+                    addReport(r);
+                    me.setEarsCharges(me.getEarsCharges() - 1);
+
+                    int pointsEach = repairPerTrigger / heavyHitLocs.size();
+                    int remainder = repairPerTrigger % heavyHitLocs.size();
+                    for (int i = 0; i < heavyHitLocs.size(); i++) {
+                        int loc = heavyHitLocs.get(i);
+                        int points = pointsEach + (i < remainder ? 1 : 0);
+                        int current = me.getArmor(loc);
+                        if (current < 0) current = 0; // destroyed location: clamp before repair
+                        int repaired = Math.min(points, me.getOArmor(loc) - current);
+                        if (repaired > 0) {
+                            me.setArmor(current + repaired, loc);
+                            r = new Report(9855);
+                            r.subject = me.getId();
+                            r.indent(1);
+                            r.add(repaired);
+                            r.add(me.getLocationAbbr(loc));
+                            r.add(me.getEarsCharges());
+                            addReport(r);
+                        }
+                    }
+                }
+            }
+
+            entityUpdate(me.getId());
+        }
+    }
+
+    /**
      * Resolve Flaming Damage for the given Entity Taharqa: This is now updated to TacOps rules which is much more
      * lenient So I have changed the name to Flaming Damage rather than flaming death
      *
@@ -17248,6 +17402,58 @@ public class TWGameManager extends AbstractGameManager {
                 if (diceRoll.getIntValue() < target) {
                     for (Mounted<?> m : entity.getMisc()) {
                         if (m.getType().hasFlag(MiscType.F_BLUE_SHIELD)) {
+                            m.setBreached(true);
+                        }
+                    }
+                    r.choose(true);
+                } else {
+                    r.choose(false);
+                }
+                mainPhaseReport.add(r);
+            }
+        }
+    }
+
+    void checkForLegionPFDDamage() {
+        Report r;
+        for (Entity entity : game.inGameTWEntities()) {
+            if (!(entity instanceof Aero) && entity.hasActiveOSPFD() && (entity.getOSPFDRounds() >= 8)) {
+                Roll diceRoll = Compute.rollD6(2);
+                int target = (2 + entity.getOSPFDRounds()) - 8;
+                r = new Report(1243);
+                r.addDesc(entity);
+                r.add(target);
+                r.add(diceRoll);
+
+                if (diceRoll.getIntValue() < target) {
+                    for (Mounted<?> m : entity.getMisc()) {
+                        if (m.getType().hasFlag(MiscType.F_OS_PFD)) {
+                            m.setBreached(true);
+                        }
+                    }
+                    r.choose(true);
+                } else {
+                    r.choose(false);
+                }
+                mainPhaseReport.add(r);
+            }
+        }
+    }
+
+    void checkForLegionAdvPFDDamage() {
+        Report r;
+        for (Entity entity : game.inGameTWEntities()) {
+            if (!(entity instanceof Aero) && entity.hasActiveOSAdvPFD() && (entity.getOSAdvPFDRounds() >= 8)) {
+                Roll diceRoll = Compute.rollD6(2);
+                int target = (2 + entity.getOSAdvPFDRounds()) - 8;
+                r = new Report(1246);
+                r.addDesc(entity);
+                r.add(target);
+                r.add(diceRoll);
+
+                if (diceRoll.getIntValue() < target) {
+                    for (Mounted<?> m : entity.getMisc()) {
+                        if (m.getType().hasFlag(MiscType.F_OS_ADV_PFD)) {
                             m.setBreached(true);
                         }
                     }
@@ -22800,7 +23006,8 @@ public class TWGameManager extends AbstractGameManager {
 
         // Apply modifiers for Anti-penetrative ablation armor
         if ((en.getArmor(loc, isRear) > 0) &&
-              (en.getArmorType(loc) == EquipmentType.T_ARMOR_ANTI_PENETRATIVE_ABLATION)) {
+              ((en.getArmorType(loc) == EquipmentType.T_ARMOR_ANTI_PENETRATIVE_ABLATION) ||
+               (en.getArmorType(loc) == EquipmentType.T_ARMOR_OS_APA))) {
             critMod -= 2;
         }
 
@@ -22978,7 +23185,9 @@ public class TWGameManager extends AbstractGameManager {
         // Because reactive armor isn't hittable, the transfer check doesn't
         // consider it
         boolean possibleReactiveCrit = (en.getArmor(loc) > 0) &&
-              (en.getArmorType(loc) == EquipmentType.T_ARMOR_REACTIVE);
+              ((en.getArmorType(loc) == EquipmentType.T_ARMOR_REACTIVE) ||
+               (en.getArmorType(loc) == EquipmentType.T_ARMOR_OS_REACTIVE) ||
+               (en.getArmorType(loc) == EquipmentType.T_ARMOR_OS_IMP_REACTIVE));
         boolean locContainsReactiveArmor = false;
         for (int i = 0; (i < en.getNumberOfCriticalSlots(loc)) && possibleReactiveCrit; i++) {
             CriticalSlot crit = en.getCritical(loc, i);
@@ -23124,8 +23333,52 @@ public class TWGameManager extends AbstractGameManager {
                         }
                     }
                 }
-                vDesc.addAll(applyCriticalHit(en, loc, slot, true, damage, isCapital));
-                hits--;
+                // DDS: absorb this critical hit (except ammo explosions and DDS component crits)
+                boolean ddsAbsorbed = false;
+                if (en instanceof Mek mekDds) {
+                    // Skip DDS if the location IS is already at 0 — the location is about to be
+                    // physically destroyed (destroyLocation fires right after criticalEntity returns),
+                    // so intercepting a crit here is meaningless and would waste a charge.
+                    boolean locationSurvives = en.getInternal(loc) > 0;
+                    boolean hasDdsEquipment = mekDds.getMisc().stream()
+                          .anyMatch(m -> m.getType().hasFlag(MiscType.F_DDS));
+                    boolean allDdsComponentsIntact = mekDds.getMisc().stream()
+                          .noneMatch(m -> m.getType().hasFlag(MiscType.F_DDS_COMPONENT) && m.isDestroyed());
+                    if (locationSurvives && hasDdsEquipment && allDdsComponentsIntact) {
+                        boolean isAmmoExplosion = (slot.getType() == CriticalSlot.TYPE_EQUIPMENT)
+                              && (slot.getMount() != null)
+                              && slot.getMount().getType().isExplosive(slot.getMount());
+                        boolean isDdsComponent = (slot.getType() == CriticalSlot.TYPE_EQUIPMENT)
+                              && (slot.getMount() != null)
+                              && slot.getMount().getType().hasFlag(MiscType.F_DDS_COMPONENT);
+                        if (!isAmmoExplosion && !isDdsComponent) {
+                            if (mekDds.getDdsCharges() > 0) {
+                                // Absorb the crit, consume one charge
+                                mekDds.setDdsCharges(mekDds.getDdsCharges() - 1);
+                                Report rDds = new Report(9857);
+                                rDds.subject = en.getId();
+                                rDds.indent(3);
+                                rDds.addDesc(en);
+                                rDds.add(en.getLocationName(loc));
+                                rDds.add(mekDds.getDdsCharges());
+                                vDesc.addElement(rDds);
+                                ddsAbsorbed = true;
+                                hits--;
+                            } else {
+                                // DDS present but charges exhausted — report and apply normally
+                                Report rDds = new Report(9858);
+                                rDds.subject = en.getId();
+                                rDds.indent(3);
+                                rDds.addDesc(en);
+                                vDesc.addElement(rDds);
+                            }
+                        }
+                    }
+                }
+                if (!ddsAbsorbed) {
+                    vDesc.addAll(applyCriticalHit(en, loc, slot, true, damage, isCapital));
+                    hits--;
+                }
             }
         } // Hit another slot in this location.
 

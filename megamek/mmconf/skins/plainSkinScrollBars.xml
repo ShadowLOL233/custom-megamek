@@ -16,13 +16,13 @@
 <skin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:noNamespaceSchemaLocation="skinSchema.xsd">
 
-  <!-- Defines default borders used in Megamek -->
+	<!-- Defines default borders used in Megamek -->
   <UI_Element>
     <name>defaultElement</name>
     <plain />
   </UI_Element>
 
-  <!-- Defines default buttons -->
+	<!-- Defines default buttons -->
   <UI_Element>
     <name>defaultButton</name>
     <plain />

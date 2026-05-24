@@ -605,6 +605,24 @@ public abstract class AbstractUnitSelectorDialog extends JDialog implements Runn
                 }
             }
         }
+        // Always add OS tech levels regardless of game tech level cap
+        for (int tl = TechConstants.T_OUTER_SPHERE_INTRO; tl <= TechConstants.T_ALL_OUTER_SPHERE; tl++) {
+            if (tl == TechConstants.T_ALL_OUTER_SPHERE) {
+                continue; // skip the "All OS" aggregate entry
+            }
+            techLevelListToIndex.put(selectionIdx, tl);
+            techModel.addElement(TechConstants.getLevelDisplayableName(tl));
+            selectionIdx++;
+        }
+        // Always add Ascended tech levels regardless of game tech level cap
+        for (int tl = TechConstants.T_ASCENDED_INTRO; tl <= TechConstants.T_ALL_ASCENDED; tl++) {
+            if (tl == TechConstants.T_ALL_ASCENDED) {
+                continue; // skip the "All Ascended" aggregate entry
+            }
+            techLevelListToIndex.put(selectionIdx, tl);
+            techModel.addElement(TechConstants.getLevelDisplayableName(tl));
+            selectionIdx++;
+        }
         listTechLevel.setModel(techModel);
         listTechLevel.setSelectedIndices(selectedIndices);
         listTechLevel.addListSelectionListener(this);

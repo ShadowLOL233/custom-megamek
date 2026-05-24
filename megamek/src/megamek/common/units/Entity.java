@@ -899,6 +899,12 @@ public abstract class Entity extends TurnOrdered
     // for how many rounds has blue shield been active?
     private int blueShieldRounds = 0;
 
+    // for how many rounds has the OS PFD been active?
+    private int osPFDRounds = 0;
+
+    // for how many rounds has the OS Adv. PFD been active?
+    private int osAdvPFDRounds = 0;
+
     // Entity fluff object for use with MegaMekLab
     protected EntityFluff fluff = new EntityFluff();
 
@@ -1689,7 +1695,19 @@ public abstract class Entity extends TurnOrdered
     }
 
     @Override
+    public boolean isOuterSphere() {
+        return TechConstants.isOuterSphere(techLevel);
+    }
+
+    @Override
+    public boolean isAscended() {
+        return TechConstants.isAscended(techLevel);
+    }
+
+    @Override
     public TechBase getTechBase() {
+        if (isAscended()) return TechBase.ASCENDED;
+        if (isOuterSphere()) return TechBase.OUTER_SPHERE;
         return isClan() ? TechBase.CLAN : TechBase.IS;
     }
 
@@ -7156,7 +7174,8 @@ public abstract class Entity extends TurnOrdered
     public boolean locationHasCase(int loc) {
         for (MiscMounted mounted : getMisc()) {
             if ((mounted.getLocation() == loc) &&
-                  (mounted.getType().hasFlag(MiscType.F_CASE) || mounted.getType().hasFlag(MiscType.F_CASEP))) {
+                  (mounted.getType().hasFlag(MiscType.F_CASE) || mounted.getType().hasFlag(MiscType.F_CASEP)
+                        || mounted.getType().hasFlag(MiscType.F_OS_CASE))) {
                 return true;
             }
         }
@@ -7167,8 +7186,8 @@ public abstract class Entity extends TurnOrdered
      * Returns whether there is CASE anywhere on this {@code Entity}.
      */
     public boolean hasCase() {
-        // Clan Meks always have CASE!
-        if (isClan()) {
+        // Clan and OS Meks always have CASE!
+        if (isClan() || isOuterSphere()) {
             return true;
         }
         for (MiscMounted mounted : getMisc()) {
@@ -7253,6 +7272,20 @@ public abstract class Entity extends TurnOrdered
         // update the number of turns we used a blue shield
         if (hasActiveBlueShield()) {
             blueShieldRounds++;
+        }
+
+        // update the number of turns we used a OS PFD
+        if (hasActiveOSPFD()) {
+            osPFDRounds++;
+        } else {
+            osPFDRounds = 0;
+        }
+
+        // update the number of turns we used a OS Adv. PFD
+        if (hasActiveOSAdvPFD()) {
+            osAdvPFDRounds++;
+        } else {
+            osAdvPFDRounds = 0;
         }
 
         // for dropping troops, check to see if they are going to land this turn, if so, then set their assault drop
@@ -11593,7 +11626,10 @@ public abstract class Entity extends TurnOrdered
     }
 
     public void setArmorType(String armType) {
-        if (!(armType.startsWith("Clan ") || armType.startsWith("IS "))) {
+        // Outer Sphere (OS) armor uses "<name> (OS)" or "OS <name>" naming with no
+        // IS/Clan prefix; skip the auto-prefix in that case so the lookup resolves correctly.
+        boolean isOuterSphereArmor = armType.endsWith(" (OS)") || armType.startsWith("OS ");
+        if (!isOuterSphereArmor && !(armType.startsWith("Clan ") || armType.startsWith("IS "))) {
             armType = (TechConstants.isClan(getArmorTechLevel(0)) ? "Clan " : "IS ") + armType;
         }
         EquipmentType et = EquipmentType.get(armType);
@@ -11616,7 +11652,10 @@ public abstract class Entity extends TurnOrdered
     }
 
     public void setArmorType(String armType, int loc) {
-        if (!(armType.startsWith("Clan ") || armType.startsWith("IS "))) {
+        // Outer Sphere (OS) armor uses "<name> (OS)" or "OS <name>" naming with no
+        // IS/Clan prefix; skip the auto-prefix in that case so the lookup resolves correctly.
+        boolean isOuterSphereArmor = armType.endsWith(" (OS)") || armType.startsWith("OS ");
+        if (!isOuterSphereArmor && !(armType.startsWith("Clan ") || armType.startsWith("IS "))) {
             armType = (TechConstants.isClan(getArmorTechLevel(0)) ? "Clan " : "IS ") + armType;
         }
         EquipmentType et = EquipmentType.get(armType);
@@ -11645,6 +11684,11 @@ public abstract class Entity extends TurnOrdered
             structureType += " Structure";
         }
         EquipmentType et = EquipmentType.get(structureType);
+        // Fallback: some structure types (e.g. OS IS) are registered without the
+        // " Structure" suffix — retry the lookup after stripping it
+        if (et == null && structureType.endsWith(" Structure")) {
+            et = EquipmentType.get(structureType.substring(0, structureType.length() - " Structure".length()));
+        }
         setStructureType(EquipmentType.getStructureType(et));
         if (et == null) {
             structureTechLevel = TechConstants.T_TECH_UNKNOWN;
@@ -14319,6 +14363,44 @@ public abstract class Entity extends TurnOrdered
         return blueShieldRounds;
     }
 
+    /**
+     * @return true if the entity has a working OS PFD switched on
+     */
+    public boolean hasActiveOSPFD() {
+        if (!isShutDown()) {
+            for (MiscMounted m : getMisc()) {
+                EquipmentType type = m.getType();
+                if (type.hasFlag(MiscType.F_OS_PFD) && m.curMode().equals("On")) {
+                    return !(m.isDestroyed() || m.isMissing() || m.isBreached() || isShutDown());
+                }
+            }
+        }
+        return false;
+    }
+
+    public int getOSPFDRounds() {
+        return osPFDRounds;
+    }
+
+    /**
+     * @return true if the entity has a working OS Adv. PFD switched on
+     */
+    public boolean hasActiveOSAdvPFD() {
+        if (!isShutDown()) {
+            for (MiscMounted m : getMisc()) {
+                EquipmentType type = m.getType();
+                if (type.hasFlag(MiscType.F_OS_ADV_PFD) && m.curMode().equals("On")) {
+                    return !(m.isDestroyed() || m.isMissing() || m.isBreached() || isShutDown());
+                }
+            }
+        }
+        return false;
+    }
+
+    public int getOSAdvPFDRounds() {
+        return osAdvPFDRounds;
+    }
+
     public boolean isDropping() {
         return isAirborne() && !(isAero());
     }
@@ -14330,7 +14412,9 @@ public abstract class Entity extends TurnOrdered
         // only non-patchwork stealth actually works as stealth
         return !hasPatchworkArmor() &&
               ((getArmorType(1) == EquipmentType.T_ARMOR_STEALTH) ||
-                    (getArmorType(1) == EquipmentType.T_ARMOR_STEALTH_VEHICLE));
+                    (getArmorType(1) == EquipmentType.T_ARMOR_STEALTH_VEHICLE) ||
+                    (getArmorType(1) == EquipmentType.T_ARMOR_OS_STEALTH) ||
+                    (getArmorType(1) == EquipmentType.T_ARMOR_OS_IMP_STEALTH));
     }
 
     /**
@@ -14547,7 +14631,13 @@ public abstract class Entity extends TurnOrdered
 
     public boolean hasHardenedArmor() {
         for (int i = 0; i < locations(); i++) {
-            if ((armorType[i] == EquipmentType.T_ARMOR_HARDENED)) {
+            int at = armorType[i];
+            if (at == EquipmentType.T_ARMOR_HARDENED
+                  || at == EquipmentType.T_ARMOR_OS_IMP_HARDENED
+                  || at == EquipmentType.T_ARMOR_OS_HARDENED_FF
+                  || at == EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FF
+                  || at == EquipmentType.T_ARMOR_OS_ADV_HARDENED_FF
+                  || at == EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FERRO_LAMELLOR) {
                 return true;
             }
         }

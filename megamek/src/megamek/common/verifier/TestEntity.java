@@ -646,7 +646,30 @@ public abstract class TestEntity implements TestEntityOption {
                   || mt.hasFlag(MiscType.F_ELECTRIC_DISCHARGE_ARMOR)
                   || mt.hasFlag(MiscType.F_HEAT_SINK)
                   || mt.hasFlag(MiscType.F_DOUBLE_HEAT_SINK)
-                  || mt.hasFlag(MiscType.F_IS_DOUBLE_HEAT_SINK_PROTOTYPE)) {
+                  || mt.hasFlag(MiscType.F_IS_DOUBLE_HEAT_SINK_PROTOTYPE)
+                  // OS Internal Structures
+                  || mt.hasFlag(MiscType.F_OS_IMP_ENDO_STEEL)
+                  || mt.hasFlag(MiscType.F_OS_ADV_ENDO_STEEL)
+                  || mt.hasFlag(MiscType.F_OS_IMP_REINFORCE)
+                  || mt.hasFlag(MiscType.F_OS_REINFORCE_COMPOSITE)
+                  || mt.hasFlag(MiscType.F_OS_REINFORCE_ENDO_STEEL)
+                  || mt.hasFlag(MiscType.F_OS_IMP_REINFORCE_ENDO_STEEL)
+                  || mt.hasFlag(MiscType.F_OS_ADV_REINFORCE_ENDO_STEEL)
+                  || mt.hasFlag(MiscType.F_OS_IMP_ENDO_COMPOSITE)
+                  || mt.hasFlag(MiscType.F_OS_ADV_ENDO_COMPOSITE)
+                  || mt.hasFlag(MiscType.F_OS_HEAVY_DUTY)
+                  || mt.hasFlag(MiscType.F_OS_HEAVY_DUTY_ENDO_STEEL)
+                  || mt.hasFlag(MiscType.F_OS_SH_DUTY_ENDO_STEEL)
+                  || mt.hasFlag(MiscType.F_OS_SH_REINFORCE)
+                  || mt.hasFlag(MiscType.F_OS_SH_REINFORCE_ENDO_STEEL)
+                  || mt.hasFlag(MiscType.F_OS_SH_REINFORCE_ENDO_COMPOSITE)
+                  || mt.hasFlag(MiscType.F_OS_REINFORCE_HEAVY_DUTY)
+                  || mt.hasFlag(MiscType.F_OS_REINFORCE_HEAVY_DUTY_ENDO_STEEL)
+                  || mt.hasFlag(MiscType.F_OS_SH_REINFORCE_HEAVY_DUTY)
+                  || mt.hasFlag(MiscType.F_OS_SH_REINFORCE_HEAVY_DUTY_ENDO_STEEL)
+                  // EARS/DDS components carry no weight (main item covers it)
+                  || mt.hasFlag(MiscType.F_EARS_COMPONENT)
+                  || mt.hasFlag(MiscType.F_DDS_COMPONENT)) {
                 continue;
             }
             weightSum += m.getTonnage();
@@ -673,6 +696,7 @@ public abstract class TestEntity implements TestEntityOption {
             if (mt.hasFlag(MiscType.F_ENDO_COMPOSITE)
                   || mt.hasFlag(MiscType.F_ENDO_STEEL)
                   || mt.hasFlag(MiscType.F_ENDO_STEEL_PROTO)
+                  || mt.hasFlag(MiscType.F_COMPOSITE)
                   || mt.hasFlag(MiscType.F_REINFORCED)
                   || mt.hasFlag(MiscType.F_FERRO_FIBROUS)
                   || mt.hasFlag(MiscType.F_FERRO_FIBROUS_PROTO)
@@ -681,7 +705,27 @@ public abstract class TestEntity implements TestEntityOption {
                   || mt.hasFlag(MiscType.F_REACTIVE)
                   || mt.hasFlag(MiscType.F_REFLECTIVE)
                   || mt.hasFlag(MiscType.F_FERRO_LAMELLOR)
-                  || mt.hasFlag(MiscType.F_INDUSTRIAL_STRUCTURE)) {
+                  || mt.hasFlag(MiscType.F_INDUSTRIAL_STRUCTURE)
+                  // OS Internal Structures
+                  || mt.hasFlag(MiscType.F_OS_IMP_ENDO_STEEL)
+                  || mt.hasFlag(MiscType.F_OS_ADV_ENDO_STEEL)
+                  || mt.hasFlag(MiscType.F_OS_IMP_REINFORCE)
+                  || mt.hasFlag(MiscType.F_OS_REINFORCE_COMPOSITE)
+                  || mt.hasFlag(MiscType.F_OS_REINFORCE_ENDO_STEEL)
+                  || mt.hasFlag(MiscType.F_OS_IMP_REINFORCE_ENDO_STEEL)
+                  || mt.hasFlag(MiscType.F_OS_ADV_REINFORCE_ENDO_STEEL)
+                  || mt.hasFlag(MiscType.F_OS_IMP_ENDO_COMPOSITE)
+                  || mt.hasFlag(MiscType.F_OS_ADV_ENDO_COMPOSITE)
+                  || mt.hasFlag(MiscType.F_OS_HEAVY_DUTY)
+                  || mt.hasFlag(MiscType.F_OS_HEAVY_DUTY_ENDO_STEEL)
+                  || mt.hasFlag(MiscType.F_OS_SH_DUTY_ENDO_STEEL)
+                  || mt.hasFlag(MiscType.F_OS_SH_REINFORCE)
+                  || mt.hasFlag(MiscType.F_OS_SH_REINFORCE_ENDO_STEEL)
+                  || mt.hasFlag(MiscType.F_OS_SH_REINFORCE_ENDO_COMPOSITE)
+                  || mt.hasFlag(MiscType.F_OS_REINFORCE_HEAVY_DUTY)
+                  || mt.hasFlag(MiscType.F_OS_REINFORCE_HEAVY_DUTY_ENDO_STEEL)
+                  || mt.hasFlag(MiscType.F_OS_SH_REINFORCE_HEAVY_DUTY)
+                  || mt.hasFlag(MiscType.F_OS_SH_REINFORCE_HEAVY_DUTY_ENDO_STEEL)) {
                 continue;
             }
 

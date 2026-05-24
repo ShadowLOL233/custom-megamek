@@ -1507,11 +1507,25 @@ public abstract class BVCalculator {
 
     private double armorMultiplier(int location) {
         double armorMultiplier = switch (entity.getArmorType(location)) {
-            case EquipmentType.T_ARMOR_HARDENED -> 2.0;
+            case EquipmentType.T_ARMOR_HARDENED,
+                 EquipmentType.T_ARMOR_OS_IMP_HARDENED,
+                 EquipmentType.T_ARMOR_OS_HARDENED_FF,
+                 EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FF,
+                 EquipmentType.T_ARMOR_OS_ADV_HARDENED_FF,
+                 EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FERRO_LAMELLOR -> 2.0;
             case EquipmentType.T_ARMOR_REACTIVE,
                  EquipmentType.T_ARMOR_REFLECTIVE,
-                 EquipmentType.T_ARMOR_BALLISTIC_REINFORCED -> 1.5;
-            case EquipmentType.T_ARMOR_FERRO_LAMELLOR, EquipmentType.T_ARMOR_ANTI_PENETRATIVE_ABLATION -> 1.2;
+                 EquipmentType.T_ARMOR_BALLISTIC_REINFORCED,
+                 EquipmentType.T_ARMOR_OS_REACTIVE,
+                 EquipmentType.T_ARMOR_OS_IMP_REACTIVE,
+                 EquipmentType.T_ARMOR_OS_LASER_REFLECTIVE,
+                 EquipmentType.T_ARMOR_OS_BALLISTIC_REINFORCED,
+                 EquipmentType.T_ARMOR_OS_ENERGY_ABSORPTION -> 1.5;
+            case EquipmentType.T_ARMOR_FERRO_LAMELLOR,
+                 EquipmentType.T_ARMOR_ANTI_PENETRATIVE_ABLATION,
+                 EquipmentType.T_ARMOR_OS_FERRO_LAMELLOR,
+                 EquipmentType.T_ARMOR_OS_HEAVY_FERRO_LAMELLOR,
+                 EquipmentType.T_ARMOR_OS_APA -> 1.2;
             case EquipmentType.T_ARMOR_HEAT_DISSIPATING -> 1.1;
             default -> 1.0;
         };
@@ -1539,6 +1553,19 @@ public abstract class BVCalculator {
             case EquipmentType.T_ARMOR_FERRO_LAMELLOR:
             case EquipmentType.T_ARMOR_ANTI_PENETRATIVE_ABLATION:
             case EquipmentType.T_ARMOR_HEAT_DISSIPATING:
+            case EquipmentType.T_ARMOR_OS_IMP_HARDENED:
+            case EquipmentType.T_ARMOR_OS_HARDENED_FF:
+            case EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FF:
+            case EquipmentType.T_ARMOR_OS_ADV_HARDENED_FF:
+            case EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FERRO_LAMELLOR:
+            case EquipmentType.T_ARMOR_OS_REACTIVE:
+            case EquipmentType.T_ARMOR_OS_IMP_REACTIVE:
+            case EquipmentType.T_ARMOR_OS_LASER_REFLECTIVE:
+            case EquipmentType.T_ARMOR_OS_BALLISTIC_REINFORCED:
+            case EquipmentType.T_ARMOR_OS_ENERGY_ABSORPTION:
+            case EquipmentType.T_ARMOR_OS_FERRO_LAMELLOR:
+            case EquipmentType.T_ARMOR_OS_HEAVY_FERRO_LAMELLOR:
+            case EquipmentType.T_ARMOR_OS_APA:
                 modifiers.add(EquipmentType.getArmorTypeName(entity.getArmorType(location)));
         }
 

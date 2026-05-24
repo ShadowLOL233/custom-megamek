@@ -1523,6 +1523,25 @@ public class ComputeToHit {
 
         }
 
+        // PPC-X family (IS and OS variants): range-bracket ToHit gradient (-1 / +0 / +1) due to
+        // particle-beam dispersion patterns. Applied as an additional modifier on top of any
+        // flat toHitModifier so it stacks correctly with mode-based bonuses.
+        if (target != null && weaponType instanceof megamek.common.weapons.ppc.PPCXWeapon) {
+            int nRange = ae.getPosition().distance(target.getPosition());
+            int[] nRanges = weaponType.getRanges(weapon, ammo);
+            int dispersionMod;
+            if (nRange <= nRanges[RangeType.RANGE_SHORT]) {
+                dispersionMod = -1;
+            } else if (nRange <= nRanges[RangeType.RANGE_MEDIUM]) {
+                dispersionMod = 0;
+            } else {
+                dispersionMod = 1;
+            }
+            if (dispersionMod != 0) {
+                toHit.addModifier(dispersionMod, Messages.getString("WeaponAttackAction.WeaponMod"));
+            }
+        }
+
         // Indirect fire (LRMs, mortars and the like) has a +1 mod
         if (isIndirect) {
             toHit.addModifier(1, Messages.getString("WeaponAttackAction.Indirect"));
