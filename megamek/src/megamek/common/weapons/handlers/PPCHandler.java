@@ -130,6 +130,16 @@ public class PPCHandler extends EnergyWeaponHandler {
             toReturn = (int) Math.max(Math.floor(toReturn / 2.0), 1);
         }
 
+        if ((target instanceof Entity) && ((Entity) target).hasActiveOSPFD()) {
+            toReturn = (int) Math.max(Math.floor(toReturn / 2.0), 1);
+            addPFDActivationReport((Entity) target, ((Entity) target).getOSPFDRounds(), 1249, 1250);
+        }
+
+        if ((target instanceof Entity) && ((Entity) target).hasActiveOSAdvPFD()) {
+            toReturn = (int) Math.max(Math.floor(toReturn / 2.0), 1);
+            addPFDActivationReport((Entity) target, ((Entity) target).getOSAdvPFDRounds(), 1253, 1254);
+        }
+
         if (target.isConventionalInfantry()) {
             toReturn = Compute.directBlowInfantryDamage(toReturn,
                   bDirect ? toHit.getMoS() / 3 : 0,

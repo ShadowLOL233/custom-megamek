@@ -298,25 +298,37 @@ public class TWDamageManager implements IDamageManager {
         boolean tookInternalDamage = damageIS;
         Hex te_hex = null;
 
+        int armorTypeAtLoc = entity.getArmorType(hit.getLocation());
         boolean hardenedArmor = ((entity instanceof Mek) || (entity instanceof Tank)) &&
-              (entity.getArmorType(hit.getLocation()) == EquipmentType.T_ARMOR_HARDENED);
+              (armorTypeAtLoc == EquipmentType.T_ARMOR_HARDENED
+                    || armorTypeAtLoc == EquipmentType.T_ARMOR_OS_IMP_HARDENED
+                    || armorTypeAtLoc == EquipmentType.T_ARMOR_OS_HARDENED_FF
+                    || armorTypeAtLoc == EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FF
+                    || armorTypeAtLoc == EquipmentType.T_ARMOR_OS_ADV_HARDENED_FF
+                    || armorTypeAtLoc == EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FERRO_LAMELLOR);
         boolean ferroLamellorArmor = ((entity instanceof Mek) || (entity instanceof Tank) || (entity instanceof Aero))
-              &&
-              (entity.getArmorType(hit.getLocation()) == EquipmentType.T_ARMOR_FERRO_LAMELLOR);
+              && (armorTypeAtLoc == EquipmentType.T_ARMOR_FERRO_LAMELLOR
+                    || armorTypeAtLoc == EquipmentType.T_ARMOR_OS_FERRO_LAMELLOR
+                    || armorTypeAtLoc == EquipmentType.T_ARMOR_OS_HEAVY_FERRO_LAMELLOR
+                    || armorTypeAtLoc == EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FERRO_LAMELLOR);
         boolean reflectiveArmor = (((entity instanceof Mek) || (entity instanceof Tank) || (entity instanceof Aero)) &&
-              (entity.getArmorType(hit.getLocation()) == EquipmentType.T_ARMOR_REFLECTIVE)) ||
-              (isBattleArmor &&
-                    (entity.getArmorType(hit.getLocation()) ==
-                          EquipmentType.T_ARMOR_BA_REFLECTIVE));
+              (armorTypeAtLoc == EquipmentType.T_ARMOR_REFLECTIVE)) ||
+              (isBattleArmor && (armorTypeAtLoc == EquipmentType.T_ARMOR_BA_REFLECTIVE));
+        boolean energyAbsorptionArmor = ((entity instanceof Mek) || (entity instanceof Tank)) &&
+              (armorTypeAtLoc == EquipmentType.T_ARMOR_OS_ENERGY_ABSORPTION);
+        boolean laserReflectiveArmor = ((entity instanceof Mek) || (entity instanceof Tank)) &&
+              (armorTypeAtLoc == EquipmentType.T_ARMOR_OS_LASER_REFLECTIVE);
         boolean reactiveArmor = (((entity instanceof Mek) || (entity instanceof Tank) || (entity instanceof Aero)) &&
-              (entity.getArmorType(hit.getLocation()) == EquipmentType.T_ARMOR_REACTIVE)) ||
-              (isBattleArmor &&
-                    (entity.getArmorType(hit.getLocation()) == EquipmentType.T_ARMOR_BA_REACTIVE));
+              (armorTypeAtLoc == EquipmentType.T_ARMOR_REACTIVE
+                    || armorTypeAtLoc == EquipmentType.T_ARMOR_OS_REACTIVE)) ||
+              (isBattleArmor && (armorTypeAtLoc == EquipmentType.T_ARMOR_BA_REACTIVE));
+        boolean impReactiveArmor = ((entity instanceof Mek) || (entity instanceof Tank)) &&
+              (armorTypeAtLoc == EquipmentType.T_ARMOR_OS_IMP_REACTIVE);
         boolean ballisticArmor = ((entity instanceof Mek) || (entity instanceof Tank) || (entity instanceof Aero)) &&
-              (entity.getArmorType(hit.getLocation()) ==
-                    EquipmentType.T_ARMOR_BALLISTIC_REINFORCED);
+              (armorTypeAtLoc == EquipmentType.T_ARMOR_BALLISTIC_REINFORCED
+                    || armorTypeAtLoc == EquipmentType.T_ARMOR_OS_BALLISTIC_REINFORCED);
         boolean impactArmor = (entity instanceof Mek) &&
-              (entity.getArmorType(hit.getLocation()) == EquipmentType.T_ARMOR_IMPACT_RESISTANT);
+              (armorTypeAtLoc == EquipmentType.T_ARMOR_IMPACT_RESISTANT);
         boolean bar5 = entity.getBARRating(hit.getLocation()) <= 5;
 
         // TACs from the hit location table
@@ -997,6 +1009,41 @@ public class TWDamageManager implements IDamageManager {
                     report.indent(3);
                     report.add(damage);
                     reportVec.addElement(report);
+                } else if (impReactiveArmor &&
+                      ((hit.getGeneralDamageType() == HitData.DAMAGE_MISSILE) ||
+                            (hit.getGeneralDamageType() == HitData.DAMAGE_ARMOR_PIERCING_MISSILE) ||
+                            areaSatArty)) {
+                    // Imp. Reactive (OS): 55% damage reduction vs missiles/artillery
+                    tmpDamageHold = damage;
+                    damage = Math.max(1, (int) Math.floor(damage * 0.45));
+                    report = new Report(6257);
+                    report.subject = entityId;
+                    report.indent(3);
+                    report.add(damage);
+                    reportVec.addElement(report);
+                } else if (energyAbsorptionArmor &&
+                      (hit.getGeneralDamageType() == HitData.DAMAGE_ENERGY)) {
+                    // Energy Absorption (OS): 50% reduction vs all energy weapons
+                    tmpDamageHold = damage;
+                    damage = (int) Math.floor(((double) damage) / 2);
+                    if (tmpDamageHold == 1) {
+                        damage = 1;
+                    }
+                    report = new Report(6258);
+                    report.subject = entityId;
+                    report.indent(3);
+                    report.add(damage);
+                    reportVec.addElement(report);
+                } else if (laserReflectiveArmor &&
+                      (hit.getGeneralDamageType() == HitData.DAMAGE_ENERGY)) {
+                    // Laser Reflective (OS): 65% reduction vs energy weapons
+                    tmpDamageHold = damage;
+                    damage = Math.max(1, (int) Math.floor(damage * 0.35));
+                    report = new Report(6259);
+                    report.subject = entityId;
+                    report.indent(3);
+                    report.add(damage);
+                    reportVec.addElement(report);
                 }
 
                 // If we're using optional tank damage thresholds, set up our hit
@@ -1059,7 +1106,9 @@ public class TWDamageManager implements IDamageManager {
                     report = new Report(6069);
                     report.subject = entityId;
                     report.indent(3);
+                    int originalDamage = damage;
                     int reportedDamage = damage / 2;
+                    report.add(originalDamage);
                     if ((damage % 2) > 0) {
                         report.add(reportedDamage + ".5");
                     } else {
@@ -1087,14 +1136,20 @@ public class TWDamageManager implements IDamageManager {
                     // we only care about this if there is armor remaining,
                     // so don't worry about the case where damage exceeds
                     // armorThreshold
-                    if ((entity instanceof Mek) && (damage > 0)) {
-                        ((Mek) entity).setArmorDamagedThisTurn(hit.getLocation(), true);
+                    if ((entity instanceof Mek mekForDmg) && (damage > 0)) {
+                        mekForDmg.setArmorDamagedThisTurn(hit.getLocation(), true);
+                        // Track per-location damage for EARS trigger B
+                        mekForDmg.addLocationDamageThisRound(hit.getLocation(), damage);
                     }
 
                     // if the armor is hardened, any penetrating crits are
                     // rolled at -2
                     if (hardenedArmor) {
                         critBonus -= 2;
+                    }
+                    // OS Reinforce structure: -1 to crit roll when armor is penetrated
+                    if ((entity instanceof Mek) && ((Mek) entity).hasOSReinforceStructure()) {
+                        critBonus -= 1;
                     }
 
                     if (tmpDamageHold >= 0) {
@@ -1137,6 +1192,10 @@ public class TWDamageManager implements IDamageManager {
                         entity.damageThisPhase += 2 * absorbed;
                     } else {
                         entity.damageThisPhase += absorbed;
+                    }
+                    // Track per-location damage for EARS trigger B (armor destroyed)
+                    if (entity instanceof Mek mekForLocDmg && absorbed > 0) {
+                        mekForLocDmg.addLocationDamageThisRound(hit.getLocation(), absorbed);
                     }
                     damage -= absorbed;
                     report = new Report(6090);
@@ -1439,6 +1498,11 @@ public class TWDamageManager implements IDamageManager {
                         report.indent(3);
                         reportVec.add(report);
                     }
+                    // OS Reinforce Composite: IS takes x1.5 damage (round down)
+                    if ((entity instanceof Mek) && ((Mek) entity).hasOSReinforceCompositeStructure()) {
+                        tmpDamageHold = damage;
+                        damage = damage * 3 / 2; // integer truncation = floor
+                    }
                     if ((entity.getInternal(hit) > damage) && (damage > 0)) {
                         // internal structure absorbs all damage
                         entity.setInternal(entity.getInternal(hit) - damage, hit);
@@ -1615,6 +1679,9 @@ public class TWDamageManager implements IDamageManager {
                             } else if (((Mek) entity).hasReinforcedStructure()) {
                                 damage *= 2;
                                 damage -= tmpDamageHold % 2;
+                            } else if (((Mek) entity).hasOSReinforceCompositeStructure()) {
+                                // Reverse the x1.5 scale for overflow damage
+                                damage = damage * 2 / 3;
                             }
                         }
                     }
@@ -1890,25 +1957,37 @@ public class TWDamageManager implements IDamageManager {
             if (damage > 0) {
                 hit = nextHit;
                 // Need to update armor status for the new location
+                int armorTypeAtLoc2 = entity.getArmorType(hit.getLocation());
                 hardenedArmor = ((entity instanceof Mek) || (entity instanceof Tank)) &&
-                      (entity.getArmorType(hit.getLocation()) == EquipmentType.T_ARMOR_HARDENED);
+                      (armorTypeAtLoc2 == EquipmentType.T_ARMOR_HARDENED
+                            || armorTypeAtLoc2 == EquipmentType.T_ARMOR_OS_IMP_HARDENED
+                            || armorTypeAtLoc2 == EquipmentType.T_ARMOR_OS_HARDENED_FF
+                            || armorTypeAtLoc2 == EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FF
+                            || armorTypeAtLoc2 == EquipmentType.T_ARMOR_OS_ADV_HARDENED_FF
+                            || armorTypeAtLoc2 == EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FERRO_LAMELLOR);
                 ferroLamellorArmor = ((entity instanceof Mek) || (entity instanceof Tank) || (entity instanceof Aero))
-                      &&
-                      (entity.getArmorType(hit.getLocation()) == EquipmentType.T_ARMOR_FERRO_LAMELLOR);
+                      && (armorTypeAtLoc2 == EquipmentType.T_ARMOR_FERRO_LAMELLOR
+                            || armorTypeAtLoc2 == EquipmentType.T_ARMOR_OS_FERRO_LAMELLOR
+                            || armorTypeAtLoc2 == EquipmentType.T_ARMOR_OS_HEAVY_FERRO_LAMELLOR
+                            || armorTypeAtLoc2 == EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FERRO_LAMELLOR);
                 reflectiveArmor = (((entity instanceof Mek) || (entity instanceof Tank) || (entity instanceof Aero)) &&
-                      (entity.getArmorType(hit.getLocation()) == EquipmentType.T_ARMOR_REFLECTIVE)) ||
-                      (isBattleArmor &&
-                            (entity.getArmorType(hit.getLocation()) ==
-                                  EquipmentType.T_ARMOR_BA_REFLECTIVE));
+                      (armorTypeAtLoc2 == EquipmentType.T_ARMOR_REFLECTIVE)) ||
+                      (isBattleArmor && (armorTypeAtLoc2 == EquipmentType.T_ARMOR_BA_REFLECTIVE));
+                energyAbsorptionArmor = ((entity instanceof Mek) || (entity instanceof Tank)) &&
+                      (armorTypeAtLoc2 == EquipmentType.T_ARMOR_OS_ENERGY_ABSORPTION);
+                laserReflectiveArmor = ((entity instanceof Mek) || (entity instanceof Tank)) &&
+                      (armorTypeAtLoc2 == EquipmentType.T_ARMOR_OS_LASER_REFLECTIVE);
                 reactiveArmor = (((entity instanceof Mek) || (entity instanceof Tank) || (entity instanceof Aero)) &&
-                      (entity.getArmorType(hit.getLocation()) == EquipmentType.T_ARMOR_REACTIVE)) ||
-                      (isBattleArmor &&
-                            (entity.getArmorType(hit.getLocation()) == EquipmentType.T_ARMOR_BA_REACTIVE));
+                      (armorTypeAtLoc2 == EquipmentType.T_ARMOR_REACTIVE
+                            || armorTypeAtLoc2 == EquipmentType.T_ARMOR_OS_REACTIVE)) ||
+                      (isBattleArmor && (armorTypeAtLoc2 == EquipmentType.T_ARMOR_BA_REACTIVE));
+                impReactiveArmor = ((entity instanceof Mek) || (entity instanceof Tank)) &&
+                      (armorTypeAtLoc2 == EquipmentType.T_ARMOR_OS_IMP_REACTIVE);
                 ballisticArmor = ((entity instanceof Mek) || (entity instanceof Tank) || (entity instanceof Aero)) &&
-                      (entity.getArmorType(hit.getLocation()) ==
-                            EquipmentType.T_ARMOR_BALLISTIC_REINFORCED);
+                      (armorTypeAtLoc2 == EquipmentType.T_ARMOR_BALLISTIC_REINFORCED
+                            || armorTypeAtLoc2 == EquipmentType.T_ARMOR_OS_BALLISTIC_REINFORCED);
                 impactArmor = (entity instanceof Mek) &&
-                      (entity.getArmorType(hit.getLocation()) == EquipmentType.T_ARMOR_IMPACT_RESISTANT);
+                      (armorTypeAtLoc2 == EquipmentType.T_ARMOR_IMPACT_RESISTANT);
             }
             if (damageIS) {
                 wasDamageIS = true;

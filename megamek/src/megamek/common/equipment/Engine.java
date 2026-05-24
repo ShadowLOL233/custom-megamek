@@ -102,12 +102,22 @@ public class Engine implements Serializable, ITechnology {
     public static final int BATTERY = 11;
     public static final int SOLAR = 12;
     public static final int EXTERNAL = 13;
-    private static final int NUM_ENGINE_TYPES = 14;
+    // OS (custom faction) engine types
+    public static final int OS_STANDARD_ENGINE = 14;  // Advance Fusion Engine – same weight as Standard, THS/QHS compatible
+    public static final int OS_LIGHT_ENGINE = 15;     // Advance Light Fusion Engine – 65% weight, 2 side-torso crits
+    public static final int OS_XL_ENGINE = 16;        // Advance XL Fusion Engine – 45% weight, 3 side-torso crits
+    public static final int OS_XXL_ENGINE = 17;       // Advance XXL Fusion Engine – 30% weight, 4 side-torso crits, no extra heat
+    public static final int OS_COMPACT_ENGINE = 18;   // Advance Light Compact Engine – 135% weight, 3 CT crits
+    public static final int OS_SH_XL_ENGINE = 19;     // Experimental Superheavy XL – high-rating, 2 SH side-torso crits
+    public static final int OS_SH_XXL_ENGINE = 20;    // Experimental Superheavy XXL – high-rating, 2 SH side-torso crits
+    private static final int NUM_ENGINE_TYPES = 21;
 
     /** Keys for retrieving engine name from {@link Messages} */
     private static final String[] TYPE_KEYS = {
           "ICE", "Fusion", "XL", "XXL", "FuelCell", "Light", "Compact", "Fission", "None",
-          "MagLev", "Steam", "Battery", "Solar", "External"
+          "MagLev", "Steam", "Battery", "Solar", "External",
+          "LegionFusion", "LegionLight", "LegionXL", "LegionXXL", "LegionCompact",
+          "LegionSHXL", "LegionSHXXL"
     };
 
     // These are the SUPPORT VEHICLE ENGINE WEIGHT MULTIPLIERS from TM PG 127
@@ -251,7 +261,10 @@ public class Engine implements Serializable, ITechnology {
             return false;
         }
 
-        if ((((engineRating / 5) > ENGINE_RATINGS.length) || (engineRating < 0)) && !hasFlag(SUPPORT_VEE_ENGINE)) {
+        // Superheavy OS engines are allowed to exceed the normal rating table
+        boolean isOSSH = (engineType == OS_SH_XL_ENGINE || engineType == OS_SH_XXL_ENGINE);
+        if ((((engineRating / 5) > ENGINE_RATINGS.length) || (engineRating < 0))
+              && !hasFlag(SUPPORT_VEE_ENGINE) && !isOSSH) {
             problem.append("Rating:").append(engineRating);
             return false;
         }
@@ -287,6 +300,29 @@ public class Engine implements Serializable, ITechnology {
                     return false;
                 }
                 break;
+            // OS engine types – only valid without CLAN_ENGINE flag
+            case OS_STANDARD_ENGINE:
+            case OS_LIGHT_ENGINE:
+            case OS_XL_ENGINE:
+            case OS_XXL_ENGINE:
+                if (hasFlag(CLAN_ENGINE)) {
+                    problem.append(Messages.getString("Engine.invalidSphereOnly"));
+                    return false;
+                }
+                break;
+            case OS_COMPACT_ENGINE:
+                if (hasFlag(CLAN_ENGINE) || hasFlag(LARGE_ENGINE)) {
+                    problem.append(Messages.getString("Engine.invalidCompactLarge"));
+                    return false;
+                }
+                break;
+            case OS_SH_XL_ENGINE:
+            case OS_SH_XXL_ENGINE:
+                if (hasFlag(CLAN_ENGINE)) {
+                    problem.append(Messages.getString("Engine.invalidSphereOnly"));
+                    return false;
+                }
+                break;
             default:
                 problem.append("Type:").append(engineType);
                 return false;
@@ -303,13 +339,34 @@ public class Engine implements Serializable, ITechnology {
      * @return the type of the engine.
      */
     public static int getEngineTypeByString(String type) {
-        if (type.toLowerCase().contains("xxl")) {
+        String lower = type.toLowerCase();
+        // OS engine checks must precede standard checks (names contain "xl", "light", etc.).
+        // Handles both the full "advance" keyword and the abbreviated "adv." used in saved MTF files.
+        if (lower.contains("legion") || lower.contains("adv.")) {
+            if (lower.contains("superhvy xxl") || lower.contains("experimental superheavy xxl")) {
+                return OS_SH_XXL_ENGINE;
+            } else if (lower.contains("superhvy xl") || lower.contains("experimental superheavy xl")) {
+                return OS_SH_XL_ENGINE;
+            } else if (lower.contains("adv. light compact") || lower.contains("advance light compact")) {
+                return OS_COMPACT_ENGINE;
+            } else if (lower.contains("adv. xxl") || lower.contains("advance xxl")) {
+                return OS_XXL_ENGINE;
+            } else if (lower.contains("adv. xl") || lower.contains("advance xl")) {
+                return OS_XL_ENGINE;
+            } else if (lower.contains("adv. light") || lower.contains("advance light")) {
+                return OS_LIGHT_ENGINE;
+            } else {
+                // "adv. fusion", "advance fusion", or bare "advance"/"adv." → standard OS engine
+                return OS_STANDARD_ENGINE;
+            }
+        }
+        if (lower.contains("xxl")) {
             return XXL_ENGINE;
-        } else if (type.toLowerCase().contains("xl")) {
+        } else if (lower.contains("xl")) {
             return XL_ENGINE;
-        } else if (type.toLowerCase().contains("light")) {
+        } else if (lower.contains("light")) {
             return LIGHT_ENGINE;
-        } else if (type.toLowerCase().contains("compact")) {
+        } else if (lower.contains("compact")) {
             return COMPACT_ENGINE;
         } else if (type.toLowerCase().contains("ice")) {
             return COMBUSTION_ENGINE;
@@ -384,7 +441,19 @@ public class Engine implements Serializable, ITechnology {
             return roundWeight.round(engineRating * 0.025, entity);
         }
 
-        double weight = ENGINE_RATINGS[(int) Math.ceil(engineRating / 5.0)];
+        // OS Superheavy engines use a quadratic formula anchored at ENGINE_RATINGS[80]
+        // (rating 400, 49.0 tons) — the practical ceiling for standard 100-ton assault mechs.
+        // This gives continuous weight at rating 400 and reasonable scaling up to rating 800.
+        // Formula: base = ENGINE_RATINGS[80] × (rating / 400)²
+        double baseRatingWeight;
+        if (engineType == OS_SH_XL_ENGINE || engineType == OS_SH_XXL_ENGINE) {
+            double ratingRatio = engineRating / 400.0;
+            baseRatingWeight = ENGINE_RATINGS[80] * ratingRatio * ratingRatio;
+        } else {
+            int idx = Math.min(100, (int) Math.ceil(engineRating / 5.0));
+            baseRatingWeight = ENGINE_RATINGS[idx];
+        }
+        double weight = baseRatingWeight;
         switch (engineType) {
             case COMBUSTION_ENGINE:
                 weight *= 2.0;
@@ -412,6 +481,27 @@ public class Engine implements Serializable, ITechnology {
                 break;
             case NONE:
                 return 0;
+            // OS engines
+            case OS_STANDARD_ENGINE:
+                break; // ×1.0, same as Standard Fusion
+            case OS_LIGHT_ENGINE:
+                weight *= 0.65;
+                break;
+            case OS_XL_ENGINE:
+                weight *= 0.45;
+                break;
+            case OS_XXL_ENGINE:
+                weight *= 0.30;
+                break;
+            case OS_COMPACT_ENGINE:
+                weight *= 1.35;
+                break;
+            case OS_SH_XL_ENGINE:
+                weight *= 0.45;  // same multiplier as Advance XL
+                break;
+            case OS_SH_XXL_ENGINE:
+                weight *= 0.30;  // same multiplier as Advance XXL
+                break;
         }
         weight = roundWeight.round(weight, entity);
 
@@ -529,6 +619,13 @@ public class Engine implements Serializable, ITechnology {
         result.put(BATTERY, getEngineTypeName(BATTERY));
         result.put(SOLAR, getEngineTypeName(SOLAR));
         result.put(EXTERNAL, getEngineTypeName(EXTERNAL));
+        result.put(OS_STANDARD_ENGINE, getEngineTypeName(OS_STANDARD_ENGINE));
+        result.put(OS_LIGHT_ENGINE, getEngineTypeName(OS_LIGHT_ENGINE));
+        result.put(OS_XL_ENGINE, getEngineTypeName(OS_XL_ENGINE));
+        result.put(OS_XXL_ENGINE, getEngineTypeName(OS_XXL_ENGINE));
+        result.put(OS_COMPACT_ENGINE, getEngineTypeName(OS_COMPACT_ENGINE));
+        result.put(OS_SH_XL_ENGINE, getEngineTypeName(OS_SH_XL_ENGINE));
+        result.put(OS_SH_XXL_ENGINE, getEngineTypeName(OS_SH_XXL_ENGINE));
 
         return result;
     }
@@ -572,7 +669,7 @@ public class Engine implements Serializable, ITechnology {
      * @return The slots taken up by the engine in the center torso.
      */
     public int[] getCenterTorsoCriticalSlots(int gyroType) {
-        if (engineType == COMPACT_ENGINE) {
+        if (engineType == COMPACT_ENGINE || engineType == OS_COMPACT_ENGINE) {
             int[] slots;
             if (hasFlag(SUPERHEAVY_ENGINE)) {
                 slots = new int[] { 0, 1 };
@@ -663,6 +760,17 @@ public class Engine implements Serializable, ITechnology {
                 slots = new int[] { 0, 1, 2, 3, 4, 5 };
             }
             return slots;
+        // OS engine side-torso crits
+        } else if (engineType == OS_LIGHT_ENGINE) {
+            return hasFlag(SUPERHEAVY_ENGINE) ? new int[] { 0 } : new int[] { 0, 1 };
+        } else if (engineType == OS_XL_ENGINE) {
+            return hasFlag(SUPERHEAVY_ENGINE) ? new int[] { 0, 1 } : new int[] { 0, 1, 2 };
+        } else if (engineType == OS_XXL_ENGINE) {
+            return hasFlag(SUPERHEAVY_ENGINE) ? new int[] { 0, 1 } : new int[] { 0, 1, 2, 3 };
+        } else if (engineType == OS_SH_XL_ENGINE) {
+            return new int[] { 0, 1 };        // 2 side-torso crits
+        } else if (engineType == OS_SH_XXL_ENGINE) {
+            return new int[] { 0, 1, 2 };     // 3 side-torso crits
         } else {
             return new int[] {};
         }
@@ -746,6 +854,14 @@ public class Engine implements Serializable, ITechnology {
             case LIGHT_ENGINE -> 15000;
             case FUEL_CELL -> 3500;
             case FISSION -> 7500;
+            // OS engine costs
+            case OS_STANDARD_ENGINE -> 5000;
+            case OS_LIGHT_ENGINE -> 15000;
+            case OS_XL_ENGINE -> 20000;
+            case OS_XXL_ENGINE -> 100000;
+            case OS_COMPACT_ENGINE -> 10000;
+            case OS_SH_XL_ENGINE -> 25000;
+            case OS_SH_XXL_ENGINE -> 120000;
             default -> 0;
         };
         if (hasFlag(LARGE_ENGINE)) {
@@ -964,6 +1080,50 @@ public class Engine implements Serializable, ITechnology {
           .setTechRating(TechRating.B)
           .setAvailability(AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.C, AvailabilityValue.C);
 
+    // OS engine tech advancements
+    // OS_STANDARD uses STANDARD tech level so it remains available when the tech level filter is "Standard"
+    private static final TechAdvancement OS_STANDARD_TA = new TechAdvancement(TechBase.OUTER_SPHERE)
+          .setISAdvancement(2840, 2850, 2865)
+          .setTechRating(TechRating.E)
+          .setAvailability(AvailabilityValue.F, AvailabilityValue.C, AvailabilityValue.B, AvailabilityValue.B)
+          .setStaticTechLevel(SimpleTechLevel.STANDARD);
+
+    private static final TechAdvancement OS_LIGHT_TA = new TechAdvancement(TechBase.OUTER_SPHERE)
+          .setISAdvancement(2855, 2865, 2870)
+          .setTechRating(TechRating.E)
+          .setAvailability(AvailabilityValue.F, AvailabilityValue.C, AvailabilityValue.B, AvailabilityValue.B)
+          .setStaticTechLevel(SimpleTechLevel.STANDARD);
+
+    private static final TechAdvancement OS_XL_TA = new TechAdvancement(TechBase.OUTER_SPHERE)
+          .setISAdvancement(2860, 2865, 2875)
+          .setTechRating(TechRating.E)
+          .setAvailability(AvailabilityValue.F, AvailabilityValue.C, AvailabilityValue.B, AvailabilityValue.B)
+          .setStaticTechLevel(SimpleTechLevel.STANDARD);
+
+    private static final TechAdvancement OS_XXL_TA = new TechAdvancement(TechBase.OUTER_SPHERE)
+          .setISAdvancement(2895, 2905, 2930)
+          .setTechRating(TechRating.F)
+          .setAvailability(AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C)
+          .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+
+    private static final TechAdvancement OS_COMPACT_TA = new TechAdvancement(TechBase.OUTER_SPHERE)
+          .setISAdvancement(2860, 2865, 2870)
+          .setTechRating(TechRating.E)
+          .setAvailability(AvailabilityValue.F, AvailabilityValue.C, AvailabilityValue.B, AvailabilityValue.B)
+          .setStaticTechLevel(SimpleTechLevel.STANDARD);
+
+    private static final TechAdvancement OS_SH_XL_TA = new TechAdvancement(TechBase.OUTER_SPHERE)
+          .setISAdvancement(3000, 3020, 3045)
+          .setTechRating(TechRating.F)
+          .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
+          .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+
+    private static final TechAdvancement OS_SH_XXL_TA = new TechAdvancement(TechBase.OUTER_SPHERE)
+          .setISAdvancement(3050, 3065, 3075)
+          .setTechRating(TechRating.F)
+          .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
+          .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+
     public TechAdvancement getTechAdvancement() {
         switch (engineType) {
             case COMBUSTION_ENGINE:
@@ -1046,6 +1206,20 @@ public class Engine implements Serializable, ITechnology {
                 return SUPPORT_NONE_TA;
             case EXTERNAL:
                 return SUPPORT_EXTERNAL_TA;
+            case OS_STANDARD_ENGINE:
+                return OS_STANDARD_TA;
+            case OS_LIGHT_ENGINE:
+                return OS_LIGHT_TA;
+            case OS_XL_ENGINE:
+                return OS_XL_TA;
+            case OS_XXL_ENGINE:
+                return OS_XXL_TA;
+            case OS_COMPACT_ENGINE:
+                return OS_COMPACT_TA;
+            case OS_SH_XL_ENGINE:
+                return OS_SH_XL_TA;
+            case OS_SH_XXL_ENGINE:
+                return OS_SH_XXL_TA;
             default:
                 return new TechAdvancement();
         }
@@ -1239,6 +1413,28 @@ public class Engine implements Serializable, ITechnology {
                     } else {
                         return TechConstants.T_IS_TW_NON_BOX;
                     }
+                }
+            // OS engine types — year-based tech level using OS constants
+            case OS_STANDARD_ENGINE:
+            case OS_LIGHT_ENGINE:
+            case OS_XL_ENGINE:
+            case OS_COMPACT_ENGINE:
+                if (year < 2800) {
+                    return TechConstants.T_OUTER_SPHERE_UNOFFICIAL;
+                } else if (year < 2900) {
+                    return TechConstants.T_OUTER_SPHERE_ADVANCED;
+                } else {
+                    return TechConstants.T_OUTER_SPHERE_ADVANCED;
+                }
+            case OS_XXL_ENGINE:
+            case OS_SH_XL_ENGINE:
+            case OS_SH_XXL_ENGINE:
+                if (year < 2800) {
+                    return TechConstants.T_OUTER_SPHERE_UNOFFICIAL;
+                } else if (year < 2900) {
+                    return TechConstants.T_OUTER_SPHERE_EXPERIMENTAL;
+                } else {
+                    return TechConstants.T_OUTER_SPHERE_EXPERIMENTAL;
                 }
             default:
                 return TechConstants.T_TECH_UNKNOWN;

@@ -58,6 +58,16 @@ public interface ITechnology {
 
     boolean isMixedTech();
 
+    /** @return true if this technology belongs to the OS tech base. */
+    default boolean isOuterSphere() {
+        return getTechBase() == TechBase.OUTER_SPHERE;
+    }
+
+    /** @return true if this technology belongs to the Ascended tech base. */
+    default boolean isAscended() {
+        return getTechBase() == TechBase.ASCENDED;
+    }
+
     TechBase getTechBase();
 
     int getIntroductionDate();

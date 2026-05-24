@@ -38,7 +38,7 @@ import java.util.Map;
 
 // --- Tech Base Enum ---
 public enum TechBase {
-    UNKNOWN(-1), ALL(0), IS(1), CLAN(2);
+    UNKNOWN(-1), ALL(0), IS(1), CLAN(2), OUTER_SPHERE(3), ASCENDED(4);
 
     private final int index;
     private static final Map<Integer, TechBase> INDEX_LOOKUP = new HashMap<>();

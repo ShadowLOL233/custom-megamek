@@ -1110,6 +1110,11 @@ public final class UnitToolTip {
                 }
 
                 currentWp.isClan = wpT.isClan();
+                // Mechanic hint for novel weapons whose behaviour isn't obvious from the
+                // mode name alone (Rotary PPC's coolant-consumption + overload model).
+                if (wpT.hasFlag(WeaponType.F_PPC_ROTARY)) {
+                    currentWp.specialNote = Messages.getString("BoardView1.Tooltip.RotaryPPCNote");
+                }
                 wpInfos.put(weaponDesc, currentWp);
 
                 // Add ammo info if the weapon has ammo
@@ -1307,7 +1312,28 @@ public final class UnitToolTip {
         col2 = UIUtil.tag("TD", "", col2);
         row = UIUtil.tag("TR", "", col1 + col2);
 
-        return new StringBuilder().append(row);
+        StringBuilder rows = new StringBuilder(row);
+
+        // Mechanic hint sub-row for weapons with non-obvious behaviour (see WeaponInfo).
+        // Rendered as an indented dimmer-colour line beneath the main weapon row so it
+        // visually subordinates and doesn't crowd the main weapon list.
+        if (currentEquip.specialNote != null && !currentEquip.specialNote.isEmpty()) {
+            String noteCol1 = "&nbsp;";
+            noteCol1 = UIUtil.tag("span", fontSizeAttr, noteCol1);
+            noteCol1 = UIUtil.tag("TD", "", noteCol1);
+
+            String noteCol2 = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ " + currentEquip.specialNote;
+            String noteAttr = String.format("FACE=Dialog COLOR=%s",
+                  UIUtil.toColorHexString(GUIP.getCautionColor()));
+            noteCol2 = UIUtil.tag("FONT", noteAttr, noteCol2);
+            noteCol2 = UIUtil.tag("I", "", noteCol2);
+            noteCol2 = UIUtil.tag("span", fontSizeAttr, noteCol2);
+            noteCol2 = UIUtil.tag("TD", "", noteCol2);
+
+            rows.append(UIUtil.tag("TR", "", noteCol1 + noteCol2));
+        }
+
+        return rows;
     }
 
     /** Returns the ammo line(s) for the ammo of one weapon type. */

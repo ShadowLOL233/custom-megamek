@@ -128,17 +128,39 @@ public class EquipmentTypeLookup {
     public static final String IS_DOUBLE_HS_PROTOTYPE = "ISDoubleHeatSinkPrototype";
     @EquipmentName
     public static final String IS_DOUBLE_HS_FREEZER = "ISDoubleHeatSinkFreezer";
+    @EquipmentName
+    public static final String OS_IMPROVED_DOUBLE_HS = "OSImprovedDoubleHeatSink";
+    @EquipmentName
+    public static final String OS_TRIPLE_HS = "OSTripleHeatSink";
+    @EquipmentName
+    public static final String OS_QUAD_HS = "OSQuadrupleHeatSink";
 
     @EquipmentName
     public static final String HITCH = "Hitch";
     @EquipmentName
     public static final String CLAN_CASE = "CLCASE";
     @EquipmentName
+    public static final String OS_CASE = "OSCASE";
+    @EquipmentName
+    public static final String OS_EARS = "OSEARS";
+    @EquipmentName
+    public static final String OS_EARS_COMPONENT = "OSEARSComponent";
+    @EquipmentName
+    public static final String OS_DDS = "OSDDS";
+    @EquipmentName
+    public static final String OS_DDS_COMPONENT = "OSDDSComponent";
+    @EquipmentName
+    public static final String OS_PFD = "OSPFD";
+    @EquipmentName
+    public static final String OS_ADV_PFD = "OSAdvPFD";
+    @EquipmentName
     public static final String IS_CASE = "ISCASE";
     @EquipmentName
     public static final String IS_CASE_P = "ISCASEPrototype";
     @EquipmentName
     public static final String COOLANT_POD = "Coolant Pod";
+    @EquipmentName
+    public static final String OS_PPC_COOLANT_POD = "OSPPCCoolantPod";
     @EquipmentName
     public static final String MEK_TRACKS = "Tracks";
     @EquipmentName

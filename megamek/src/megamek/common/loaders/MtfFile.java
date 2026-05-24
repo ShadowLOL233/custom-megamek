@@ -165,6 +165,8 @@ public class MtfFile implements IMekLoader {
     public static final String HS_DOUBLE = "Double";
     public static final String HS_LASER = "Laser";
     public static final String HS_COMPACT = "Compact";
+    public static final String HS_TRIPLE = "Triple";
+    public static final String HS_QUAD = "Quad";
     public static final String TECH_BASE_IS = "IS";
     public static final String TECH_BASE_CLAN = "Clan";
     public static final String WALK_MP = "walk mp:";
@@ -333,6 +335,8 @@ public class MtfFile implements IMekLoader {
             boolean dblSinks = heatSinks.contains(HS_DOUBLE);
             boolean laserSinks = heatSinks.contains(HS_LASER);
             boolean compactSinks = heatSinks.contains(HS_COMPACT);
+            boolean tripleSinks = heatSinks.contains(HS_TRIPLE);
+            boolean quadSinks = heatSinks.contains(HS_QUAD);
             int expectedSinks = Integer.parseInt(heatSinks.substring(11, 13).trim());
             int baseHeatSinks = Integer
                   .parseInt(baseChassisHeatSinks.substring("base chassis heat sinks:".length()).trim());
@@ -388,7 +392,9 @@ public class MtfFile implements IMekLoader {
                                   "Unsupported tech level: " + rulesLevel.substring(12).trim());
                     }
                 }
-                thisArmorType = thisArmorType.substring(0, thisArmorType.indexOf('(')).trim();
+                // Use lastIndexOf so that OS armor names like "Imp. Hardened (OS)(IS Advanced)"
+                // only have the trailing tech-level parenthesis stripped, preserving the OS suffix.
+                thisArmorType = thisArmorType.substring(0, thisArmorType.lastIndexOf('(')).trim();
                 mek.setArmorType(thisArmorType);
             } else if (!thisArmorType.equals(EquipmentType.getArmorTypeName(EquipmentType.T_ARMOR_PATCHWORK))) {
                 mek.setArmorTechLevel(mek.getTechLevel());
@@ -481,7 +487,11 @@ public class MtfFile implements IMekLoader {
             }
 
             // add any heat sinks not allocated
-            if (laserSinks) {
+            if (quadSinks) {
+                mek.addEngineSinks(expectedSinks - mek.heatSinks(), MiscType.F_QUAD_HEAT_SINK);
+            } else if (tripleSinks) {
+                mek.addEngineSinks(expectedSinks - mek.heatSinks(), MiscType.F_TRIPLE_HEAT_SINK);
+            } else if (laserSinks) {
                 mek.addEngineSinks(expectedSinks - mek.heatSinks(), MiscType.F_LASER_HEAT_SINK);
             } else if (dblSinks) {
                 // If the heat sink entry didn't specify Clan or IS double, check for sinks that
@@ -565,9 +575,13 @@ public class MtfFile implements IMekLoader {
 
     private String isClan(int x) {
         boolean clan = armorValues[x].contains("Clan");
+        // Use lastIndexOf so OS armor names like "Imp. Hardened (OS)(IS Advanced)"
+        // strip only the trailing tech-level parenthesis, preserving the OS suffix.
         String armorName = armorValues[x].substring(armorValues[x].indexOf(':') + 1,
-              armorValues[x].indexOf('('));
-        if (!armorName.contains("Clan") && !armorName.contains("IS")) {
+              armorValues[x].lastIndexOf('(')).trim();
+        // Outer Sphere (OS) armor doesn't take an IS/Clan prefix.
+        boolean isOuterSphereArmor = armorName.endsWith(" (OS)") || armorName.startsWith("OS ");
+        if (!isOuterSphereArmor && !armorName.contains("Clan") && !armorName.contains("IS")) {
             if (clan) {
                 armorName = "Clan " + armorName;
             } else {
@@ -737,6 +751,87 @@ public class MtfFile implements IMekLoader {
                     throw new EntityLoadingException("Unsupported tech level: " + rulesLevel.substring(12).trim());
             }
             mek.setMixedTech(true);
+        } else if (techBase.equalsIgnoreCase("OS")) {
+            switch (Integer.parseInt(rulesLevel.substring(12).trim())) {
+                case 1:
+                    mek.setTechLevel(TechConstants.T_OUTER_SPHERE_INTRO);
+                    break;
+                case 2:
+                    mek.setTechLevel(TechConstants.T_OUTER_SPHERE_STANDARD);
+                    break;
+                case 3:
+                    mek.setTechLevel(TechConstants.T_OUTER_SPHERE_ADVANCED);
+                    break;
+                case 4:
+                    mek.setTechLevel(TechConstants.T_OUTER_SPHERE_EXPERIMENTAL);
+                    break;
+                case 5:
+                    mek.setTechLevel(TechConstants.T_OUTER_SPHERE_UNOFFICIAL);
+                    break;
+                default:
+                    throw new EntityLoadingException("Unsupported tech level: " + rulesLevel.substring(12).trim());
+            }
+        } else if (techBase.equalsIgnoreCase("Mixed (OS Chassis)")) {
+            switch (Integer.parseInt(rulesLevel.substring(12).trim())) {
+                case 2:
+                    mek.setTechLevel(TechConstants.T_OUTER_SPHERE_STANDARD);
+                    break;
+                case 3:
+                    mek.setTechLevel(TechConstants.T_OUTER_SPHERE_ADVANCED);
+                    break;
+                case 4:
+                    mek.setTechLevel(TechConstants.T_OUTER_SPHERE_EXPERIMENTAL);
+                    break;
+                case 5:
+                    mek.setTechLevel(TechConstants.T_OUTER_SPHERE_UNOFFICIAL);
+                    break;
+                default:
+                    throw new EntityLoadingException("Unsupported tech level: " + rulesLevel.substring(12).trim());
+            }
+            mek.setMixedTech(true);
+        } else if (techBase.toLowerCase().startsWith("legion")) {
+            // Fallback: handle any legacy "Legion_Standard", "Legion_Advanced" etc. format
+            switch (Integer.parseInt(rulesLevel.substring(12).trim())) {
+                case 1: mek.setTechLevel(TechConstants.T_OUTER_SPHERE_INTRO); break;
+                case 2: mek.setTechLevel(TechConstants.T_OUTER_SPHERE_STANDARD); break;
+                case 3: mek.setTechLevel(TechConstants.T_OUTER_SPHERE_ADVANCED); break;
+                case 4: mek.setTechLevel(TechConstants.T_OUTER_SPHERE_EXPERIMENTAL); break;
+                case 5: mek.setTechLevel(TechConstants.T_OUTER_SPHERE_UNOFFICIAL); break;
+                default:
+                    throw new EntityLoadingException("Unsupported tech level: " + rulesLevel.substring(12).trim());
+            }
+        } else if (techBase.equalsIgnoreCase("Ascended")) {
+            // Ascended is pure tech base — no Mixed variant supported.
+            switch (Integer.parseInt(rulesLevel.substring(12).trim())) {
+                case 1:
+                    mek.setTechLevel(TechConstants.T_ASCENDED_INTRO);
+                    break;
+                case 2:
+                    mek.setTechLevel(TechConstants.T_ASCENDED_STANDARD);
+                    break;
+                case 3:
+                    mek.setTechLevel(TechConstants.T_ASCENDED_ADVANCED);
+                    break;
+                case 4:
+                    mek.setTechLevel(TechConstants.T_ASCENDED_EXPERIMENTAL);
+                    break;
+                case 5:
+                    mek.setTechLevel(TechConstants.T_ASCENDED_UNOFFICIAL);
+                    break;
+                default:
+                    throw new EntityLoadingException("Unsupported tech level: " + rulesLevel.substring(12).trim());
+            }
+        } else if (techBase.toLowerCase().startsWith("ascended")) {
+            // Fallback: handle any legacy "Ascended_Standard", "Ascended_Advanced" etc. format
+            switch (Integer.parseInt(rulesLevel.substring(12).trim())) {
+                case 1: mek.setTechLevel(TechConstants.T_ASCENDED_INTRO); break;
+                case 2: mek.setTechLevel(TechConstants.T_ASCENDED_STANDARD); break;
+                case 3: mek.setTechLevel(TechConstants.T_ASCENDED_ADVANCED); break;
+                case 4: mek.setTechLevel(TechConstants.T_ASCENDED_EXPERIMENTAL); break;
+                case 5: mek.setTechLevel(TechConstants.T_ASCENDED_UNOFFICIAL); break;
+                default:
+                    throw new EntityLoadingException("Unsupported tech level: " + rulesLevel.substring(12).trim());
+            }
         } else if (techBase.equalsIgnoreCase("Mixed")) {
             throw new EntityLoadingException(
                   "Unsupported tech base: \"Mixed\" is no longer allowed by itself.  You must specify \"Mixed (IS Chassis)\" or \"Mixed (Clan Chassis)\".");

@@ -303,6 +303,14 @@ public abstract class Mek extends Entity {
     // QuadVees, LAMs, and tracked 'Meks can change movement mode.
     protected EntityMovementMode originalMovementMode = EntityMovementMode.BIPED;
 
+    // OS EARS (Emergency Armor Repair System) state
+    private int earsCharges = 5;
+    // OS DDS (Damage Distribution System) state
+    private int ddsCharges = 8;
+    // Per-location damage tracking for EARS trigger B (15+ to a single location)
+    // Entity.damageThisRound already tracks total round damage for EARS trigger A
+    private int[] locationDamageThisRound = new int[0]; // sized in constructor
+
     /**
      * Construct a new, blank, Mek.
      */
@@ -320,6 +328,7 @@ public abstract class Mek extends Entity {
         orig_rearArmor = new int[locations()];
         rearHardenedArmorDamaged = new boolean[locations()];
         armorDamagedThisTurn = new boolean[locations()];
+        locationDamageThisRound = new int[locations()];
 
         for (int i = 0; i < locations(); i++) {
             if (!hasRearArmor(i)) {
@@ -603,6 +612,9 @@ public abstract class Mek extends Entity {
         for (int loc = 0; loc < locations(); ++loc) {
             setArmorDamagedThisTurn(loc, false);
         }
+
+        // Reset per-location damage tracking for EARS
+        clearLocationDamageTracking();
     } // End public void newRound()
 
     /**
@@ -740,6 +752,89 @@ public abstract class Mek extends Entity {
      */
     public boolean hasReinforcedStructure() {
         return (getStructureType() == EquipmentType.T_STRUCTURE_REINFORCED);
+    }
+
+    /** does this Mek have OS Reinforce Composite structure? (x1.5 IS damage) */
+    public boolean hasOSReinforceCompositeStructure() {
+        return (getStructureType() == EquipmentType.T_STRUCTURE_OS_REINFORCE_COMPOSITE);
+    }
+
+    /**
+     * does this Mek have a OS Reinforce-type structure (grants -1 crit roll modifier)?
+     */
+    public boolean hasOSReinforceStructure() {
+        int st = getStructureType();
+        return st == EquipmentType.T_STRUCTURE_OS_IMP_REINFORCE
+              || st == EquipmentType.T_STRUCTURE_OS_REINFORCE_ENDO_STEEL
+              || st == EquipmentType.T_STRUCTURE_OS_IMP_REINFORCE_ENDO_STEEL
+              || st == EquipmentType.T_STRUCTURE_OS_ADV_REINFORCE_ENDO_STEEL
+              || st == EquipmentType.T_STRUCTURE_OS_SH_REINFORCE
+              || st == EquipmentType.T_STRUCTURE_OS_SH_REINFORCE_ENDO_STEEL
+              || st == EquipmentType.T_STRUCTURE_OS_SH_REINFORCE_ENDO_COMPOSITE
+              || st == EquipmentType.T_STRUCTURE_OS_REINFORCE_HEAVY_DUTY
+              || st == EquipmentType.T_STRUCTURE_OS_REINFORCE_HEAVY_DUTY_ENDO_STEEL
+              || st == EquipmentType.T_STRUCTURE_OS_SH_REINFORCE_HEAVY_DUTY
+              || st == EquipmentType.T_STRUCTURE_OS_SH_REINFORCE_HEAVY_DUTY_ENDO_STEEL;
+    }
+
+    /**
+     * Returns the HP multiplier for OS internal structure types.
+     * 1.0 = no change (standard HP), >1.0 = boosted HP.
+     */
+    public double getOSStructureHpMultiplier() {
+        return switch (getStructureType()) {
+            case EquipmentType.T_STRUCTURE_OS_IMP_REINFORCE -> 2.0;
+            case EquipmentType.T_STRUCTURE_OS_REINFORCE_COMPOSITE -> 1.5;
+            case EquipmentType.T_STRUCTURE_OS_REINFORCE_ENDO_STEEL -> 1.5;
+            case EquipmentType.T_STRUCTURE_OS_IMP_REINFORCE_ENDO_STEEL -> 1.5;
+            case EquipmentType.T_STRUCTURE_OS_ADV_REINFORCE_ENDO_STEEL -> 1.5;
+            case EquipmentType.T_STRUCTURE_OS_HEAVY_DUTY -> 1.2;
+            case EquipmentType.T_STRUCTURE_OS_HEAVY_DUTY_ENDO_STEEL -> 1.2;
+            case EquipmentType.T_STRUCTURE_OS_SH_DUTY_ENDO_STEEL -> 1.25;
+            case EquipmentType.T_STRUCTURE_OS_SH_REINFORCE -> 2.0;
+            case EquipmentType.T_STRUCTURE_OS_SH_REINFORCE_ENDO_STEEL -> 1.75;
+            case EquipmentType.T_STRUCTURE_OS_SH_REINFORCE_ENDO_COMPOSITE -> 1.75;
+            case EquipmentType.T_STRUCTURE_OS_REINFORCE_HEAVY_DUTY -> 1.75;
+            case EquipmentType.T_STRUCTURE_OS_REINFORCE_HEAVY_DUTY_ENDO_STEEL -> 1.75;
+            case EquipmentType.T_STRUCTURE_OS_SH_REINFORCE_HEAVY_DUTY -> 1.75;
+            case EquipmentType.T_STRUCTURE_OS_SH_REINFORCE_HEAVY_DUTY_ENDO_STEEL -> 1.75;
+            default -> 1.0;
+        };
+    }
+
+    /**
+     * Returns the armor capacity bonus fraction for this mek's OS IS type.
+     * Only Heavy Duty variants (including Reinforce Heavy Duty) grant extra armor.
+     * All other OS IS types return 0.0 (same armor cap as standard IS).
+     */
+    public double getOSArmorBonus() {
+        return switch (getStructureType()) {
+            case EquipmentType.T_STRUCTURE_OS_HEAVY_DUTY,
+                 EquipmentType.T_STRUCTURE_OS_HEAVY_DUTY_ENDO_STEEL -> 0.20;
+            case EquipmentType.T_STRUCTURE_OS_SH_DUTY_ENDO_STEEL -> 0.25;
+            case EquipmentType.T_STRUCTURE_OS_REINFORCE_HEAVY_DUTY,
+                 EquipmentType.T_STRUCTURE_OS_REINFORCE_HEAVY_DUTY_ENDO_STEEL -> 0.15;
+            case EquipmentType.T_STRUCTURE_OS_SH_REINFORCE_HEAVY_DUTY,
+                 EquipmentType.T_STRUCTURE_OS_SH_REINFORCE_HEAVY_DUTY_ENDO_STEEL -> 0.20;
+            default -> 0.0;
+        };
+    }
+
+    /**
+     * Returns the base (pre-OS-HP-multiplier) internal structure value for a location.
+     * Uses floor division since the multiplied value is ceil(base * mult), so
+     * floor(ceil(base * mult) / mult) == base for all mult >= 1.0.
+     */
+    public int getBaseInternal(int loc) {
+        double mult = getOSStructureHpMultiplier();
+        if (mult == 1.0) {
+            return getOInternal(loc);
+        }
+        // REINFORCE_COMPOSITE uses floor(base * 1.5); recovery requires round() to invert
+        if (getStructureType() == EquipmentType.T_STRUCTURE_OS_REINFORCE_COMPOSITE) {
+            return (int) Math.round(getOInternal(loc) / mult);
+        }
+        return (int) (getOInternal(loc) / mult);
     }
 
     /**
@@ -1357,6 +1452,10 @@ public abstract class Mek extends Entity {
             addEngineSinks(totalSinks, EquipmentTypeLookup.COMPACT_HS_1);
         } else if (heatSinkFlag == MiscType.F_LASER_HEAT_SINK) {
             addEngineSinks(totalSinks, EquipmentTypeLookup.LASER_HS);
+        } else if (heatSinkFlag == MiscType.F_TRIPLE_HEAT_SINK) {
+            addEngineSinks(totalSinks, EquipmentTypeLookup.OS_TRIPLE_HS);
+        } else if (heatSinkFlag == MiscType.F_QUAD_HEAT_SINK) {
+            addEngineSinks(totalSinks, EquipmentTypeLookup.OS_QUAD_HS);
         } else {
             addEngineSinks(totalSinks, EquipmentTypeLookup.SINGLE_HS);
         }
@@ -1466,6 +1565,8 @@ public abstract class Mek extends Entity {
                 sinks += 2;
             } else if (etype.hasFlag(MiscType.F_HEAT_SINK)
                   || etype.hasFlag(MiscType.F_DOUBLE_HEAT_SINK)
+                  || etype.hasFlag(MiscType.F_TRIPLE_HEAT_SINK)
+                  || etype.hasFlag(MiscType.F_QUAD_HEAT_SINK)
                   || (etype.hasFlag(MiscType.F_IS_DOUBLE_HEAT_SINK_PROTOTYPE) && countPrototypes)) {
                 sinks++;
             }
@@ -1489,6 +1590,8 @@ public abstract class Mek extends Entity {
                 sinks += 2;
             } else if (etype.hasFlag(MiscType.F_HEAT_SINK)
                   || etype.hasFlag(MiscType.F_DOUBLE_HEAT_SINK)
+                  || etype.hasFlag(MiscType.F_TRIPLE_HEAT_SINK)
+                  || etype.hasFlag(MiscType.F_QUAD_HEAT_SINK)
                   || etype.hasFlag(MiscType.F_IS_DOUBLE_HEAT_SINK_PROTOTYPE)) {
                 sinks++;
             }
@@ -1507,7 +1610,9 @@ public abstract class Mek extends Entity {
             }
             if (m.getType().hasFlag(MiscType.F_HEAT_SINK)
                   || m.getType().hasFlag(MiscType.F_DOUBLE_HEAT_SINK)
-                  || m.getType().hasFlag(MiscType.F_LASER_HEAT_SINK)) {
+                  || m.getType().hasFlag(MiscType.F_LASER_HEAT_SINK)
+                  || m.getType().hasFlag(MiscType.F_TRIPLE_HEAT_SINK)
+                  || m.getType().hasFlag(MiscType.F_QUAD_HEAT_SINK)) {
                 return m.getName();
             }
         }
@@ -1552,6 +1657,14 @@ public abstract class Mek extends Entity {
                   MiscType.F_IS_DOUBLE_HEAT_SINK_PROTOTYPE)) {
                 capacity += 2;
                 isDoubleHeatSink = true;
+            } else if ((activeCount > 0)
+                  && mounted.getType().hasFlag(MiscType.F_TRIPLE_HEAT_SINK)) {
+                activeCount--;
+                capacity += 3;
+            } else if ((activeCount > 0)
+                  && mounted.getType().hasFlag(MiscType.F_QUAD_HEAT_SINK)) {
+                activeCount--;
+                capacity += 4;
             } else if (includePartialWing
                   && mounted.getType().hasFlag(MiscType.F_PARTIAL_WING)
                   && // unless all crits are destroyed, we get the bonus
@@ -2637,6 +2750,21 @@ public abstract class Mek extends Entity {
                 setInternal(4, 60, 42, 33, 42);
                 break;
         }
+        // Apply OS structure HP multiplier if applicable
+        double hpMult = getOSStructureHpMultiplier();
+        if (hpMult != 1.0) {
+            // REINFORCE_COMPOSITE uses floor(base * 1.5) per plan spec
+            boolean floorRounding = (getStructureType() == EquipmentType.T_STRUCTURE_OS_REINFORCE_COMPOSITE);
+            for (int loc = 0; loc < locations(); loc++) {
+                int base = getInternal(loc);
+                if (base > 0) {
+                    int newIS = floorRounding
+                          ? (int) (base * hpMult)
+                          : (int) Math.ceil(base * hpMult);
+                    initializeInternal(newIS, loc);
+                }
+            }
+        }
     }
 
     @Override
@@ -2665,6 +2793,149 @@ public abstract class Mek extends Entity {
                 } catch (LocationFullException ex) {
                     // um, that's impossible.
                 }
+            }
+        }
+    }
+
+    public void addOSCase() {
+        if (!isOuterSphere()) {
+            return;
+        }
+        boolean explosiveFound;
+        EquipmentType osCase = EquipmentType.get(EquipmentTypeLookup.OS_CASE);
+        for (int i = 0; i < locations(); i++) {
+            // Skip location if it already contains CASE
+            if (locationHasCase(i) || hasCASEII(i)) {
+                continue;
+            }
+
+            explosiveFound = false;
+            for (Mounted<?> m : getEquipment()) {
+                if (m.getType().isExplosive(m, true)
+                      && ((m.getLocation() == i) || (m.getSecondLocation() == i))) {
+                    explosiveFound = true;
+                }
+            }
+            if (explosiveFound) {
+                try {
+                    addEquipment(Mounted.createMounted(this, osCase), i, false);
+                } catch (LocationFullException ex) {
+                    // um, that's impossible.
+                }
+            }
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // OS EARS / DDS helpers
+    // -------------------------------------------------------------------------
+
+    /** Returns true if this mek has an operational EARS system (no crit hits, charges remain). */
+    public boolean hasEARS() {
+        if (!isOuterSphere() || earsCharges <= 0) {
+            return false;
+        }
+        for (MiscMounted m : getMisc()) {
+            if (m.getType().hasFlag(MiscType.F_EARS)) {
+                return !m.isInoperable();
+            }
+        }
+        return false;
+    }
+
+    /** Returns true if this mek has an operational DDS system (no crit hits, charges remain). */
+    public boolean hasDDS() {
+        if (!isOuterSphere() || ddsCharges <= 0) {
+            return false;
+        }
+        for (MiscMounted m : getMisc()) {
+            if (m.getType().hasFlag(MiscType.F_DDS)) {
+                return !m.isInoperable();
+            }
+        }
+        return false;
+    }
+
+    public int getEarsCharges() {
+        return earsCharges;
+    }
+
+    public void setEarsCharges(int charges) {
+        earsCharges = charges;
+    }
+
+    public int getDdsCharges() {
+        return ddsCharges;
+    }
+
+    public void setDdsCharges(int charges) {
+        ddsCharges = charges;
+    }
+
+    public int getLocationDamageThisRound(int loc) {
+        if (loc < 0 || loc >= locationDamageThisRound.length) {
+            return 0;
+        }
+        return locationDamageThisRound[loc];
+    }
+
+    public void addLocationDamageThisRound(int loc, int amount) {
+        if (loc >= 0 && loc < locationDamageThisRound.length) {
+            locationDamageThisRound[loc] += amount;
+        }
+    }
+
+    /** Clears per-location round damage tracking. Entity.damageThisRound is reset separately via newRound(). */
+    public void clearLocationDamageTracking() {
+        java.util.Arrays.fill(locationDamageThisRound, 0);
+    }
+
+    /**
+     * Auto-places EARS component mounts (one per required location).
+     * Normal meks: CT, LT, RT, LA, RA, LL, RL (7 locations, no head).
+     * SuperHeavy meks: LT, RT, LA, RA, LL, RL (6 locations, no head or CT).
+     */
+    public void addEARSComponents() {
+        if (!isOuterSphere()) {
+            return;
+        }
+        EquipmentType earsComp = EquipmentType.get(EquipmentTypeLookup.OS_EARS_COMPONENT);
+        if (earsComp == null) {
+            return;
+        }
+        int[] locations = isSuperHeavy()
+              ? new int[] { LOC_LEFT_TORSO, LOC_RIGHT_TORSO, LOC_LEFT_ARM, LOC_RIGHT_ARM, LOC_LEFT_LEG, LOC_RIGHT_LEG }
+              : new int[] { LOC_CENTER_TORSO, LOC_LEFT_TORSO, LOC_RIGHT_TORSO, LOC_LEFT_ARM, LOC_RIGHT_ARM, LOC_LEFT_LEG, LOC_RIGHT_LEG };
+        for (int loc : locations) {
+            try {
+                addEquipment(Mounted.createMounted(this, earsComp), loc, false);
+            } catch (LocationFullException ex) {
+                // best-effort auto-placement
+            }
+        }
+    }
+
+    /**
+     * Auto-places DDS component mounts (one per required location).
+     * Normal meks: CT, LT, RT, LA, RA, LL, RL (7 locations, no head).
+     * SuperHeavy meks: LT, RT, LA, RA, LL, RL (6 locations, no head or CT).
+     */
+    public void addDDSComponents() {
+        if (!isOuterSphere()) {
+            return;
+        }
+        EquipmentType ddsComp = EquipmentType.get(EquipmentTypeLookup.OS_DDS_COMPONENT);
+        if (ddsComp == null) {
+            return;
+        }
+        int[] locations = isSuperHeavy()
+              ? new int[] { LOC_LEFT_TORSO, LOC_RIGHT_TORSO, LOC_LEFT_ARM, LOC_RIGHT_ARM, LOC_LEFT_LEG, LOC_RIGHT_LEG }
+              : new int[] { LOC_CENTER_TORSO, LOC_LEFT_TORSO, LOC_RIGHT_TORSO, LOC_LEFT_ARM, LOC_RIGHT_ARM, LOC_LEFT_LEG, LOC_RIGHT_LEG };
+        for (int loc : locations) {
+            try {
+                addEquipment(Mounted.createMounted(this, ddsComp), loc, false);
+            } catch (LocationFullException ex) {
+                // best-effort auto-placement
             }
         }
     }
@@ -3757,6 +4028,10 @@ public abstract class Mek extends Entity {
                 sinks++;
             } else if (mounted.getType().hasFlag(MiscType.F_DOUBLE_HEAT_SINK)) {
                 sinks++;
+            } else if (mounted.getType().hasFlag(MiscType.F_TRIPLE_HEAT_SINK)) {
+                sinks++;
+            } else if (mounted.getType().hasFlag(MiscType.F_QUAD_HEAT_SINK)) {
+                sinks++;
             }
         }
         return sinks;
@@ -4296,9 +4571,13 @@ public abstract class Mek extends Entity {
         if (isMixedTech()) {
             if (isClan()) {
                 sb.append("Mixed (Clan Chassis)");
+            } else if (isOuterSphere()) {
+                sb.append("Mixed (OS Chassis)");
             } else {
                 sb.append("Mixed (IS Chassis)");
             }
+        } else if (isOuterSphere()) {
+            sb.append("OS");
         } else {
             sb.append(TechConstants.getTechName(techLevel));
         }
@@ -4395,7 +4674,9 @@ public abstract class Mek extends Entity {
         sb.append(MtfFile.HEAT_SINKS).append(heatSinks()).append(" ");
         Optional<MiscType> heatSink = getMisc().stream()
               .filter(m -> m.getType().hasFlag(MiscType.F_HEAT_SINK)
-                    || m.getType().hasFlag(MiscType.F_DOUBLE_HEAT_SINK))
+                    || m.getType().hasFlag(MiscType.F_DOUBLE_HEAT_SINK)
+                    || m.getType().hasFlag(MiscType.F_TRIPLE_HEAT_SINK)
+                    || m.getType().hasFlag(MiscType.F_QUAD_HEAT_SINK))
               .map(Mounted::getType).findFirst();
         // If we didn't find any heat sinks we may have an ICE with no added sinks, or
         // prototype
@@ -4408,6 +4689,10 @@ public abstract class Mek extends Entity {
             sb.append(MtfFile.HS_LASER);
         } else if (heatSink.get().hasFlag(MiscType.F_COMPACT_HEAT_SINK)) {
             sb.append(MtfFile.HS_COMPACT);
+        } else if (heatSink.get().hasFlag(MiscType.F_QUAD_HEAT_SINK)) {
+            sb.append(MtfFile.HS_QUAD);
+        } else if (heatSink.get().hasFlag(MiscType.F_TRIPLE_HEAT_SINK)) {
+            sb.append(MtfFile.HS_TRIPLE);
         } else if (heatSink.get().hasFlag(MiscType.F_DOUBLE_HEAT_SINK)) {
             sb.append(heatSink.get().isClan() ? MtfFile.TECH_BASE_CLAN : MtfFile.TECH_BASE_IS);
             sb.append(" ").append(MtfFile.HS_DOUBLE);

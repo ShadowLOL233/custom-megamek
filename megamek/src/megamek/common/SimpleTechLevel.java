@@ -106,6 +106,30 @@ public enum SimpleTechLevel {
     }
 
     /**
+     * @return The corresponding TechConstants.T_* value, with OS tech base support.
+     */
+    public int getCompoundTechLevel(boolean clan, boolean legion) {
+        if (legion) {
+            return TechConstants.convertFromSimpleLevelForOuterSphere(this.ordinal());
+        }
+        return getCompoundTechLevel(clan);
+    }
+
+    /**
+     * @return The corresponding TechConstants.T_* value, with OS or Ascended tech base support.
+     *         Mutually exclusive — at most one of {@code legion} and {@code ascended} should be true.
+     */
+    public int getCompoundTechLevel(boolean clan, boolean legion, boolean ascended) {
+        if (ascended) {
+            return TechConstants.convertFromSimpleLevelForAscended(this.ordinal());
+        }
+        if (legion) {
+            return TechConstants.convertFromSimpleLevelForOuterSphere(this.ordinal());
+        }
+        return getCompoundTechLevel(clan);
+    }
+
+    /**
      * Finds simple tech level equivalent of compound tech base/rules level constant
      *
      * @param level A TechConstants tech level constant
@@ -114,9 +138,17 @@ public enum SimpleTechLevel {
     public static SimpleTechLevel convertCompoundToSimple(int level) {
         return switch (level) {
             case TechConstants.T_INTRO_BOX_SET -> SimpleTechLevel.INTRO;
-            case TechConstants.T_IS_ADVANCED, TechConstants.T_CLAN_ADVANCED -> SimpleTechLevel.ADVANCED;
-            case TechConstants.T_IS_EXPERIMENTAL, TechConstants.T_CLAN_EXPERIMENTAL -> SimpleTechLevel.EXPERIMENTAL;
-            case TechConstants.T_IS_UNOFFICIAL, TechConstants.T_CLAN_UNOFFICIAL -> SimpleTechLevel.UNOFFICIAL;
+            case TechConstants.T_IS_ADVANCED, TechConstants.T_CLAN_ADVANCED,
+                 TechConstants.T_OUTER_SPHERE_ADVANCED,
+                 TechConstants.T_ASCENDED_ADVANCED -> SimpleTechLevel.ADVANCED;
+            case TechConstants.T_IS_EXPERIMENTAL, TechConstants.T_CLAN_EXPERIMENTAL,
+                 TechConstants.T_OUTER_SPHERE_EXPERIMENTAL,
+                 TechConstants.T_ASCENDED_EXPERIMENTAL -> SimpleTechLevel.EXPERIMENTAL;
+            case TechConstants.T_IS_UNOFFICIAL, TechConstants.T_CLAN_UNOFFICIAL,
+                 TechConstants.T_OUTER_SPHERE_UNOFFICIAL,
+                 TechConstants.T_ASCENDED_UNOFFICIAL -> SimpleTechLevel.UNOFFICIAL;
+            case TechConstants.T_OUTER_SPHERE_INTRO, TechConstants.T_ASCENDED_INTRO -> SimpleTechLevel.INTRO;
+            case TechConstants.T_ASCENDED_STANDARD -> SimpleTechLevel.STANDARD;
             default -> SimpleTechLevel.STANDARD;
         };
     }

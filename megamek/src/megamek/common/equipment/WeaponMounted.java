@@ -122,8 +122,18 @@ public class WeaponMounted extends Mounted<WeaponType> {
         if (getType().hasFlag(WeaponType.F_ENERGY) && getType().hasModes()) {
             heat = Compute.dialDownHeat(this, getType());
         }
-        // multiply by number of shots and number of weapons
-        heat = heat * getCurrentShots() * getNWeapons();
+        // Outer Sphere Rotary PPC: 4-6 shot modes consume RPPC Coolant Pod charges to
+        // suppress per-shot heat for shots beyond the third (each suppressed shot costs
+        // ceil(baseHeat / 3) instead of full baseHeat). Insufficient coolant for 4+ shot
+        // triggers Capacitor Overload, adding a +15 heat penalty on top of full heat.
+        // This block computes the per-fire raw heat for Rotary PPC, skipping the default
+        // heat × shots multiplication below.
+        if (getType().hasFlag(WeaponType.F_PPC_ROTARY)) {
+            heat = rotaryPPCHeat(heat) * getNWeapons();
+        } else {
+            // multiply by number of shots and number of weapons
+            heat = heat * getCurrentShots() * getNWeapons();
+        }
         if (hasQuirk(OptionsConstants.QUIRK_WEAPON_POS_IMP_COOLING)) {
             heat = Math.max(1, heat - 1);
         }
@@ -154,6 +164,51 @@ public class WeaponMounted extends Mounted<WeaponType> {
         }
 
         return heat;
+    }
+
+    /**
+     * Computes the per-fire raw heat for a Rotary PPC at its current firing mode, taking
+     * RPPC Coolant Pod consumption and Capacitor Overload into account. Used to make the
+     * in-game heat display match the heat the {@code RotaryPPCHandler} actually applies.
+     *
+     * @param baseHeat the per-shot base heat of the weapon (post energy-mode dial-down).
+     * @return the raw heat for this single weapon at the current mode and entity coolant state.
+     */
+    private int rotaryPPCHeat(int baseHeat) {
+        int shots = getCurrentShots();
+        if (shots <= 1) {
+            return baseHeat;
+        }
+        int extra = shots - 1;
+        int available = rotaryPPCCoolantAvailable();
+        int suppressed = Math.min(extra, available);
+        int unsuppressed = extra - suppressed;
+        int extraHeat = (int) Math.ceil(baseHeat / 3.0) * suppressed + baseHeat * unsuppressed;
+        int total = baseHeat + extraHeat;
+        if (unsuppressed > 0) {
+            total += 15;  // Capacitor Overload penalty
+        }
+        return total;
+    }
+
+    /**
+     * @return Total RPPC Coolant Pod charges available on this weapon's entity (entity-wide pool).
+     */
+    private int rotaryPPCCoolantAvailable() {
+        Entity entity = getEntity();
+        if (entity == null) {
+            return 0;
+        }
+        int total = 0;
+        for (AmmoMounted m : entity.getAmmo()) {
+            if (m.isDestroyed() || m.isMissing()) {
+                continue;
+            }
+            if (m.getType().getAmmoType() == AmmoType.AmmoTypeEnum.PPC_COOLANT) {
+                total += m.getUsableShotsLeft();
+            }
+        }
+        return total;
     }
 
     /**

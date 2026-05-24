@@ -140,6 +140,28 @@ public class EquipmentType implements ITechnology {
     public static final int T_ARMOR_SV_BAR_9 = 50;
     public static final int T_ARMOR_SV_BAR_10 = 51;
 
+    // OS Armor Types
+    public static final int T_ARMOR_OS_IMP_FF = 52;
+    public static final int T_ARMOR_OS_ADV_FF = 53;
+    public static final int T_ARMOR_OS_HEAVY_FF = 54;
+    public static final int T_ARMOR_OS_IMP_HEAVY_FF = 55;
+    public static final int T_ARMOR_OS_IMP_LIGHT_FF = 56;
+    public static final int T_ARMOR_OS_IMP_HARDENED = 57;
+    public static final int T_ARMOR_OS_HARDENED_FF = 58;
+    public static final int T_ARMOR_OS_HARDENED_HEAVY_FF = 59;
+    public static final int T_ARMOR_OS_ADV_HARDENED_FF = 60;
+    public static final int T_ARMOR_OS_REACTIVE = 61;
+    public static final int T_ARMOR_OS_IMP_REACTIVE = 62;
+    public static final int T_ARMOR_OS_ENERGY_ABSORPTION = 63;
+    public static final int T_ARMOR_OS_LASER_REFLECTIVE = 64;
+    public static final int T_ARMOR_OS_BALLISTIC_REINFORCED = 65;
+    public static final int T_ARMOR_OS_FERRO_LAMELLOR = 66;
+    public static final int T_ARMOR_OS_HEAVY_FERRO_LAMELLOR = 67;
+    public static final int T_ARMOR_OS_HARDENED_HEAVY_FERRO_LAMELLOR = 68;
+    public static final int T_ARMOR_OS_STEALTH = 69;
+    public static final int T_ARMOR_OS_APA = 70;
+    public static final int T_ARMOR_OS_IMP_STEALTH = 71;
+
     public static final int T_STRUCTURE_UNKNOWN = -1;
     public static final int T_STRUCTURE_STANDARD = 0;
     public static final int T_STRUCTURE_INDUSTRIAL = 1;
@@ -148,12 +170,54 @@ public class EquipmentType implements ITechnology {
     public static final int T_STRUCTURE_REINFORCED = 4;
     public static final int T_STRUCTURE_COMPOSITE = 5;
     public static final int T_STRUCTURE_ENDO_COMPOSITE = 6;
+    // OS structure types
+    public static final int T_STRUCTURE_OS_IMP_ENDO_STEEL = 7;
+    public static final int T_STRUCTURE_OS_ADV_ENDO_STEEL = 8;
+    public static final int T_STRUCTURE_OS_IMP_REINFORCE = 9;
+    public static final int T_STRUCTURE_OS_REINFORCE_COMPOSITE = 10;
+    public static final int T_STRUCTURE_OS_REINFORCE_ENDO_STEEL = 11;
+    public static final int T_STRUCTURE_OS_IMP_REINFORCE_ENDO_STEEL = 12;
+    public static final int T_STRUCTURE_OS_ADV_REINFORCE_ENDO_STEEL = 13;
+    public static final int T_STRUCTURE_OS_IMP_ENDO_COMPOSITE = 14;
+    public static final int T_STRUCTURE_OS_ADV_ENDO_COMPOSITE = 15;
+    public static final int T_STRUCTURE_OS_HEAVY_DUTY = 16;
+    public static final int T_STRUCTURE_OS_HEAVY_DUTY_ENDO_STEEL = 17;
+    public static final int T_STRUCTURE_OS_SH_DUTY_ENDO_STEEL = 18;
+    public static final int T_STRUCTURE_OS_SH_REINFORCE = 19;
+    public static final int T_STRUCTURE_OS_SH_REINFORCE_ENDO_STEEL = 20;
+    public static final int T_STRUCTURE_OS_SH_REINFORCE_ENDO_COMPOSITE = 21;
+    public static final int T_STRUCTURE_OS_REINFORCE_HEAVY_DUTY = 22;
+    public static final int T_STRUCTURE_OS_REINFORCE_HEAVY_DUTY_ENDO_STEEL = 23;
+    public static final int T_STRUCTURE_OS_SH_REINFORCE_HEAVY_DUTY = 24;
+    public static final int T_STRUCTURE_OS_SH_REINFORCE_HEAVY_DUTY_ENDO_STEEL = 25;
 
-    public static final String[] structureNames = { "Standard", "Industrial", "Endo Steel", "Endo Steel Prototype",
-                                                    "Reinforced", "Composite", "Endo-Composite" };
+    public static final String[] structureNames = {
+        "Standard", "Industrial", "Endo Steel", "Endo Steel Prototype",
+        "Reinforced", "Composite", "Endo-Composite",
+        // OS structures
+        "Imp. Endo Steel (OS)", "Adv. Endo Steel (OS)",
+        "Imp. Reinforce (OS)", "Reinforce Composite (OS)",
+        "Reinforce Endo Steel (OS)", "Imp. Reinforce Endo Steel (OS)",
+        "Adv. Reinforce Endo Steel (OS)",
+        "Imp. Endo-Composite (OS)", "Adv. Endo-Composite (OS)",
+        "Heavy Duty (OS)", "Heavy Duty Endo Steel (OS)",
+        "Suphvy Hvy-Duty Endo Steel (OS)", "Suphvy Reinforce (OS)",
+        "Suphvy Rein. Endo Steel (OS)", "Suphvy Rein. Endo-Composite (OS)",
+        "Rein. Heavy Duty (OS)", "Rein. Hvy Duty Endo Steel (OS)",
+        "Suphvy Rein. Hvy-Duty (OS)", "Suphvy Rein. Hvy Duty Endo Steel (OS)"
+    };
 
     // Assume for now that prototype is not more expensive
-    public static final double[] structureCosts = { 400, 300, 1600, 4800, 6400, 1600, 3200 };
+    public static final double[] structureCosts = {
+        400, 300, 1600, 4800, 6400, 1600, 3200,
+        // OS structure costs
+        2000, 2400, 8000, 4000, 8000, 8000, 8000, 3200, 4000,
+        6000, 8000, 10000, 10000, 12000, 12000,
+        // Reinforce Heavy Duty, Reinforce Heavy Duty Endo Steel
+        12000, 14000,
+        // SH Reinforce Heavy Duty, SH Reinforce Heavy Duty Endo Steel
+        16000, 18000
+    };
 
     protected String name = null;
 
@@ -477,6 +541,18 @@ public class EquipmentType implements ITechnology {
             return false;
         }
 
+        // special case. OS PFD only explodes when switched on
+        if ((mounted.getType() instanceof MiscType) &&
+              (mounted.getType().hasFlag(MiscType.F_OS_PFD) && mounted.curMode().equals("Off"))) {
+            return false;
+        }
+
+        // special case. OS Adv. PFD only explodes when switched on
+        if ((mounted.getType() instanceof MiscType) &&
+              (mounted.getType().hasFlag(MiscType.F_OS_ADV_PFD) && mounted.curMode().equals("Off"))) {
+            return false;
+        }
+
         // special case. PPC with Capacitor only explodes when charged
         if (ignoreCharge) {
             // for BV purposes, we need to ignore the charged-ness and check only
@@ -495,6 +571,14 @@ public class EquipmentType implements ITechnology {
               mounted.getType().hasFlag(MiscType.F_PPC_CAPACITOR) &&
               !mounted.curMode().equals("Charge")) {
             return false;
+        }
+        // Outer Sphere Rotary PPC family — multi-stage capacitor architecture means the
+        // weapon discharges catastrophically when critically hit, regardless of any external
+        // PPC Capacitor module. Unlike standard PPCs (which only explode via linked Capacitor
+        // mode), F_PPC_ROTARY weapons are always explosive in their own right (Gauss-style).
+        // This check must come BEFORE the PPCWeapon capacitor exception below.
+        if ((mounted.getType() instanceof WeaponType wt) && wt.hasFlag(WeaponType.F_PPC_ROTARY)) {
+            return explosive;
         }
         if ((mounted.getType() instanceof PPCWeapon) && (mounted.hasChargedCapacitor() == 0)) {
             return false;
@@ -1776,6 +1860,26 @@ public class EquipmentType implements ITechnology {
         result.put(T_STRUCTURE_REINFORCED, getStructureTypeName(T_STRUCTURE_REINFORCED));
         result.put(T_STRUCTURE_COMPOSITE, getStructureTypeName(T_STRUCTURE_COMPOSITE));
         result.put(T_STRUCTURE_ENDO_COMPOSITE, getStructureTypeName(T_STRUCTURE_ENDO_COMPOSITE));
+        // OS structures
+        result.put(T_STRUCTURE_OS_IMP_ENDO_STEEL, getStructureTypeName(T_STRUCTURE_OS_IMP_ENDO_STEEL));
+        result.put(T_STRUCTURE_OS_ADV_ENDO_STEEL, getStructureTypeName(T_STRUCTURE_OS_ADV_ENDO_STEEL));
+        result.put(T_STRUCTURE_OS_IMP_REINFORCE, getStructureTypeName(T_STRUCTURE_OS_IMP_REINFORCE));
+        result.put(T_STRUCTURE_OS_REINFORCE_COMPOSITE, getStructureTypeName(T_STRUCTURE_OS_REINFORCE_COMPOSITE));
+        result.put(T_STRUCTURE_OS_REINFORCE_ENDO_STEEL, getStructureTypeName(T_STRUCTURE_OS_REINFORCE_ENDO_STEEL));
+        result.put(T_STRUCTURE_OS_IMP_REINFORCE_ENDO_STEEL, getStructureTypeName(T_STRUCTURE_OS_IMP_REINFORCE_ENDO_STEEL));
+        result.put(T_STRUCTURE_OS_ADV_REINFORCE_ENDO_STEEL, getStructureTypeName(T_STRUCTURE_OS_ADV_REINFORCE_ENDO_STEEL));
+        result.put(T_STRUCTURE_OS_IMP_ENDO_COMPOSITE, getStructureTypeName(T_STRUCTURE_OS_IMP_ENDO_COMPOSITE));
+        result.put(T_STRUCTURE_OS_ADV_ENDO_COMPOSITE, getStructureTypeName(T_STRUCTURE_OS_ADV_ENDO_COMPOSITE));
+        result.put(T_STRUCTURE_OS_HEAVY_DUTY, getStructureTypeName(T_STRUCTURE_OS_HEAVY_DUTY));
+        result.put(T_STRUCTURE_OS_HEAVY_DUTY_ENDO_STEEL, getStructureTypeName(T_STRUCTURE_OS_HEAVY_DUTY_ENDO_STEEL));
+        result.put(T_STRUCTURE_OS_SH_DUTY_ENDO_STEEL, getStructureTypeName(T_STRUCTURE_OS_SH_DUTY_ENDO_STEEL));
+        result.put(T_STRUCTURE_OS_SH_REINFORCE, getStructureTypeName(T_STRUCTURE_OS_SH_REINFORCE));
+        result.put(T_STRUCTURE_OS_SH_REINFORCE_ENDO_STEEL, getStructureTypeName(T_STRUCTURE_OS_SH_REINFORCE_ENDO_STEEL));
+        result.put(T_STRUCTURE_OS_SH_REINFORCE_ENDO_COMPOSITE, getStructureTypeName(T_STRUCTURE_OS_SH_REINFORCE_ENDO_COMPOSITE));
+        result.put(T_STRUCTURE_OS_REINFORCE_HEAVY_DUTY, getStructureTypeName(T_STRUCTURE_OS_REINFORCE_HEAVY_DUTY));
+        result.put(T_STRUCTURE_OS_REINFORCE_HEAVY_DUTY_ENDO_STEEL, getStructureTypeName(T_STRUCTURE_OS_REINFORCE_HEAVY_DUTY_ENDO_STEEL));
+        result.put(T_STRUCTURE_OS_SH_REINFORCE_HEAVY_DUTY, getStructureTypeName(T_STRUCTURE_OS_SH_REINFORCE_HEAVY_DUTY));
+        result.put(T_STRUCTURE_OS_SH_REINFORCE_HEAVY_DUTY_ENDO_STEEL, getStructureTypeName(T_STRUCTURE_OS_SH_REINFORCE_HEAVY_DUTY_ENDO_STEEL));
 
         return result;
     }

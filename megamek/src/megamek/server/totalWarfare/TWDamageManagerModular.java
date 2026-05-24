@@ -2480,26 +2480,37 @@ public class TWDamageManagerModular extends TWDamageManager implements IDamageMa
 
         mods.ferroFibrousArmor = (checkFerroFibrous(entity, hit));
         mods.bar5 = (entity.getBARRating(hit.getLocation()) <= 5);
+        int armorTypeMod = entity.getArmorType(hit.getLocation());
         mods.ballisticArmor = ((entity instanceof Mek) || (entity instanceof Tank) || (entity instanceof Aero)) &&
-              (entity.getArmorType(hit.getLocation()) ==
-                    EquipmentType.T_ARMOR_BALLISTIC_REINFORCED);
+              (armorTypeMod == EquipmentType.T_ARMOR_BALLISTIC_REINFORCED
+                    || armorTypeMod == EquipmentType.T_ARMOR_OS_BALLISTIC_REINFORCED);
         mods.ferroLamellorArmor = ((entity instanceof Mek) || (entity instanceof Tank) || (entity instanceof Aero)) &&
-              (entity.getArmorType(hit.getLocation()) ==
-                    EquipmentType.T_ARMOR_FERRO_LAMELLOR);
+              (armorTypeMod == EquipmentType.T_ARMOR_FERRO_LAMELLOR
+                    || armorTypeMod == EquipmentType.T_ARMOR_OS_FERRO_LAMELLOR
+                    || armorTypeMod == EquipmentType.T_ARMOR_OS_HEAVY_FERRO_LAMELLOR
+                    || armorTypeMod == EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FERRO_LAMELLOR);
         mods.hardenedArmor = ((entity instanceof Mek) || (entity instanceof Tank)) &&
-              (entity.getArmorType(hit.getLocation()) == EquipmentType.T_ARMOR_HARDENED);
+              (armorTypeMod == EquipmentType.T_ARMOR_HARDENED
+                    || armorTypeMod == EquipmentType.T_ARMOR_OS_IMP_HARDENED
+                    || armorTypeMod == EquipmentType.T_ARMOR_OS_HARDENED_FF
+                    || armorTypeMod == EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FF
+                    || armorTypeMod == EquipmentType.T_ARMOR_OS_ADV_HARDENED_FF
+                    || armorTypeMod == EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FERRO_LAMELLOR);
         mods.impactArmor = (entity instanceof Mek) &&
-              (entity.getArmorType(hit.getLocation()) == EquipmentType.T_ARMOR_IMPACT_RESISTANT);
+              (armorTypeMod == EquipmentType.T_ARMOR_IMPACT_RESISTANT);
         mods.reactiveArmor = (((entity instanceof Mek) || (entity instanceof Tank) || (entity instanceof Aero)) &&
-              (entity.getArmorType(hit.getLocation()) == EquipmentType.T_ARMOR_REACTIVE)) ||
-              (isBattleArmor &&
-                    (entity.getArmorType(hit.getLocation()) ==
-                          EquipmentType.T_ARMOR_BA_REACTIVE));
+              (armorTypeMod == EquipmentType.T_ARMOR_REACTIVE
+                    || armorTypeMod == EquipmentType.T_ARMOR_OS_REACTIVE)) ||
+              (isBattleArmor && (armorTypeMod == EquipmentType.T_ARMOR_BA_REACTIVE));
+        mods.impReactiveArmor = ((entity instanceof Mek) || (entity instanceof Tank)) &&
+              (armorTypeMod == EquipmentType.T_ARMOR_OS_IMP_REACTIVE);
         mods.reflectiveArmor = (((entity instanceof Mek) || (entity instanceof Tank) || (entity instanceof Aero)) &&
-              (entity.getArmorType(hit.getLocation()) == EquipmentType.T_ARMOR_REFLECTIVE)) ||
-              isBattleArmor &&
-                    (entity.getArmorType(hit.getLocation()) ==
-                          EquipmentType.T_ARMOR_BA_REFLECTIVE);
+              (armorTypeMod == EquipmentType.T_ARMOR_REFLECTIVE)) ||
+              (isBattleArmor && (armorTypeMod == EquipmentType.T_ARMOR_BA_REFLECTIVE));
+        mods.energyAbsorptionArmor = ((entity instanceof Mek) || (entity instanceof Tank)) &&
+              (armorTypeMod == EquipmentType.T_ARMOR_OS_ENERGY_ABSORPTION);
+        mods.laserReflectiveArmor = ((entity instanceof Mek) || (entity instanceof Tank)) &&
+              (armorTypeMod == EquipmentType.T_ARMOR_OS_LASER_REFLECTIVE);
     }
 
     public int manageDamageTypeReports(Entity entity, Vector<Report> reportVec, int damage, DamageType damageType,
@@ -2693,6 +2704,9 @@ public class TWDamageManagerModular extends TWDamageManager implements IDamageMa
         boolean impactArmor = mods.impactArmor;
         boolean reflectiveArmor = mods.reflectiveArmor;
         boolean reactiveArmor = mods.reactiveArmor;
+        boolean impReactiveArmor = mods.impReactiveArmor;
+        boolean energyAbsorptionArmor = mods.energyAbsorptionArmor;
+        boolean laserReflectiveArmor = mods.laserReflectiveArmor;
         boolean isBattleArmor = (entity instanceof BattleArmor);
         int damageOriginal = mods.damageOriginal;
         int critBonus = mods.critBonus;
@@ -2798,6 +2812,41 @@ public class TWDamageManagerModular extends TWDamageManager implements IDamageMa
                 report.indent(3);
                 report.add(damage);
                 reportVec.addElement(report);
+            } else if (impReactiveArmor &&
+                  ((hit.getGeneralDamageType() == HitData.DAMAGE_MISSILE) ||
+                        (hit.getGeneralDamageType() == HitData.DAMAGE_ARMOR_PIERCING_MISSILE) ||
+                        areaSatArty)) {
+                // Imp. Reactive (OS): 55% reduction vs missiles/artillery
+                tmpDamageHold = damage;
+                damage = Math.max(1, (int) Math.floor(damage * 0.45));
+                report = new Report(6257);
+                report.subject = entityId;
+                report.indent(3);
+                report.add(damage);
+                reportVec.addElement(report);
+            } else if (energyAbsorptionArmor &&
+                  (hit.getGeneralDamageType() == HitData.DAMAGE_ENERGY)) {
+                // Energy Absorption (OS): 50% reduction vs all energy
+                tmpDamageHold = damage;
+                damage = (int) Math.floor(((double) damage) / 2);
+                if (tmpDamageHold == 1) {
+                    damage = 1;
+                }
+                report = new Report(6258);
+                report.subject = entityId;
+                report.indent(3);
+                report.add(damage);
+                reportVec.addElement(report);
+            } else if (laserReflectiveArmor &&
+                  (hit.getGeneralDamageType() == HitData.DAMAGE_ENERGY)) {
+                // Laser Reflective (OS): 65% reduction vs energy weapons
+                tmpDamageHold = damage;
+                damage = Math.max(1, (int) Math.floor(damage * 0.35));
+                report = new Report(6259);
+                report.subject = entityId;
+                report.indent(3);
+                report.add(damage);
+                reportVec.addElement(report);
             }
 
             // If we're using optional tank damage thresholds, set up our hit
@@ -2859,7 +2908,9 @@ public class TWDamageManagerModular extends TWDamageManager implements IDamageMa
                 report = new Report(6069);
                 report.subject = entityId;
                 report.indent(3);
+                int originalDamage = damage;
                 int reportedDamage = damage / 2;
+                report.add(originalDamage);
                 if ((damage % 2) > 0) {
                     report.add(reportedDamage + ".5");
                 } else {
@@ -2898,6 +2949,10 @@ public class TWDamageManagerModular extends TWDamageManager implements IDamageMa
                 // rolled at -2
                 if (hardenedArmor) {
                     mods.critBonus = critBonus - 2;
+                }
+                // OS Reinforce structure: -1 to crit roll when armor is penetrated
+                if ((entity instanceof Mek) && ((Mek) entity).hasOSReinforceStructure()) {
+                    mods.critBonus = critBonus - 1;
                 }
 
                 // We should only record the applied damage, although original and tmpDamageHold
@@ -2989,7 +3044,10 @@ public class TWDamageManagerModular extends TWDamageManager implements IDamageMa
         public boolean hardenedArmor = false;
         public boolean impactArmor = false;
         public boolean reactiveArmor = false;
+        public boolean impReactiveArmor = false;
         public boolean reflectiveArmor = false;
+        public boolean energyAbsorptionArmor = false;
+        public boolean laserReflectiveArmor = false;
         public boolean isBattleArmor = false;
         public boolean isHeadHit = false;
         public boolean damageIS = false;

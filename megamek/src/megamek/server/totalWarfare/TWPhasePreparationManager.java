@@ -101,6 +101,8 @@ public record TWPhasePreparationManager(TWGameManager gameManager) {
                 gameManager.checkForConditionDeath();
 
                 gameManager.checkForBlueShieldDamage();
+                gameManager.checkForLegionPFDDamage();
+                gameManager.checkForLegionAdvPFDDamage();
                 gameManager.checkForAtmosphereDeath();
                 gameManager.checkForSpaceDeath();
 
@@ -192,6 +194,7 @@ public record TWPhasePreparationManager(TWGameManager gameManager) {
                 gameManager.addReport(gameManager.resolveInternalBombHits());
                 gameManager.checkLayExplosives();
                 gameManager.resolveHarJelRepairs();
+                gameManager.resolveEARSRepairs();
                 gameManager.resolveEmergencyCoolantSystem();
                 gameManager.checkForSuffocation();
                 gameManager.getGame().getPlanetaryConditions().determineWind();

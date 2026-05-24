@@ -991,7 +991,15 @@ public class QuadMek extends Mek {
     @Override
     public boolean hasMPReducingHardenedArmor() {
         return IntStream.of(LOC_LEFT_LEG, LOC_RIGHT_LEG, LOC_LEFT_ARM, LOC_RIGHT_ARM)
-              .anyMatch(i -> (armorType[i] == EquipmentType.T_ARMOR_HARDENED));
+              .anyMatch(i -> {
+                  int at = armorType[i];
+                  return at == EquipmentType.T_ARMOR_HARDENED
+                        || at == EquipmentType.T_ARMOR_OS_IMP_HARDENED
+                        || at == EquipmentType.T_ARMOR_OS_HARDENED_FF
+                        || at == EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FF
+                        || at == EquipmentType.T_ARMOR_OS_ADV_HARDENED_FF
+                        || at == EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FERRO_LAMELLOR;
+              });
     }
 
     @Override

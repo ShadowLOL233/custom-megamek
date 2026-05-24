@@ -44,4 +44,11 @@ public class WeaponInfo {
     public boolean isRapidFire = false;
     public HashMap<String, Integer> ammunition = new HashMap<>();
     public int ammoActiveWeaponCount;
+    /**
+     * Optional one-line mechanic hint shown as an indented sub-row beneath the weapon
+     * entry in the unit tooltip. Populated by createWeaponList() for weapons whose
+     * behaviour isn't obvious from their name (e.g. Rotary PPC coolant consumption,
+     * Hyper PPC charging cycle). Left null for ordinary weapons.
+     */
+    public String specialNote;
 }

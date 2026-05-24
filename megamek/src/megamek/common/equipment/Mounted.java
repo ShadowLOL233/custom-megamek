@@ -80,6 +80,7 @@ public class Mounted<T extends EquipmentType> implements Serializable, RoundUpda
     private boolean jammedThisPhase = false;
     private boolean useless = false;
     private boolean fired = false; // Only true for used OS stuff and TSEMP.
+    private int hyperLaserCooldown = 0; // Turns remaining before Hyper Laser can fire again
     private boolean tsempDowntime = false; // Needed for "every other turn" TSEMP.
     private boolean rapidFire = false; // MGs in rapid-fire mode
     private boolean hotLoaded = false; // Hot loading for ammoType
@@ -406,6 +407,10 @@ public class Mounted<T extends EquipmentType> implements Serializable, RoundUpda
             mode = pendingMode;
             pendingMode = -1;
         }
+        // Hyper Laser cooldown ticks down at the start of each new round.
+        if (hyperLaserCooldown > 0) {
+            hyperLaserCooldown--;
+        }
         called.reset();
     }
 
@@ -494,6 +499,22 @@ public class Mounted<T extends EquipmentType> implements Serializable, RoundUpda
             desc.append(shotsLeft);
             desc.append(")");
         }
+        // Rotary PPC family: surface the entity-wide RPPC Coolant Pod pool right in the
+        // weapon's display name so the player can see at a glance whether 4+ shot modes
+        // will be coolant-suppressed or risk Capacitor Overload.
+        if ((type instanceof WeaponType wt) && wt.hasFlag(WeaponType.F_PPC_ROTARY)
+              && (getEntity() != null)) {
+            int coolant = 0;
+            for (AmmoMounted am : getEntity().getAmmo()) {
+                if (am.isDestroyed() || am.isMissing()) {
+                    continue;
+                }
+                if (am.getType().getAmmoType() == AmmoType.AmmoTypeEnum.PPC_COOLANT) {
+                    coolant += am.getUsableShotsLeft();
+                }
+            }
+            desc.append(" [Coolant: ").append(coolant).append("]");
+        }
         if (getEntity() instanceof BattleArmor) {
             if ((getBaMountLoc() >= BattleArmor.MOUNT_LOC_BODY) && (getBaMountLoc() <= BattleArmor.MOUNT_LOC_TURRET)) {
                 desc.append(" (%s)".formatted(BattleArmor.getBaMountLocAbbr(getBaMountLoc())));
@@ -581,7 +602,46 @@ public class Mounted<T extends EquipmentType> implements Serializable, RoundUpda
               !jammed &&
               !useless &&
               !fired &&
+              (hyperLaserCooldown <= 0) &&
+              isHyperLaserChargedForFire() &&
               (!isDWPMounted || getLinkedBy() != null);
+    }
+
+    /**
+     * Returns false only for OS Hyper Lasers that aren't currently in "Charging" mode.
+     * Standard weapons and Hyper Lasers without a Charging mode (e.g. RISC Hyper Laser)
+     * always return true.
+     */
+    private boolean isHyperLaserChargedForFire() {
+        if (type == null || !type.hasModes()) {
+            return true;
+        }
+        boolean hasChargingMode = false;
+        for (int i = 0; i < type.getModesCount(); i++) {
+            if ("Charging".equals(type.getMode(i).getName())) {
+                hasChargingMode = true;
+                break;
+            }
+        }
+        if (!hasChargingMode) {
+            return true;
+        }
+        return "Charging".equals(curMode().getName());
+    }
+
+    /**
+     * @return Turns remaining in the Hyper Laser cooldown cycle. 0 means the weapon is ready to fire.
+     */
+    public int getHyperLaserCooldown() {
+        return hyperLaserCooldown;
+    }
+
+    /**
+     * Sets the Hyper Laser cooldown counter. The weapon is unusable while this value is &gt; 0;
+     * it is decremented by {@code newRound(int)} at the start of each round.
+     */
+    public void setHyperLaserCooldown(int turns) {
+        this.hyperLaserCooldown = turns;
     }
 
     public boolean isUsedThisRound() {
@@ -805,6 +865,7 @@ public class Mounted<T extends EquipmentType> implements Serializable, RoundUpda
               (ignoreMode || ((mode != null) && mode.equals(Weapon.MODE_AC_RAPID)))) {
             return 2;
         } else if ((weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.AC_ROTARY) ||
+              weaponType.hasFlag(WeaponType.F_PPC_ROTARY) ||
               weaponType.getInternalName().equals(BattleArmor.MINE_LAUNCHER)) {
             if (ignoreMode || (mode == null) || mode.equals(Weapon.MODE_RAC_SIX_SHOT)) {
                 return 6;

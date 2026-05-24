@@ -498,7 +498,9 @@ public class TestMek extends TestEntity {
                 }
                 if (mt.hasFlag(MiscType.F_HEAT_SINK)
                       || mt.hasFlag(MiscType.F_DOUBLE_HEAT_SINK)
-                      || mt.hasFlag(MiscType.F_IS_DOUBLE_HEAT_SINK_PROTOTYPE)) {
+                      || mt.hasFlag(MiscType.F_IS_DOUBLE_HEAT_SINK_PROTOTYPE)
+                      || mt.hasFlag(MiscType.F_TRIPLE_HEAT_SINK)
+                      || mt.hasFlag(MiscType.F_QUAD_HEAT_SINK)) {
                     countInternalHeatSinks++;
                 } else {
                     unallocated.addElement(m);
@@ -619,23 +621,25 @@ public class TestMek extends TestEntity {
 
     public boolean correctArmor(StringBuffer buff) {
         boolean correct = true;
-        for (int loc = 0; loc < mek.locations(); loc++) {
-            if (loc == Mek.LOC_HEAD) {
-                if (((mek.getOArmor(Mek.LOC_HEAD) > 9) && !mek.isSuperHeavy())
-                      || ((mek.getOArmor(Mek.LOC_HEAD) > 12) && mek.isSuperHeavy())) {
-                    buff.append(printArmorLocation(Mek.LOC_HEAD))
-                          .append(printArmorLocProp(Mek.LOC_HEAD, 9))
+        // Head armor max is fixed at 9/12 for all mechs regardless of IS type (balance requirement)
+        int maxHeadArmor = mek.isSuperHeavy() ? 12 : 9;
+        if (mek.getOArmor(Mek.LOC_HEAD) > maxHeadArmor) {
+            buff.append(printArmorLocation(Mek.LOC_HEAD))
+                  .append(printArmorLocProp(Mek.LOC_HEAD, maxHeadArmor))
+                  .append("\n");
+            correct = false;
+        }
+        // Non-head per-location cap: OS mechs are exempt (armor limited by tonnage only)
+        if (!mek.isOuterSphere()) {
+            for (int loc = 1; loc < mek.locations(); loc++) {
+                if ((mek.getOArmor(loc) + (mek.hasRearArmor(loc) ? mek
+                      .getOArmor(loc, true) : 0)) > (2 * mek.getOInternal(loc))) {
+                    buff.append(printArmorLocation(loc))
+                          .append(printArmorLocProp(loc,
+                                2 * mek.getOInternal(loc)))
                           .append("\n");
                     correct = false;
                 }
-
-            } else if ((mek.getOArmor(loc) + (mek.hasRearArmor(loc) ? mek
-                  .getOArmor(loc, true) : 0)) > (2 * mek.getOInternal(loc))) {
-                buff.append(printArmorLocation(loc))
-                      .append(printArmorLocProp(loc,
-                            2 * mek.getOInternal(loc)))
-                      .append("\n");
-                correct = false;
             }
         }
 
@@ -793,6 +797,8 @@ public class TestMek extends TestEntity {
         boolean hasAES = false;
         boolean hasMekJumpBooster = false;
         boolean hasPartialWing = false;
+        boolean hasOSPFD = false;
+        boolean hasOSAdvPFD = false;
         EquipmentType advancedMyomer = null;
         HashSet<Integer> shieldLocations = new HashSet<>();
 
@@ -809,6 +815,8 @@ public class TestMek extends TestEntity {
             hasMASC |= m.getType().hasFlag(MiscType.F_MASC)
                   && !m.getType().hasSubType(MiscType.S_SUPERCHARGER);
             hasAES |= m.getType().hasFlag(MiscType.F_ACTUATOR_ENHANCEMENT_SYSTEM);
+            hasOSPFD |= m.getType().hasFlag(MiscType.F_OS_PFD);
+            hasOSAdvPFD |= m.getType().hasFlag(MiscType.F_OS_ADV_PFD);
             if (m.getType().hasFlag(MiscType.F_TSM)
                   || m.getType().hasFlag(MiscType.F_INDUSTRIAL_TSM)
                   || m.getType().hasFlag(MiscType.F_SCM)) {
@@ -828,6 +836,11 @@ public class TestMek extends TestEntity {
                     shieldLocations.add(m.getLocation());
                 }
             }
+        }
+
+        if (hasOSPFD && hasOSAdvPFD) {
+            illegal = true;
+            buff.append("Particle Field Damper (OS) and Adv. Particle Field Damper (OS) cannot be mounted together.\n");
         }
 
         for (Mounted<?> m : getEntity().getMisc()) {
@@ -1185,11 +1198,20 @@ public class TestMek extends TestEntity {
                 ats.add(mek.getArmorType(i));
             }
             for (int at : ats) {
-                if (at == EquipmentType.T_ARMOR_HARDENED) {
+                if (at == EquipmentType.T_ARMOR_HARDENED
+                        || at == EquipmentType.T_ARMOR_OS_IMP_HARDENED
+                        || at == EquipmentType.T_ARMOR_OS_HARDENED_FF
+                        || at == EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FF
+                        || at == EquipmentType.T_ARMOR_OS_ADV_HARDENED_FF
+                        || at == EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FERRO_LAMELLOR) {
                     buff.append("LAMs cannot use hardened armor.\n");
                     illegal = true;
                 } else {
-                    final EquipmentType eq = EquipmentType.get(EquipmentType.getArmorTypeName(at, mek.isClan()));
+                    EquipmentType eq = EquipmentType.get(EquipmentType.getArmorTypeName(at, mek.isClan()));
+                    if (eq == null) {
+                        // OS armor types are registered without IS/Clan prefix
+                        eq = EquipmentType.get(EquipmentType.getArmorTypeName(at));
+                    }
                     if (eq != null && eq.getNumCriticalSlots(mek) > 0) {
                         buff.append("LAMs cannot use ").append(eq.getName()).append("\n");
                         illegal = true;
@@ -1464,13 +1486,18 @@ public class TestMek extends TestEntity {
         // fully loaded unit in MML and
         // will make units appear invalid during loading (MML calls
         // UnitUtil.expandUnitMounts() after loading)
-        String structureName = EquipmentType.getStructureTypeName(mek.getStructureType(),
-              TechConstants.isClan(mek.getStructureTechLevel()));
+        // OS IS types are registered without "IS "/"Clan " prefix; use the single-arg form
+        String structureName = TechConstants.isOuterSphere(mek.getStructureTechLevel())
+              ? EquipmentType.getStructureTypeName(mek.getStructureType())
+              : EquipmentType.getStructureTypeName(mek.getStructureType(),
+                    TechConstants.isClan(mek.getStructureTechLevel()));
         EquipmentType structure = EquipmentType.get(structureName);
-        int requiredStructureCrits = structure.getNumCriticalSlots(mek);
-        if (mek.getNumberOfCriticalSlots(structure) != requiredStructureCrits) {
-            buff.append("The internal structure of this mek is not using the correct number of crit slots\n");
-            illegal = true;
+        if (structure != null) {
+            int requiredStructureCrits = structure.getNumCriticalSlots(mek);
+            if (mek.getNumberOfCriticalSlots(structure) != requiredStructureCrits) {
+                buff.append("The internal structure of this mek is not using the correct number of crit slots\n");
+                illegal = true;
+            }
         }
 
         if (hasPartialWing && hasMekJumpBooster) {

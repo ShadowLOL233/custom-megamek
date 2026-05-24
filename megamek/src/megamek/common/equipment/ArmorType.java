@@ -52,6 +52,7 @@ import megamek.common.enums.TechRating;
 import megamek.common.interfaces.ITechnology;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
+import megamek.common.units.Mek;
 import megamek.common.units.ProtoMek;
 import megamek.common.units.SmallCraft;
 
@@ -183,6 +184,28 @@ public class ArmorType extends MiscType {
 
         addArmorType(createPatchworkArmor());
         addArmorType(createNoArmor());
+
+        // OS Armor Types
+        addArmorType(createOSImpFF());
+        addArmorType(createOSAdvFF());
+        addArmorType(createOSHeavyFF());
+        addArmorType(createOSImpHeavyFF());
+        addArmorType(createOSImpLightFF());
+        addArmorType(createOSImpHardened());
+        addArmorType(createOSHardenedFF());
+        addArmorType(createOSHardenedHeavyFF());
+        addArmorType(createOSAdvHardenedFF());
+        addArmorType(createOSReactive());
+        addArmorType(createOSImpReactive());
+        addArmorType(createOSEnergyAbsorption());
+        addArmorType(createOSLaserReflective());
+        addArmorType(createOSBallisticReinforced());
+        addArmorType(createOSFerroLamellor());
+        addArmorType(createOSHeavyFerroLamellor());
+        addArmorType(createOSHardenedHeavyFerroLamellor());
+        addArmorType(createOSStealth());
+        addArmorType(createOSAPA());
+        addArmorType(createOSImpStealth());
     }
 
     private static void addArmorType(ArmorType at) {
@@ -198,6 +221,11 @@ public class ArmorType extends MiscType {
               || (at.techAdvancement.getTechBase() == TechBase.ALL)) {
             armorTypeLookupClan.put(at.armorType, at);
         }
+        // OS armor types are registered in both lookups so they can always be resolved.
+        if (at.techAdvancement.getTechBase() == TechBase.OUTER_SPHERE) {
+            armorTypeLookupIS.put(at.armorType, at);
+            armorTypeLookupClan.put(at.armorType, at);
+        }
     }
 
     private static final int[] spheroidDSThresholds = {
@@ -211,6 +239,7 @@ public class ArmorType extends MiscType {
     };
 
     private int armorType = T_ARMOR_UNKNOWN;
+    private int stealthHeat = STEALTH_ARMOR_HEAT;
     private int fighterSlots = 0;
     private int patchworkSlotsMekSV = 0;
     private int patchworkSlotsCVFtr = 0;
@@ -243,6 +272,13 @@ public class ArmorType extends MiscType {
      */
     public int getArmorType() {
         return armorType;
+    }
+
+    /**
+     * @return The heat generated per round when stealth armor is active.
+     */
+    public int getStealthHeat() {
+        return stealthHeat;
     }
 
     /**
@@ -341,6 +377,33 @@ public class ArmorType extends MiscType {
 
     public int getBAR() {
         return bar;
+    }
+
+    /**
+     * Returns the number of critical slots this armor occupies on the given entity.
+     * <p>
+     * For variable-slot armor (e.g. OS Ferro-Lamellor), delegates to MiscType's
+     * flag-based dispatch. For all OS fixed-slot armor types, applies the
+     * superheavy halving rule: {@code ceil(standardSlots / 2)} when mounted on a
+     * superheavy Mek, matching the same rule used for standard armor types.
+     */
+    @Override
+    public int getNumCriticalSlots(Entity entity, double size) {
+        // Variable-slot armor: delegate to MiscType's flag-based dispatch
+        // (handles OS Ferro-Lamellor correctly via the F_FERRO_LAMELLOR branch)
+        if (criticalSlots == CRITICAL_SLOTS_VARIABLE) {
+            return super.getNumCriticalSlots(entity, size);
+        }
+        // Zero-slot or no entity: return as-is (e.g. OS Imp. Hardened = 0 slots)
+        if (criticalSlots <= 0 || entity == null) {
+            return criticalSlots;
+        }
+        // OS armor: apply the superheavy halving rule ceil(standard / 2)
+        if (techAdvancement.getTechBase() == TechBase.OUTER_SPHERE
+                && (entity instanceof Mek) && entity.isSuperHeavy()) {
+            return (int) Math.ceil(criticalSlots / 2.0);
+        }
+        return criticalSlots;
     }
 
     private static ArmorType createStandardArmor() {
@@ -1956,6 +2019,388 @@ public class ArmorType extends MiscType {
         armor.weightPerPointSV.put(TechRating.E, 0.056);
         armor.weightPerPointSV.put(TechRating.F, 0.052);
 
+        return armor;
+    }
+
+    // -------------------------------------------------------------------------
+    // OS Armor Types
+    // -------------------------------------------------------------------------
+
+    private static ArmorType createOSImpFF() {
+        ArmorType armor = new ArmorType();
+        armor.name = "Imp. Ferro-Fibrous (OS)";
+        armor.setInternalName("OS Imp. Ferro-Fibrous");
+        armor.addLookupName("Legion Imp. Ferro-Fibrous");
+        armor.addLookupName("Imp. Ferro-Fibrous (Legion)");
+        armor.cost = 20000.0;
+        armor.criticalSlots = 9;
+        armor.flags = armor.flags.or(F_FERRO_FIBROUS).or(F_MEK_EQUIPMENT);
+        armor.rulesRefs = "OS Custom";
+        armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C)
+              .setISAdvancement(2820, 2825, 2832).setStaticTechLevel(SimpleTechLevel.STANDARD);
+        armor.armorType = T_ARMOR_OS_IMP_FF;
+        armor.pptMultiplier = 1.12;
+        return armor;
+    }
+
+    private static ArmorType createOSAdvFF() {
+        ArmorType armor = new ArmorType();
+        armor.name = "Adv. Ferro-Fibrous (OS)";
+        armor.setInternalName("OS Adv. Ferro-Fibrous");
+        armor.addLookupName("Legion Adv. Ferro-Fibrous");
+        armor.addLookupName("Adv. Ferro-Fibrous (Legion)");
+        armor.cost = 28000.0;
+        armor.criticalSlots = 7;
+        armor.flags = armor.flags.or(F_FERRO_FIBROUS).or(F_MEK_EQUIPMENT);
+        armor.rulesRefs = "OS Custom";
+        armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
+              .setISAdvancement(2840, 2848, 2856).setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        armor.armorType = T_ARMOR_OS_ADV_FF;
+        armor.pptMultiplier = 1.208;
+        return armor;
+    }
+
+    private static ArmorType createOSHeavyFF() {
+        ArmorType armor = new ArmorType();
+        armor.name = "Heavy Ferro-Fibrous (OS)";
+        armor.setInternalName("OS Heavy Ferro-Fibrous");
+        armor.addLookupName("Legion Heavy Ferro-Fibrous");
+        armor.addLookupName("Heavy Ferro-Fibrous (Legion)");
+        armor.cost = 25000.0;
+        armor.criticalSlots = 15;
+        armor.flags = armor.flags.or(F_HEAVY_FERRO).or(F_MEK_EQUIPMENT);
+        armor.rulesRefs = "OS Custom";
+        armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C)
+              .setISAdvancement(2824, 2830, 2838).setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        armor.armorType = T_ARMOR_OS_HEAVY_FF;
+        armor.pptMultiplier = 1.1875;
+        return armor;
+    }
+
+    private static ArmorType createOSImpHeavyFF() {
+        ArmorType armor = new ArmorType();
+        armor.name = "Imp. Heavy Ferro-Fibrous (OS)";
+        armor.setInternalName("OS Imp. Heavy Ferro-Fibrous");
+        armor.addLookupName("Legion Imp. Heavy Ferro-Fibrous");
+        armor.addLookupName("Imp. Heavy Ferro-Fibrous (Legion)");
+        armor.cost = 32000.0;
+        armor.criticalSlots = 13;
+        armor.flags = armor.flags.or(F_HEAVY_FERRO).or(F_MEK_EQUIPMENT);
+        armor.rulesRefs = "OS Custom";
+        armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
+              .setISAdvancement(2848, 2856, 2866).setStaticTechLevel(SimpleTechLevel.STANDARD);
+        armor.armorType = T_ARMOR_OS_IMP_HEAVY_FF;
+        armor.pptMultiplier = 1.25;
+        return armor;
+    }
+
+    private static ArmorType createOSImpLightFF() {
+        ArmorType armor = new ArmorType();
+        armor.name = "Imp. Light Ferro-Fibrous (OS)";
+        armor.setInternalName("OS Imp. Light Ferro-Fibrous");
+        armor.addLookupName("Legion Imp. Light Ferro-Fibrous");
+        armor.addLookupName("Imp. Light Ferro-Fibrous (Legion)");
+        armor.cost = 18000.0;
+        armor.criticalSlots = 6;
+        armor.flags = armor.flags.or(F_FERRO_FIBROUS).or(F_MEK_EQUIPMENT);
+        armor.rulesRefs = "OS Custom";
+        armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C)
+              .setISAdvancement(2828, 2834, 2842).setStaticTechLevel(SimpleTechLevel.STANDARD);
+        armor.armorType = T_ARMOR_OS_IMP_LIGHT_FF;
+        armor.pptMultiplier = 1.0;
+        return armor;
+    }
+
+    private static ArmorType createOSImpHardened() {
+        ArmorType armor = new ArmorType();
+        armor.name = "Imp. Hardened (OS)";
+        armor.setInternalName("OS Imp. Hardened");
+        armor.addLookupName("Legion Imp. Hardened");
+        armor.addLookupName("Imp. Hardened (Legion)");
+        armor.cost = 22000.0;
+        armor.criticalSlots = 5;
+        armor.spreadable = true;
+        armor.tankSlots = 1;
+        armor.flags = armor.flags.or(F_HARDENED_ARMOR).or(F_MEK_EQUIPMENT).or(F_TANK_EQUIPMENT);
+        armor.rulesRefs = "OS Custom";
+        armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
+              .setISAdvancement(2850, 2860, 2872).setStaticTechLevel(SimpleTechLevel.STANDARD);
+        armor.armorType = T_ARMOR_OS_IMP_HARDENED;
+        armor.pptMultiplier = 0.625;
+        return armor;
+    }
+
+    private static ArmorType createOSHardenedFF() {
+        ArmorType armor = new ArmorType();
+        armor.name = "Hardened Ferro-Fibrous (OS)";
+        armor.setInternalName("OS Hardened Ferro-Fibrous");
+        armor.addLookupName("Legion Hardened Ferro-Fibrous");
+        armor.addLookupName("Hardened Ferro-Fibrous (Legion)");
+        armor.cost = 30000.0;
+        armor.criticalSlots = 14;
+        armor.flags = armor.flags.or(F_HARDENED_ARMOR).or(F_FERRO_FIBROUS).or(F_MEK_EQUIPMENT);
+        armor.rulesRefs = "OS Custom";
+        armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
+              .setISAdvancement(2860, 2870, 2882).setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        armor.armorType = T_ARMOR_OS_HARDENED_FF;
+        armor.pptMultiplier = 0.5625;
+        return armor;
+    }
+
+    private static ArmorType createOSHardenedHeavyFF() {
+        ArmorType armor = new ArmorType();
+        armor.name = "Hardened Heavy Ferro-Fibrous (OS)";
+        armor.setInternalName("OS Hardened Heavy Ferro-Fibrous");
+        armor.addLookupName("Legion Hardened Heavy Ferro-Fibrous");
+        armor.addLookupName("Hardened Heavy Ferro-Fibrous (Legion)");
+        armor.cost = 45000.0;
+        armor.criticalSlots = 16;
+        armor.flags = armor.flags.or(F_HARDENED_ARMOR).or(F_HEAVY_FERRO).or(F_MEK_EQUIPMENT);
+        armor.rulesRefs = "OS Custom";
+        armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
+              .setISAdvancement(2875, 2888, 2900).setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+        armor.armorType = T_ARMOR_OS_HARDENED_HEAVY_FF;
+        armor.pptMultiplier = 0.9375;
+        return armor;
+    }
+
+    private static ArmorType createOSAdvHardenedFF() {
+        ArmorType armor = new ArmorType();
+        armor.name = "Adv. Hardened Ferro-Fibrous (OS)";
+        armor.setInternalName("OS Adv. Hardened Ferro-Fibrous");
+        armor.addLookupName("Legion Adv. Hardened Ferro-Fibrous");
+        armor.addLookupName("Adv. Hardened Ferro-Fibrous (Legion)");
+        armor.cost = 38000.0;
+        armor.criticalSlots = 14;
+        armor.flags = armor.flags.or(F_HARDENED_ARMOR).or(F_FERRO_FIBROUS).or(F_MEK_EQUIPMENT);
+        armor.rulesRefs = "OS Custom";
+        armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
+              .setISAdvancement(2870, 2882, 2896).setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+        armor.armorType = T_ARMOR_OS_ADV_HARDENED_FF;
+        armor.pptMultiplier = 0.8125;
+        return armor;
+    }
+
+    private static ArmorType createOSReactive() {
+        ArmorType armor = new ArmorType();
+        armor.name = "Reactive (OS)";
+        armor.setInternalName("OS Reactive");
+        armor.addLookupName("Legion Reactive");
+        armor.addLookupName("Reactive (Legion)");
+        armor.cost = 30000.0;
+        armor.criticalSlots = 12;
+        armor.tankSlots = 1;
+        armor.flags = armor.flags.or(F_REACTIVE).or(F_MEK_EQUIPMENT).or(F_TANK_EQUIPMENT).or(F_VTOL_EQUIPMENT);
+        armor.rulesRefs = "OS Custom";
+        armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
+              .setISAdvancement(2840, 2850, 2862).setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        armor.armorType = T_ARMOR_OS_REACTIVE;
+        armor.pptMultiplier = 1.0;
+        return armor;
+    }
+
+    private static ArmorType createOSImpReactive() {
+        ArmorType armor = new ArmorType();
+        armor.name = "Imp. Reactive (OS)";
+        armor.setInternalName("OS Imp. Reactive");
+        armor.addLookupName("Legion Imp. Reactive");
+        armor.addLookupName("Imp. Reactive (Legion)");
+        armor.cost = 40000.0;
+        armor.criticalSlots = 5;
+        armor.tankSlots = 1;
+        armor.flags = armor.flags.or(F_REACTIVE).or(F_MEK_EQUIPMENT).or(F_TANK_EQUIPMENT).or(F_VTOL_EQUIPMENT);
+        armor.rulesRefs = "OS Custom";
+        armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
+              .setISAdvancement(2870, 2882, 2896).setStaticTechLevel(SimpleTechLevel.STANDARD);
+        armor.armorType = T_ARMOR_OS_IMP_REACTIVE;
+        armor.pptMultiplier = 1.0;
+        return armor;
+    }
+
+    private static ArmorType createOSEnergyAbsorption() {
+        ArmorType armor = new ArmorType();
+        armor.name = "Energy Absorption (OS)";
+        armor.setInternalName("OS Energy Absorption");
+        armor.addLookupName("Legion Energy Absorption");
+        armor.addLookupName("Energy Absorption (Legion)");
+        armor.cost = 35000.0;
+        armor.criticalSlots = 9;
+        armor.flags = armor.flags.or(F_REFLECTIVE).or(F_MEK_EQUIPMENT);
+        armor.rulesRefs = "OS Custom";
+        armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
+              .setISAdvancement(2855, 2865, 2878).setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        armor.armorType = T_ARMOR_OS_ENERGY_ABSORPTION;
+        armor.pptMultiplier = 1.0;
+        return armor;
+    }
+
+    private static ArmorType createOSLaserReflective() {
+        ArmorType armor = new ArmorType();
+        armor.name = "Laser Reflective (OS)";
+        armor.setInternalName("OS Laser Reflective");
+        armor.addLookupName("Legion Laser Reflective");
+        armor.addLookupName("Laser Reflective (Legion)");
+        armor.cost = 30000.0;
+        armor.criticalSlots = 7;
+        armor.flags = armor.flags.or(F_REFLECTIVE).or(F_MEK_EQUIPMENT);
+        armor.rulesRefs = "OS Custom";
+        armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
+              .setISAdvancement(2848, 2858, 2870).setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        armor.armorType = T_ARMOR_OS_LASER_REFLECTIVE;
+        armor.pptMultiplier = 1.0;
+        return armor;
+    }
+
+    private static ArmorType createOSBallisticReinforced() {
+        ArmorType armor = new ArmorType();
+        armor.name = "Ballistic-Reinforced (OS)";
+        armor.setInternalName("OS Ballistic-Reinforced");
+        armor.addLookupName("Legion Ballistic-Reinforced");
+        armor.addLookupName("Ballistic-Reinforced (Legion)");
+        armor.cost = 25000.0;
+        armor.criticalSlots = 7;
+        armor.flags = armor.flags.or(F_BALLISTIC_REINFORCED).or(F_MEK_EQUIPMENT).or(F_TANK_EQUIPMENT);
+        armor.rulesRefs = "OS Custom";
+        armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
+              .setISAdvancement(2845, 2855, 2868).setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        armor.armorType = T_ARMOR_OS_BALLISTIC_REINFORCED;
+        armor.pptMultiplier = 0.875;
+        return armor;
+    }
+
+    private static ArmorType createOSFerroLamellor() {
+        ArmorType armor = new ArmorType();
+        armor.name = "Ferro-Lamellor (OS)";
+        armor.setInternalName("OS Ferro-Lamellor");
+        armor.addLookupName("Legion Ferro-Lamellor");
+        armor.addLookupName("Ferro-Lamellor (Legion)");
+        armor.cost = 35000.0;
+        armor.criticalSlots = CRITICAL_SLOTS_VARIABLE;
+        armor.tankSlots = 1;
+        armor.flags = armor.flags.or(F_FERRO_LAMELLOR).or(F_MEK_EQUIPMENT).or(F_TANK_EQUIPMENT);
+        armor.rulesRefs = "OS Custom";
+        armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
+              .setISAdvancement(2878, 2892, 2910).setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        armor.armorType = T_ARMOR_OS_FERRO_LAMELLOR;
+        armor.pptMultiplier = 0.75;
+        return armor;
+    }
+
+    private static ArmorType createOSHeavyFerroLamellor() {
+        ArmorType armor = new ArmorType();
+        armor.name = "Heavy Ferro-Lamellor (OS)";
+        armor.setInternalName("OS Heavy Ferro-Lamellor");
+        armor.addLookupName("Legion Heavy Ferro-Lamellor");
+        armor.addLookupName("Heavy Ferro-Lamellor (Legion)");
+        armor.cost = 50000.0;
+        armor.criticalSlots = 16;
+        armor.tankSlots = 1;
+        armor.flags = armor.flags.or(F_FERRO_LAMELLOR).or(F_MEK_EQUIPMENT).or(F_TANK_EQUIPMENT);
+        armor.rulesRefs = "OS Custom";
+        armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
+              .setISAdvancement(2890, 2905, 2922).setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        armor.armorType = T_ARMOR_OS_HEAVY_FERRO_LAMELLOR;
+        armor.pptMultiplier = 0.875;
+        return armor;
+    }
+
+    private static ArmorType createOSHardenedHeavyFerroLamellor() {
+        ArmorType armor = new ArmorType();
+        armor.name = "Hardened Heavy Ferro-Lamellor (OS)";
+        armor.setInternalName("OS Hardened Heavy Ferro-Lamellor");
+        armor.addLookupName("Legion Hardened Heavy Ferro-Lamellor");
+        armor.addLookupName("Hardened Heavy Ferro-Lamellor (Legion)");
+        armor.cost = 80000.0;
+        armor.criticalSlots = 18;
+        armor.tankSlots = 1;
+        armor.flags = armor.flags.or(F_HARDENED_ARMOR).or(F_FERRO_LAMELLOR).or(F_MEK_EQUIPMENT);
+        armor.rulesRefs = "OS Custom";
+        armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
+              .setISAdvancement(2905, 2920, 2940).setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+        armor.armorType = T_ARMOR_OS_HARDENED_HEAVY_FERRO_LAMELLOR;
+        armor.pptMultiplier = 0.75;
+        return armor;
+    }
+
+    private static ArmorType createOSStealth() {
+        ArmorType armor = new ArmorType();
+        armor.name = "Stealth (OS)";
+        armor.setInternalName("OS Stealth");
+        armor.addLookupName("Legion Stealth");
+        armor.addLookupName("Stealth (Legion)");
+        armor.cost = 50000.0;
+        armor.criticalSlots = 12;
+        armor.stealthHeat = 8;
+        armor.flags = armor.flags.or(F_STEALTH).or(F_MEK_EQUIPMENT);
+        String[] saModes = { "Off", "On" };
+        armor.setModes(saModes);
+        armor.setInstantModeSwitch(false);
+        armor.bv = 0;
+        armor.rulesRefs = "OS Custom";
+        armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
+              .setISAdvancement(2852, 2862, 2875).setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        armor.armorType = T_ARMOR_OS_STEALTH;
+        armor.pptMultiplier = 1.0;
+        return armor;
+    }
+
+    private static ArmorType createOSAPA() {
+        ArmorType armor = new ArmorType();
+        armor.name = "Anti-Penetrative Ablation (OS)";
+        armor.setInternalName("OS Anti-Penetrative Ablation");
+        armor.addLookupName("Legion Anti-Penetrative Ablation");
+        armor.addLookupName("Anti-Penetrative Ablation (Legion)");
+        armor.cost = 20000.0;
+        armor.criticalSlots = 6;
+        armor.tankSlots = 1;
+        armor.flags = armor.flags.or(F_ANTI_PENETRATIVE_ABLATIVE).or(F_MEK_EQUIPMENT).or(F_TANK_EQUIPMENT);
+        armor.rulesRefs = "OS Custom";
+        armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C)
+              .setISAdvancement(2830, 2840, 2852).setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        armor.armorType = T_ARMOR_OS_APA;
+        armor.pptMultiplier = 0.9375;
+        return armor;
+    }
+
+    private static ArmorType createOSImpStealth() {
+        ArmorType armor = new ArmorType();
+        armor.name = "Imp. Stealth (OS)";
+        armor.setInternalName("OS Imp. Stealth");
+        armor.addLookupName("Legion Imp. Stealth");
+        armor.addLookupName("Imp. Stealth (Legion)");
+        armor.cost = 75000.0;
+        armor.criticalSlots = 10;
+        armor.stealthHeat = 7;
+        armor.flags = armor.flags.or(F_STEALTH).or(F_MEK_EQUIPMENT);
+        String[] saModes = { "Off", "On" };
+        armor.setModes(saModes);
+        armor.setInstantModeSwitch(false);
+        armor.bv = 0;
+        armor.rulesRefs = "OS Custom";
+        armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
+              .setISAdvancement(2878, 2892, 2910).setStaticTechLevel(SimpleTechLevel.STANDARD);
+        armor.armorType = T_ARMOR_OS_IMP_STEALTH;
+        armor.pptMultiplier = 1.0;
         return armor;
     }
 

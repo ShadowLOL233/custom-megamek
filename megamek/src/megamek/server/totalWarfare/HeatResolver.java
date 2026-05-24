@@ -47,6 +47,8 @@ import megamek.common.equipment.ArmorType;
 import megamek.common.equipment.EquipmentMode;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
+import megamek.common.equipment.WeaponMounted;
+import megamek.common.equipment.WeaponType;
 import megamek.common.options.OptionsConstants;
 import megamek.common.rolls.PilotingRollData;
 import megamek.common.rolls.Roll;
@@ -244,12 +246,32 @@ class HeatResolver extends AbstractTWRuleHandler {
             // engine hits add a lot of heat, provided the engine is on
             entity.heatBuildup += entity.getEngineCritHeat();
 
-            // If a Mek had an active Stealth suite, add 10 heat.
+            // If a Mek had an active Stealth suite, add heat (amount varies by armor type).
             if (entity.isStealthOn()) {
-                entity.heatBuildup += ArmorType.STEALTH_ARMOR_HEAT;
+                entity.heatBuildup += ArmorType.forEntity(entity).getStealthHeat();
                 report = new Report(5015);
                 report.subject = entity.getId();
                 heatEffectsReports.add(report);
+            }
+
+            // Outer Sphere Hyper Laser: while in "Charging" mode each turn the weapon generates
+            // charge heat (approx. fire heat / 3). If the weapon fired this round (firing turn),
+            // the charge heat is suppressed — only the full fire heat from the actual shot applies.
+            for (WeaponMounted weapon : entity.getWeaponList()) {
+                if (weapon.getType().hasFlag(WeaponType.F_HYPER)
+                      && !weapon.isDestroyed()
+                      && !weapon.isMissing()
+                      && weapon.getHyperLaserCooldown() == 0
+                      && "Charging".equals(weapon.curMode().getName())
+                      && !weapon.isUsedThisRound()) {
+                    int chargeHeat = (int) Math.ceil(weapon.getType().getHeat() / 3.0);
+                    entity.heatBuildup += chargeHeat;
+                    Report chargeReport = new Report(1264);
+                    chargeReport.subject = entity.getId();
+                    chargeReport.indent(1);
+                    chargeReport.add(chargeHeat);
+                    heatEffectsReports.add(chargeReport);
+                }
             }
 
             // Greg: Nova CEWS If a Mek had an active Nova suite, add 2 heat.

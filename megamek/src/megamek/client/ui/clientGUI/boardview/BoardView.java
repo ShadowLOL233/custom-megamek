@@ -3412,20 +3412,31 @@ public final class BoardView extends AbstractBoardView
                   && !(entity instanceof Infantry)
                   && (position != null)
                   && board.contains(position)) {
-                WreckSprite wreckSprite;
-                IsometricWreckSprite isometricWreckSprite;
-                if (entity.getSecondaryPositions().isEmpty()) {
-                    wreckSprite = new WreckSprite(this, entity, -1);
-                    newWrecks.add(wreckSprite);
-                    isometricWreckSprite = new IsometricWreckSprite(this, entity, -1);
-                    newIsometricWrecks.add(isometricWreckSprite);
-                } else {
-                    for (int secondaryPos : entity.getSecondaryPositions().keySet()) {
-                        wreckSprite = new WreckSprite(this, entity, secondaryPos);
+                // Defensive: wreck sprite construction can fail with NoClassDefFoundError if
+                // the runtime classpath is in an inconsistent state during incremental
+                // recompilation. Skip the wreck rendering for this entity rather than
+                // surfacing an Uncaught Exception dialog.
+                try {
+                    WreckSprite wreckSprite;
+                    IsometricWreckSprite isometricWreckSprite;
+                    if (entity.getSecondaryPositions().isEmpty()) {
+                        wreckSprite = new WreckSprite(this, entity, -1);
                         newWrecks.add(wreckSprite);
-                        isometricWreckSprite = new IsometricWreckSprite(this, entity, secondaryPos);
+                        isometricWreckSprite = new IsometricWreckSprite(this, entity, -1);
                         newIsometricWrecks.add(isometricWreckSprite);
+                    } else {
+                        for (int secondaryPos : entity.getSecondaryPositions().keySet()) {
+                            wreckSprite = new WreckSprite(this, entity, secondaryPos);
+                            newWrecks.add(wreckSprite);
+                            isometricWreckSprite = new IsometricWreckSprite(this, entity, secondaryPos);
+                            newIsometricWrecks.add(isometricWreckSprite);
+                        }
                     }
+                } catch (LinkageError err) {
+                    // LinkageError covers NoClassDefFoundError, ClassFormatError, and similar
+                    // class-loading issues that can briefly happen during incremental rebuilds.
+                    LOGGER.warn(err, "Skipping wreck sprite for entity {} due to transient class load failure",
+                          entity.getDisplayName());
                 }
             }
         }

@@ -407,8 +407,18 @@ public class BipedMek extends MekWithArms {
 
     @Override
     public boolean hasMPReducingHardenedArmor() {
-        return (armorType[LOC_LEFT_LEG] == EquipmentType.T_ARMOR_HARDENED) ||
-              (armorType[LOC_RIGHT_LEG] == EquipmentType.T_ARMOR_HARDENED);
+        for (int leg : new int[]{LOC_LEFT_LEG, LOC_RIGHT_LEG}) {
+            int at = armorType[leg];
+            if (at == EquipmentType.T_ARMOR_HARDENED
+                  || at == EquipmentType.T_ARMOR_OS_IMP_HARDENED
+                  || at == EquipmentType.T_ARMOR_OS_HARDENED_FF
+                  || at == EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FF
+                  || at == EquipmentType.T_ARMOR_OS_ADV_HARDENED_FF
+                  || at == EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FERRO_LAMELLOR) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

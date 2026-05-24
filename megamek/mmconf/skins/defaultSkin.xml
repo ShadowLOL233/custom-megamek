@@ -16,17 +16,17 @@
 <skin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:noNamespaceSchemaLocation="skinSchema.xsd">
 
-  <!-- Defines default borders used in Megamek -->
+	<!-- Defines default borders used in Megamek -->
   <UI_Element>
     <name>BoardViewBorder</name>
-    <!-- Specification of border images -->
+		<!-- Specification of border images -->
     <border>
-      <!-- Corner images -->
+			<!-- Corner images -->
       <corner_top_left>kiro/01.gif</corner_top_left>
       <corner_top_right>kiro/07.gif</corner_top_right>
       <corner_bottom_left>kiro/19.gif</corner_bottom_left>
       <corner_bottom_right>kiro/13.png</corner_bottom_right>
-      <!-- Border lines: these images will be tiled -->
+			<!-- Border lines: these images will be tiled -->
       <edge>
         <edgeIcon>
           <icon>kiro/02.gif</icon>
@@ -124,17 +124,17 @@
     <background_image>hyades.jpg</background_image>
   </UI_Element>
 
-  <!-- Defines the borders for the PhaseDisplay -->
+	<!-- Defines the borders for the PhaseDisplay -->
   <UI_Element>
     <name>PhaseDisplayBorder</name>
-    <!-- Specification of border images -->
+		<!-- Specification of border images -->
     <border>
-      <!-- Corner images -->
+			<!-- Corner images -->
       <corner_top_left>monitor_top_left.png</corner_top_left>
       <corner_top_right>monitor_top_right.png</corner_top_right>
       <corner_bottom_left>monitor_bottom_left.png</corner_bottom_left>
       <corner_bottom_right>monitor_bottom_right.png</corner_bottom_right>
-      <!-- Border lines: these images will be tiled -->
+			<!-- Border lines: these images will be tiled -->
       <edge>
         <edgeIcon>
           <icon>monitor_top_line.png</icon>
@@ -164,17 +164,17 @@
     <font_color>#FFFF00</font_color>
   </UI_Element>
 
-  <!-- Defines default borders used in Megamek -->
+	<!-- Defines default borders used in Megamek -->
   <UI_Element>
     <name>defaultElement</name>
-    <!-- Specification of border images -->
+		<!-- Specification of border images -->
     <border>
-      <!-- Corner images -->
+			<!-- Corner images -->
       <corner_top_left>monitor_top_left.png</corner_top_left>
       <corner_top_right>monitor_top_right.png</corner_top_right>
       <corner_bottom_left>monitor_bottom_left.png</corner_bottom_left>
       <corner_bottom_right>monitor_bottom_right.png</corner_bottom_right>
-      <!-- Border lines: these images will be tiled -->
+			<!-- Border lines: these images will be tiled -->
       <edge>
         <edgeIcon>
           <icon>monitor_top_line.png</icon>
@@ -204,13 +204,13 @@
   </UI_Element>
 
 
-  <!-- Defines default buttons -->
+	<!-- Defines default buttons -->
   <UI_Element>
     <name>defaultButton</name>
-    <!-- Specification of border images -->
+		<!-- Specification of border images -->
     <no_border>true</no_border>
     <tile_background>false</tile_background>
-    <!-- Specification of background image -->
+		<!-- Specification of background image -->
     <background_image>SpaceD/buttonNormal.png</background_image>
     <background_image>SpaceD/buttonPushed.png</background_image>
     <font_color>#ffffff</font_color>

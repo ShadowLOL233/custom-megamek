@@ -74,13 +74,33 @@ public class TechConstants {
     public static final int T_ALL_CLAN = 12;
     public static final int T_ALL = 13;
 
+    // Outer Sphere tech levels — a parallel tech base derived from the old SLDF/IS lineage
+    public static final int T_OUTER_SPHERE_INTRO = 14;
+    public static final int T_OUTER_SPHERE_STANDARD = 15;
+    public static final int T_OUTER_SPHERE_ADVANCED = 16;
+    public static final int T_OUTER_SPHERE_EXPERIMENTAL = 17;
+    public static final int T_OUTER_SPHERE_UNOFFICIAL = 18;
+    public static final int T_ALL_OUTER_SPHERE = 19;
+
+    // Ascended tech levels — a third parallel tech base (no Mixed variant)
+    public static final int T_ASCENDED_INTRO = 20;
+    public static final int T_ASCENDED_STANDARD = 21;
+    public static final int T_ASCENDED_ADVANCED = 22;
+    public static final int T_ASCENDED_EXPERIMENTAL = 23;
+    public static final int T_ASCENDED_UNOFFICIAL = 24;
+    public static final int T_ALL_ASCENDED = 25;
+
     // Number of legal level 2 choices
     public static final int SIZE_LEVEL_2 = 5;
 
     // It must match the index to the constant's value.
     private static final String[] T_NAMES = { "IS_Box_Set", "IS_TW_Non_Box", "Clan_TW", "IS_TW", "All_TW",
                                               "IS_Advanced", "Clan_Advanced", "IS_Experimental", "Clan_Experimental",
-                                              "IS_Unofficial", "Clan_Unofficial", "All_IS", "All_Clan", "All" };
+                                              "IS_Unofficial", "Clan_Unofficial", "All_IS", "All_Clan", "All",
+                                              "Outer_Sphere_Intro", "Outer_Sphere_Standard", "Outer_Sphere_Advanced",
+                                              "Outer_Sphere_Experimental", "Outer_Sphere_Unofficial", "All_Outer_Sphere",
+                                              "Ascended_Intro", "Ascended_Standard", "Ascended_Advanced",
+                                              "Ascended_Experimental", "Ascended_Unofficial", "All_Ascended" };
 
     public static final int SIZE = T_NAMES.length;
 
@@ -102,7 +122,8 @@ public class TechConstants {
     // The "all" selections return -1, since they don't apply to
     // individual units.
     public static final String[] T_SIMPLE_LEVEL = { "1", "2", "2", "-1", "-1", "3", "3", "4", "4", "5", "5", "-1", "-1",
-                                                    "-1" };
+                                                    "-1",
+                                                    "1", "2", "3", "4", "5", "-1" };
 
     public static String getLevelName(int level) {
         if (level == T_ALLOWED_ALL) {
@@ -227,6 +248,34 @@ public class TechConstants {
     }
 
     /**
+     * Given a simple tech level, return the corresponding Outer Sphere tech level constant.
+     */
+    public static int convertFromSimpleLevelForOuterSphere(int simpleTechLvl) {
+        return switch (simpleTechLvl) {
+            case T_SIMPLE_INTRO -> T_OUTER_SPHERE_INTRO;
+            case T_SIMPLE_STANDARD -> T_OUTER_SPHERE_STANDARD;
+            case T_SIMPLE_ADVANCED -> T_OUTER_SPHERE_ADVANCED;
+            case T_SIMPLE_EXPERIMENTAL -> T_OUTER_SPHERE_EXPERIMENTAL;
+            case T_SIMPLE_UNOFFICIAL -> T_OUTER_SPHERE_UNOFFICIAL;
+            default -> T_OUTER_SPHERE_INTRO;
+        };
+    }
+
+    /**
+     * Given a simple tech level, return the corresponding Ascended tech level constant.
+     */
+    public static int convertFromSimpleLevelForAscended(int simpleTechLvl) {
+        return switch (simpleTechLvl) {
+            case T_SIMPLE_INTRO -> T_ASCENDED_INTRO;
+            case T_SIMPLE_STANDARD -> T_ASCENDED_STANDARD;
+            case T_SIMPLE_ADVANCED -> T_ASCENDED_ADVANCED;
+            case T_SIMPLE_EXPERIMENTAL -> T_ASCENDED_EXPERIMENTAL;
+            case T_SIMPLE_UNOFFICIAL -> T_ASCENDED_UNOFFICIAL;
+            default -> T_ASCENDED_INTRO;
+        };
+    }
+
+    /**
      * Use the game's simple tech level and a flag to return the tech level + tech type.
      *
      * @param game   The current {@link Game}
@@ -300,12 +349,56 @@ public class TechConstants {
 
         // If none of the catch-alls above are true, we go to specific cases
 
-        // If the equipment is allowed to all clan and the entity is clan...
+        // Outer Sphere-exclusive equipment can only be used by Outer Sphere units
+        if (equipmentTechLevel == T_ALL_OUTER_SPHERE) {
+            return isOuterSphere(entityTechLevel);
+        }
+
+        // Ascended-exclusive equipment can only be used by Ascended units
+        if (equipmentTechLevel == T_ALL_ASCENDED) {
+            return isAscended(entityTechLevel);
+        }
+
+        // Outer Sphere units cannot use IS-specific, Clan-specific, or Ascended-specific equipment
+        if (isOuterSphere(entityTechLevel) &&
+              (equipmentTechLevel == T_IS_TW_NON_BOX ||
+               equipmentTechLevel == T_IS_TW_ALL ||
+               equipmentTechLevel == T_TW_ALL ||
+               equipmentTechLevel == T_IS_ADVANCED ||
+               equipmentTechLevel == T_IS_EXPERIMENTAL ||
+               equipmentTechLevel == T_IS_UNOFFICIAL ||
+               equipmentTechLevel == T_CLAN_TW ||
+               equipmentTechLevel == T_CLAN_ADVANCED ||
+               equipmentTechLevel == T_CLAN_EXPERIMENTAL ||
+               equipmentTechLevel == T_CLAN_UNOFFICIAL ||
+               equipmentTechLevel == T_ALL_CLAN ||
+               isAscended(equipmentTechLevel))) {
+            return false;
+        }
+
+        // Ascended units cannot use IS-specific, Clan-specific, or Outer Sphere-specific equipment
+        if (isAscended(entityTechLevel) &&
+              (equipmentTechLevel == T_IS_TW_NON_BOX ||
+               equipmentTechLevel == T_IS_TW_ALL ||
+               equipmentTechLevel == T_TW_ALL ||
+               equipmentTechLevel == T_IS_ADVANCED ||
+               equipmentTechLevel == T_IS_EXPERIMENTAL ||
+               equipmentTechLevel == T_IS_UNOFFICIAL ||
+               equipmentTechLevel == T_CLAN_TW ||
+               equipmentTechLevel == T_CLAN_ADVANCED ||
+               equipmentTechLevel == T_CLAN_EXPERIMENTAL ||
+               equipmentTechLevel == T_CLAN_UNOFFICIAL ||
+               equipmentTechLevel == T_ALL_CLAN ||
+               isOuterSphere(equipmentTechLevel))) {
+            return false;
+        }
+
+        // If the equipment is allowed to all IS (and Outer Sphere follows IS lineage)
         if ((equipmentTechLevel == T_ALL_IS) && !isClan(entityTechLevel)) {
             return true;
         }
 
-        // IS box set can be in any IS
+        // IS box set (Introductory) can be used by any IS or Outer Sphere unit
         if ((equipmentTechLevel == T_INTRO_BOX_SET) &&
               ((entityTechLevel == T_IS_TW_NON_BOX) ||
                     (entityTechLevel == T_IS_TW_ALL) ||
@@ -313,7 +406,12 @@ public class TechConstants {
                     (entityTechLevel == T_IS_ADVANCED) ||
                     (entityTechLevel == T_IS_EXPERIMENTAL) ||
                     (entityTechLevel == T_IS_UNOFFICIAL) ||
-                    (entityTechLevel == T_ALL))) {
+                    (entityTechLevel == T_ALL) ||
+                    (entityTechLevel == T_OUTER_SPHERE_INTRO) ||
+                    (entityTechLevel == T_OUTER_SPHERE_STANDARD) ||
+                    (entityTechLevel == T_OUTER_SPHERE_ADVANCED) ||
+                    (entityTechLevel == T_OUTER_SPHERE_EXPERIMENTAL) ||
+                    (entityTechLevel == T_OUTER_SPHERE_UNOFFICIAL))) {
             return true;
         }
 
@@ -366,10 +464,57 @@ public class TechConstants {
             return true;
         }
         // clan experimental stuff can be in clan unofficial or all (identical
-        // level
-        // is caught above
-        return (equipmentTechLevel == T_CLAN_EXPERIMENTAL) &&
-              ((entityTechLevel == T_CLAN_UNOFFICIAL) || (entityTechLevel == T_ALL));
+        // level is caught above
+        if ((equipmentTechLevel == T_CLAN_EXPERIMENTAL) &&
+              ((entityTechLevel == T_CLAN_UNOFFICIAL) || (entityTechLevel == T_ALL))) {
+            return true;
+        }
+
+        // Outer Sphere tech cascade: lower levels usable by higher-level Outer Sphere units
+        if ((equipmentTechLevel == T_OUTER_SPHERE_INTRO) &&
+              ((entityTechLevel == T_OUTER_SPHERE_STANDARD) ||
+               (entityTechLevel == T_OUTER_SPHERE_ADVANCED) ||
+               (entityTechLevel == T_OUTER_SPHERE_EXPERIMENTAL) ||
+               (entityTechLevel == T_OUTER_SPHERE_UNOFFICIAL))) {
+            return true;
+        }
+        if ((equipmentTechLevel == T_OUTER_SPHERE_STANDARD) &&
+              ((entityTechLevel == T_OUTER_SPHERE_ADVANCED) ||
+               (entityTechLevel == T_OUTER_SPHERE_EXPERIMENTAL) ||
+               (entityTechLevel == T_OUTER_SPHERE_UNOFFICIAL))) {
+            return true;
+        }
+        if ((equipmentTechLevel == T_OUTER_SPHERE_ADVANCED) &&
+              ((entityTechLevel == T_OUTER_SPHERE_EXPERIMENTAL) ||
+               (entityTechLevel == T_OUTER_SPHERE_UNOFFICIAL))) {
+            return true;
+        }
+        if ((equipmentTechLevel == T_OUTER_SPHERE_EXPERIMENTAL) &&
+              (entityTechLevel == T_OUTER_SPHERE_UNOFFICIAL)) {
+            return true;
+        }
+
+        // Ascended tech cascade: lower levels usable by higher-level Ascended units
+        if ((equipmentTechLevel == T_ASCENDED_INTRO) &&
+              ((entityTechLevel == T_ASCENDED_STANDARD) ||
+               (entityTechLevel == T_ASCENDED_ADVANCED) ||
+               (entityTechLevel == T_ASCENDED_EXPERIMENTAL) ||
+               (entityTechLevel == T_ASCENDED_UNOFFICIAL))) {
+            return true;
+        }
+        if ((equipmentTechLevel == T_ASCENDED_STANDARD) &&
+              ((entityTechLevel == T_ASCENDED_ADVANCED) ||
+               (entityTechLevel == T_ASCENDED_EXPERIMENTAL) ||
+               (entityTechLevel == T_ASCENDED_UNOFFICIAL))) {
+            return true;
+        }
+        if ((equipmentTechLevel == T_ASCENDED_ADVANCED) &&
+              ((entityTechLevel == T_ASCENDED_EXPERIMENTAL) ||
+               (entityTechLevel == T_ASCENDED_UNOFFICIAL))) {
+            return true;
+        }
+        return (equipmentTechLevel == T_ASCENDED_EXPERIMENTAL) &&
+              (entityTechLevel == T_ASCENDED_UNOFFICIAL);
     }
 
     public static String getTechName(int level) {
@@ -384,6 +529,18 @@ public class TechConstants {
               (level == T_CLAN_EXPERIMENTAL) ||
               (level == T_CLAN_UNOFFICIAL)) {
             return "Clan";
+        } else if ((level == T_OUTER_SPHERE_INTRO) ||
+              (level == T_OUTER_SPHERE_STANDARD) ||
+              (level == T_OUTER_SPHERE_ADVANCED) ||
+              (level == T_OUTER_SPHERE_EXPERIMENTAL) ||
+              (level == T_OUTER_SPHERE_UNOFFICIAL)) {
+            return "Outer Sphere";
+        } else if ((level == T_ASCENDED_INTRO) ||
+              (level == T_ASCENDED_STANDARD) ||
+              (level == T_ASCENDED_ADVANCED) ||
+              (level == T_ASCENDED_EXPERIMENTAL) ||
+              (level == T_ASCENDED_UNOFFICIAL)) {
+            return "Ascended";
         } else if (level == T_ALLOWED_ALL) {
             return "IS/Clan";
         } else {
@@ -398,6 +555,22 @@ public class TechConstants {
         };
     }
 
+    public static boolean isOuterSphere(int level) {
+        return switch (level) {
+            case T_OUTER_SPHERE_INTRO, T_OUTER_SPHERE_STANDARD, T_OUTER_SPHERE_ADVANCED, T_OUTER_SPHERE_EXPERIMENTAL,
+                 T_OUTER_SPHERE_UNOFFICIAL, T_ALL_OUTER_SPHERE -> true;
+            default -> false;
+        };
+    }
+
+    public static boolean isAscended(int level) {
+        return switch (level) {
+            case T_ASCENDED_INTRO, T_ASCENDED_STANDARD, T_ASCENDED_ADVANCED, T_ASCENDED_EXPERIMENTAL,
+                 T_ASCENDED_UNOFFICIAL, T_ALL_ASCENDED -> true;
+            default -> false;
+        };
+    }
+
     public static int getOppositeTechLevel(int level) {
         return switch (level) {
             case T_INTRO_BOX_SET, T_IS_TW_NON_BOX -> T_CLAN_TW;
@@ -408,6 +581,10 @@ public class TechConstants {
             case T_CLAN_ADVANCED -> T_IS_ADVANCED;
             case T_CLAN_EXPERIMENTAL -> T_IS_EXPERIMENTAL;
             case T_CLAN_UNOFFICIAL -> T_IS_UNOFFICIAL;
+            case T_OUTER_SPHERE_INTRO, T_OUTER_SPHERE_STANDARD, T_OUTER_SPHERE_ADVANCED,
+                 T_OUTER_SPHERE_EXPERIMENTAL, T_OUTER_SPHERE_UNOFFICIAL -> T_TECH_UNKNOWN;
+            case T_ASCENDED_INTRO, T_ASCENDED_STANDARD, T_ASCENDED_ADVANCED,
+                 T_ASCENDED_EXPERIMENTAL, T_ASCENDED_UNOFFICIAL -> T_TECH_UNKNOWN;
             default -> T_TECH_UNKNOWN;
         };
     }
