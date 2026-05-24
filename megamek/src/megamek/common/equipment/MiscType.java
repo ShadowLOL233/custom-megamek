@@ -805,11 +805,11 @@ public class MiscType extends EquipmentType {
         } else if (hasFlag(F_OS_IMP_ENDO_STEEL)) {
             return defaultRounding.round(entity.getWeight() * 0.05, entity);
         } else if (hasFlag(F_OS_ADV_ENDO_STEEL)) {
-            return RoundWeight.NEXT_HALF_TON.round(entity.getWeight() * 0.045, entity);
+            return defaultRounding.round(entity.getWeight() * 0.045, entity);
         } else if (hasFlag(F_OS_IMP_REINFORCE)) {
             return defaultRounding.round(entity.getWeight() * 0.175, entity);
         } else if (hasFlag(F_OS_REINFORCE_COMPOSITE)) {
-            return RoundWeight.NEXT_HALF_TON.round(entity.getWeight() * 0.075, entity);
+            return defaultRounding.round(entity.getWeight() * 0.075, entity);
         } else if (hasFlag(F_OS_REINFORCE_ENDO_STEEL)) {
             return defaultRounding.round(entity.getWeight() * 0.145, entity);
         } else if (hasFlag(F_OS_IMP_REINFORCE_ENDO_STEEL)) {
@@ -817,9 +817,9 @@ public class MiscType extends EquipmentType {
         } else if (hasFlag(F_OS_ADV_REINFORCE_ENDO_STEEL)) {
             return defaultRounding.round(entity.getWeight() * 0.125, entity);
         } else if (hasFlag(F_OS_IMP_ENDO_COMPOSITE)) {
-            return RoundWeight.NEXT_HALF_TON.round(entity.getWeight() * 0.075, entity);
+            return defaultRounding.round(entity.getWeight() * 0.075, entity);
         } else if (hasFlag(F_OS_ADV_ENDO_COMPOSITE)) {
-            return RoundWeight.NEXT_HALF_TON.round(entity.getWeight() * 0.065, entity);
+            return defaultRounding.round(entity.getWeight() * 0.065, entity);
         } else if (hasFlag(F_OS_HEAVY_DUTY)) {
             return defaultRounding.round(entity.getWeight() * 0.135, entity);
         } else if (hasFlag(F_OS_HEAVY_DUTY_ENDO_STEEL)) {

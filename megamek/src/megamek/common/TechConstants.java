@@ -123,7 +123,8 @@ public class TechConstants {
     // individual units.
     public static final String[] T_SIMPLE_LEVEL = { "1", "2", "2", "-1", "-1", "3", "3", "4", "4", "5", "5", "-1", "-1",
                                                     "-1",
-                                                    "1", "2", "3", "4", "5", "-1" };
+                                                    "1", "2", "3", "4", "5", "-1",   // 14-19 Outer Sphere
+                                                    "1", "2", "3", "4", "5", "-1" }; // 20-25 Ascended
 
     public static String getLevelName(int level) {
         if (level == T_ALLOWED_ALL) {
