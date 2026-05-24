@@ -1044,7 +1044,28 @@ public class TechAdvancement implements ITechnology {
     }
 
     @Override
+    public boolean isOuterSphere() {
+        return techBase == TechBase.OUTER_SPHERE;
+    }
+
+    @Override
+    public boolean isAscended() {
+        return techBase == TechBase.ASCENDED;
+    }
+
+    @Override
     public boolean isMixedTech() {
         return techBase == TechBase.ALL;
+    }
+
+    @Override
+    public int getTechLevel(int year, boolean clan) {
+        if (isOuterSphere()) {
+            return getSimpleLevel(year, false).getCompoundTechLevel(false, true, false);
+        }
+        if (isAscended()) {
+            return getSimpleLevel(year, false).getCompoundTechLevel(false, false, true);
+        }
+        return getSimpleLevel(year, clan).getCompoundTechLevel(clan);
     }
 }

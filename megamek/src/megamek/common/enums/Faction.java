@@ -85,7 +85,8 @@ public enum Faction {
     CWM(43, FactionAffiliation.CLAN, "CWM", "CWI"),
     CWF(44, FactionAffiliation.CLAN, "CWF", "CW"),
     CWX(45, FactionAffiliation.CLAN, "CWX", "CWIE"),
-    CWV(46, FactionAffiliation.CLAN, "CWV", "CWOV");
+    CWV(46, FactionAffiliation.CLAN, "CWV", "CWOV"),
+    LEGION(47, FactionAffiliation.IS, "LEG", "LEG");
 
     private final int index;
     private final FactionAffiliation affiliation;

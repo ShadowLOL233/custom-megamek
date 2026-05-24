@@ -51,6 +51,9 @@ public enum MiscTypeFlag implements EquipmentFlag {
     F_RADICAL_HEATSINK,
     F_LASER_INSULATOR,
     F_HEAT_DISSIPATING,
+    // OS-exclusive heat sink family
+    F_TRIPLE_HEAT_SINK,
+    F_QUAD_HEAT_SINK,
 
     // Limit which type of unit can install the equipment
     F_BA_EQUIPMENT,
@@ -427,5 +430,39 @@ public enum MiscTypeFlag implements EquipmentFlag {
     S_MARITIME_LIFEBOAT,
     S_MARITIME_ESCAPE_POD,
     S_ATMOSPHERIC_LIFEBOAT,
+
+    // OS Internal Structure Flags
+    F_OS_IMP_ENDO_STEEL,
+    F_OS_ADV_ENDO_STEEL,
+    F_OS_IMP_REINFORCE,
+    F_OS_REINFORCE_COMPOSITE,
+    F_OS_REINFORCE_ENDO_STEEL,
+    F_OS_IMP_REINFORCE_ENDO_STEEL,
+    F_OS_ADV_REINFORCE_ENDO_STEEL,
+    F_OS_IMP_ENDO_COMPOSITE,
+    F_OS_ADV_ENDO_COMPOSITE,
+    F_OS_HEAVY_DUTY,
+    F_OS_HEAVY_DUTY_ENDO_STEEL,
+    F_OS_SH_DUTY_ENDO_STEEL,
+    F_OS_SH_REINFORCE,
+    F_OS_SH_REINFORCE_ENDO_STEEL,
+    F_OS_SH_REINFORCE_ENDO_COMPOSITE,
+    F_OS_REINFORCE_HEAVY_DUTY,
+    F_OS_REINFORCE_HEAVY_DUTY_ENDO_STEEL,
+    F_OS_SH_REINFORCE_HEAVY_DUTY,
+    F_OS_SH_REINFORCE_HEAVY_DUTY_ENDO_STEEL,
+    F_OS_CASE,
+
+    // EARS (Emergency Armor Repair System) and DDS (Damage Distribution System)
+    F_EARS,
+    F_EARS_COMPONENT,
+    F_DDS,
+    F_DDS_COMPONENT,
+
+    // OS Particle Field Damper (PFD)
+    F_OS_PFD,
+
+    // OS Advanced Particle Field Damper (Adv. PFD)
+    F_OS_ADV_PFD,
 
 }

@@ -82,6 +82,7 @@ public enum WeaponTypeFlag implements EquipmentFlag {
     F_B_POD,
     F_BOMBAST_LASER,
     F_HYPER, // Hyper-Laser
+    F_PPC_ROTARY, // Outer Sphere Rotary PPC family — RAC-style cluster firing mode with PPC Coolant Pod consumption
     F_LASER,
     F_LARGE_MISSILE, // Thunderbolt and similar large missiles, for use with AMS resolution
     F_ER_FLAMER, // ER flamers do half damage in heat mode

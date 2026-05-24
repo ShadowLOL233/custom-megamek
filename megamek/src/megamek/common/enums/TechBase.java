@@ -38,7 +38,8 @@ import java.util.Map;
 
 // --- Tech Base Enum ---
 public enum TechBase {
-    UNKNOWN(-1, "Unknown"), ALL(0, "All"), IS(1, "IS"), CLAN(2, "Clan");
+    UNKNOWN(-1, "Unknown"), ALL(0, "All"), IS(1, "IS"), CLAN(2, "Clan"),
+    OUTER_SPHERE(3, "Outer Sphere"), ASCENDED(4, "Ascended");
 
     private final int index;
     private final String name;

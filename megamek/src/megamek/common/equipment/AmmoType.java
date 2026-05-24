@@ -191,7 +191,8 @@ public class AmmoType extends EquipmentType {
         KILLER_WHALE_T(110, "Killer Whale-T", AmmoCategory.Missile),
         WHITE_SHARK_T(111, "White Shark-T", AmmoCategory.Missile),
         BARRACUDA_T(112, "Barracuda-T", AmmoCategory.Missile),
-        INFANTRY(113, "Infantry", AmmoCategory.Special);
+        INFANTRY(113, "Infantry", AmmoCategory.Special),
+        PPC_COOLANT(114, "PPC Coolant Pod", AmmoCategory.Special);
 
         private static final Map<Integer, AmmoTypeEnum> INDEX_LOOKUP = new HashMap<>();
 
@@ -2751,6 +2752,7 @@ public class AmmoType extends EquipmentType {
         clanHeavyFlamerAmmos.add(base);
         EquipmentType.addType(base);
         EquipmentType.addType(AmmoType.createISCoolantPod());
+        EquipmentType.addType(AmmoType.createOSPPCCoolantPod());
         EquipmentType.addType(AmmoType.createISRailGunAmmo());
         EquipmentType.addType(AmmoType.createISMPodAmmo());
         EquipmentType.addType(AmmoType.createISBPodAmmo());
@@ -14937,6 +14939,51 @@ public class AmmoType extends EquipmentType {
     }
 
     // Misc Stuff. (Pods)
+
+    /**
+     * Outer Sphere RPPC Coolant Pod — feeds the Rotary PPC family (RLPPC + RSPPC).
+     * 18 shots per pod, treated like RAC ammunition. Consumed whenever a Rotary PPC
+     * fires in 2-shot mode or higher (one charge per shot beyond the first). Pods are
+     * pooled across the entity (shared ammo-bay model); any Rotary PPC may draw from
+     * any installed pod regardless of location.
+     */
+    private static AmmoType createOSPPCCoolantPod() {
+        AmmoType ammo = new AmmoType();
+
+        ammo.name = "RPPC Coolant Pod";
+        ammo.shortName = "RPPC Coolant";
+        ammo.setInternalName(EquipmentTypeLookup.OS_PPC_COOLANT_POD);
+        ammo.addLookupName("LegionPPCCoolantPod");
+        ammo.addLookupName("Legion PPC Coolant Pod");
+        ammo.addLookupName("Legion RPPC Coolant Pod");
+        ammo.addLookupName("OS PPC Coolant Pod");
+        ammo.addLookupName("OS RPPC Coolant Pod");
+        // Phase-Stabilized Coolant (PSC) is a high-energy chemical fluid, not an inert
+        // refrigerant. Each charge contributes 1 point to the rupture explosion if the pod
+        // is critically destroyed (full pod = 18 dmg, depleted pod = 0). Because the pod is
+        // registered as an AmmoType, standard CASE / LegionCASE protection naturally applies.
+        ammo.damagePerShot = 1;
+        ammo.rackSize = 1;
+        ammo.ammoType = AmmoTypeEnum.PPC_COOLANT;
+        ammo.shots = 18;
+        ammo.bv = 5;
+        ammo.cost = 30000;
+        ammo.tonnage = 1.0;
+        ammo.kgPerShot = 56;
+        ammo.explosive = true;
+        ammo.rulesRefs = "OS Custom";
+        ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setIntroLevel(false)
+              .setUnofficial(false)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
+              .setISAdvancement(3130, 3135, 3140, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        return ammo;
+    }
 
     private static AmmoType createISCoolantPod() {
         AmmoType ammo = new AmmoType();

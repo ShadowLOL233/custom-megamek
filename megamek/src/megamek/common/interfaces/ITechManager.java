@@ -79,6 +79,20 @@ public interface ITechManager {
     boolean useMixedTech();
 
     /**
+     * @return True if the tech should have a OS tech base.
+     */
+    default boolean useOSTechBase() {
+        return false;
+    }
+
+    /**
+     * @return True if the tech should have an Ascended tech base.
+     */
+    default boolean useAscendedTechBase() {
+        return false;
+    }
+
+    /**
      * @return The maximum allowable tech level.
      */
     SimpleTechLevel getTechLevel();
@@ -100,6 +114,30 @@ public interface ITechManager {
     boolean showExtinct();
 
     default boolean isLegal(ITechnology tech) {
+        // Outer Sphere-exclusive equipment is only available to Outer Sphere tech base units
+        if (tech.getTechBase() == TechBase.OUTER_SPHERE && !useOSTechBase()) {
+            return false;
+        }
+        // Ascended-exclusive equipment is only available to Ascended tech base units
+        if (tech.getTechBase() == TechBase.ASCENDED && !useAscendedTechBase()) {
+            return false;
+        }
+        // Pure Outer Sphere units can only use ALL or OUTER_SPHERE equipment (no IS-exclusive,
+        // Clan-exclusive, or Ascended-exclusive)
+        if (useOSTechBase() && !useMixedTech()
+              && tech.getTechBase() != TechBase.ALL
+              && tech.getTechBase() != TechBase.OUTER_SPHERE) {
+            return false;
+        }
+        // Pure Ascended units can only use ALL or ASCENDED equipment (no IS-exclusive,
+        // Clan-exclusive, or Outer Sphere-exclusive). Ascended has no Mixed variant — every
+        // Ascended unit is strictly Ascended-only.
+        if (useAscendedTechBase()
+              && tech.getTechBase() != TechBase.ALL
+              && tech.getTechBase() != TechBase.ASCENDED) {
+            return false;
+        }
+
         // Unofficial tech has the option to ignore year availability
         if ((getTechLevel() == SimpleTechLevel.UNOFFICIAL)
               && unofficialNoYear()) {

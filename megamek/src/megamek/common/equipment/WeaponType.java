@@ -272,6 +272,52 @@ import megamek.common.weapons.lasers.innerSphere.small.ISPulseLaserSmall;
 import megamek.common.weapons.lasers.innerSphere.small.ISReengineeredLaserSmall;
 import megamek.common.weapons.lasers.innerSphere.small.ISVariableSpeedPulseLaserSmall;
 import megamek.common.weapons.lasers.innerSphere.small.ISXPulseLaserSmall;
+import megamek.common.weapons.lasers.outerSphere.OSBinaryLaserSystem;
+import megamek.common.weapons.lasers.outerSphere.OSERBinaryLaserSystem;
+import megamek.common.weapons.lasers.outerSphere.OSERTrinaryLaserSystem;
+import megamek.common.weapons.lasers.outerSphere.OSHyperLaserLarge;
+import megamek.common.weapons.lasers.outerSphere.OSHyperLaserMedium;
+import megamek.common.weapons.lasers.outerSphere.OSHyperLaserSmall;
+import megamek.common.weapons.lasers.outerSphere.OSTrinaryLaserSystem;
+import megamek.common.weapons.lasers.outerSphere.large.OSAdvERLaserLarge;
+import megamek.common.weapons.lasers.outerSphere.large.OSAdvERPulseLaserLarge;
+import megamek.common.weapons.lasers.outerSphere.large.OSERHeavyLaserLarge;
+import megamek.common.weapons.lasers.outerSphere.large.OSERLaserLarge;
+import megamek.common.weapons.lasers.outerSphere.large.OSERPulseLaserLarge;
+import megamek.common.weapons.lasers.outerSphere.large.OSHeavyLaserLarge;
+import megamek.common.weapons.lasers.outerSphere.large.OSHeavyPulseLaserLarge;
+import megamek.common.weapons.lasers.outerSphere.large.OSImpERLaserLarge;
+import megamek.common.weapons.lasers.outerSphere.large.OSImpERPulseLaserLarge;
+import megamek.common.weapons.lasers.outerSphere.large.OSImpHeavyLaserLarge;
+import megamek.common.weapons.lasers.outerSphere.large.OSImpHeavyPulseLaserLarge;
+import megamek.common.weapons.lasers.outerSphere.large.OSImpLaserLarge;
+import megamek.common.weapons.lasers.outerSphere.large.OSImpPulseLaserLarge;
+import megamek.common.weapons.lasers.outerSphere.medium.OSAdvERLaserMedium;
+import megamek.common.weapons.lasers.outerSphere.medium.OSAdvERPulseLaserMedium;
+import megamek.common.weapons.lasers.outerSphere.medium.OSERHeavyLaserMedium;
+import megamek.common.weapons.lasers.outerSphere.medium.OSERLaserMedium;
+import megamek.common.weapons.lasers.outerSphere.medium.OSERPulseLaserMedium;
+import megamek.common.weapons.lasers.outerSphere.medium.OSHeavyLaserMedium;
+import megamek.common.weapons.lasers.outerSphere.medium.OSHeavyPulseLaserMedium;
+import megamek.common.weapons.lasers.outerSphere.medium.OSImpERLaserMedium;
+import megamek.common.weapons.lasers.outerSphere.medium.OSImpERPulseLaserMedium;
+import megamek.common.weapons.lasers.outerSphere.medium.OSImpHeavyLaserMedium;
+import megamek.common.weapons.lasers.outerSphere.medium.OSImpHeavyPulseLaserMedium;
+import megamek.common.weapons.lasers.outerSphere.medium.OSImpLaserMedium;
+import megamek.common.weapons.lasers.outerSphere.medium.OSImpPulseLaserMedium;
+import megamek.common.weapons.lasers.outerSphere.small.OSAdvERLaserSmall;
+import megamek.common.weapons.lasers.outerSphere.small.OSAdvERPulseLaserSmall;
+import megamek.common.weapons.lasers.outerSphere.small.OSERHeavyLaserSmall;
+import megamek.common.weapons.lasers.outerSphere.small.OSERLaserSmall;
+import megamek.common.weapons.lasers.outerSphere.small.OSERPulseLaserSmall;
+import megamek.common.weapons.lasers.outerSphere.small.OSHeavyLaserSmall;
+import megamek.common.weapons.lasers.outerSphere.small.OSHeavyPulseLaserSmall;
+import megamek.common.weapons.lasers.outerSphere.small.OSImpERLaserSmall;
+import megamek.common.weapons.lasers.outerSphere.small.OSImpERPulseLaserSmall;
+import megamek.common.weapons.lasers.outerSphere.small.OSImpHeavyLaserSmall;
+import megamek.common.weapons.lasers.outerSphere.small.OSImpHeavyPulseLaserSmall;
+import megamek.common.weapons.lasers.outerSphere.small.OSImpLaserSmall;
+import megamek.common.weapons.lasers.outerSphere.small.OSImpPulseLaserSmall;
 import megamek.common.weapons.lrms.clan.*;
 import megamek.common.weapons.lrms.clan.improvedLRM.CLImprovedLRM10;
 import megamek.common.weapons.lrms.clan.improvedLRM.CLImprovedLRM15;
@@ -646,6 +692,10 @@ public class WeaponType extends EquipmentType {
 
     // Hyper-Laser
     public static final WeaponTypeFlag F_HYPER = WeaponTypeFlag.F_HYPER;
+
+    // OS Rotary PPC family — RAC-style cluster firing modes (1/2/3/4/5/6 shot)
+    // consuming PPC Coolant Pods on 4+ shot to suppress per-shot heat.
+    public static final WeaponTypeFlag F_PPC_ROTARY = WeaponTypeFlag.F_PPC_ROTARY;
 
     // Fusillade works like a one-shot weapon but has a second round.
     public static final WeaponTypeFlag F_DOUBLE_ONE_SHOT = WeaponTypeFlag.F_DOUBLE_ONE_SHOT;
@@ -1348,6 +1398,69 @@ public class WeaponType extends EquipmentType {
         EquipmentType.addType(new CLChemicalLaserMedium());
         EquipmentType.addType(new CLChemicalLaserSmall());
 
+        // Outer Sphere (OS) Laser types
+        // Improve Lasers
+        EquipmentType.addType(new OSImpLaserSmall());
+        EquipmentType.addType(new OSImpLaserMedium());
+        EquipmentType.addType(new OSImpLaserLarge());
+        // ER Lasers (OS)
+        EquipmentType.addType(new OSERLaserSmall());
+        EquipmentType.addType(new OSERLaserMedium());
+        EquipmentType.addType(new OSERLaserLarge());
+        // Imp. ER Lasers
+        EquipmentType.addType(new OSImpERLaserSmall());
+        EquipmentType.addType(new OSImpERLaserMedium());
+        EquipmentType.addType(new OSImpERLaserLarge());
+        // Adv. ER Lasers (-1 ToHit)
+        EquipmentType.addType(new OSAdvERLaserSmall());
+        EquipmentType.addType(new OSAdvERLaserMedium());
+        EquipmentType.addType(new OSAdvERLaserLarge());
+        // Imp. Pulse Lasers (-2 ToHit)
+        EquipmentType.addType(new OSImpPulseLaserSmall());
+        EquipmentType.addType(new OSImpPulseLaserMedium());
+        EquipmentType.addType(new OSImpPulseLaserLarge());
+        // ER Pulse Lasers (-1 ToHit)
+        EquipmentType.addType(new OSERPulseLaserSmall());
+        EquipmentType.addType(new OSERPulseLaserMedium());
+        EquipmentType.addType(new OSERPulseLaserLarge());
+        // Imp. ER Pulse Lasers (-2 ToHit)
+        EquipmentType.addType(new OSImpERPulseLaserSmall());
+        EquipmentType.addType(new OSImpERPulseLaserMedium());
+        EquipmentType.addType(new OSImpERPulseLaserLarge());
+        // Adv. ER Pulse Lasers (-3 ToHit)
+        EquipmentType.addType(new OSAdvERPulseLaserSmall());
+        EquipmentType.addType(new OSAdvERPulseLaserMedium());
+        EquipmentType.addType(new OSAdvERPulseLaserLarge());
+        // Heavy Lasers (+1 ToHit)
+        EquipmentType.addType(new OSHeavyLaserSmall());
+        EquipmentType.addType(new OSHeavyLaserMedium());
+        EquipmentType.addType(new OSHeavyLaserLarge());
+        // Imp. Heavy Lasers (no ToHit)
+        EquipmentType.addType(new OSImpHeavyLaserSmall());
+        EquipmentType.addType(new OSImpHeavyLaserMedium());
+        EquipmentType.addType(new OSImpHeavyLaserLarge());
+        // ER Heavy Lasers (+1 ToHit)
+        EquipmentType.addType(new OSERHeavyLaserSmall());
+        EquipmentType.addType(new OSERHeavyLaserMedium());
+        EquipmentType.addType(new OSERHeavyLaserLarge());
+        // Heavy Pulse Lasers (-2 ToHit, short range)
+        EquipmentType.addType(new OSHeavyPulseLaserSmall());
+        EquipmentType.addType(new OSHeavyPulseLaserMedium());
+        EquipmentType.addType(new OSHeavyPulseLaserLarge());
+        // Imp. Heavy Pulse Lasers (-2 ToHit, restored range)
+        EquipmentType.addType(new OSImpHeavyPulseLaserSmall());
+        EquipmentType.addType(new OSImpHeavyPulseLaserMedium());
+        EquipmentType.addType(new OSImpHeavyPulseLaserLarge());
+        // Binary/Trinary Laser Systems (Resonance Tuning)
+        EquipmentType.addType(new OSBinaryLaserSystem());
+        EquipmentType.addType(new OSTrinaryLaserSystem());
+        EquipmentType.addType(new OSERBinaryLaserSystem());
+        EquipmentType.addType(new OSERTrinaryLaserSystem());
+        // Hyper Lasers
+        EquipmentType.addType(new OSHyperLaserSmall());
+        EquipmentType.addType(new OSHyperLaserMedium());
+        EquipmentType.addType(new OSHyperLaserLarge());
+
         // PPC types
         EquipmentType.addType(new ISPPC());
         EquipmentType.addType(new ISPPCPrimitive());
@@ -1359,6 +1472,28 @@ public class WeaponType extends EquipmentType {
         EquipmentType.addType(new ISKinsSlaughterPPC());
         EquipmentType.addType(new ISBASupportPPC());
         EquipmentType.addType(new CLBASupportPPC());
+        EquipmentType.addType(new megamek.common.weapons.ppc.innerSphere.ISPPCX());
+
+        // Outer Sphere (OS) PPC types
+        // Standard tier (Imp / Imp ER / Adv ER)
+        EquipmentType.addType(new megamek.common.weapons.ppc.outerSphere.OSImpPPC());
+        EquipmentType.addType(new megamek.common.weapons.ppc.outerSphere.OSImpERPPC());
+        EquipmentType.addType(new megamek.common.weapons.ppc.outerSphere.OSAdvERPPC());
+        // Light / Snub-Nose family
+        EquipmentType.addType(new megamek.common.weapons.ppc.outerSphere.OSLightPPC());
+        EquipmentType.addType(new megamek.common.weapons.ppc.outerSphere.OSSnubNosePPC());
+        EquipmentType.addType(new megamek.common.weapons.ppc.outerSphere.OSHeavySnubNosePPC());
+        // Heavy PPC family (new OS damage-focused design, NOT canonical IS Heavy PPC clone)
+        EquipmentType.addType(new megamek.common.weapons.ppc.outerSphere.OSHeavyPPC());
+        EquipmentType.addType(new megamek.common.weapons.ppc.outerSphere.OSERHeavyPPC());
+        // Hyper PPC (charge mechanic, extreme range)
+        EquipmentType.addType(new megamek.common.weapons.ppc.outerSphere.OSHyperPPC());
+        // PPC-X family (cluster mechanic + range-bracket ToHit)
+        EquipmentType.addType(new megamek.common.weapons.ppc.outerSphere.OSPPCX());
+        EquipmentType.addType(new megamek.common.weapons.ppc.outerSphere.OSHeavyPPCX());
+        // Rotary PPC family (multi-mode firing, RPPC Coolant Pod consumption, overload risk)
+        EquipmentType.addType(new megamek.common.weapons.ppc.outerSphere.OSLightRotaryPPC());
+        EquipmentType.addType(new megamek.common.weapons.ppc.outerSphere.OSSnubNoseRotaryPPC());
 
         // Flamers
         EquipmentType.addType(new CLFlamer());

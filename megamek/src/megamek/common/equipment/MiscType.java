@@ -255,6 +255,8 @@ public class MiscType extends EquipmentType {
     public static final MiscTypeFlag F_HARJEL_II = MiscTypeFlag.F_HARJEL_II;
     public static final MiscTypeFlag F_HARJEL_III = MiscTypeFlag.F_HARJEL_III;
     public static final MiscTypeFlag F_RADICAL_HEATSINK = MiscTypeFlag.F_RADICAL_HEATSINK;
+    public static final MiscTypeFlag F_TRIPLE_HEAT_SINK = MiscTypeFlag.F_TRIPLE_HEAT_SINK;
+    public static final MiscTypeFlag F_QUAD_HEAT_SINK = MiscTypeFlag.F_QUAD_HEAT_SINK;
     public static final MiscTypeFlag F_BA_MANIPULATOR = MiscTypeFlag.F_BA_MANIPULATOR;
     public static final MiscTypeFlag F_NOVA = MiscTypeFlag.F_NOVA;
     public static final MiscTypeFlag F_BOMB_BAY = MiscTypeFlag.F_BOMB_BAY;
@@ -333,6 +335,42 @@ public class MiscType extends EquipmentType {
     public static final MiscTypeFlag F_CHAIN_DRAPE_PONCHO = MiscTypeFlag.F_CHAIN_DRAPE_PONCHO;
 
     public static final MiscTypeFlag F_WEAPON_ENHANCEMENT = MiscTypeFlag.F_WEAPON_ENHANCEMENT;
+
+    // OS CASE
+    public static final MiscTypeFlag F_OS_CASE = MiscTypeFlag.F_OS_CASE;
+
+    // OS Internal Structure Flags
+    public static final MiscTypeFlag F_OS_IMP_ENDO_STEEL = MiscTypeFlag.F_OS_IMP_ENDO_STEEL;
+    public static final MiscTypeFlag F_OS_ADV_ENDO_STEEL = MiscTypeFlag.F_OS_ADV_ENDO_STEEL;
+    public static final MiscTypeFlag F_OS_IMP_REINFORCE = MiscTypeFlag.F_OS_IMP_REINFORCE;
+    public static final MiscTypeFlag F_OS_REINFORCE_COMPOSITE = MiscTypeFlag.F_OS_REINFORCE_COMPOSITE;
+    public static final MiscTypeFlag F_OS_REINFORCE_ENDO_STEEL = MiscTypeFlag.F_OS_REINFORCE_ENDO_STEEL;
+    public static final MiscTypeFlag F_OS_IMP_REINFORCE_ENDO_STEEL = MiscTypeFlag.F_OS_IMP_REINFORCE_ENDO_STEEL;
+    public static final MiscTypeFlag F_OS_ADV_REINFORCE_ENDO_STEEL = MiscTypeFlag.F_OS_ADV_REINFORCE_ENDO_STEEL;
+    public static final MiscTypeFlag F_OS_IMP_ENDO_COMPOSITE = MiscTypeFlag.F_OS_IMP_ENDO_COMPOSITE;
+    public static final MiscTypeFlag F_OS_ADV_ENDO_COMPOSITE = MiscTypeFlag.F_OS_ADV_ENDO_COMPOSITE;
+    public static final MiscTypeFlag F_OS_HEAVY_DUTY = MiscTypeFlag.F_OS_HEAVY_DUTY;
+    public static final MiscTypeFlag F_OS_HEAVY_DUTY_ENDO_STEEL = MiscTypeFlag.F_OS_HEAVY_DUTY_ENDO_STEEL;
+    public static final MiscTypeFlag F_OS_SH_DUTY_ENDO_STEEL = MiscTypeFlag.F_OS_SH_DUTY_ENDO_STEEL;
+    public static final MiscTypeFlag F_OS_SH_REINFORCE = MiscTypeFlag.F_OS_SH_REINFORCE;
+    public static final MiscTypeFlag F_OS_SH_REINFORCE_ENDO_STEEL = MiscTypeFlag.F_OS_SH_REINFORCE_ENDO_STEEL;
+    public static final MiscTypeFlag F_OS_SH_REINFORCE_ENDO_COMPOSITE = MiscTypeFlag.F_OS_SH_REINFORCE_ENDO_COMPOSITE;
+    public static final MiscTypeFlag F_OS_REINFORCE_HEAVY_DUTY = MiscTypeFlag.F_OS_REINFORCE_HEAVY_DUTY;
+    public static final MiscTypeFlag F_OS_REINFORCE_HEAVY_DUTY_ENDO_STEEL = MiscTypeFlag.F_OS_REINFORCE_HEAVY_DUTY_ENDO_STEEL;
+    public static final MiscTypeFlag F_OS_SH_REINFORCE_HEAVY_DUTY = MiscTypeFlag.F_OS_SH_REINFORCE_HEAVY_DUTY;
+    public static final MiscTypeFlag F_OS_SH_REINFORCE_HEAVY_DUTY_ENDO_STEEL = MiscTypeFlag.F_OS_SH_REINFORCE_HEAVY_DUTY_ENDO_STEEL;
+
+    // OS EARS and DDS
+    public static final MiscTypeFlag F_EARS = MiscTypeFlag.F_EARS;
+    public static final MiscTypeFlag F_EARS_COMPONENT = MiscTypeFlag.F_EARS_COMPONENT;
+    public static final MiscTypeFlag F_DDS = MiscTypeFlag.F_DDS;
+    public static final MiscTypeFlag F_DDS_COMPONENT = MiscTypeFlag.F_DDS_COMPONENT;
+
+    // OS Particle Field Damper
+    public static final MiscTypeFlag F_OS_PFD = MiscTypeFlag.F_OS_PFD;
+
+    // OS Advanced Particle Field Damper
+    public static final MiscTypeFlag F_OS_ADV_PFD = MiscTypeFlag.F_OS_ADV_PFD;
 
     public static final String S_ACTIVE_SHIELD = "Active";
     public static final String S_PASSIVE_SHIELD = "Passive";
@@ -686,6 +724,45 @@ public class MiscType extends EquipmentType {
             return defaultRounding.round(entity.getWeight() * 0.2, entity);
         } else if (hasFlag(F_ENDO_COMPOSITE)) {
             return defaultRounding.round(entity.getWeight() * 0.075, entity);
+        // OS Internal Structures
+        } else if (hasFlag(F_OS_IMP_ENDO_STEEL)) {
+            return defaultRounding.round(entity.getWeight() * 0.05, entity);
+        } else if (hasFlag(F_OS_ADV_ENDO_STEEL)) {
+            return defaultRounding.round(entity.getWeight() * 0.045, entity);
+        } else if (hasFlag(F_OS_IMP_REINFORCE)) {
+            return defaultRounding.round(entity.getWeight() * 0.175, entity);
+        } else if (hasFlag(F_OS_REINFORCE_COMPOSITE)) {
+            return defaultRounding.round(entity.getWeight() * 0.075, entity);
+        } else if (hasFlag(F_OS_REINFORCE_ENDO_STEEL)) {
+            return defaultRounding.round(entity.getWeight() * 0.145, entity);
+        } else if (hasFlag(F_OS_IMP_REINFORCE_ENDO_STEEL)) {
+            return defaultRounding.round(entity.getWeight() * 0.135, entity);
+        } else if (hasFlag(F_OS_ADV_REINFORCE_ENDO_STEEL)) {
+            return defaultRounding.round(entity.getWeight() * 0.125, entity);
+        } else if (hasFlag(F_OS_IMP_ENDO_COMPOSITE)) {
+            return defaultRounding.round(entity.getWeight() * 0.075, entity);
+        } else if (hasFlag(F_OS_ADV_ENDO_COMPOSITE)) {
+            return defaultRounding.round(entity.getWeight() * 0.065, entity);
+        } else if (hasFlag(F_OS_HEAVY_DUTY)) {
+            return defaultRounding.round(entity.getWeight() * 0.135, entity);
+        } else if (hasFlag(F_OS_HEAVY_DUTY_ENDO_STEEL)) {
+            return defaultRounding.round(entity.getWeight() * 0.105, entity);
+        } else if (hasFlag(F_OS_SH_DUTY_ENDO_STEEL)) {
+            return defaultRounding.round(entity.getWeight() * 0.125, entity);
+        } else if (hasFlag(F_OS_SH_REINFORCE)) {
+            return defaultRounding.round(entity.getWeight() * 0.20, entity);
+        } else if (hasFlag(F_OS_SH_REINFORCE_ENDO_STEEL)) {
+            return defaultRounding.round(entity.getWeight() * 0.165, entity);
+        } else if (hasFlag(F_OS_SH_REINFORCE_ENDO_COMPOSITE)) {
+            return defaultRounding.round(entity.getWeight() * 0.145, entity);
+        } else if (hasFlag(F_OS_REINFORCE_HEAVY_DUTY)) {
+            return defaultRounding.round(entity.getWeight() * 0.175, entity);
+        } else if (hasFlag(F_OS_REINFORCE_HEAVY_DUTY_ENDO_STEEL)) {
+            return defaultRounding.round(entity.getWeight() * 0.145, entity);
+        } else if (hasFlag(F_OS_SH_REINFORCE_HEAVY_DUTY)) {
+            return defaultRounding.round(entity.getWeight() * 0.175, entity);
+        } else if (hasFlag(F_OS_SH_REINFORCE_HEAVY_DUTY_ENDO_STEEL)) {
+            return defaultRounding.round(entity.getWeight() * 0.145, entity);
         } else if (hasFlag(F_DUNE_BUGGY)) {
             return entity.getWeight() / 10.0f;
         } else if (hasFlag(F_ENVIRONMENTAL_SEALING)) {
@@ -879,6 +956,12 @@ public class MiscType extends EquipmentType {
             return RoundWeight.nearestKg(size / 1000.0);
         } else if (hasFlag(F_RAM_PLATE)) {
             return RoundWeight.nextTon(entity.getWeight() / 10.0);
+        } else if (hasFlag(F_EARS)) {
+            // EARS: 2.5% of mek weight, rounded to nearest half ton
+            return RoundWeight.nearestHalfTon(entity.getWeight() * 0.025);
+        } else if (hasFlag(F_DDS)) {
+            // DDS: 1.5% of mek weight, rounded to nearest half ton
+            return RoundWeight.nearestHalfTon(entity.getWeight() * 0.015);
         }
         // okay, I'm out of ideas
         return 1.0f;
@@ -1319,6 +1402,43 @@ public class MiscType extends EquipmentType {
             } else {
                 return isClan() ? 4 : 7;
             }
+        // OS Internal Structure crits
+        } else if (hasFlag(F_OS_IMP_ENDO_STEEL)) {
+            return entity.isSuperHeavy() ? 5 : 10;
+        } else if (hasFlag(F_OS_ADV_ENDO_STEEL)) {
+            return entity.isSuperHeavy() ? 4 : 8;
+        } else if (hasFlag(F_OS_IMP_REINFORCE)
+              || hasFlag(F_OS_REINFORCE_COMPOSITE)
+              || hasFlag(F_OS_SH_REINFORCE)) {
+            return 0;
+        } else if (hasFlag(F_OS_REINFORCE_ENDO_STEEL)) {
+            return entity.isSuperHeavy() ? 7 : 14;
+        } else if (hasFlag(F_OS_IMP_REINFORCE_ENDO_STEEL)) {
+            return entity.isSuperHeavy() ? 6 : 12;
+        } else if (hasFlag(F_OS_ADV_REINFORCE_ENDO_STEEL)) {
+            return entity.isSuperHeavy() ? 5 : 10;
+        } else if (hasFlag(F_OS_IMP_ENDO_COMPOSITE)) {
+            return entity.isSuperHeavy() ? 4 : 7;
+        } else if (hasFlag(F_OS_ADV_ENDO_COMPOSITE)) {
+            return entity.isSuperHeavy() ? 3 : 5;
+        } else if (hasFlag(F_OS_HEAVY_DUTY)) {
+            return entity.isSuperHeavy() ? 5 : 10;
+        } else if (hasFlag(F_OS_HEAVY_DUTY_ENDO_STEEL)) {
+            return entity.isSuperHeavy() ? 7 : 14;
+        } else if (hasFlag(F_OS_SH_DUTY_ENDO_STEEL)) {
+            return 7; // SH-only, always SH crit count
+        } else if (hasFlag(F_OS_SH_REINFORCE_ENDO_STEEL)) {
+            return 7; // SH-only
+        } else if (hasFlag(F_OS_SH_REINFORCE_ENDO_COMPOSITE)) {
+            return 5; // SH-only
+        } else if (hasFlag(F_OS_REINFORCE_HEAVY_DUTY)) {
+            return entity.isSuperHeavy() ? 8 : 16;
+        } else if (hasFlag(F_OS_REINFORCE_HEAVY_DUTY_ENDO_STEEL)) {
+            return entity.isSuperHeavy() ? 10 : 20;
+        } else if (hasFlag(F_OS_SH_REINFORCE_HEAVY_DUTY)) {
+            return 12; // SH-only
+        } else if (hasFlag(F_OS_SH_REINFORCE_HEAVY_DUTY_ENDO_STEEL)) {
+            return 14; // SH-only
         } else if (hasFlag(F_FUEL)) {
             return (int) Math.ceil(getTonnage(entity));
         } else if (hasFlag(F_CARGO)) {
@@ -1490,8 +1610,18 @@ public class MiscType extends EquipmentType {
         EquipmentType.addType(MiscType.createISDoubleHeatSinkPrototype());
         EquipmentType.addType(MiscType.createISFreezerPrototype());
         EquipmentType.addType(MiscType.createCLDoubleHeatSink());
+        EquipmentType.addType(MiscType.createOSImprovedDoubleHeatSink());
+        EquipmentType.addType(MiscType.createOSTripleHeatSink());
+        EquipmentType.addType(MiscType.createOSQuadrupleHeatSink());
         EquipmentType.addType(MiscType.createISCASE());
         EquipmentType.addType(MiscType.createCLCASE());
+        EquipmentType.addType(MiscType.createOSCASE());
+        EquipmentType.addType(MiscType.createOSEARS());
+        EquipmentType.addType(MiscType.createOSEARSComponent());
+        EquipmentType.addType(MiscType.createOSDDS());
+        EquipmentType.addType(MiscType.createOSDDSComponent());
+        EquipmentType.addType(MiscType.createOSPFD());
+        EquipmentType.addType(MiscType.createOSAdvPFD());
         EquipmentType.addType(MiscType.createISMASC());
         EquipmentType.addType(MiscType.createCLMASC());
         EquipmentType.addType(MiscType.createTSM());
@@ -1547,6 +1677,26 @@ public class MiscType extends EquipmentType {
         EquipmentType.addType(MiscType.createReinforcedStructure());
         EquipmentType.addType(MiscType.createISCompositeStructure());
         EquipmentType.addType(MiscType.createIndustrialStructure());
+        // OS Internal Structures
+        EquipmentType.addType(MiscType.createOSImpEndoSteelStructure());
+        EquipmentType.addType(MiscType.createOSAdvEndoSteelStructure());
+        EquipmentType.addType(MiscType.createOSImpReinforceStructure());
+        EquipmentType.addType(MiscType.createOSReinforceCompositeStructure());
+        EquipmentType.addType(MiscType.createOSReinforceEndoSteelStructure());
+        EquipmentType.addType(MiscType.createOSImpReinforceEndoSteelStructure());
+        EquipmentType.addType(MiscType.createOSAdvReinforceEndoSteelStructure());
+        EquipmentType.addType(MiscType.createOSImpEndoCompositeStructure());
+        EquipmentType.addType(MiscType.createOSAdvEndoCompositeStructure());
+        EquipmentType.addType(MiscType.createOSHeavyDutyStructure());
+        EquipmentType.addType(MiscType.createOSHeavyDutyEndoSteelStructure());
+        EquipmentType.addType(MiscType.createOSReinforceHeavyDutyStructure());
+        EquipmentType.addType(MiscType.createOSReinforceHeavyDutyEndoSteelStructure());
+        EquipmentType.addType(MiscType.createOSSHReinforceHeavyDutyStructure());
+        EquipmentType.addType(MiscType.createOSSHReinforceHeavyDutyEndoSteelStructure());
+        EquipmentType.addType(MiscType.createOSSHDutyEndoSteelStructure());
+        EquipmentType.addType(MiscType.createOSSHReinforceStructure());
+        EquipmentType.addType(MiscType.createOSSHReinforceEndoSteelStructure());
+        EquipmentType.addType(MiscType.createOSSHReinforceEndoCompositeStructure());
         EquipmentType.addType(MiscType.createIS1CompactHeatSink());
         EquipmentType.addType(MiscType.createIS2CompactHeatSinks());
         EquipmentType.addType(MiscType.createCLLaserHeatSink());
@@ -4489,6 +4639,35 @@ public class MiscType extends EquipmentType {
         return misc;
     }
 
+    public static MiscType createOSCASE() {
+        MiscType misc = new MiscType();
+
+        misc.name = "CASE";
+        misc.setInternalName(EquipmentTypeLookup.OS_CASE);
+        misc.addLookupName("LegionCASE");
+        misc.addLookupName("Legion CASE");
+        misc.tonnage = 0.0f;
+        misc.criticalSlots = 0;
+        misc.tankSlots = 0;
+        misc.hittable = false;
+        misc.flags = misc.flags.or(F_OS_CASE)
+              .or(F_MEK_EQUIPMENT)
+              .or(F_TANK_EQUIPMENT)
+              .or(F_SUPPORT_TANK_EQUIPMENT)
+              .or(F_FIGHTER_EQUIPMENT)
+              .or(F_HEAVY_EQUIPMENT);
+        misc.cost = 50000;
+        misc.bv = 0;
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setIntroLevel(false)
+              .setUnofficial(false)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C)
+              .setISAdvancement(2824, 2825, 2828)
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+        return misc;
+    }
+
     public static MiscType createCLCASE() {
         MiscType misc = new MiscType();
 
@@ -6747,6 +6926,68 @@ public class MiscType extends EquipmentType {
               .setProductionFactions(Faction.CJF)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D);
+        return misc;
+    }
+
+    // OS heat sink family
+
+    public static MiscType createOSImprovedDoubleHeatSink() {
+        MiscType misc = new MiscType();
+        misc.name = "Improved Double Heat Sink";
+        misc.setInternalName(EquipmentTypeLookup.OS_IMPROVED_DOUBLE_HS);
+        misc.addLookupName("LegionImprovedDoubleHeatSink");
+        misc.addLookupName("Legion Improved Double Heat Sink");
+        misc.tonnage = 1.0f;
+        misc.criticalSlots = 2;
+        misc.flags = misc.flags.or(F_DOUBLE_HEAT_SINK);
+        misc.bv = 0;
+        misc.cost = 6000;
+        misc.rulesRefs = "OS Custom";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setISAdvancement(2835, 2845, 2860)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.F, AvailabilityValue.C, AvailabilityValue.B, AvailabilityValue.B)
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+        return misc;
+    }
+
+    public static MiscType createOSTripleHeatSink() {
+        MiscType misc = new MiscType();
+        misc.name = "Triple Heat Sink";
+        misc.setInternalName(EquipmentTypeLookup.OS_TRIPLE_HS);
+        misc.addLookupName("LegionTripleHeatSink");
+        misc.addLookupName("Legion Triple Heat Sink");
+        misc.tonnage = 1.0f;
+        misc.criticalSlots = 2;
+        misc.flags = misc.flags.or(F_TRIPLE_HEAT_SINK);
+        misc.bv = 0;
+        misc.cost = 10500;
+        misc.rulesRefs = "OS Custom";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setISAdvancement(2850, 2870, 2880)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C)
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        return misc;
+    }
+
+    public static MiscType createOSQuadrupleHeatSink() {
+        MiscType misc = new MiscType();
+        misc.name = "Quadruple Heat Sink";
+        misc.setInternalName(EquipmentTypeLookup.OS_QUAD_HS);
+        misc.addLookupName("LegionQuadrupleHeatSink");
+        misc.addLookupName("Legion Quadruple Heat Sink");
+        misc.tonnage = 1.0f;
+        misc.criticalSlots = 3;
+        misc.flags = misc.flags.or(F_QUAD_HEAT_SINK);
+        misc.bv = 0;
+        misc.cost = 16000;
+        misc.rulesRefs = "OS Custom";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setISAdvancement(2895, 2905, 2920)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
+              .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
         return misc;
     }
 
@@ -9311,6 +9552,421 @@ public class MiscType extends EquipmentType {
      * would need to be captured as part of the tech progression.
      */
 
+    // ==================== OS Internal Structures ====================
+
+    public static MiscType createOSImpEndoSteelStructure() {
+        MiscType misc = new MiscType();
+        misc.name = EquipmentType.getStructureTypeName(T_STRUCTURE_OS_IMP_ENDO_STEEL);
+        misc.setInternalName(misc.name);
+        misc.addLookupName("IS " + misc.name);
+        misc.addLookupName("Clan " + misc.name);
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
+        misc.hittable = false;
+        misc.spreadable = true;
+        misc.flags = misc.flags.or(F_OS_IMP_ENDO_STEEL);
+        misc.omniFixedOnly = true;
+        misc.bv = 0;
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setISAdvancement(2855, 2865, 2875)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.F, AvailabilityValue.C, AvailabilityValue.B, AvailabilityValue.B)
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+        return misc;
+    }
+
+    public static MiscType createOSAdvEndoSteelStructure() {
+        MiscType misc = new MiscType();
+        misc.name = EquipmentType.getStructureTypeName(T_STRUCTURE_OS_ADV_ENDO_STEEL);
+        misc.setInternalName(misc.name);
+        misc.addLookupName("IS " + misc.name);
+        misc.addLookupName("Clan " + misc.name);
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
+        misc.hittable = false;
+        misc.spreadable = true;
+        misc.flags = misc.flags.or(F_OS_ADV_ENDO_STEEL);
+        misc.omniFixedOnly = true;
+        misc.bv = 0;
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setISAdvancement(2870, 2880, 2895)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C, AvailabilityValue.B)
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+        return misc;
+    }
+
+    public static MiscType createOSImpReinforceStructure() {
+        MiscType misc = new MiscType();
+        misc.name = EquipmentType.getStructureTypeName(T_STRUCTURE_OS_IMP_REINFORCE);
+        misc.setInternalName(misc.name);
+        misc.addLookupName("IS " + misc.name);
+        misc.addLookupName("Clan " + misc.name);
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = 0;
+        misc.hittable = false;
+        misc.flags = misc.flags.or(F_OS_IMP_REINFORCE);
+        misc.omniFixedOnly = true;
+        misc.bv = 0;
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setISAdvancement(2870, 2885, 2900)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C, AvailabilityValue.B)
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        return misc;
+    }
+
+    public static MiscType createOSReinforceCompositeStructure() {
+        MiscType misc = new MiscType();
+        misc.name = EquipmentType.getStructureTypeName(T_STRUCTURE_OS_REINFORCE_COMPOSITE);
+        misc.setInternalName(misc.name);
+        misc.addLookupName("IS " + misc.name);
+        misc.addLookupName("Clan " + misc.name);
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = 0;
+        misc.hittable = false;
+        misc.flags = misc.flags.or(F_OS_REINFORCE_COMPOSITE);
+        misc.omniFixedOnly = true;
+        misc.bv = 0;
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setISAdvancement(2875, 2890, 2905)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C, AvailabilityValue.B)
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        return misc;
+    }
+
+    public static MiscType createOSReinforceEndoSteelStructure() {
+        MiscType misc = new MiscType();
+        misc.name = EquipmentType.getStructureTypeName(T_STRUCTURE_OS_REINFORCE_ENDO_STEEL);
+        misc.setInternalName(misc.name);
+        misc.addLookupName("IS " + misc.name);
+        misc.addLookupName("Clan " + misc.name);
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
+        misc.hittable = false;
+        misc.spreadable = true;
+        misc.flags = misc.flags.or(F_OS_REINFORCE_ENDO_STEEL);
+        misc.omniFixedOnly = true;
+        misc.bv = 0;
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setISAdvancement(2880, 2895, 2910)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C)
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        return misc;
+    }
+
+    public static MiscType createOSImpReinforceEndoSteelStructure() {
+        MiscType misc = new MiscType();
+        misc.name = EquipmentType.getStructureTypeName(T_STRUCTURE_OS_IMP_REINFORCE_ENDO_STEEL);
+        misc.setInternalName(misc.name);
+        misc.addLookupName("IS " + misc.name);
+        misc.addLookupName("Clan " + misc.name);
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
+        misc.hittable = false;
+        misc.spreadable = true;
+        misc.flags = misc.flags.or(F_OS_IMP_REINFORCE_ENDO_STEEL);
+        misc.omniFixedOnly = true;
+        misc.bv = 0;
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setISAdvancement(2895, 2910, 2930)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C)
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        return misc;
+    }
+
+    public static MiscType createOSAdvReinforceEndoSteelStructure() {
+        MiscType misc = new MiscType();
+        misc.name = EquipmentType.getStructureTypeName(T_STRUCTURE_OS_ADV_REINFORCE_ENDO_STEEL);
+        misc.setInternalName(misc.name);
+        misc.addLookupName("IS " + misc.name);
+        misc.addLookupName("Clan " + misc.name);
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
+        misc.hittable = false;
+        misc.spreadable = true;
+        misc.flags = misc.flags.or(F_OS_ADV_REINFORCE_ENDO_STEEL);
+        misc.omniFixedOnly = true;
+        misc.bv = 0;
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setISAdvancement(2910, 2930, 2950)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
+              .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+        return misc;
+    }
+
+    public static MiscType createOSImpEndoCompositeStructure() {
+        MiscType misc = new MiscType();
+        misc.name = EquipmentType.getStructureTypeName(T_STRUCTURE_OS_IMP_ENDO_COMPOSITE);
+        misc.setInternalName(misc.name);
+        misc.addLookupName("IS " + misc.name);
+        misc.addLookupName("Clan " + misc.name);
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
+        misc.hittable = false;
+        misc.spreadable = true;
+        misc.flags = misc.flags.or(F_OS_IMP_ENDO_COMPOSITE);
+        misc.omniFixedOnly = true;
+        misc.bv = 0;
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setISAdvancement(2870, 2880, 2895)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C, AvailabilityValue.B)
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+        return misc;
+    }
+
+    public static MiscType createOSAdvEndoCompositeStructure() {
+        MiscType misc = new MiscType();
+        misc.name = EquipmentType.getStructureTypeName(T_STRUCTURE_OS_ADV_ENDO_COMPOSITE);
+        misc.setInternalName(misc.name);
+        misc.addLookupName("IS " + misc.name);
+        misc.addLookupName("Clan " + misc.name);
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
+        misc.hittable = false;
+        misc.spreadable = true;
+        misc.flags = misc.flags.or(F_OS_ADV_ENDO_COMPOSITE);
+        misc.omniFixedOnly = true;
+        misc.bv = 0;
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setISAdvancement(2885, 2895, 2910)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C)
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        return misc;
+    }
+
+    public static MiscType createOSHeavyDutyStructure() {
+        MiscType misc = new MiscType();
+        misc.name = EquipmentType.getStructureTypeName(T_STRUCTURE_OS_HEAVY_DUTY);
+        misc.setInternalName(misc.name);
+        misc.addLookupName("IS " + misc.name);
+        misc.addLookupName("Clan " + misc.name);
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
+        misc.hittable = false;
+        misc.spreadable = true;
+        misc.flags = misc.flags.or(F_OS_HEAVY_DUTY);
+        misc.omniFixedOnly = true;
+        misc.bv = 0;
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setISAdvancement(2880, 2895, 2910)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C)
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        return misc;
+    }
+
+    public static MiscType createOSHeavyDutyEndoSteelStructure() {
+        MiscType misc = new MiscType();
+        misc.name = EquipmentType.getStructureTypeName(T_STRUCTURE_OS_HEAVY_DUTY_ENDO_STEEL);
+        misc.setInternalName(misc.name);
+        misc.addLookupName("IS " + misc.name);
+        misc.addLookupName("Clan " + misc.name);
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
+        misc.hittable = false;
+        misc.spreadable = true;
+        misc.flags = misc.flags.or(F_OS_HEAVY_DUTY_ENDO_STEEL);
+        misc.omniFixedOnly = true;
+        misc.bv = 0;
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setISAdvancement(2895, 2910, 2930)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        return misc;
+    }
+
+    public static MiscType createOSReinforceHeavyDutyStructure() {
+        MiscType misc = new MiscType();
+        misc.name = EquipmentType.getStructureTypeName(T_STRUCTURE_OS_REINFORCE_HEAVY_DUTY);
+        misc.setInternalName(misc.name);
+        misc.addLookupName("IS " + misc.name);
+        misc.addLookupName("Clan " + misc.name);
+        // Backward-compatible alias for MTF files saved with the previous abbreviated name
+        misc.addLookupName("Rein. Hvy Duty (Legion)");
+        misc.addLookupName("IS Rein. Hvy Duty (Legion)");
+        misc.addLookupName("Clan Rein. Hvy Duty (Legion)");
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
+        misc.hittable = false;
+        misc.spreadable = true;
+        misc.flags = misc.flags.or(F_OS_REINFORCE_HEAVY_DUTY);
+        misc.omniFixedOnly = true;
+        misc.bv = 0;
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setISAdvancement(2895, 2910, 2930)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        return misc;
+    }
+
+    public static MiscType createOSReinforceHeavyDutyEndoSteelStructure() {
+        MiscType misc = new MiscType();
+        misc.name = EquipmentType.getStructureTypeName(T_STRUCTURE_OS_REINFORCE_HEAVY_DUTY_ENDO_STEEL);
+        misc.setInternalName(misc.name);
+        misc.addLookupName("IS " + misc.name);
+        misc.addLookupName("Clan " + misc.name);
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
+        misc.hittable = false;
+        misc.spreadable = true;
+        misc.flags = misc.flags.or(F_OS_REINFORCE_HEAVY_DUTY_ENDO_STEEL);
+        misc.omniFixedOnly = true;
+        misc.bv = 0;
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setISAdvancement(2910, 2930, 2950)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        return misc;
+    }
+
+    public static MiscType createOSSHDutyEndoSteelStructure() {
+        MiscType misc = new MiscType();
+        misc.name = EquipmentType.getStructureTypeName(T_STRUCTURE_OS_SH_DUTY_ENDO_STEEL);
+        misc.setInternalName(misc.name);
+        misc.addLookupName("IS " + misc.name);
+        misc.addLookupName("Clan " + misc.name);
+        // Backward-compatible alias for MTF files saved with the old name
+        misc.addLookupName("Legion SH Duty Endo Steel");
+        misc.addLookupName("IS Legion SH Duty Endo Steel");
+        misc.addLookupName("Clan Legion SH Duty Endo Steel");
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
+        misc.hittable = false;
+        misc.spreadable = true;
+        misc.flags = misc.flags.or(F_OS_SH_DUTY_ENDO_STEEL);
+        misc.omniFixedOnly = true;
+        misc.bv = 0;
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setISAdvancement(2990, 3010, 3030)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
+              .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+        return misc;
+    }
+
+    public static MiscType createOSSHReinforceStructure() {
+        MiscType misc = new MiscType();
+        misc.name = EquipmentType.getStructureTypeName(T_STRUCTURE_OS_SH_REINFORCE);
+        misc.setInternalName(misc.name);
+        misc.addLookupName("IS " + misc.name);
+        misc.addLookupName("Clan " + misc.name);
+        misc.addLookupName("Legion SH Reinforce");
+        misc.addLookupName("IS Legion SH Reinforce");
+        misc.addLookupName("Clan Legion SH Reinforce");
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = 0;
+        misc.hittable = false;
+        misc.flags = misc.flags.or(F_OS_SH_REINFORCE);
+        misc.omniFixedOnly = true;
+        misc.bv = 0;
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setISAdvancement(2995, 3015, 3035)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
+              .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+        return misc;
+    }
+
+    public static MiscType createOSSHReinforceEndoSteelStructure() {
+        MiscType misc = new MiscType();
+        misc.name = EquipmentType.getStructureTypeName(T_STRUCTURE_OS_SH_REINFORCE_ENDO_STEEL);
+        misc.setInternalName(misc.name);
+        misc.addLookupName("IS " + misc.name);
+        misc.addLookupName("Clan " + misc.name);
+        misc.addLookupName("Legion SH Reinforce Endo Steel");
+        misc.addLookupName("IS Legion SH Reinforce Endo Steel");
+        misc.addLookupName("Clan Legion SH Reinforce Endo Steel");
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
+        misc.hittable = false;
+        misc.spreadable = true;
+        misc.flags = misc.flags.or(F_OS_SH_REINFORCE_ENDO_STEEL);
+        misc.omniFixedOnly = true;
+        misc.bv = 0;
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setISAdvancement(3000, 3025, 3050)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
+              .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+        return misc;
+    }
+
+    public static MiscType createOSSHReinforceEndoCompositeStructure() {
+        MiscType misc = new MiscType();
+        misc.name = EquipmentType.getStructureTypeName(T_STRUCTURE_OS_SH_REINFORCE_ENDO_COMPOSITE);
+        misc.setInternalName(misc.name);
+        misc.addLookupName("IS " + misc.name);
+        misc.addLookupName("Clan " + misc.name);
+        misc.addLookupName("Legion SH Reinforce Endo Composite");
+        misc.addLookupName("IS Legion SH Reinforce Endo Composite");
+        misc.addLookupName("Clan Legion SH Reinforce Endo Composite");
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
+        misc.hittable = false;
+        misc.spreadable = true;
+        misc.flags = misc.flags.or(F_OS_SH_REINFORCE_ENDO_COMPOSITE);
+        misc.omniFixedOnly = true;
+        misc.bv = 0;
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setISAdvancement(3020, 3045, 3070)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
+              .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+        return misc;
+    }
+
+    public static MiscType createOSSHReinforceHeavyDutyStructure() {
+        MiscType misc = new MiscType();
+        misc.name = EquipmentType.getStructureTypeName(T_STRUCTURE_OS_SH_REINFORCE_HEAVY_DUTY);
+        misc.setInternalName(misc.name);
+        misc.addLookupName("IS " + misc.name);
+        misc.addLookupName("Clan " + misc.name);
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
+        misc.hittable = false;
+        misc.spreadable = true;
+        misc.flags = misc.flags.or(F_OS_SH_REINFORCE_HEAVY_DUTY);
+        misc.omniFixedOnly = true;
+        misc.bv = 0;
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setISAdvancement(3025, 3050, 3075)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
+              .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+        return misc;
+    }
+
+    public static MiscType createOSSHReinforceHeavyDutyEndoSteelStructure() {
+        MiscType misc = new MiscType();
+        misc.name = EquipmentType.getStructureTypeName(T_STRUCTURE_OS_SH_REINFORCE_HEAVY_DUTY_ENDO_STEEL);
+        misc.setInternalName(misc.name);
+        misc.addLookupName("IS " + misc.name);
+        misc.addLookupName("Clan " + misc.name);
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
+        misc.hittable = false;
+        misc.spreadable = true;
+        misc.flags = misc.flags.or(F_OS_SH_REINFORCE_HEAVY_DUTY_ENDO_STEEL);
+        misc.omniFixedOnly = true;
+        misc.bv = 0;
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setISAdvancement(3035, 3060, 3085)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
+              .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+        return misc;
+    }
+
     // Actuators and Actuator Systems IO pg 48
 
     public static MiscType createISAES() {
@@ -11856,6 +12512,182 @@ public class MiscType extends EquipmentType {
      * DropShip Docking Collar (post-Boom) DropShuttle Bays Space Station K-F
      * Adapter
      */
+
+    // -------------------------------------------------------------------------
+    // OS EARS and DDS
+    // -------------------------------------------------------------------------
+
+    /**
+     * EARS (Emergency Armor Repair System) main item.
+     * Carries the weight (2.5% of mek mass, rounded to nearest half ton).
+     * Zero crit slots - components handle the crit distribution.
+     */
+    public static MiscType createOSEARS() {
+        MiscType misc = new MiscType();
+        misc.name = "EARS";
+        misc.setInternalName(EquipmentTypeLookup.OS_EARS);
+        misc.addLookupName("LegionEARS");
+        misc.addLookupName("Legion EARS");
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = 7;
+        misc.spreadable = true;
+        misc.tankSlots = 0;
+        misc.flags = misc.flags.or(F_EARS).or(F_MEK_EQUIPMENT);
+        misc.cost = COST_VARIABLE;
+        misc.bv = 0;
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C)
+              .setISAdvancement(2824, 2825, 2828)
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+        return misc;
+    }
+
+    /**
+     * EARS Component item. Zero weight, 1 crit slot, auto-placed one per required location.
+     * If any component is destroyed, the entire EARS system is disabled.
+     */
+    public static MiscType createOSEARSComponent() {
+        MiscType misc = new MiscType();
+        misc.name = "EARS";
+        misc.setInternalName(EquipmentTypeLookup.OS_EARS_COMPONENT);
+        misc.addLookupName("LegionEARSComponent");
+        misc.addLookupName("Legion EARS Component");
+        misc.addLookupName("EARS Component");
+        misc.tonnage = 0.0f;
+        misc.criticalSlots = 1;
+        misc.tankSlots = 0;
+        misc.hittable = true;
+        misc.flags = misc.flags.or(F_EARS_COMPONENT).or(F_MEK_EQUIPMENT);
+        misc.cost = 0;
+        misc.bv = 0;
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C)
+              .setISAdvancement(2824, 2825, 2828)
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+        return misc;
+    }
+
+    /**
+     * DDS (Damage Distribution System) main item.
+     * Carries the weight (1.5% of mek mass, rounded to nearest half ton).
+     * Zero crit slots - components handle the crit distribution.
+     */
+    public static MiscType createOSDDS() {
+        MiscType misc = new MiscType();
+        misc.name = "DDS";
+        misc.setInternalName(EquipmentTypeLookup.OS_DDS);
+        misc.addLookupName("LegionDDS");
+        misc.addLookupName("Legion DDS");
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = 7;
+        misc.spreadable = true;
+        misc.tankSlots = 0;
+        misc.flags = misc.flags.or(F_DDS).or(F_MEK_EQUIPMENT);
+        misc.cost = COST_VARIABLE;
+        misc.bv = 0;
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C)
+              .setISAdvancement(2824, 2825, 2828)
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+        return misc;
+    }
+
+    /**
+     * DDS Component item. Zero weight, 1 crit slot, auto-placed one per required location.
+     * If any component is destroyed, the entire DDS system is disabled.
+     */
+    public static MiscType createOSDDSComponent() {
+        MiscType misc = new MiscType();
+        misc.name = "DDS";
+        misc.setInternalName(EquipmentTypeLookup.OS_DDS_COMPONENT);
+        misc.addLookupName("LegionDDSComponent");
+        misc.addLookupName("Legion DDS Component");
+        misc.addLookupName("DDS Component");
+        misc.tonnage = 0.0f;
+        misc.criticalSlots = 1;
+        misc.tankSlots = 0;
+        misc.hittable = true;
+        misc.flags = misc.flags.or(F_DDS_COMPONENT).or(F_MEK_EQUIPMENT);
+        misc.cost = 0;
+        misc.bv = 0;
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C)
+              .setISAdvancement(2824, 2825, 2828)
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+        return misc;
+    }
+
+    /**
+     * OS Particle Field Damper (PFD).
+     * Weight: 3 tons fixed. 5 crit slots spread across CT, RT, LT, RA, LA.
+     * Effect: PPC -50%, other energy weapons -10% (min 1) while in "On" mode.
+     * After 8 consecutive rounds of use, must roll each round to avoid failure.
+     * Any crit slot destroyed → entire system fails.
+     */
+    public static MiscType createOSPFD() {
+        MiscType misc = new MiscType();
+        misc.name = "Particle Field Damper (OS)";
+        misc.shortName = "Particle Field Damper (OS)";
+        misc.setInternalName(EquipmentTypeLookup.OS_PFD);
+        misc.addLookupName("LegionPFD");
+        misc.addLookupName("Legion PFD");
+        misc.addLookupName("Legion Particle Field Damper");
+        misc.addLookupName("Adv. Particle Field Damper"); // backward-compat: old name before rename
+        misc.setModes("Off", "On");
+        misc.instantModeSwitch = false;
+        misc.explosive = true;
+        misc.tonnage = 3.0f;
+        misc.criticalSlots = 5;
+        misc.spreadable = true;
+        misc.tankSlots = 0;
+        misc.cost = 1500000;
+        misc.flags = misc.flags.or(F_OS_PFD).or(F_MEK_EQUIPMENT);
+        misc.bv = 0;
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C)
+              .setISAdvancement(2824, 2825, 2828)
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+        return misc;
+    }
+
+    /**
+     * OS Advanced Particle Field Damper (Adv. PFD).
+     * Weight: 0 tons. 5 crit slots spread across CT, RT, LT, RA, LA.
+     * Effect: PPC-type weapons -50% (min 1), other energy weapons -20% (min 1) while in "On" mode.
+     * After 8 consecutive rounds of use, must roll each round to avoid failure.
+     * Any crit slot destroyed → entire system fails.
+     */
+    public static MiscType createOSAdvPFD() {
+        MiscType misc = new MiscType();
+        misc.name = "Adv. Particle Field Damper (OS)";
+        misc.shortName = "Adv. Particle Field Damper (OS)";
+        misc.setInternalName(EquipmentTypeLookup.OS_ADV_PFD);
+        misc.addLookupName("LegionAdvPFD");
+        misc.addLookupName("Legion Adv. PFD");
+        misc.addLookupName("Adv. Particle Field Damper"); // backward-compat: old name before rename
+        misc.addLookupName("Legion Advanced Particle Field Damper");
+        misc.setModes("Off", "On");
+        misc.instantModeSwitch = false;
+        misc.explosive = true;
+        misc.tonnage = 2.0f;
+        misc.criticalSlots = 5;
+        misc.spreadable = true;
+        misc.tankSlots = 0;
+        misc.cost = 2000000;
+        misc.flags = misc.flags.or(F_OS_ADV_PFD).or(F_MEK_EQUIPMENT);
+        misc.bv = 0;
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
+              .setISAdvancement(2830, 2832, 2836)
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        return misc;
+    }
 
     @Override
     public String toString() {
