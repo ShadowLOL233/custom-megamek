@@ -3207,6 +3207,12 @@ public abstract class Mek extends Entity {
 
     @Override
     public TechAdvancement getConstructionTechAdvancement() {
+        // Outer Sphere superheavy 'Mechs use an OS-tech-base chassis so the whole unit stays pure OS
+        if (isOuterSphere() && (getWeightClass() == EntityWeightClass.WEIGHT_SUPER_HEAVY)
+              && !isIndustrial() && !isPrimitive()
+              && ((getEntityType() & ETYPE_TRIPOD_MEK) == 0)) {
+            return getOSSuperheavyChassisTechAdvancement();
+        }
         return getTechAdvancement(getEntityType(), isPrimitive(), isIndustrial(), getWeightClass());
     }
 
@@ -3454,6 +3460,9 @@ public abstract class Mek extends Entity {
     }
 
     public TechAdvancement getCockpitTechAdvancement() {
+        if ((getCockpitType() == COCKPIT_SUPERHEAVY) && isOuterSphere()) {
+            return getOSSuperheavyCockpitTechAdvancement();
+        }
         return getCockpitTechAdvancement(getCockpitType());
     }
 
@@ -3465,7 +3474,45 @@ public abstract class Mek extends Entity {
     }
 
     public TechAdvancement getGyroTechAdvancement() {
+        if ((getGyroType() == GYRO_SUPERHEAVY) && isOuterSphere()) {
+            return getOSSuperheavyGyroTechAdvancement();
+        }
         return getGyroTechAdvancement(getGyroType());
+    }
+
+    /**
+     * @return Tech advancement for the Outer Sphere superheavy 'Mech chassis (OS tech base, so a pure-OS
+     *       superheavy is not flagged as mixed/IS tech). Used by {@link #getConstructionTechAdvancement()}.
+     */
+    public static TechAdvancement getOSSuperheavyChassisTechAdvancement() {
+        return new TechAdvancement(TechBase.OUTER_SPHERE)
+              .setISAdvancement(3000, 3020, 3045)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
+              .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+    }
+
+    /**
+     * @return Tech advancement for the Outer Sphere superheavy gyro (OS tech base variant of the superheavy gyro).
+     */
+    public static TechAdvancement getOSSuperheavyGyroTechAdvancement() {
+        return new TechAdvancement(TechBase.OUTER_SPHERE)
+              .setISAdvancement(3000, 3020, 3045)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
+              .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+    }
+
+    /**
+     * @return Tech advancement for the Outer Sphere superheavy cockpit (OS tech base variant of the superheavy
+     *       cockpit).
+     */
+    public static TechAdvancement getOSSuperheavyCockpitTechAdvancement() {
+        return new TechAdvancement(TechBase.OUTER_SPHERE)
+              .setISAdvancement(3000, 3020, 3045)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
+              .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
     }
 
     public static TechAdvancement getFullHeadEjectAdvancement() {
