@@ -296,9 +296,16 @@ public abstract class AbstractUnitSelectorDialog extends JDialog implements Runn
         listTechLevel.setToolTipText(Messages.getString("MekSelectorDialog.m_labelType.ToolTip"));
         listTechLevel.setLayoutOrientation(JList.VERTICAL_WRAP);
         listTechLevel.setVisibleRowCount(3);
+        // Wrap the "Group" (tech level) list in a scroll pane and let it fill its cell width so it is no
+        // longer a rigid fixed-size block (scrolls when the options don't fit instead of being clipped).
+        JScrollPane scrollTechLevel = new JScrollPane(listTechLevel);
         gridBagConstraintsWest.gridx = 1;
         gridBagConstraintsWest.gridy = 2;
-        panelFilterButtons.add(listTechLevel, gridBagConstraintsWest);
+        gridBagConstraintsWest.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraintsWest.weightx = 1.0;
+        panelFilterButtons.add(scrollTechLevel, gridBagConstraintsWest);
+        gridBagConstraintsWest.fill = GridBagConstraints.NONE;
+        gridBagConstraintsWest.weightx = 0;
 
         JLabel labelWeight = new JLabel(Messages.getString("MekSelectorDialog.m_labelWeightClass"));
         labelWeight.setName("labelWeight");
