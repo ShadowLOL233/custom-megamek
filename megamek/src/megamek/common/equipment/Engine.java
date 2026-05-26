@@ -103,23 +103,23 @@ public class Engine implements Serializable, ITechnology {
     public static final int SOLAR = 12;
     public static final int EXTERNAL = 13;
     // OS (Outer Sphere / Republic of the Outer Sphere) engine types
-    public static final int OS_STANDARD_ENGINE = 14;  // Advance Fusion (OSAdvanceFusion) – 90% weight, 1 side-torso crit, 15 free HS
-    public static final int OS_LIGHT_ENGINE = 15;     // Light (OSLight) – 75% weight, 2 side-torso crits
-    public static final int OS_XL_ENGINE = 16;        // Advance XL (OSAdvanceXL) – 45% weight, 3 side-torso crits, 15 free HS
-    public static final int OS_XXL_ENGINE = 17;       // Advance XXL (OSAdvanceXXL) – 28% weight, 4 side-torso crits, 15 free HS, no extra heat
-    public static final int OS_COMPACT_ENGINE = 18;   // Compact (OSCompact) – 135% weight, 3 CT crits
+    public static final int OS_ADVANCE_FUSION_ENGINE = 14;  // Advance Fusion (OSAdvanceFusion) – 90% weight, 1 side-torso crit, 15 free HS
+    public static final int OS_STANDARD_LIGHT_ENGINE = 15;     // Light (OSLight) – 75% weight, 2 side-torso crits
+    public static final int OS_ADVANCE_XL_ENGINE = 16;        // Advance XL (OSAdvanceXL) – 45% weight, 3 side-torso crits, 15 free HS
+    public static final int OS_ADVANCE_XXL_ENGINE = 17;       // Advance XXL (OSAdvanceXXL) – 28% weight, 4 side-torso crits, 15 free HS, no extra heat
+    public static final int OS_STANDARD_COMPACT_ENGINE = 18;   // Compact (OSCompact) – 135% weight, 3 CT crits
     public static final int OS_SH_XL_ENGINE = 19;     // Experimental Superheavy XL – 2 SH side-torso crits, 15 free HS
     public static final int OS_SH_XXL_ENGINE = 20;    // Experimental Superheavy XXL – 3 SH side-torso crits, 15 free HS
-    public static final int OS_IMP_STD_ENGINE = 21;   // OS Improve Fusion (OSImproveFusion) – 90% weight, 1 side-torso crit
-    public static final int OS_IMP_LIGHT_ENGINE = 22; // OS Improve Light (OSImproveLight) – 65% weight, 2 side-torso crits
-    public static final int OS_BASE_XL_ENGINE = 23;   // OS XL (OSXL) – 50% weight, 3 side-torso crits
-    public static final int OS_IMP_XL_ENGINE = 24;    // OS Improve XL (OSImproveXL) – 50% weight, 2 side-torso crits
-    public static final int OS_BASE_XXL_ENGINE = 25;  // OS XXL (OSXXL) – 30% weight, 5 side-torso crits, 15 free HS, XXL extra heat
-    public static final int OS_STD_FUSION_ENGINE = 26; // Standard Fusion (OSStandardFusion) – 100% weight, CT only, 10 free HS
-    public static final int OS_ADV_LIGHT_ENGINE = 27; // Advance Light (OSAdvanceLight) – 60% weight, 2 side-torso crits, 15 free HS
-    public static final int OS_IMP_XXL_ENGINE = 28;   // OS Improve XXL (OSImproveXXL) – 30% weight, 4 side-torso crits
-    public static final int OS_IMP_COMPACT_ENGINE = 29; // OS Improve Compact (OSImproveCompact) – 120% weight, 3 CT crits
-    public static final int OS_ADV_COMPACT_ENGINE = 30; // OS Advance Compact (OSAdvanceCompact) – 110% weight, 3 CT crits, 15 free HS
+    public static final int OS_IMPROVE_FUSION_ENGINE = 21;   // OS Improve Fusion (OSImproveFusion) – 90% weight, 1 side-torso crit
+    public static final int OS_IMPROVE_LIGHT_ENGINE = 22; // OS Improve Light (OSImproveLight) – 65% weight, 2 side-torso crits
+    public static final int OS_STANDARD_XL_ENGINE = 23;   // OS XL (OSXL) – 50% weight, 3 side-torso crits
+    public static final int OS_IMPROVE_XL_ENGINE = 24;    // OS Improve XL (OSImproveXL) – 50% weight, 2 side-torso crits
+    public static final int OS_STANDARD_XXL_ENGINE = 25;  // OS XXL (OSXXL) – 30% weight, 5 side-torso crits, 15 free HS, XXL extra heat
+    public static final int OS_STANDARD_FUSION_ENGINE = 26; // Standard Fusion (OSStandardFusion) – 100% weight, CT only, 10 free HS
+    public static final int OS_ADVANCE_LIGHT_ENGINE = 27; // Advance Light (OSAdvanceLight) – 60% weight, 2 side-torso crits, 15 free HS
+    public static final int OS_IMPROVE_XXL_ENGINE = 28;   // OS Improve XXL (OSImproveXXL) – 30% weight, 4 side-torso crits
+    public static final int OS_IMPROVE_COMPACT_ENGINE = 29; // OS Improve Compact (OSImproveCompact) – 120% weight, 3 CT crits
+    public static final int OS_ADVANCE_COMPACT_ENGINE = 30; // OS Advance Compact (OSAdvanceCompact) – 110% weight, 3 CT crits, 15 free HS
     public static final int OS_SH_STANDARD_ENGINE = 31; // Experimental Superheavy Standard – 90% weight, 1 SH side-torso crit, 15 free HS
     private static final int NUM_ENGINE_TYPES = 32;
 
@@ -316,26 +316,26 @@ public class Engine implements Serializable, ITechnology {
                 }
                 break;
             // OS engine types – only valid without CLAN_ENGINE flag
-            case OS_STANDARD_ENGINE:
-            case OS_LIGHT_ENGINE:
-            case OS_XL_ENGINE:
-            case OS_XXL_ENGINE:
-            case OS_IMP_STD_ENGINE:
-            case OS_IMP_LIGHT_ENGINE:
-            case OS_BASE_XL_ENGINE:
-            case OS_IMP_XL_ENGINE:
-            case OS_BASE_XXL_ENGINE:
-            case OS_STD_FUSION_ENGINE:
-            case OS_ADV_LIGHT_ENGINE:
-            case OS_IMP_XXL_ENGINE:
+            case OS_ADVANCE_FUSION_ENGINE:
+            case OS_STANDARD_LIGHT_ENGINE:
+            case OS_ADVANCE_XL_ENGINE:
+            case OS_ADVANCE_XXL_ENGINE:
+            case OS_IMPROVE_FUSION_ENGINE:
+            case OS_IMPROVE_LIGHT_ENGINE:
+            case OS_STANDARD_XL_ENGINE:
+            case OS_IMPROVE_XL_ENGINE:
+            case OS_STANDARD_XXL_ENGINE:
+            case OS_STANDARD_FUSION_ENGINE:
+            case OS_ADVANCE_LIGHT_ENGINE:
+            case OS_IMPROVE_XXL_ENGINE:
                 if (hasFlag(CLAN_ENGINE)) {
                     problem.append(Messages.getString("Engine.invalidSphereOnly"));
                     return false;
                 }
                 break;
-            case OS_COMPACT_ENGINE:
-            case OS_IMP_COMPACT_ENGINE:
-            case OS_ADV_COMPACT_ENGINE:
+            case OS_STANDARD_COMPACT_ENGINE:
+            case OS_IMPROVE_COMPACT_ENGINE:
+            case OS_ADVANCE_COMPACT_ENGINE:
                 if (hasFlag(CLAN_ENGINE) || hasFlag(LARGE_ENGINE)) {
                     problem.append(Messages.getString("Engine.invalidCompactLarge"));
                     return false;
@@ -383,46 +383,46 @@ public class Engine implements Serializable, ITechnology {
             // Compact family (also matches legacy "Adv. Light Compact (OS)")
             if (lower.contains("compact")) {
                 if (lower.contains("imp. compact") || lower.contains("improve compact")) {
-                    return OS_IMP_COMPACT_ENGINE;
+                    return OS_IMPROVE_COMPACT_ENGINE;
                 } else if (lower.contains("adv. compact") || lower.contains("advance compact")) {
-                    return OS_ADV_COMPACT_ENGINE;
+                    return OS_ADVANCE_COMPACT_ENGINE;
                 } else {
-                    return OS_COMPACT_ENGINE;
+                    return OS_STANDARD_COMPACT_ENGINE;
                 }
             }
             // OS Improve family (xxl before xl)
             if (lower.contains("imp. xxl") || lower.contains("improve xxl")) {
-                return OS_IMP_XXL_ENGINE;
+                return OS_IMPROVE_XXL_ENGINE;
             } else if (lower.contains("imp. xl") || lower.contains("improve xl")) {
-                return OS_IMP_XL_ENGINE;
+                return OS_IMPROVE_XL_ENGINE;
             } else if (lower.contains("imp. light") || lower.contains("improve light")) {
-                return OS_IMP_LIGHT_ENGINE;
+                return OS_IMPROVE_LIGHT_ENGINE;
             } else if (lower.contains("imp. fusion") || lower.contains("improve fusion")) {
-                return OS_IMP_STD_ENGINE;
+                return OS_IMPROVE_FUSION_ENGINE;
             }
             // Advance family (also matches legacy "Adv. *" saved names)
             if (lower.contains("adv. xxl") || lower.contains("advance xxl")) {
-                return OS_XXL_ENGINE;
+                return OS_ADVANCE_XXL_ENGINE;
             } else if (lower.contains("adv. xl") || lower.contains("advance xl")) {
-                return OS_XL_ENGINE;
+                return OS_ADVANCE_XL_ENGINE;
             } else if (lower.contains("adv. light") || lower.contains("advance light")) {
-                return OS_ADV_LIGHT_ENGINE;
+                return OS_ADVANCE_LIGHT_ENGINE;
             } else if (lower.contains("adv. fusion") || lower.contains("advance fusion")) {
-                return OS_STANDARD_ENGINE;
+                return OS_ADVANCE_FUSION_ENGINE;
             }
             // Base OS family (current plain names): "Fusion (OS)", "XXL (OS)", "XL (OS)", "Light (OS)"
             if (lower.contains("xxl")) {
-                return OS_BASE_XXL_ENGINE;
+                return OS_STANDARD_XXL_ENGINE;
             } else if (lower.contains("xl")) {
-                return OS_BASE_XL_ENGINE;
+                return OS_STANDARD_XL_ENGINE;
             } else if (lower.contains("light")) {
-                return OS_LIGHT_ENGINE;
+                return OS_STANDARD_LIGHT_ENGINE;
             } else if (lower.contains("fusion")) {
                 // plain "Fusion (OS)" (also legacy "Std. Fusion (OS)") -> OS Standard Fusion
-                return OS_STD_FUSION_ENGINE;
+                return OS_STANDARD_FUSION_ENGINE;
             } else {
                 // bare "(os)"/"legion" -> Advance Fusion
-                return OS_STANDARD_ENGINE;
+                return OS_ADVANCE_FUSION_ENGINE;
             }
         }
         if (lower.contains("xxl")) {
@@ -549,19 +549,19 @@ public class Engine implements Serializable, ITechnology {
             case NONE:
                 return 0;
             // OS engines
-            case OS_STANDARD_ENGINE:
+            case OS_ADVANCE_FUSION_ENGINE:
                 weight *= 0.90; // Advance Fusion
                 break;
-            case OS_LIGHT_ENGINE:
+            case OS_STANDARD_LIGHT_ENGINE:
                 weight *= 0.75; // Light (OS)
                 break;
-            case OS_XL_ENGINE:
+            case OS_ADVANCE_XL_ENGINE:
                 weight *= 0.45; // Advance XL
                 break;
-            case OS_XXL_ENGINE:
+            case OS_ADVANCE_XXL_ENGINE:
                 weight *= 0.28; // Advance XXL
                 break;
-            case OS_COMPACT_ENGINE:
+            case OS_STANDARD_COMPACT_ENGINE:
                 weight *= 1.35; // Compact (OS)
                 break;
             case OS_SH_XL_ENGINE:
@@ -570,33 +570,33 @@ public class Engine implements Serializable, ITechnology {
             case OS_SH_XXL_ENGINE:
                 weight *= 0.30;  // same multiplier as Advance XXL
                 break;
-            case OS_IMP_STD_ENGINE:
+            case OS_IMPROVE_FUSION_ENGINE:
                 weight *= 0.90; // OS Improve Fusion
                 break;
-            case OS_IMP_LIGHT_ENGINE:
+            case OS_IMPROVE_LIGHT_ENGINE:
                 weight *= 0.65; // OS Improve Light
                 break;
-            case OS_BASE_XL_ENGINE:
+            case OS_STANDARD_XL_ENGINE:
                 weight *= 0.50; // OS XL
                 break;
-            case OS_IMP_XL_ENGINE:
+            case OS_IMPROVE_XL_ENGINE:
                 weight *= 0.50; // OS Improve XL
                 break;
-            case OS_BASE_XXL_ENGINE:
+            case OS_STANDARD_XXL_ENGINE:
                 weight *= 0.30; // OS XXL
                 break;
-            case OS_STD_FUSION_ENGINE:
+            case OS_STANDARD_FUSION_ENGINE:
                 break; // Standard Fusion (OS), ×1.0
-            case OS_ADV_LIGHT_ENGINE:
+            case OS_ADVANCE_LIGHT_ENGINE:
                 weight *= 0.60; // OS Advance Light
                 break;
-            case OS_IMP_XXL_ENGINE:
+            case OS_IMPROVE_XXL_ENGINE:
                 weight *= 0.30; // OS Improve XXL
                 break;
-            case OS_IMP_COMPACT_ENGINE:
+            case OS_IMPROVE_COMPACT_ENGINE:
                 weight *= 1.20; // OS Improve Compact
                 break;
-            case OS_ADV_COMPACT_ENGINE:
+            case OS_ADVANCE_COMPACT_ENGINE:
                 weight *= 1.10; // OS Advance Compact
                 break;
             case OS_SH_STANDARD_ENGINE:
@@ -652,9 +652,9 @@ public class Engine implements Serializable, ITechnology {
         }
         // OS engines with enhanced integral cooling carry 15 weight-free heat sinks
         // (Advance-tier engines, the base/Advance XXL, and all superheavy variants)
-        if ((engineType == OS_STANDARD_ENGINE) || (engineType == OS_XL_ENGINE)
-              || (engineType == OS_XXL_ENGINE) || (engineType == OS_BASE_XXL_ENGINE)
-              || (engineType == OS_ADV_LIGHT_ENGINE) || (engineType == OS_ADV_COMPACT_ENGINE)
+        if ((engineType == OS_ADVANCE_FUSION_ENGINE) || (engineType == OS_ADVANCE_XL_ENGINE)
+              || (engineType == OS_ADVANCE_XXL_ENGINE) || (engineType == OS_STANDARD_XXL_ENGINE)
+              || (engineType == OS_ADVANCE_LIGHT_ENGINE) || (engineType == OS_ADVANCE_COMPACT_ENGINE)
               || (engineType == OS_SH_XL_ENGINE) || (engineType == OS_SH_XXL_ENGINE)
               || (engineType == OS_SH_STANDARD_ENGINE)) {
             return 15;
@@ -728,23 +728,23 @@ public class Engine implements Serializable, ITechnology {
         result.put(BATTERY, getEngineTypeName(BATTERY));
         result.put(SOLAR, getEngineTypeName(SOLAR));
         result.put(EXTERNAL, getEngineTypeName(EXTERNAL));
-        result.put(OS_STANDARD_ENGINE, getEngineTypeName(OS_STANDARD_ENGINE));
-        result.put(OS_LIGHT_ENGINE, getEngineTypeName(OS_LIGHT_ENGINE));
-        result.put(OS_XL_ENGINE, getEngineTypeName(OS_XL_ENGINE));
-        result.put(OS_XXL_ENGINE, getEngineTypeName(OS_XXL_ENGINE));
-        result.put(OS_COMPACT_ENGINE, getEngineTypeName(OS_COMPACT_ENGINE));
+        result.put(OS_ADVANCE_FUSION_ENGINE, getEngineTypeName(OS_ADVANCE_FUSION_ENGINE));
+        result.put(OS_STANDARD_LIGHT_ENGINE, getEngineTypeName(OS_STANDARD_LIGHT_ENGINE));
+        result.put(OS_ADVANCE_XL_ENGINE, getEngineTypeName(OS_ADVANCE_XL_ENGINE));
+        result.put(OS_ADVANCE_XXL_ENGINE, getEngineTypeName(OS_ADVANCE_XXL_ENGINE));
+        result.put(OS_STANDARD_COMPACT_ENGINE, getEngineTypeName(OS_STANDARD_COMPACT_ENGINE));
         result.put(OS_SH_XL_ENGINE, getEngineTypeName(OS_SH_XL_ENGINE));
         result.put(OS_SH_XXL_ENGINE, getEngineTypeName(OS_SH_XXL_ENGINE));
-        result.put(OS_IMP_STD_ENGINE, getEngineTypeName(OS_IMP_STD_ENGINE));
-        result.put(OS_IMP_LIGHT_ENGINE, getEngineTypeName(OS_IMP_LIGHT_ENGINE));
-        result.put(OS_BASE_XL_ENGINE, getEngineTypeName(OS_BASE_XL_ENGINE));
-        result.put(OS_IMP_XL_ENGINE, getEngineTypeName(OS_IMP_XL_ENGINE));
-        result.put(OS_BASE_XXL_ENGINE, getEngineTypeName(OS_BASE_XXL_ENGINE));
-        result.put(OS_STD_FUSION_ENGINE, getEngineTypeName(OS_STD_FUSION_ENGINE));
-        result.put(OS_ADV_LIGHT_ENGINE, getEngineTypeName(OS_ADV_LIGHT_ENGINE));
-        result.put(OS_IMP_XXL_ENGINE, getEngineTypeName(OS_IMP_XXL_ENGINE));
-        result.put(OS_IMP_COMPACT_ENGINE, getEngineTypeName(OS_IMP_COMPACT_ENGINE));
-        result.put(OS_ADV_COMPACT_ENGINE, getEngineTypeName(OS_ADV_COMPACT_ENGINE));
+        result.put(OS_IMPROVE_FUSION_ENGINE, getEngineTypeName(OS_IMPROVE_FUSION_ENGINE));
+        result.put(OS_IMPROVE_LIGHT_ENGINE, getEngineTypeName(OS_IMPROVE_LIGHT_ENGINE));
+        result.put(OS_STANDARD_XL_ENGINE, getEngineTypeName(OS_STANDARD_XL_ENGINE));
+        result.put(OS_IMPROVE_XL_ENGINE, getEngineTypeName(OS_IMPROVE_XL_ENGINE));
+        result.put(OS_STANDARD_XXL_ENGINE, getEngineTypeName(OS_STANDARD_XXL_ENGINE));
+        result.put(OS_STANDARD_FUSION_ENGINE, getEngineTypeName(OS_STANDARD_FUSION_ENGINE));
+        result.put(OS_ADVANCE_LIGHT_ENGINE, getEngineTypeName(OS_ADVANCE_LIGHT_ENGINE));
+        result.put(OS_IMPROVE_XXL_ENGINE, getEngineTypeName(OS_IMPROVE_XXL_ENGINE));
+        result.put(OS_IMPROVE_COMPACT_ENGINE, getEngineTypeName(OS_IMPROVE_COMPACT_ENGINE));
+        result.put(OS_ADVANCE_COMPACT_ENGINE, getEngineTypeName(OS_ADVANCE_COMPACT_ENGINE));
         result.put(OS_SH_STANDARD_ENGINE, getEngineTypeName(OS_SH_STANDARD_ENGINE));
 
         return result;
@@ -789,8 +789,8 @@ public class Engine implements Serializable, ITechnology {
      * @return The slots taken up by the engine in the center torso.
      */
     public int[] getCenterTorsoCriticalSlots(int gyroType) {
-        if (engineType == COMPACT_ENGINE || engineType == OS_COMPACT_ENGINE
-              || engineType == OS_IMP_COMPACT_ENGINE || engineType == OS_ADV_COMPACT_ENGINE) {
+        if (engineType == COMPACT_ENGINE || engineType == OS_STANDARD_COMPACT_ENGINE
+              || engineType == OS_IMPROVE_COMPACT_ENGINE || engineType == OS_ADVANCE_COMPACT_ENGINE) {
             int[] slots;
             if (hasFlag(SUPERHEAVY_ENGINE)) {
                 slots = new int[] { 0, 1 };
@@ -865,31 +865,31 @@ public class Engine implements Serializable, ITechnology {
             }
             return slots;
         // OS engine side-torso crits
-        } else if (engineType == OS_STANDARD_ENGINE) {
+        } else if (engineType == OS_ADVANCE_FUSION_ENGINE) {
             return new int[] { 0 };           // Advance Fusion: 1
-        } else if (engineType == OS_LIGHT_ENGINE) {
+        } else if (engineType == OS_STANDARD_LIGHT_ENGINE) {
             return hasFlag(SUPERHEAVY_ENGINE) ? new int[] { 0 } : new int[] { 0, 1 };        // Light (OS): 2
-        } else if (engineType == OS_XL_ENGINE) {
+        } else if (engineType == OS_ADVANCE_XL_ENGINE) {
             return hasFlag(SUPERHEAVY_ENGINE) ? new int[] { 0, 1 } : new int[] { 0, 1, 2 };  // Advance XL: 3
-        } else if (engineType == OS_XXL_ENGINE) {
+        } else if (engineType == OS_ADVANCE_XXL_ENGINE) {
             return hasFlag(SUPERHEAVY_ENGINE) ? new int[] { 0, 1 } : new int[] { 0, 1, 2, 3 }; // Advance XXL: 4
         } else if (engineType == OS_SH_XL_ENGINE) {
             return new int[] { 0, 1 };        // 2 side-torso crits
         } else if (engineType == OS_SH_XXL_ENGINE) {
             return new int[] { 0, 1, 2 };     // 3 side-torso crits
-        } else if (engineType == OS_IMP_STD_ENGINE) {
+        } else if (engineType == OS_IMPROVE_FUSION_ENGINE) {
             return new int[] { 0 };           // OS Improve Fusion: 1
-        } else if (engineType == OS_IMP_LIGHT_ENGINE) {
+        } else if (engineType == OS_IMPROVE_LIGHT_ENGINE) {
             return hasFlag(SUPERHEAVY_ENGINE) ? new int[] { 0 } : new int[] { 0, 1 };        // OS Improve Light: 2
-        } else if (engineType == OS_BASE_XL_ENGINE) {
+        } else if (engineType == OS_STANDARD_XL_ENGINE) {
             return hasFlag(SUPERHEAVY_ENGINE) ? new int[] { 0, 1 } : new int[] { 0, 1, 2 };  // OS XL: 3
-        } else if (engineType == OS_IMP_XL_ENGINE) {
+        } else if (engineType == OS_IMPROVE_XL_ENGINE) {
             return hasFlag(SUPERHEAVY_ENGINE) ? new int[] { 0 } : new int[] { 0, 1 };        // OS Improve XL: 2
-        } else if (engineType == OS_BASE_XXL_ENGINE) {
+        } else if (engineType == OS_STANDARD_XXL_ENGINE) {
             return hasFlag(SUPERHEAVY_ENGINE) ? new int[] { 0, 1, 2 } : new int[] { 0, 1, 2, 3, 4 }; // OS XXL: 5
-        } else if (engineType == OS_ADV_LIGHT_ENGINE) {
+        } else if (engineType == OS_ADVANCE_LIGHT_ENGINE) {
             return hasFlag(SUPERHEAVY_ENGINE) ? new int[] { 0 } : new int[] { 0, 1 };        // OS Advance Light: 2
-        } else if (engineType == OS_IMP_XXL_ENGINE) {
+        } else if (engineType == OS_IMPROVE_XXL_ENGINE) {
             return hasFlag(SUPERHEAVY_ENGINE) ? new int[] { 0, 1 } : new int[] { 0, 1, 2, 3 }; // OS Improve XXL: 4
         } else if (engineType == OS_SH_STANDARD_ENGINE) {
             return new int[] { 0 };           // Superheavy Standard: 1
@@ -902,7 +902,7 @@ public class Engine implements Serializable, ITechnology {
      * @return the heat generated while the mek is standing still.
      */
     public int getStandingHeat(Entity entity) {
-        boolean isXXL = (engineType == XXL_ENGINE) || (engineType == OS_BASE_XXL_ENGINE);
+        boolean isXXL = (engineType == XXL_ENGINE) || (engineType == OS_STANDARD_XXL_ENGINE);
         return (isXXL && !entity.hasWorkingSCM()) ? 2 : 0;
     }
 
@@ -917,7 +917,7 @@ public class Engine implements Serializable, ITechnology {
         return switch (engineType) {
             // ICE/Fuel Cell Meks generate movement heat per TacOps pg 85
             case COMBUSTION_ENGINE, FUEL_CELL -> 1;
-            case XXL_ENGINE, OS_BASE_XXL_ENGINE -> mek.hasWorkingSCM() ? 0 : 4;
+            case XXL_ENGINE, OS_STANDARD_XXL_ENGINE -> mek.hasWorkingSCM() ? 0 : 4;
             default -> mek.hasWorkingSCM() ? 0 : 1;
         };
     }
@@ -933,7 +933,7 @@ public class Engine implements Serializable, ITechnology {
         return switch (engineType) {
             // ICE/Fuel Cell Meks generate movement heat per TacOps pg 85
             case COMBUSTION_ENGINE, FUEL_CELL -> 2;
-            case XXL_ENGINE, OS_BASE_XXL_ENGINE -> mek.hasWorkingSCM() ? 0 : 6;
+            case XXL_ENGINE, OS_STANDARD_XXL_ENGINE -> mek.hasWorkingSCM() ? 0 : 6;
             default -> mek.hasWorkingSCM() ? 0 : 2;
         };
     }
@@ -949,7 +949,7 @@ public class Engine implements Serializable, ITechnology {
         return switch (engineType) {
             // ICE/Fuel Cell Meks generate movement heat per TacOps pg 85
             case COMBUSTION_ENGINE, FUEL_CELL -> 3;
-            case XXL_ENGINE, OS_BASE_XXL_ENGINE -> mek.hasWorkingSCM() ? 0 : 9;
+            case XXL_ENGINE, OS_STANDARD_XXL_ENGINE -> mek.hasWorkingSCM() ? 0 : 9;
             default -> mek.hasWorkingSCM() ? 0 : 3;
         };
     }
@@ -958,7 +958,7 @@ public class Engine implements Serializable, ITechnology {
      * @return the heat generated while the mek is jumping.
      */
     public int getJumpHeat(int movedMP) {
-        if ((engineType == XXL_ENGINE) || (engineType == OS_BASE_XXL_ENGINE)) {
+        if ((engineType == XXL_ENGINE) || (engineType == OS_STANDARD_XXL_ENGINE)) {
             return Math.max(6, movedMP * 2);
         }
         return Math.max(3, movedMP);
@@ -984,9 +984,9 @@ public class Engine implements Serializable, ITechnology {
      *       lack the cooling integration required for triple heat sinks.
      */
     public boolean prohibitsOSTripleHeatSinks() {
-        return (engineType == OS_STD_FUSION_ENGINE) || (engineType == OS_LIGHT_ENGINE)
-              || (engineType == OS_BASE_XL_ENGINE) || (engineType == OS_COMPACT_ENGINE)
-              || (engineType == OS_BASE_XXL_ENGINE);
+        return (engineType == OS_STANDARD_FUSION_ENGINE) || (engineType == OS_STANDARD_LIGHT_ENGINE)
+              || (engineType == OS_STANDARD_XL_ENGINE) || (engineType == OS_STANDARD_COMPACT_ENGINE)
+              || (engineType == OS_STANDARD_XXL_ENGINE);
     }
 
     /**
@@ -995,9 +995,9 @@ public class Engine implements Serializable, ITechnology {
      */
     public boolean prohibitsOSQuadHeatSinks() {
         return prohibitsOSTripleHeatSinks()
-              || (engineType == OS_IMP_STD_ENGINE) || (engineType == OS_IMP_LIGHT_ENGINE)
-              || (engineType == OS_IMP_XL_ENGINE) || (engineType == OS_IMP_COMPACT_ENGINE)
-              || (engineType == OS_IMP_XXL_ENGINE);
+              || (engineType == OS_IMPROVE_FUSION_ENGINE) || (engineType == OS_IMPROVE_LIGHT_ENGINE)
+              || (engineType == OS_IMPROVE_XL_ENGINE) || (engineType == OS_IMPROVE_COMPACT_ENGINE)
+              || (engineType == OS_IMPROVE_XXL_ENGINE);
     }
 
     public int getBaseCost() {
@@ -1011,23 +1011,23 @@ public class Engine implements Serializable, ITechnology {
             case FUEL_CELL -> 3500;
             case FISSION -> 7500;
             // OS engine costs
-            case OS_STANDARD_ENGINE -> 9000;    // Advance Fusion
-            case OS_LIGHT_ENGINE -> 13000;      // Light (OS)
-            case OS_XL_ENGINE -> 25000;         // Advance XL
-            case OS_XXL_ENGINE -> 100000;       // Advance XXL
-            case OS_COMPACT_ENGINE -> 10000;    // Compact (OS)
+            case OS_ADVANCE_FUSION_ENGINE -> 9000;    // Advance Fusion
+            case OS_STANDARD_LIGHT_ENGINE -> 13000;      // Light (OS)
+            case OS_ADVANCE_XL_ENGINE -> 25000;         // Advance XL
+            case OS_ADVANCE_XXL_ENGINE -> 100000;       // Advance XXL
+            case OS_STANDARD_COMPACT_ENGINE -> 10000;    // Compact (OS)
             case OS_SH_XL_ENGINE -> 25000;
             case OS_SH_XXL_ENGINE -> 120000;
-            case OS_IMP_STD_ENGINE -> 7000;     // OS Improve Fusion
-            case OS_IMP_LIGHT_ENGINE -> 17000;  // OS Improve Light
-            case OS_BASE_XL_ENGINE -> 18000;    // OS XL
-            case OS_IMP_XL_ENGINE -> 22000;     // OS Improve XL
-            case OS_BASE_XXL_ENGINE -> 110000;  // OS XXL
-            case OS_STD_FUSION_ENGINE -> 5000;  // Standard Fusion (OS)
-            case OS_ADV_LIGHT_ENGINE -> 19000;  // OS Advance Light
-            case OS_IMP_XXL_ENGINE -> 105000;   // OS Improve XXL
-            case OS_IMP_COMPACT_ENGINE -> 12000; // OS Improve Compact
-            case OS_ADV_COMPACT_ENGINE -> 16000; // OS Advance Compact
+            case OS_IMPROVE_FUSION_ENGINE -> 7000;     // OS Improve Fusion
+            case OS_IMPROVE_LIGHT_ENGINE -> 17000;  // OS Improve Light
+            case OS_STANDARD_XL_ENGINE -> 18000;    // OS XL
+            case OS_IMPROVE_XL_ENGINE -> 22000;     // OS Improve XL
+            case OS_STANDARD_XXL_ENGINE -> 110000;  // OS XXL
+            case OS_STANDARD_FUSION_ENGINE -> 5000;  // Standard Fusion (OS)
+            case OS_ADVANCE_LIGHT_ENGINE -> 19000;  // OS Advance Light
+            case OS_IMPROVE_XXL_ENGINE -> 105000;   // OS Improve XXL
+            case OS_IMPROVE_COMPACT_ENGINE -> 12000; // OS Improve Compact
+            case OS_ADVANCE_COMPACT_ENGINE -> 16000; // OS Advance Compact
             case OS_SH_STANDARD_ENGINE -> 30000; // Superheavy Standard
             default -> 0;
         };
@@ -1453,39 +1453,39 @@ public class Engine implements Serializable, ITechnology {
                 return SUPPORT_NONE_TA;
             case EXTERNAL:
                 return SUPPORT_EXTERNAL_TA;
-            case OS_STANDARD_ENGINE:
+            case OS_ADVANCE_FUSION_ENGINE:
                 return OS_STANDARD_TA;
-            case OS_LIGHT_ENGINE:
+            case OS_STANDARD_LIGHT_ENGINE:
                 return OS_LIGHT_TA;
-            case OS_XL_ENGINE:
+            case OS_ADVANCE_XL_ENGINE:
                 return OS_XL_TA;
-            case OS_XXL_ENGINE:
+            case OS_ADVANCE_XXL_ENGINE:
                 return OS_XXL_TA;
-            case OS_COMPACT_ENGINE:
+            case OS_STANDARD_COMPACT_ENGINE:
                 return OS_COMPACT_TA;
             case OS_SH_XL_ENGINE:
                 return OS_SH_XL_TA;
             case OS_SH_XXL_ENGINE:
                 return OS_SH_XXL_TA;
-            case OS_IMP_STD_ENGINE:
+            case OS_IMPROVE_FUSION_ENGINE:
                 return OS_IMP_STD_TA;
-            case OS_IMP_LIGHT_ENGINE:
+            case OS_IMPROVE_LIGHT_ENGINE:
                 return OS_IMP_LIGHT_TA;
-            case OS_BASE_XL_ENGINE:
+            case OS_STANDARD_XL_ENGINE:
                 return OS_BASE_XL_TA;
-            case OS_IMP_XL_ENGINE:
+            case OS_IMPROVE_XL_ENGINE:
                 return OS_IMP_XL_TA;
-            case OS_BASE_XXL_ENGINE:
+            case OS_STANDARD_XXL_ENGINE:
                 return OS_BASE_XXL_TA;
-            case OS_STD_FUSION_ENGINE:
+            case OS_STANDARD_FUSION_ENGINE:
                 return OS_STD_FUSION_TA;
-            case OS_ADV_LIGHT_ENGINE:
+            case OS_ADVANCE_LIGHT_ENGINE:
                 return OS_ADV_LIGHT_TA;
-            case OS_IMP_XXL_ENGINE:
+            case OS_IMPROVE_XXL_ENGINE:
                 return OS_IMP_XXL_TA;
-            case OS_IMP_COMPACT_ENGINE:
+            case OS_IMPROVE_COMPACT_ENGINE:
                 return OS_IMP_COMPACT_TA;
-            case OS_ADV_COMPACT_ENGINE:
+            case OS_ADVANCE_COMPACT_ENGINE:
                 return OS_ADV_COMPACT_TA;
             case OS_SH_STANDARD_ENGINE:
                 return OS_SH_STANDARD_TA;
@@ -1684,26 +1684,26 @@ public class Engine implements Serializable, ITechnology {
                     }
                 }
             // OS engine types — year-based tech level using OS constants
-            case OS_STANDARD_ENGINE:
-            case OS_LIGHT_ENGINE:
-            case OS_XL_ENGINE:
-            case OS_COMPACT_ENGINE:
-            case OS_IMP_STD_ENGINE:
-            case OS_IMP_LIGHT_ENGINE:
-            case OS_BASE_XL_ENGINE:
-            case OS_IMP_XL_ENGINE:
-            case OS_STD_FUSION_ENGINE:
-            case OS_ADV_LIGHT_ENGINE:
-            case OS_IMP_COMPACT_ENGINE:
-            case OS_ADV_COMPACT_ENGINE:
+            case OS_ADVANCE_FUSION_ENGINE:
+            case OS_STANDARD_LIGHT_ENGINE:
+            case OS_ADVANCE_XL_ENGINE:
+            case OS_STANDARD_COMPACT_ENGINE:
+            case OS_IMPROVE_FUSION_ENGINE:
+            case OS_IMPROVE_LIGHT_ENGINE:
+            case OS_STANDARD_XL_ENGINE:
+            case OS_IMPROVE_XL_ENGINE:
+            case OS_STANDARD_FUSION_ENGINE:
+            case OS_ADVANCE_LIGHT_ENGINE:
+            case OS_IMPROVE_COMPACT_ENGINE:
+            case OS_ADVANCE_COMPACT_ENGINE:
                 if (year < 2800) {
                     return TechConstants.T_OUTER_SPHERE_UNOFFICIAL;
                 } else {
                     return TechConstants.T_OUTER_SPHERE_ADVANCED;
                 }
-            case OS_XXL_ENGINE:
-            case OS_BASE_XXL_ENGINE:
-            case OS_IMP_XXL_ENGINE:
+            case OS_ADVANCE_XXL_ENGINE:
+            case OS_STANDARD_XXL_ENGINE:
+            case OS_IMPROVE_XXL_ENGINE:
             case OS_SH_XL_ENGINE:
             case OS_SH_XXL_ENGINE:
             case OS_SH_STANDARD_ENGINE:
