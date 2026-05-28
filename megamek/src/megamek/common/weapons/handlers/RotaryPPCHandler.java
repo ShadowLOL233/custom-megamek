@@ -48,10 +48,11 @@ import megamek.server.totalWarfare.TWGameManager;
  *
  * Coolant + Heat resolution:
  *   - 1-shot: no coolant consumed, heat = baseHeat
- *   - 2+ shot: each shot beyond the first consumes one charge from the entity-wide
- *     RPPC Coolant Pod pool; the suppressed shots cost ⌈baseHeat / 3⌉ heat instead
- *     of the full baseHeat
- *   - If insufficient coolant for the requested mode: Capacitor Overload triggers
+ *   - up to FREE_SHOTS (3) shots: self-cooled and pod-free; each shot beyond the first
+ *     costs the suppressed ⌈baseHeat / 3⌉ heat
+ *   - beyond FREE_SHOTS: each further shot draws one charge from the entity-wide RPPC
+ *     Coolant Pod pool and stays suppressed; an uncovered shot runs at full baseHeat
+ *   - If insufficient coolant for a shot beyond FREE_SHOTS: Capacitor Overload triggers
  *     (weapon destroyed, entity heat +15, location takes 15 internal damage)
  *
  * Per-sub-bolt damage uses {@code weaponType.getDamage(nRange)} so that variants with
@@ -70,6 +71,21 @@ public class RotaryPPCHandler extends PPCHandler {
     private int coolantUsed;
     private boolean overloaded;
 
+    /**
+     * Built-in cluster-roll bonus applied to every multi-shot rotary burst. The synchronized
+     * rotary drum and advanced fire control shift the missile cluster table upward, raising the
+     * average number of sub-bolts that connect so a dialed-up burst is less of a dice gamble.
+     */
+    private static final int ROTARY_CLUSTER_BONUS = 1;
+
+    /**
+     * Shots a Rotary PPC fires on its own internal cooling without drawing RPPC Coolant Pod
+     * charges. Only shots beyond this count consume one pod charge each, so dialing at or below it
+     * is always pod-free and can never overload - two RPPCs sharing the entity-wide pool therefore
+     * no longer starve each other at low/mid dial.
+     */
+    private static final int FREE_SHOTS = 3;
+
     public RotaryPPCHandler(ToHitData toHit, WeaponAttackAction waa, Game g, TWGameManager m)
           throws EntityLoadingException {
         super(toHit, waa, g, m);
@@ -81,16 +97,18 @@ public class RotaryPPCHandler extends PPCHandler {
         setDone();
         howManyShots = shotsForMode(weapon.curMode().toString());
 
-        // Every shot beyond the first consumes one RPPC Coolant Pod charge.
-        if (howManyShots >= 2) {
-            int extraShots = howManyShots - 1;
+        // Only shots beyond FREE_SHOTS draw from the entity-wide RPPC Coolant Pod pool (1 charge
+        // each). The first FREE_SHOTS shots are self-cooled and pod-free, so low/mid dialing never
+        // overloads and multiple RPPCs no longer starve each other.
+        int coolantNeeded = Math.max(0, howManyShots - FREE_SHOTS);
+        if (coolantNeeded > 0) {
             int available = getAvailableCoolant();
-            int draw = Math.min(extraShots, available);
+            int draw = Math.min(coolantNeeded, available);
             if (draw > 0) {
                 consumeCoolant(draw);
             }
             coolantUsed = draw;
-            overloaded = (draw < extraShots);
+            overloaded = (draw < coolantNeeded);
         }
     }
 
@@ -150,7 +168,10 @@ public class RotaryPPCHandler extends PPCHandler {
             totalHeat = baseHeat;
         } else {
             int extra = howManyShots - 1;
-            int suppressed = coolantUsed;
+            // Shots 2..FREE_SHOTS are self-cooled (no pod needed); shots beyond FREE_SHOTS are
+            // suppressed only when a coolant charge covers them, otherwise they run at full heat.
+            int freeExtras = Math.min(extra, FREE_SHOTS - 1);
+            int suppressed = freeExtras + coolantUsed;
             int unsuppressed = extra - suppressed;
             int extraHeatSuppressed = (int) Math.ceil(baseHeat / 3.0) * suppressed;
             int extraHeatNormal = baseHeat * unsuppressed;
@@ -219,7 +240,9 @@ public class RotaryPPCHandler extends PPCHandler {
             return 1;
         }
         bSalvo = true;
-        int nMod = getClusterModifiers(true);
+        // Built-in cluster bonus: the synchronized rotary drum + advanced fire control shift the
+        // cluster table upward so more sub-bolts land on average, taming the "5-shot, 1 hit" swing.
+        int nMod = getClusterModifiers(true) + ROTARY_CLUSTER_BONUS;
         int shotsHit;
         if (allShotsHit()) {
             shotsHit = howManyShots;
@@ -234,6 +257,10 @@ public class RotaryPPCHandler extends PPCHandler {
         } else {
             PlanetaryConditions conditions = game.getPlanetaryConditions();
             shotsHit = Compute.missilesHit(howManyShots, nMod, conditions.getEMI().isEMI());
+            // Reliability floor: on a burst that hits, at least half the dialed sub-bolts always
+            // connect, cutting off the worst-case cluster rolls while keeping rotary randomness.
+            int minHits = (int) Math.ceil(howManyShots / 2.0);
+            shotsHit = Math.max(shotsHit, minHits);
         }
 
         Report r = new Report(3325);

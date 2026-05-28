@@ -296,15 +296,26 @@ public abstract class AbstractUnitSelectorDialog extends JDialog implements Runn
         listTechLevel.setToolTipText(Messages.getString("MekSelectorDialog.m_labelType.ToolTip"));
         listTechLevel.setLayoutOrientation(JList.VERTICAL_WRAP);
         listTechLevel.setVisibleRowCount(3);
-        // The tech-level "Group" list is populated later (setModel, further below), so a scroll pane
-        // around it cannot auto-size from its (currently empty) content here. Without an explicit size
-        // the scroll pane takes a near-zero preferred size that the weightless GridBag row locks in,
-        // collapsing the control. Pin the height to three rows; horizontal overflow scrolls.
+        // The tech-level "Group" list is populated later (setModel, further below). In VERTICAL_WRAP
+        // mode the list derives its own height from its model, so while it is still empty it reports a
+        // near-zero height and the surrounding scroll pane collapses ("squashed", no rows visible) -
+        // sizing only the scroll pane is not enough because the list inside it stays zero-height.
+        // A prototype cell value gives the empty list a real cell size up front, so it reports a proper
+        // three-row height immediately; we then also pin the scroll pane's preferred AND minimum size so
+        // the weightless GridBag row can never shrink it. Horizontal overflow scrolls.
+        listTechLevel.setPrototypeCellValue("Outer Sphere Experimental");
         JScrollPane scrollTechLevel = new JScrollPane(listTechLevel,
               JScrollPane.VERTICAL_SCROLLBAR_NEVER,
               JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         int techGroupRowHeight = listTechLevel.getFontMetrics(listTechLevel.getFont()).getHeight();
-        scrollTechLevel.setPreferredSize(new Dimension(200, (techGroupRowHeight * 3) + 18));
+        // three text rows + room for the horizontal scrollbar + scroll-pane borders
+        int techGroupHeight = (techGroupRowHeight * 3) + 24;
+        if (techGroupHeight < 72) {
+            techGroupHeight = 78; // safety floor if font metrics are unavailable this early
+        }
+        Dimension techGroupSize = new Dimension(220, techGroupHeight);
+        scrollTechLevel.setPreferredSize(techGroupSize);
+        scrollTechLevel.setMinimumSize(techGroupSize);
         gridBagConstraintsWest.gridx = 1;
         gridBagConstraintsWest.gridy = 2;
         gridBagConstraintsWest.fill = GridBagConstraints.HORIZONTAL;

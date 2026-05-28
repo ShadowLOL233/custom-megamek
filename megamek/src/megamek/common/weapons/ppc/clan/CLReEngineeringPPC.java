@@ -86,6 +86,6 @@ public class CLReEngineeringPPC extends PPCWeapon {
               .setClanApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.CSR)
               .setProductionFactions(Faction.CSR)
-              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
     }
 }

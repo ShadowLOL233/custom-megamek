@@ -276,8 +276,6 @@ import megamek.common.weapons.lasers.outerSphere.OSBinaryLaserSystem;
 import megamek.common.weapons.lasers.outerSphere.OSERBinaryLaserSystem;
 import megamek.common.weapons.lasers.outerSphere.OSERTrinaryLaserSystem;
 import megamek.common.weapons.lasers.outerSphere.OSHyperLaserLarge;
-import megamek.common.weapons.lasers.outerSphere.OSHyperLaserMedium;
-import megamek.common.weapons.lasers.outerSphere.OSHyperLaserSmall;
 import megamek.common.weapons.lasers.outerSphere.OSTrinaryLaserSystem;
 import megamek.common.weapons.lasers.outerSphere.large.OSAdvERLaserLarge;
 import megamek.common.weapons.lasers.outerSphere.large.OSAdvERPulseLaserLarge;
@@ -1458,8 +1456,6 @@ public class WeaponType extends EquipmentType {
         EquipmentType.addType(new OSERBinaryLaserSystem());
         EquipmentType.addType(new OSERTrinaryLaserSystem());
         // Hyper Lasers
-        EquipmentType.addType(new OSHyperLaserSmall());
-        EquipmentType.addType(new OSHyperLaserMedium());
         EquipmentType.addType(new OSHyperLaserLarge());
 
         // PPC types

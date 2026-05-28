@@ -52,7 +52,7 @@ public class OSBinaryLaserSystem extends LaserWeapon {
         waterExtremeRange = 12;
         tonnage = 7.0;
         criticalSlots = 4;
-        bv = 200;
+        bv = 246;
         cost = 230000;
         shortAV = 16;
         medAV = 16;

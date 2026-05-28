@@ -44,7 +44,7 @@ public class OSHeavyLaserLarge extends LaserWeapon {
         waterExtremeRange = 12;
         tonnage = 4.0;
         criticalSlots = 3;
-        bv = 258;
+        bv = 244;
         cost = 350000;
         shortAV = 16;
         medAV = 16;

@@ -39,6 +39,7 @@ import java.util.*;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -70,6 +71,11 @@ import megamek.common.annotations.Nullable;
  * avoid repetition.
  */
 @SuppressWarnings("unused") // Class fields are assigned when factions are loaded from YAML files
+// Tolerate faction YAML fields this class does not (yet) model - e.g. sucsCodes carried by newer
+// unified-faction data. Without this, a single unknown field makes Jackson reject the whole file,
+// and if every faction file carries it the RAT generator faction list ends up empty, which crashes
+// hosting (NPE on getFaction("IS")) in the random army dialog.
+@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder({ "key", "name", "nameChanges", "capital", "capitalChanges", "yearsActive", "successor", "tags",
                      "color", "logo", "background", "camos", "camosChanges", "nameGenerator", "eraMods", "ratingLevels",
                      "fallBackFactions", "preInvasionHonorRating", "postInvasionHonorRating", "formationBaseSize",

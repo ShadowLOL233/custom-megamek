@@ -21,10 +21,10 @@ import megamek.common.weapons.ppc.PPCRotaryWeapon;
  * Mode-dial cluster PPC: 5 damage per sub-bolt across 1-5 firing modes / 5 heat per shot /
  * Range 6-12-18 no min / 7t / 5 crit / BV ~280.
  *
- * Every shot beyond the first consumes one charge from an installed RPPC Coolant Pod and
- * converts that shot's heat to ⌈5/3⌉ = 2 heat. Firing 2+ shot without sufficient coolant
- * triggers Capacitor Overload: weapon destroyed, entity heat +15, and 15 points of
- * internal damage to the mounting location.
+ * The first three shots are self-cooled and pod-free, each costing ⌈5/3⌉ = 2 suppressed heat;
+ * only the 4th and 5th shots draw one charge each from an installed RPPC Coolant Pod. Dialing
+ * 4+ shot without sufficient coolant triggers Capacitor Overload: weapon destroyed, entity heat
+ * +15, and 15 points of internal damage to the mounting location.
  */
 public class OSLightRotaryPPC extends PPCRotaryWeapon {
     @Serial

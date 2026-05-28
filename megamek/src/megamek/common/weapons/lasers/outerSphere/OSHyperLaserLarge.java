@@ -26,8 +26,8 @@ import megamek.common.weapons.lasers.LaserWeapon;
 import megamek.server.totalWarfare.TWGameManager;
 
 /**
- * Outer Sphere Large Hyper Laser
- * Damage 20 / Heat 24 (charge 8 + fire 24) / Range 8-15-25 / -1 ToHit, 8t / 6 crit
+ * Outer Sphere Hyper Laser - extreme-range charge-up laser.
+ * Damage 25 / Heat 25 / Range 12-24-36 / -1 ToHit / 8t / 6 crit / BV 620.
  */
 public class OSHyperLaserLarge extends LaserWeapon {
     @Serial
@@ -35,8 +35,10 @@ public class OSHyperLaserLarge extends LaserWeapon {
 
     public OSHyperLaserLarge() {
         super();
-        name = "Large Hyper Laser";
+        name = "Hyper Laser";
         setInternalName("OSLargeHyperLaser");
+        addLookupName("OS Hyper Laser");
+        addLookupName("Hyper Laser");
         addLookupName("OS Large Hyper Laser");
         sortingName = "Laser Hyper D";
         heat = 25;
@@ -52,7 +54,7 @@ public class OSHyperLaserLarge extends LaserWeapon {
         waterExtremeRange = 33;
         tonnage = 8.0;
         criticalSlots = 6;
-        bv = 400;
+        bv = 620;
         cost = 900000;
         shortAV = 25;
         medAV = 25;

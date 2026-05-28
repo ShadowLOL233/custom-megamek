@@ -39,12 +39,12 @@ import megamek.server.totalWarfare.TWGameManager;
  *
  * Adapts the Rotary AC firing-mode pattern to a PPC chassis: subclasses declare
  * a maximum shot count (3-6) and the constructor builds the corresponding 1..N
- * shot mode list. Every shot beyond the first consumes one charge from the
- * entity-wide RPPC Coolant Pod pool; suppressed shots cost
- * {@code ceil(baseHeat / 3)} heat instead of the full base heat. Firing in any
- * multi-shot mode without sufficient coolant triggers a Capacitor Overload —
- * heavier than a RAC jam (weapon destroyed, +15 entity heat, +15 location
- * critical damage).
+ * shot mode list. The first three shots are self-cooled and pod-free; only shots
+ * beyond the third draw one charge each from the entity-wide RPPC Coolant Pod
+ * pool. Suppressed shots cost {@code ceil(baseHeat / 3)} heat instead of the full
+ * base heat. Dialing a 4+ shot mode without sufficient coolant triggers a
+ * Capacitor Overload — heavier than a RAC jam (weapon destroyed, +15 entity heat,
+ * +15 location critical damage).
  *
  * Coolant consumption, heat suppression, overload resolution, and per-bolt
  * variable damage (Snub-Nose variant) are all handled in

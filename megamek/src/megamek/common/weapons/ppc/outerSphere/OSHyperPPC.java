@@ -61,7 +61,7 @@ public class OSHyperPPC extends PPCWeapon {
         waterExtremeRange = 33;
         tonnage = 10.0;
         criticalSlots = 7;
-        bv = 490;
+        bv = 824;
         cost = 1000000;
         shortAV = 30;
         medAV = 30;

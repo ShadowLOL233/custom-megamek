@@ -44,7 +44,7 @@ public class OSHeavyLaserSmall extends LaserWeapon {
         waterExtremeRange = 4;
         tonnage = 0.5;
         criticalSlots = 1;
-        bv = 16;
+        bv = 15;
         cost = 20000;
         shortAV = 6;
         maxRange = RANGE_SHORT;

@@ -44,7 +44,7 @@ public class OSHeavyLaserMedium extends LaserWeapon {
         waterExtremeRange = 8;
         tonnage = 1.0;
         criticalSlots = 2;
-        bv = 80;
+        bv = 76;
         cost = 100000;
         shortAV = 10;
         medAV = 10;

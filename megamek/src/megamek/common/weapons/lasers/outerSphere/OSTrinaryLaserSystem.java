@@ -52,7 +52,7 @@ public class OSTrinaryLaserSystem extends LaserWeapon {
         waterExtremeRange = 12;
         tonnage = 11.0;
         criticalSlots = 6;
-        bv = 295;
+        bv = 369;
         cost = 480000;
         shortAV = 24;
         medAV = 24;

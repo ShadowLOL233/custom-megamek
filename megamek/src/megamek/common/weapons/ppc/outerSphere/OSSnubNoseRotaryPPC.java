@@ -23,9 +23,9 @@ import megamek.common.weapons.ppc.PPCRotaryWeapon;
  * damage while 4-shot at long produces 16 max. 8 heat per shot / Range 8-12-15 no min /
  * 10t / 6 crit / BV ~360.
  *
- * Every shot beyond the first consumes one RPPC Coolant Pod charge and converts that
- * shot's heat to ⌈8/3⌉ = 3 heat. 2+ shot without sufficient coolant triggers Capacitor
- * Overload.
+ * The first three shots are self-cooled and pod-free, each costing ⌈8/3⌉ = 3 suppressed heat;
+ * only the 4th shot draws one RPPC Coolant Pod charge. Dialing 4-shot without sufficient
+ * coolant triggers Capacitor Overload.
  */
 public class OSSnubNoseRotaryPPC extends PPCRotaryWeapon {
     @Serial
