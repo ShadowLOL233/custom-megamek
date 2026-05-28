@@ -68,10 +68,10 @@ public class CLReEngineeringPPC extends PPCWeapon {
         this.waterMediumRange = 9;
         this.waterLongRange = 13;
         this.waterExtremeRange = 20;
-        this.tonnage = 7.0;
-        this.criticalSlots = 3;
+        this.tonnage = 8.0;
+        this.criticalSlots = 4;
         this.bv = 300.0;
-        this.cost = 350000;
+        this.cost = 280000;
         this.shortAV = 12;
         this.medAV = 12;
         this.longAV = 12;
