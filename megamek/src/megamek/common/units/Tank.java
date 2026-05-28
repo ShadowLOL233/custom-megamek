@@ -104,6 +104,8 @@ public class Tank extends Entity {
     private boolean infernoFire = false;
     private ArrayList<Mounted<?>> jammedWeapons = new ArrayList<>();
     protected boolean engineHit = false;
+    // OS Hybrid engine: tracks whether the once-per-game engine-crit absorption has been used
+    private boolean usedHybridEngineCritAbsorb = false;
 
     // locations
     public static final int LOC_BODY = 0;
@@ -2217,6 +2219,15 @@ public class Tank extends Entity {
 
     public boolean isEngineHit() {
         return engineHit;
+    }
+
+    /** @return whether this vehicle's OS Hybrid engine has already used its once-per-game engine-crit absorption. */
+    public boolean hasUsedHybridEngineCritAbsorb() {
+        return usedHybridEngineCritAbsorb;
+    }
+
+    public void setUsedHybridEngineCritAbsorb(boolean used) {
+        usedHybridEngineCritAbsorb = used;
     }
 
     @Override

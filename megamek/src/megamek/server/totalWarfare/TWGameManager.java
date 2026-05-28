@@ -22106,6 +22106,17 @@ public class TWGameManager extends AbstractGameManager {
                 }
                 break;
             case Tank.CRIT_ENGINE:
+                // OS Hybrid engine: redundant subsystem absorbs the first engine-destroying
+                // critical per game, keeping the vehicle running.
+                if (tank.hasEngine()
+                      && (tank.getEngine().getEngineType() == Engine.OS_HYBRID_ENGINE)
+                      && !tank.hasUsedHybridEngineCritAbsorb()) {
+                    tank.setUsedHybridEngineCritAbsorb(true);
+                    r = new Report(9859);
+                    r.subject = tank.getId();
+                    reports.add(r);
+                    break;
+                }
                 r = new Report(6210);
                 r.subject = tank.getId();
                 reports.add(r);
