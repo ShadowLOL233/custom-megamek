@@ -185,7 +185,9 @@ public class TestMek extends TestEntity {
     public double getWeightPowerAmp() {
         if (!mek.hasEngine()
               || (mek.getEngine().getEngineType() == Engine.COMBUSTION_ENGINE)
-              || (mek.getEngine().getEngineType() == Engine.FUEL_CELL)) {
+              || (mek.getEngine().getEngineType() == Engine.FUEL_CELL)
+              || (mek.getEngine().getEngineType() == Engine.OS_IMPROVE_ICE_ENGINE)
+              || (mek.getEngine().getEngineType() == Engine.OS_HYBRID_ENGINE)) {
             double powerAmpWeight = 0;
             for (Mounted<?> m : mek.getWeaponList()) {
                 WeaponType wt = (WeaponType) m.getType();

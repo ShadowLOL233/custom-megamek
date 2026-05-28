@@ -121,7 +121,9 @@ public class Engine implements Serializable, ITechnology {
     public static final int OS_IMPROVE_COMPACT_ENGINE = 29; // OS Improve Compact (OSImproveCompact) – 120% weight, 3 CT crits
     public static final int OS_ADVANCE_COMPACT_ENGINE = 30; // OS Advance Compact (OSAdvanceCompact) – 110% weight, 3 CT crits, 15 free HS
     public static final int OS_SH_STANDARD_ENGINE = 31; // Experimental Superheavy Standard – 90% weight, 1 SH side-torso crit, 15 free HS
-    private static final int NUM_ENGINE_TYPES = 32;
+    public static final int OS_IMPROVE_ICE_ENGINE = 32; // OS Improve ICE – non-fusion, ×1.7 weight, 0 free HS, needs power amps
+    public static final int OS_HYBRID_ENGINE = 33;      // OS Hybrid (ICE+Fuel Cell) – non-fusion, ×1.5 weight, 0 free HS, engine-crit resilience + sealed ops
+    private static final int NUM_ENGINE_TYPES = 34;
 
     /** Keys for retrieving engine name from {@link Messages} */
     private static final String[] TYPE_KEYS = {
@@ -131,7 +133,8 @@ public class Engine implements Serializable, ITechnology {
           "OSSHXL", "OSSHXXL",
           "OSImproveFusion", "OSImproveLight", "OSXL", "OSImproveXL", "OSXXL",
           "OSStandardFusion", "OSAdvanceLight", "OSImproveXXL", "OSImproveCompact",
-          "OSAdvanceCompact", "OSSHStandard"
+          "OSAdvanceCompact", "OSSHStandard",
+          "OSImproveICE", "OSHybrid"
     };
 
     // These are the SUPPORT VEHICLE ENGINE WEIGHT MULTIPLIERS from TM PG 127
@@ -328,6 +331,8 @@ public class Engine implements Serializable, ITechnology {
             case OS_STANDARD_FUSION_ENGINE:
             case OS_ADVANCE_LIGHT_ENGINE:
             case OS_IMPROVE_XXL_ENGINE:
+            case OS_IMPROVE_ICE_ENGINE:
+            case OS_HYBRID_ENGINE:
                 if (hasFlag(CLAN_ENGINE)) {
                     problem.append(Messages.getString("Engine.invalidSphereOnly"));
                     return false;
@@ -379,6 +384,13 @@ public class Engine implements Serializable, ITechnology {
             } else if (lower.contains("superhvy std") || lower.contains("superheavy std")
                   || lower.contains("superheavy standard")) {
                 return OS_SH_STANDARD_ENGINE;
+            }
+            // Non-fusion OS engines (check before family keywords)
+            if (lower.contains("hybrid")) {
+                return OS_HYBRID_ENGINE;
+            }
+            if (lower.contains("imp. ice") || lower.contains("improve ice") || lower.contains("ice")) {
+                return OS_IMPROVE_ICE_ENGINE;
             }
             // Compact family (also matches legacy "Adv. Light Compact (OS)")
             if (lower.contains("compact")) {
@@ -545,6 +557,12 @@ public class Engine implements Serializable, ITechnology {
                 break;
             case FUEL_CELL:
                 weight *= 1.2;
+                break;
+            case OS_IMPROVE_ICE_ENGINE:
+                weight *= 1.7; // OS Improve ICE (non-fusion)
+                break;
+            case OS_HYBRID_ENGINE:
+                weight *= 1.5; // OS Hybrid (non-fusion)
                 break;
             case NONE:
                 return 0;
@@ -746,6 +764,8 @@ public class Engine implements Serializable, ITechnology {
         result.put(OS_IMPROVE_COMPACT_ENGINE, getEngineTypeName(OS_IMPROVE_COMPACT_ENGINE));
         result.put(OS_ADVANCE_COMPACT_ENGINE, getEngineTypeName(OS_ADVANCE_COMPACT_ENGINE));
         result.put(OS_SH_STANDARD_ENGINE, getEngineTypeName(OS_SH_STANDARD_ENGINE));
+        result.put(OS_IMPROVE_ICE_ENGINE, getEngineTypeName(OS_IMPROVE_ICE_ENGINE));
+        result.put(OS_HYBRID_ENGINE, getEngineTypeName(OS_HYBRID_ENGINE));
 
         return result;
     }
@@ -997,7 +1017,8 @@ public class Engine implements Serializable, ITechnology {
         return prohibitsOSTripleHeatSinks()
               || (engineType == OS_IMPROVE_FUSION_ENGINE) || (engineType == OS_IMPROVE_LIGHT_ENGINE)
               || (engineType == OS_IMPROVE_XL_ENGINE) || (engineType == OS_IMPROVE_COMPACT_ENGINE)
-              || (engineType == OS_IMPROVE_XXL_ENGINE);
+              || (engineType == OS_IMPROVE_XXL_ENGINE)
+              || (engineType == OS_IMPROVE_ICE_ENGINE) || (engineType == OS_HYBRID_ENGINE);
     }
 
     public int getBaseCost() {
@@ -1029,6 +1050,8 @@ public class Engine implements Serializable, ITechnology {
             case OS_IMPROVE_COMPACT_ENGINE -> 12000; // OS Improve Compact
             case OS_ADVANCE_COMPACT_ENGINE -> 16000; // OS Advance Compact
             case OS_SH_STANDARD_ENGINE -> 30000; // Superheavy Standard
+            case OS_IMPROVE_ICE_ENGINE -> 1800;  // OS Improve ICE
+            case OS_HYBRID_ENGINE -> 2800;       // OS Hybrid
             default -> 0;
         };
         if (hasFlag(LARGE_ENGINE)) {
@@ -1194,6 +1217,18 @@ public class Engine implements Serializable, ITechnology {
           .setPrototypeFactions(Faction.TA).setProductionFactions(Faction.TH)
           .setAvailability(AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.D, AvailabilityValue.C)
           .setStaticTechLevel(SimpleTechLevel.STANDARD);
+
+    private static final TechAdvancement OS_IMPROVE_ICE_TA = new TechAdvancement(TechBase.OUTER_SPHERE)
+          .setISAdvancement(2850, 2860, 2875)
+          .setTechRating(TechRating.D)
+          .setAvailability(AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.B, AvailabilityValue.B)
+          .setStaticTechLevel(SimpleTechLevel.STANDARD);
+
+    private static final TechAdvancement OS_HYBRID_TA = new TechAdvancement(TechBase.OUTER_SPHERE)
+          .setISAdvancement(2900, 2915, 2930)
+          .setTechRating(TechRating.E)
+          .setAvailability(AvailabilityValue.D, AvailabilityValue.D, AvailabilityValue.C, AvailabilityValue.C)
+          .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
     private static final TechAdvancement SUPPORT_STEAM_TA = new TechAdvancement(TechBase.ALL)
           .setAdvancement(DATE_PS, DATE_PS, DATE_PS).setTechRating(TechRating.A)
@@ -1469,6 +1504,10 @@ public class Engine implements Serializable, ITechnology {
                 return OS_SH_XXL_TA;
             case OS_IMPROVE_FUSION_ENGINE:
                 return OS_IMP_STD_TA;
+            case OS_IMPROVE_ICE_ENGINE:
+                return OS_IMPROVE_ICE_TA;
+            case OS_HYBRID_ENGINE:
+                return OS_HYBRID_TA;
             case OS_IMPROVE_LIGHT_ENGINE:
                 return OS_IMP_LIGHT_TA;
             case OS_STANDARD_XL_ENGINE:
@@ -1696,6 +1735,8 @@ public class Engine implements Serializable, ITechnology {
             case OS_ADVANCE_LIGHT_ENGINE:
             case OS_IMPROVE_COMPACT_ENGINE:
             case OS_ADVANCE_COMPACT_ENGINE:
+            case OS_IMPROVE_ICE_ENGINE:
+            case OS_HYBRID_ENGINE:
                 if (year < 2800) {
                     return TechConstants.T_OUTER_SPHERE_UNOFFICIAL;
                 } else {
