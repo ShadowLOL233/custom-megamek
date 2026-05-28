@@ -437,6 +437,7 @@ import megamek.common.weapons.other.clan.CLNarcIOS;
 import megamek.common.weapons.other.clan.CLNarcOS;
 import megamek.common.weapons.other.innerSphere.*;
 import megamek.common.weapons.ppc.clan.CLERPPC;
+import megamek.common.weapons.ppc.clan.CLReEngineeringPPC;
 import megamek.common.weapons.ppc.clan.CLEnhancedPPC;
 import megamek.common.weapons.ppc.clan.CLImprovedPPC;
 import megamek.common.weapons.ppc.clan.CLPlasmaCannon;
@@ -1466,6 +1467,7 @@ public class WeaponType extends EquipmentType {
         EquipmentType.addType(new ISPPCPrimitive());
         EquipmentType.addType(new ISERPPC());
         EquipmentType.addType(new CLERPPC());
+        EquipmentType.addType(new CLReEngineeringPPC());
         EquipmentType.addType(new ISSnubNosePPC());
         EquipmentType.addType(new ISLightPPC());
         EquipmentType.addType(new ISHeavyPPC());
