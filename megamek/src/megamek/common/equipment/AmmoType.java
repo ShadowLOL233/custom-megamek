@@ -192,7 +192,13 @@ public class AmmoType extends EquipmentType {
         WHITE_SHARK_T(111, "White Shark-T", AmmoCategory.Missile),
         BARRACUDA_T(112, "Barracuda-T", AmmoCategory.Missile),
         INFANTRY(113, "Infantry", AmmoCategory.Special),
-        PPC_COOLANT(114, "PPC Coolant Pod", AmmoCategory.Special);
+        PPC_COOLANT(114, "PPC Coolant Pod", AmmoCategory.Special),
+        // Outer Sphere (OS) plasma weapon ammo - one distinct type per weapon so binding is unambiguous
+        PLASMA_RIFLE_OS(115, "Plasma Rifle (OS)", AmmoCategory.Energy),
+        PLASMA_RIFLE_HEAVY_OS(116, "Heavy Plasma Rifle (OS)", AmmoCategory.Energy),
+        PLASMA_CANNON_OS(117, "Plasma Cannon (OS)", AmmoCategory.Energy),
+        PLASMA_CANNON_HEAVY_OS(118, "Heavy Plasma Cannon (OS)", AmmoCategory.Energy),
+        PLASMA_EMP_OS(119, "EMP Plasma Accelerator (OS)", AmmoCategory.Energy);
 
         private static final Map<Integer, AmmoTypeEnum> INDEX_LOOKUP = new HashMap<>();
 
@@ -3051,6 +3057,12 @@ public class AmmoType extends EquipmentType {
         EquipmentType.addType(AmmoType.createCLHAG40Ammo());
         EquipmentType.addType(AmmoType.createCLPlasmaCannonAmmo());
         EquipmentType.addType(AmmoType.createISPlasmaRifleAmmo());
+        // Outer Sphere (OS) plasma ammo
+        EquipmentType.addType(AmmoType.createOSPlasmaRifleAmmo());
+        EquipmentType.addType(AmmoType.createOSHeavyPlasmaRifleAmmo());
+        EquipmentType.addType(AmmoType.createOSPlasmaCannonAmmo());
+        EquipmentType.addType(AmmoType.createOSHeavyPlasmaCannonAmmo());
+        EquipmentType.addType(AmmoType.createOSEMPPlasmaAcceleratorAmmo());
         EquipmentType.addType(AmmoType.createCLAPGaussRifleAmmo());
         EquipmentType.addType(AmmoType.createCLMediumChemicalLaserAmmo());
         EquipmentType.addType(AmmoType.createCLSmallChemicalLaserAmmo());
@@ -11732,6 +11744,142 @@ public class AmmoType extends EquipmentType {
               .setClanApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.CSF)
               .setProductionFactions(Faction.CSF);
+        return ammo;
+    }
+
+    // OUTER SPHERE (OS) PLASMA WEAPONS
+    // Base name is "<Weapon> Ammo"; in mixed tech the UI renders it "<Weapon> (OS) Ammo".
+
+    private static AmmoType createOSPlasmaRifleAmmo() {
+        AmmoType ammo = new AmmoType();
+
+        ammo.name = "Plasma Rifle Ammo";
+        ammo.shortName = "Plasma Rifle";
+        ammo.setInternalName("OSPlasmaRifleAmmo");
+        ammo.addLookupName("OS Plasma Rifle Ammo");
+        ammo.damagePerShot = 10;
+        ammo.rackSize = 1;
+        ammo.ammoType = AmmoTypeEnum.PLASMA_RIFLE_OS;
+        ammo.shots = 10;
+        ammo.bv = 31;
+        ammo.cost = 30000;
+        ammo.explosive = false;
+        ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setIntroLevel(false)
+              .setUnofficial(false)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
+              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION);
+        return ammo;
+    }
+
+    private static AmmoType createOSHeavyPlasmaRifleAmmo() {
+        AmmoType ammo = new AmmoType();
+
+        ammo.name = "Heavy Plasma Rifle Ammo";
+        ammo.shortName = "Heavy Plasma Rifle";
+        ammo.setInternalName("OSHeavyPlasmaRifleAmmo");
+        ammo.addLookupName("OS Heavy Plasma Rifle Ammo");
+        ammo.damagePerShot = 15;
+        ammo.rackSize = 1;
+        ammo.ammoType = AmmoTypeEnum.PLASMA_RIFLE_HEAVY_OS;
+        ammo.shots = 10;
+        ammo.bv = 39;
+        ammo.cost = 45000;
+        ammo.explosive = false;
+        ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setIntroLevel(false)
+              .setUnofficial(false)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
+              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION);
+        return ammo;
+    }
+
+    private static AmmoType createOSPlasmaCannonAmmo() {
+        AmmoType ammo = new AmmoType();
+
+        ammo.name = "Plasma Cannon Ammo";
+        ammo.shortName = "Plasma Cannon";
+        ammo.setInternalName("OSPlasmaCannonAmmo");
+        ammo.addLookupName("OS Plasma Cannon Ammo");
+        ammo.damagePerShot = 0;
+        ammo.rackSize = 2;
+        ammo.ammoType = AmmoTypeEnum.PLASMA_CANNON_OS;
+        ammo.shots = 10;
+        ammo.bv = 23;
+        ammo.cost = 30000;
+        ammo.explosive = false;
+        ammo.kgPerShot = 100;
+        ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setIntroLevel(false)
+              .setUnofficial(false)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
+              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION);
+        return ammo;
+    }
+
+    private static AmmoType createOSHeavyPlasmaCannonAmmo() {
+        AmmoType ammo = new AmmoType();
+
+        ammo.name = "Heavy Plasma Cannon Ammo";
+        ammo.shortName = "Heavy Plasma Cannon";
+        ammo.setInternalName("OSHeavyPlasmaCannonAmmo");
+        ammo.addLookupName("OS Heavy Plasma Cannon Ammo");
+        ammo.damagePerShot = 0;
+        ammo.rackSize = 2;
+        ammo.ammoType = AmmoTypeEnum.PLASMA_CANNON_HEAVY_OS;
+        ammo.shots = 10;
+        ammo.bv = 36;
+        ammo.cost = 45000;
+        ammo.explosive = false;
+        ammo.kgPerShot = 100;
+        ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setIntroLevel(false)
+              .setUnofficial(false)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
+              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION);
+        return ammo;
+    }
+
+    private static AmmoType createOSEMPPlasmaAcceleratorAmmo() {
+        AmmoType ammo = new AmmoType();
+
+        ammo.name = "EMP Plasma Accelerator Ammo";
+        ammo.shortName = "EMP Plasma Accelerator";
+        ammo.setInternalName("OSEMPPlasmaAcceleratorAmmo");
+        ammo.addLookupName("OS EMP Plasma Accelerator Ammo");
+        ammo.damagePerShot = 0;
+        ammo.rackSize = 1;
+        ammo.ammoType = AmmoTypeEnum.PLASMA_EMP_OS;
+        ammo.shots = 10;
+        ammo.bv = 30;
+        ammo.cost = 30000;
+        ammo.explosive = false;
+        ammo.kgPerShot = 100;
+        ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setIntroLevel(false)
+              .setUnofficial(false)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
+              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION);
         return ammo;
     }
 

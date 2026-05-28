@@ -1502,6 +1502,19 @@ public class WeaponType extends EquipmentType {
         EquipmentType.addType(new ISERFlamer());
         EquipmentType.addType(new CLERFlamer());
 
+        // Outer Sphere (OS) Flamers - all energy-fed (no ammo)
+        EquipmentType.addType(new megamek.common.weapons.flamers.outerSphere.OSImprovedFlamer());
+        EquipmentType.addType(new megamek.common.weapons.flamers.outerSphere.OSERFlamer());
+        EquipmentType.addType(new megamek.common.weapons.flamers.outerSphere.OSHeavyFlamer());
+        EquipmentType.addType(new megamek.common.weapons.flamers.outerSphere.OSERHeavyFlamer());
+
+        // Outer Sphere (OS) Plasma weapons - all ammo-fed
+        EquipmentType.addType(new megamek.common.weapons.plasma.outerSphere.OSPlasmaRifle());
+        EquipmentType.addType(new megamek.common.weapons.plasma.outerSphere.OSHeavyPlasmaRifle());
+        EquipmentType.addType(new megamek.common.weapons.plasma.outerSphere.OSPlasmaCannon());
+        EquipmentType.addType(new megamek.common.weapons.plasma.outerSphere.OSHeavyPlasmaCannon());
+        EquipmentType.addType(new megamek.common.weapons.plasma.outerSphere.OSEMPPlasmaAccelerator());
+
         // Autocannons
         EquipmentType.addType(new ISAC2());
         EquipmentType.addType(new ISAC5());
