@@ -769,6 +769,11 @@ public class MiscType extends EquipmentType {
             if (entity.isSupportVehicle()) {
                 // SV Chassis mods are accounted for in the structure weight
                 return 0;
+            } else if (entity.hasEngine()
+                  && (entity.getEngine().getEngineType() == Engine.OS_HYBRID_ENGINE)) {
+                // OS Hybrid engine carries its own oxidizer and integrates environmental
+                // sealing, so it provides sealing at no additional tonnage cost.
+                return 0;
             } else {
                 return RoundWeight.standard(entity.getWeight() / 10.0, entity);
             }
