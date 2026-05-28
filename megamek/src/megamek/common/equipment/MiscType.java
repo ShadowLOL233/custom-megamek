@@ -50,6 +50,7 @@ import megamek.common.miscGear.AntiMekGear;
 import megamek.common.units.*;
 import megamek.common.util.RoundWeight;
 import megamek.common.weapons.ppc.clan.CLERPPC;
+import megamek.common.weapons.ppc.clan.CLReEngineeringPPC;
 import megamek.common.weapons.ppc.innerSphere.ISERPPC;
 import megamek.common.weapons.ppc.innerSphere.ISHeavyPPC;
 import megamek.common.weapons.ppc.innerSphere.ISLightPPC;
@@ -1492,6 +1493,10 @@ public class MiscType extends EquipmentType {
 
             if (linkedTo.getType() instanceof CLERPPC) {
                 return 136;
+            }
+
+            if (linkedTo.getType() instanceof CLReEngineeringPPC) {
+                return 125;
             }
         }
 

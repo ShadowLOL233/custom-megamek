@@ -69,6 +69,7 @@ import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.common.verifier.TestInfantry;
 import megamek.common.weapons.lasers.clan.CLChemicalLaserWeapon;
 import megamek.common.weapons.ppc.clan.CLERPPC;
+import megamek.common.weapons.ppc.clan.CLReEngineeringPPC;
 import megamek.common.weapons.ppc.clan.CLEnhancedPPC;
 import megamek.common.weapons.ppc.clan.CLImprovedPPC;
 import megamek.common.weapons.ppc.innerSphere.ISERPPC;
@@ -462,6 +463,7 @@ public class MekFileParser {
                               (mWeapon.getType() instanceof ISHeavyPPC) ||
                               (mWeapon.getType() instanceof ISERPPC) ||
                               (mWeapon.getType() instanceof ISSnubNosePPC) ||
+                              (mWeapon.getType() instanceof CLReEngineeringPPC) ||
                               (mWeapon.getType() instanceof CLERPPC && ent.getYear() >= 3101)) {
                             m.setLinked(mWeapon);
                             break;
@@ -613,6 +615,7 @@ public class MekFileParser {
                                       (bayWeaponType instanceof ISHeavyPPC) ||
                                       (bayWeaponType instanceof ISERPPC) ||
                                       (bayWeaponType instanceof ISSnubNosePPC) ||
+                                      (bayWeaponType instanceof CLReEngineeringPPC) ||
                                       (bayWeaponType instanceof CLERPPC && ent.getYear() >= 3101)) {
 
                                     m.setCrossLinked(bayMountedWeapon);
@@ -639,6 +642,7 @@ public class MekFileParser {
                               (mWeapon.getType() instanceof CLEnhancedPPC) ||
                               (mWeapon.getType() instanceof CLImprovedPPC) ||
                               (mWeapon.getType() instanceof ISKinsSlaughterPPC) ||
+                              (mWeapon.getType() instanceof CLReEngineeringPPC) ||
                               (mWeapon.getType() instanceof CLERPPC && ent.getYear() >= 3101)) {
 
                             m.setCrossLinked(mWeapon);
