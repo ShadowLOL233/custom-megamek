@@ -1515,6 +1515,51 @@ public class WeaponType extends EquipmentType {
         EquipmentType.addType(new megamek.common.weapons.plasma.outerSphere.OSHeavyPlasmaCannon());
         EquipmentType.addType(new megamek.common.weapons.plasma.outerSphere.OSEMPPlasmaAccelerator());
 
+        // Outer Sphere (OS) Autocannons - Improve AC tier
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSImproveAC2());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSImproveAC5());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSImproveAC10());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSImproveAC20());
+        // OS LB-X (standard tier = IS-stat clones)
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSLB2XAC());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSLB5XAC());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSLB10XAC());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSLB20XAC());
+        // OS Improve LB-X
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSImproveLB2XAC());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSImproveLB5XAC());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSImproveLB10XAC());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSImproveLB20XAC());
+        // OS Ultra AC (standard tier = IS-stat clones)
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSUltraAC2());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSUltraAC5());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSUltraAC10());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSUltraAC20());
+        // OS Improve Ultra AC
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSImproveUltraAC2());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSImproveUltraAC5());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSImproveUltraAC10());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSImproveUltraAC20());
+        // OS Advance Ultra AC (up to 3 shots; rotary-style multi-shot)
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAdvanceUltraAC2());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAdvanceUltraAC5());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAdvanceUltraAC10());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAdvanceUltraAC20());
+        // OS Rotary AC
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSRotaryAC2());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSRotaryAC5());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSRotaryAC10());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSRotaryAC20());
+        // OS Assault AC (3-projectile burst)
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAssaultAC2());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAssaultAC5());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAssaultAC10());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAssaultAC20());
+        // OS Advance LB-X (LB-X + Ultra-style double tap)
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAdvanceLB5XAC());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAdvanceLB10XAC());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAdvanceLB20XAC());
+
         // Autocannons
         EquipmentType.addType(new ISAC2());
         EquipmentType.addType(new ISAC5());

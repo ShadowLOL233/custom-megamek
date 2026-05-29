@@ -198,7 +198,12 @@ public class AmmoType extends EquipmentType {
         PLASMA_RIFLE_HEAVY_OS(116, "Heavy Plasma Rifle (OS)", AmmoCategory.Energy),
         PLASMA_CANNON_OS(117, "Plasma Cannon (OS)", AmmoCategory.Energy),
         PLASMA_CANNON_HEAVY_OS(118, "Heavy Plasma Cannon (OS)", AmmoCategory.Energy),
-        PLASMA_EMP_OS(119, "EMP Plasma Accelerator (OS)", AmmoCategory.Energy);
+        PLASMA_EMP_OS(119, "EMP Plasma Accelerator (OS)", AmmoCategory.Energy),
+        // Outer Sphere (OS) autocannon ammo families - one enum per mechanism, calibers split by rackSize.
+        // Ultra/Rotary reuse the canon AC_ULTRA/AC_ROTARY enums (their multi-shot heat is hard-keyed to those).
+        AC_IMP_OS(120, "Improve Autocannon (OS)", AmmoCategory.Ballistic),
+        AC_ASSAULT_OS(121, "Assault Autocannon (OS)", AmmoCategory.Ballistic),
+        LBX_OS(122, "LB-X Autocannon (OS)", AmmoCategory.Ballistic);
 
         private static final Map<Integer, AmmoTypeEnum> INDEX_LOOKUP = new HashMap<>();
 
@@ -3063,6 +3068,25 @@ public class AmmoType extends EquipmentType {
         EquipmentType.addType(AmmoType.createOSPlasmaCannonAmmo());
         EquipmentType.addType(AmmoType.createOSHeavyPlasmaCannonAmmo());
         EquipmentType.addType(AmmoType.createOSEMPPlasmaAcceleratorAmmo());
+        // Outer Sphere (OS) Improve AC ammo
+        EquipmentType.addType(AmmoType.createOSImproveAC2Ammo());
+        EquipmentType.addType(AmmoType.createOSImproveAC5Ammo());
+        EquipmentType.addType(AmmoType.createOSImproveAC10Ammo());
+        EquipmentType.addType(AmmoType.createOSImproveAC20Ammo());
+        // Outer Sphere (OS) LB-X ammo (slug + cluster)
+        EquipmentType.addType(AmmoType.createOSLB2XAmmo());
+        EquipmentType.addType(AmmoType.createOSLB2XClusterAmmo());
+        EquipmentType.addType(AmmoType.createOSLB5XAmmo());
+        EquipmentType.addType(AmmoType.createOSLB5XClusterAmmo());
+        EquipmentType.addType(AmmoType.createOSLB10XAmmo());
+        EquipmentType.addType(AmmoType.createOSLB10XClusterAmmo());
+        EquipmentType.addType(AmmoType.createOSLB20XAmmo());
+        EquipmentType.addType(AmmoType.createOSLB20XClusterAmmo());
+        // Outer Sphere (OS) Assault AC ammo
+        EquipmentType.addType(AmmoType.createOSAssaultAC2Ammo());
+        EquipmentType.addType(AmmoType.createOSAssaultAC5Ammo());
+        EquipmentType.addType(AmmoType.createOSAssaultAC10Ammo());
+        EquipmentType.addType(AmmoType.createOSAssaultAC20Ammo());
         EquipmentType.addType(AmmoType.createCLAPGaussRifleAmmo());
         EquipmentType.addType(AmmoType.createCLMediumChemicalLaserAmmo());
         EquipmentType.addType(AmmoType.createCLSmallChemicalLaserAmmo());
@@ -11881,6 +11905,109 @@ public class AmmoType extends EquipmentType {
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION);
         return ammo;
+    }
+
+    // OUTER SPHERE (OS) AUTOCANNON AMMO
+    // Per-shot damage comes from the weapon, so ammo damagePerShot stays 1; rackSize binds caliber.
+    // Base name "<weapon> Ammo"; mixed tech renders "<weapon> (OS) Ammo".
+
+    private static AmmoType makeOSACAmmo(String weaponName, String internal, AmmoTypeEnum type, int rackSize,
+          int shots, int bv, long cost) {
+        AmmoType ammo = new AmmoType();
+        ammo.name = weaponName + " Ammo";
+        ammo.shortName = weaponName;
+        ammo.setInternalName(internal);
+        ammo.addLookupName("OS " + weaponName + " Ammo");
+        ammo.damagePerShot = 1;
+        ammo.rackSize = rackSize;
+        ammo.ammoType = type;
+        ammo.shots = shots;
+        ammo.bv = bv;
+        ammo.cost = cost;
+        ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setIntroLevel(false)
+              .setUnofficial(false)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
+              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION);
+        return ammo;
+    }
+
+    private static AmmoType createOSImproveAC2Ammo() {
+        return makeOSACAmmo("Improve AC/2", "OSImproveAC2Ammo", AmmoTypeEnum.AC_IMP_OS, 2, 50, 5, 1200);
+    }
+
+    private static AmmoType createOSImproveAC5Ammo() {
+        return makeOSACAmmo("Improve AC/5", "OSImproveAC5Ammo", AmmoTypeEnum.AC_IMP_OS, 5, 22, 11, 5000);
+    }
+
+    private static AmmoType createOSImproveAC10Ammo() {
+        return makeOSACAmmo("Improve AC/10", "OSImproveAC10Ammo", AmmoTypeEnum.AC_IMP_OS, 10, 11, 16, 7000);
+    }
+
+    private static AmmoType createOSImproveAC20Ammo() {
+        return makeOSACAmmo("Improve AC/20", "OSImproveAC20Ammo", AmmoTypeEnum.AC_IMP_OS, 20, 6, 24, 11000);
+    }
+
+    // OS LB-X ammo (shared by standard / Improve / Advance LB-X tiers); slug + cluster per caliber
+    private static AmmoType makeOSLBXClusterAmmo(String weaponName, String internal, int rackSize, int shots,
+          int bv, long cost) {
+        AmmoType ammo = makeOSACAmmo(weaponName + " Cluster", internal, AmmoTypeEnum.LBX_OS, rackSize, shots, bv, cost);
+        ammo.munitionType = EnumSet.of(Munitions.M_CLUSTER);
+        ammo.toHitModifier = -1;
+        return ammo;
+    }
+
+    private static AmmoType createOSLB2XAmmo() {
+        return makeOSACAmmo("LB 2-X", "OSLB2XAmmo", AmmoTypeEnum.LBX_OS, 2, 50, 5, 3000);
+    }
+
+    private static AmmoType createOSLB2XClusterAmmo() {
+        return makeOSLBXClusterAmmo("LB 2-X", "OSLB2XClusterAmmo", 2, 50, 5, 4000);
+    }
+
+    private static AmmoType createOSLB5XAmmo() {
+        return makeOSACAmmo("LB 5-X", "OSLB5XAmmo", AmmoTypeEnum.LBX_OS, 5, 22, 11, 9000);
+    }
+
+    private static AmmoType createOSLB5XClusterAmmo() {
+        return makeOSLBXClusterAmmo("LB 5-X", "OSLB5XClusterAmmo", 5, 22, 12, 11000);
+    }
+
+    private static AmmoType createOSLB10XAmmo() {
+        return makeOSACAmmo("LB 10-X", "OSLB10XAmmo", AmmoTypeEnum.LBX_OS, 10, 10, 16, 15000);
+    }
+
+    private static AmmoType createOSLB10XClusterAmmo() {
+        return makeOSLBXClusterAmmo("LB 10-X", "OSLB10XClusterAmmo", 10, 10, 19, 20000);
+    }
+
+    private static AmmoType createOSLB20XAmmo() {
+        return makeOSACAmmo("LB 20-X", "OSLB20XAmmo", AmmoTypeEnum.LBX_OS, 20, 6, 24, 24000);
+    }
+
+    private static AmmoType createOSLB20XClusterAmmo() {
+        return makeOSLBXClusterAmmo("LB 20-X", "OSLB20XClusterAmmo", 20, 6, 30, 30000);
+    }
+
+    // OS Assault AC ammo (one burst = one round; per-shot damage from the weapon)
+    private static AmmoType createOSAssaultAC2Ammo() {
+        return makeOSACAmmo("Assault AC/2", "OSAssaultAC2Ammo", AmmoTypeEnum.AC_ASSAULT_OS, 2, 20, 6, 2000);
+    }
+
+    private static AmmoType createOSAssaultAC5Ammo() {
+        return makeOSACAmmo("Assault AC/5", "OSAssaultAC5Ammo", AmmoTypeEnum.AC_ASSAULT_OS, 5, 10, 16, 7000);
+    }
+
+    private static AmmoType createOSAssaultAC10Ammo() {
+        return makeOSACAmmo("Assault AC/10", "OSAssaultAC10Ammo", AmmoTypeEnum.AC_ASSAULT_OS, 10, 5, 24, 12000);
+    }
+
+    private static AmmoType createOSAssaultAC20Ammo() {
+        return makeOSACAmmo("Assault AC/20", "OSAssaultAC20Ammo", AmmoTypeEnum.AC_ASSAULT_OS, 20, 3, 34, 18000);
     }
 
     // RISC APDS

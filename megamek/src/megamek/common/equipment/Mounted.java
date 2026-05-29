@@ -876,7 +876,8 @@ public class Mounted<T extends EquipmentType> implements Serializable, RoundUpda
     public static int getNumShots(WeaponType weaponType, EquipmentMode mode, boolean ignoreMode) {
         // figure out # of shots for variable-shot weapons
         if (((weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.AC_ULTRA) ||
-              (weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.AC_ULTRA_THB)) &&
+              (weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.AC_ULTRA_THB) ||
+              (weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.LBX_OS)) &&
               (ignoreMode || ((mode != null) && mode.equals(Weapon.MODE_UAC_ULTRA)))) {
             return 2;
         }
