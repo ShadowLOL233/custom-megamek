@@ -27,7 +27,7 @@ public class OSAdvanceUltraAC10 extends RACWeapon {
         name = "Advance Ultra AC/10";
         setInternalName("OSAdvanceUltraAC10");
         addLookupName("OS Advance Ultra AC/10");
-        sortingName = "AC OS UAC Adv 10";
+        sortingName = "AC OS 3 UAC 3 Adv 10";
         setModes(new String[] { MODE_AC_SINGLE, MODE_RAC_TWO_SHOT, MODE_RAC_THREE_SHOT });
         heat = 3;
         damage = 10;

@@ -30,7 +30,7 @@ public class OSHeavyPulseLaserLarge extends PulseLaserWeapon {
         setInternalName("OSHeavyLargePulseLaser");
         addLookupName("OS Heavy Large Pulse Laser");
         addLookupName("OSHeavyPulseLaserLarge");
-        sortingName = "Laser HeavyPulse D";
+        sortingName = "Laser OS 06 HeavyPulse 1 Std D";
         heat = 14;
         damage = 12;
         toHitModifier = -2;

@@ -29,7 +29,7 @@ public class OSLightPPC extends PPCWeapon {
         name = "Light PPC";
         setInternalName("OSLightPPC");
         addLookupName("OS Light PPC");
-        sortingName = "PPC Light B";
+        sortingName = "PPC OS 1 Std 1 Lgt 1 Std";
         heat = 7;
         damage = 7;
         minimumRange = 3;

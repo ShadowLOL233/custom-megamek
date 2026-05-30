@@ -29,7 +29,7 @@ public class OSERPulseLaserSmall extends PulseLaserWeapon {
         setInternalName("OSERSmallPulseLaser");
         addLookupName("OS ER Small Pulse Laser");
         addLookupName("OSERPulseLaserSmall");
-        sortingName = "Laser ER Pulse A";
+        sortingName = "Laser OS 07 ERPulse 1 Std A";
         heat = 3;
         damage = 3;
         toHitModifier = -1;

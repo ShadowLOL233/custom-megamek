@@ -37,7 +37,7 @@ public class OSLightRotaryPPC extends PPCRotaryWeapon {
         addLookupName("OS Rotary Light PPC");
         addLookupName("Legion Rotary Light PPC");
         addLookupName("RLPPC");
-        sortingName = "PPC Rotary Light B";
+        sortingName = "PPC OS 4 Rotary 1 Lgt 1 Std";
         heat = 5;
         damage = 5;
         shortRange = 6;

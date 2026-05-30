@@ -43,7 +43,7 @@ public class OSPlasmaRifle extends AmmoWeapon {
         name = "Plasma Rifle";
         setInternalName("OSPlasmaRifle");
         addLookupName("OS Plasma Rifle");
-        sortingName = "Plasma C Rifle";
+        sortingName = "Plasma OS 1 Rifle 1 Std";
         heat = 8;
         damage = 10;
         rackSize = 1;

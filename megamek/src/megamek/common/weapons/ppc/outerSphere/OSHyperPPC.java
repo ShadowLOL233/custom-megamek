@@ -46,7 +46,7 @@ public class OSHyperPPC extends PPCWeapon {
         name = "Hyper PPC";
         setInternalName("OSHyperPPC");
         addLookupName("OS Hyper PPC");
-        sortingName = "PPC Hyper E";
+        sortingName = "PPC OS 6 Hyper 2 Std 1 Std";
         heat = 30;
         damage = 30;
         toHitModifier = -1;

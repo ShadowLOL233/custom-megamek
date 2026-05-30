@@ -32,7 +32,7 @@ public class OSImproveAC10 extends ACWeapon {
         setInternalName("OSImproveAC10");
         addLookupName("OS Improve AC/10");
         addLookupName("Improve Autocannon/10");
-        sortingName = "AC OS Imp 10";
+        sortingName = "AC OS 1 Std 2 Imp 10";
         ammoType = AmmoType.AmmoTypeEnum.AC_IMP_OS;
         heat = 2;
         damage = 10;

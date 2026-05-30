@@ -28,7 +28,7 @@ public class OSHeavySnubNosePPC extends PPCWeapon {
         name = "Heavy Snub-Nose PPC";
         setInternalName("OSHeavySnubNosePPC");
         addLookupName("OS Heavy Snub-Nose PPC");
-        sortingName = "PPC Snub Heavy D";
+        sortingName = "PPC OS 3 Snub 3 Hvy 1 Std";
         heat = 15;
         damage = DAMAGE_VARIABLE;
         minimumRange = 0;

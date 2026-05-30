@@ -26,7 +26,7 @@ public class OSLB20XAC extends LBXACWeapon {
         name = "LB 20-X";
         setInternalName("OSLB20XAC");
         addLookupName("OS LB 20-X AC");
-        sortingName = "AC OS LBX 20";
+        sortingName = "AC OS 2 LBX 1 Std 20";
         ammoType = AmmoType.AmmoTypeEnum.LBX_OS;
         heat = 5;
         damage = 20;

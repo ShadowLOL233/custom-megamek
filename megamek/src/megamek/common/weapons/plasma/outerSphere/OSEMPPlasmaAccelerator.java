@@ -44,7 +44,7 @@ public class OSEMPPlasmaAccelerator extends AmmoWeapon {
         name = "EMP Plasma Accelerator";
         setInternalName("OSEMPPlasmaAccelerator");
         addLookupName("OS EMP Plasma Accelerator");
-        sortingName = "Plasma G EMP";
+        sortingName = "Plasma OS 3 EMP 1 Std";
         heat = 8;
         damage = 0;
         rackSize = 1;

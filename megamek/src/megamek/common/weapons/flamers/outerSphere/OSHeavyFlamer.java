@@ -34,7 +34,7 @@ public class OSHeavyFlamer extends FlamerWeapon {
         name = "Heavy Flamer";
         setInternalName("OSHeavyFlamer");
         addLookupName("OS Heavy Flamer");
-        sortingName = "Flamer OS C Heavy";
+        sortingName = "Flamer OS 2 Heavy 1 Std";
         heat = 6;
         damage = 5;
         infDamageClass = WeaponType.WEAPON_BURST_6D6;

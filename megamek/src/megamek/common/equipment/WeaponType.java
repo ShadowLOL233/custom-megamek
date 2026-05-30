@@ -277,45 +277,48 @@ import megamek.common.weapons.lasers.outerSphere.OSERBinaryLaserSystem;
 import megamek.common.weapons.lasers.outerSphere.OSERTrinaryLaserSystem;
 import megamek.common.weapons.lasers.outerSphere.OSHyperLaserLarge;
 import megamek.common.weapons.lasers.outerSphere.OSTrinaryLaserSystem;
-import megamek.common.weapons.lasers.outerSphere.large.OSAdvERLaserLarge;
-import megamek.common.weapons.lasers.outerSphere.large.OSAdvERPulseLaserLarge;
+import megamek.common.weapons.lasers.outerSphere.large.OSAdvanceERLaserLarge;
+import megamek.common.weapons.lasers.outerSphere.large.OSAdvanceERPulseLaserLarge;
 import megamek.common.weapons.lasers.outerSphere.large.OSERHeavyLaserLarge;
 import megamek.common.weapons.lasers.outerSphere.large.OSERLaserLarge;
 import megamek.common.weapons.lasers.outerSphere.large.OSERPulseLaserLarge;
 import megamek.common.weapons.lasers.outerSphere.large.OSHeavyLaserLarge;
 import megamek.common.weapons.lasers.outerSphere.large.OSHeavyPulseLaserLarge;
-import megamek.common.weapons.lasers.outerSphere.large.OSImpERLaserLarge;
-import megamek.common.weapons.lasers.outerSphere.large.OSImpERPulseLaserLarge;
-import megamek.common.weapons.lasers.outerSphere.large.OSImpHeavyLaserLarge;
-import megamek.common.weapons.lasers.outerSphere.large.OSImpHeavyPulseLaserLarge;
-import megamek.common.weapons.lasers.outerSphere.large.OSImpLaserLarge;
-import megamek.common.weapons.lasers.outerSphere.large.OSImpPulseLaserLarge;
-import megamek.common.weapons.lasers.outerSphere.medium.OSAdvERLaserMedium;
-import megamek.common.weapons.lasers.outerSphere.medium.OSAdvERPulseLaserMedium;
+import megamek.common.weapons.lasers.outerSphere.large.OSImproveERLaserLarge;
+import megamek.common.weapons.lasers.outerSphere.large.OSImproveERPulseLaserLarge;
+import megamek.common.weapons.lasers.outerSphere.large.OSImproveHeavyLaserLarge;
+import megamek.common.weapons.lasers.outerSphere.large.OSImproveHeavyPulseLaserLarge;
+import megamek.common.weapons.lasers.outerSphere.large.OSImproveLaserLarge;
+import megamek.common.weapons.lasers.outerSphere.large.OSLaserLarge;
+import megamek.common.weapons.lasers.outerSphere.large.OSImprovePulseLaserLarge;
+import megamek.common.weapons.lasers.outerSphere.medium.OSAdvanceERLaserMedium;
+import megamek.common.weapons.lasers.outerSphere.medium.OSAdvanceERPulseLaserMedium;
 import megamek.common.weapons.lasers.outerSphere.medium.OSERHeavyLaserMedium;
 import megamek.common.weapons.lasers.outerSphere.medium.OSERLaserMedium;
 import megamek.common.weapons.lasers.outerSphere.medium.OSERPulseLaserMedium;
 import megamek.common.weapons.lasers.outerSphere.medium.OSHeavyLaserMedium;
 import megamek.common.weapons.lasers.outerSphere.medium.OSHeavyPulseLaserMedium;
-import megamek.common.weapons.lasers.outerSphere.medium.OSImpERLaserMedium;
-import megamek.common.weapons.lasers.outerSphere.medium.OSImpERPulseLaserMedium;
-import megamek.common.weapons.lasers.outerSphere.medium.OSImpHeavyLaserMedium;
-import megamek.common.weapons.lasers.outerSphere.medium.OSImpHeavyPulseLaserMedium;
-import megamek.common.weapons.lasers.outerSphere.medium.OSImpLaserMedium;
-import megamek.common.weapons.lasers.outerSphere.medium.OSImpPulseLaserMedium;
-import megamek.common.weapons.lasers.outerSphere.small.OSAdvERLaserSmall;
-import megamek.common.weapons.lasers.outerSphere.small.OSAdvERPulseLaserSmall;
+import megamek.common.weapons.lasers.outerSphere.medium.OSImproveERLaserMedium;
+import megamek.common.weapons.lasers.outerSphere.medium.OSImproveERPulseLaserMedium;
+import megamek.common.weapons.lasers.outerSphere.medium.OSImproveHeavyLaserMedium;
+import megamek.common.weapons.lasers.outerSphere.medium.OSImproveHeavyPulseLaserMedium;
+import megamek.common.weapons.lasers.outerSphere.medium.OSImproveLaserMedium;
+import megamek.common.weapons.lasers.outerSphere.medium.OSLaserMedium;
+import megamek.common.weapons.lasers.outerSphere.medium.OSImprovePulseLaserMedium;
+import megamek.common.weapons.lasers.outerSphere.small.OSAdvanceERLaserSmall;
+import megamek.common.weapons.lasers.outerSphere.small.OSAdvanceERPulseLaserSmall;
 import megamek.common.weapons.lasers.outerSphere.small.OSERHeavyLaserSmall;
 import megamek.common.weapons.lasers.outerSphere.small.OSERLaserSmall;
 import megamek.common.weapons.lasers.outerSphere.small.OSERPulseLaserSmall;
 import megamek.common.weapons.lasers.outerSphere.small.OSHeavyLaserSmall;
 import megamek.common.weapons.lasers.outerSphere.small.OSHeavyPulseLaserSmall;
-import megamek.common.weapons.lasers.outerSphere.small.OSImpERLaserSmall;
-import megamek.common.weapons.lasers.outerSphere.small.OSImpERPulseLaserSmall;
-import megamek.common.weapons.lasers.outerSphere.small.OSImpHeavyLaserSmall;
-import megamek.common.weapons.lasers.outerSphere.small.OSImpHeavyPulseLaserSmall;
-import megamek.common.weapons.lasers.outerSphere.small.OSImpLaserSmall;
-import megamek.common.weapons.lasers.outerSphere.small.OSImpPulseLaserSmall;
+import megamek.common.weapons.lasers.outerSphere.small.OSImproveERLaserSmall;
+import megamek.common.weapons.lasers.outerSphere.small.OSImproveERPulseLaserSmall;
+import megamek.common.weapons.lasers.outerSphere.small.OSImproveHeavyLaserSmall;
+import megamek.common.weapons.lasers.outerSphere.small.OSImproveHeavyPulseLaserSmall;
+import megamek.common.weapons.lasers.outerSphere.small.OSImproveLaserSmall;
+import megamek.common.weapons.lasers.outerSphere.small.OSLaserSmall;
+import megamek.common.weapons.lasers.outerSphere.small.OSImprovePulseLaserSmall;
 import megamek.common.weapons.lrms.clan.*;
 import megamek.common.weapons.lrms.clan.improvedLRM.CLImprovedLRM10;
 import megamek.common.weapons.lrms.clan.improvedLRM.CLImprovedLRM15;
@@ -1398,46 +1401,50 @@ public class WeaponType extends EquipmentType {
         EquipmentType.addType(new CLChemicalLaserSmall());
 
         // Outer Sphere (OS) Laser types
+        // Standard Lasers (RoOS clones of upstream IS Lasers)
+        EquipmentType.addType(new OSLaserSmall());
+        EquipmentType.addType(new OSLaserMedium());
+        EquipmentType.addType(new OSLaserLarge());
         // Improve Lasers
-        EquipmentType.addType(new OSImpLaserSmall());
-        EquipmentType.addType(new OSImpLaserMedium());
-        EquipmentType.addType(new OSImpLaserLarge());
+        EquipmentType.addType(new OSImproveLaserSmall());
+        EquipmentType.addType(new OSImproveLaserMedium());
+        EquipmentType.addType(new OSImproveLaserLarge());
         // ER Lasers (OS)
         EquipmentType.addType(new OSERLaserSmall());
         EquipmentType.addType(new OSERLaserMedium());
         EquipmentType.addType(new OSERLaserLarge());
         // Imp. ER Lasers
-        EquipmentType.addType(new OSImpERLaserSmall());
-        EquipmentType.addType(new OSImpERLaserMedium());
-        EquipmentType.addType(new OSImpERLaserLarge());
+        EquipmentType.addType(new OSImproveERLaserSmall());
+        EquipmentType.addType(new OSImproveERLaserMedium());
+        EquipmentType.addType(new OSImproveERLaserLarge());
         // Adv. ER Lasers (-1 ToHit)
-        EquipmentType.addType(new OSAdvERLaserSmall());
-        EquipmentType.addType(new OSAdvERLaserMedium());
-        EquipmentType.addType(new OSAdvERLaserLarge());
+        EquipmentType.addType(new OSAdvanceERLaserSmall());
+        EquipmentType.addType(new OSAdvanceERLaserMedium());
+        EquipmentType.addType(new OSAdvanceERLaserLarge());
         // Imp. Pulse Lasers (-2 ToHit)
-        EquipmentType.addType(new OSImpPulseLaserSmall());
-        EquipmentType.addType(new OSImpPulseLaserMedium());
-        EquipmentType.addType(new OSImpPulseLaserLarge());
+        EquipmentType.addType(new OSImprovePulseLaserSmall());
+        EquipmentType.addType(new OSImprovePulseLaserMedium());
+        EquipmentType.addType(new OSImprovePulseLaserLarge());
         // ER Pulse Lasers (-1 ToHit)
         EquipmentType.addType(new OSERPulseLaserSmall());
         EquipmentType.addType(new OSERPulseLaserMedium());
         EquipmentType.addType(new OSERPulseLaserLarge());
         // Imp. ER Pulse Lasers (-2 ToHit)
-        EquipmentType.addType(new OSImpERPulseLaserSmall());
-        EquipmentType.addType(new OSImpERPulseLaserMedium());
-        EquipmentType.addType(new OSImpERPulseLaserLarge());
+        EquipmentType.addType(new OSImproveERPulseLaserSmall());
+        EquipmentType.addType(new OSImproveERPulseLaserMedium());
+        EquipmentType.addType(new OSImproveERPulseLaserLarge());
         // Adv. ER Pulse Lasers (-3 ToHit)
-        EquipmentType.addType(new OSAdvERPulseLaserSmall());
-        EquipmentType.addType(new OSAdvERPulseLaserMedium());
-        EquipmentType.addType(new OSAdvERPulseLaserLarge());
+        EquipmentType.addType(new OSAdvanceERPulseLaserSmall());
+        EquipmentType.addType(new OSAdvanceERPulseLaserMedium());
+        EquipmentType.addType(new OSAdvanceERPulseLaserLarge());
         // Heavy Lasers (+1 ToHit)
         EquipmentType.addType(new OSHeavyLaserSmall());
         EquipmentType.addType(new OSHeavyLaserMedium());
         EquipmentType.addType(new OSHeavyLaserLarge());
         // Imp. Heavy Lasers (no ToHit)
-        EquipmentType.addType(new OSImpHeavyLaserSmall());
-        EquipmentType.addType(new OSImpHeavyLaserMedium());
-        EquipmentType.addType(new OSImpHeavyLaserLarge());
+        EquipmentType.addType(new OSImproveHeavyLaserSmall());
+        EquipmentType.addType(new OSImproveHeavyLaserMedium());
+        EquipmentType.addType(new OSImproveHeavyLaserLarge());
         // ER Heavy Lasers (+1 ToHit)
         EquipmentType.addType(new OSERHeavyLaserSmall());
         EquipmentType.addType(new OSERHeavyLaserMedium());
@@ -1447,9 +1454,9 @@ public class WeaponType extends EquipmentType {
         EquipmentType.addType(new OSHeavyPulseLaserMedium());
         EquipmentType.addType(new OSHeavyPulseLaserLarge());
         // Imp. Heavy Pulse Lasers (-2 ToHit, restored range)
-        EquipmentType.addType(new OSImpHeavyPulseLaserSmall());
-        EquipmentType.addType(new OSImpHeavyPulseLaserMedium());
-        EquipmentType.addType(new OSImpHeavyPulseLaserLarge());
+        EquipmentType.addType(new OSImproveHeavyPulseLaserSmall());
+        EquipmentType.addType(new OSImproveHeavyPulseLaserMedium());
+        EquipmentType.addType(new OSImproveHeavyPulseLaserLarge());
         // Binary/Trinary Laser Systems (Resonance Tuning)
         EquipmentType.addType(new OSBinaryLaserSystem());
         EquipmentType.addType(new OSTrinaryLaserSystem());
@@ -1473,10 +1480,13 @@ public class WeaponType extends EquipmentType {
         EquipmentType.addType(new megamek.common.weapons.ppc.innerSphere.ISPPCX());
 
         // Outer Sphere (OS) PPC types
-        // Standard tier (Imp / Imp ER / Adv ER)
-        EquipmentType.addType(new megamek.common.weapons.ppc.outerSphere.OSImpPPC());
-        EquipmentType.addType(new megamek.common.weapons.ppc.outerSphere.OSImpERPPC());
-        EquipmentType.addType(new megamek.common.weapons.ppc.outerSphere.OSAdvERPPC());
+        // Standard tier (RoOS clones of upstream IS PPCs)
+        EquipmentType.addType(new megamek.common.weapons.ppc.outerSphere.OSPPC());
+        EquipmentType.addType(new megamek.common.weapons.ppc.outerSphere.OSERPPC());
+        // Improve / Advance tier
+        EquipmentType.addType(new megamek.common.weapons.ppc.outerSphere.OSImprovePPC());
+        EquipmentType.addType(new megamek.common.weapons.ppc.outerSphere.OSImproveERPPC());
+        EquipmentType.addType(new megamek.common.weapons.ppc.outerSphere.OSAdvanceERPPC());
         // Light / Snub-Nose family
         EquipmentType.addType(new megamek.common.weapons.ppc.outerSphere.OSLightPPC());
         EquipmentType.addType(new megamek.common.weapons.ppc.outerSphere.OSSnubNosePPC());
@@ -1503,7 +1513,7 @@ public class WeaponType extends EquipmentType {
         EquipmentType.addType(new CLERFlamer());
 
         // Outer Sphere (OS) Flamers - all energy-fed (no ammo)
-        EquipmentType.addType(new megamek.common.weapons.flamers.outerSphere.OSImprovedFlamer());
+        EquipmentType.addType(new megamek.common.weapons.flamers.outerSphere.OSImproveFlamer());
         EquipmentType.addType(new megamek.common.weapons.flamers.outerSphere.OSERFlamer());
         EquipmentType.addType(new megamek.common.weapons.flamers.outerSphere.OSHeavyFlamer());
         EquipmentType.addType(new megamek.common.weapons.flamers.outerSphere.OSERHeavyFlamer());
@@ -1515,7 +1525,12 @@ public class WeaponType extends EquipmentType {
         EquipmentType.addType(new megamek.common.weapons.plasma.outerSphere.OSHeavyPlasmaCannon());
         EquipmentType.addType(new megamek.common.weapons.plasma.outerSphere.OSEMPPlasmaAccelerator());
 
-        // Outer Sphere (OS) Autocannons - Improve AC tier
+        // Outer Sphere (OS) Autocannons - Standard tier (RoOS clones of upstream IS AC)
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAC2());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAC5());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAC10());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAC20());
+        // Improve AC tier
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSImproveAC2());
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSImproveAC5());
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSImproveAC10());

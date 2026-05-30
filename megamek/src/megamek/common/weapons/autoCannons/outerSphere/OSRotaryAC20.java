@@ -27,7 +27,7 @@ public class OSRotaryAC20 extends RACWeapon {
         name = "RAC/20";
         setInternalName("OSRotaryAC20");
         addLookupName("OS Rotary AC/20");
-        sortingName = "AC OS RAC 20";
+        sortingName = "AC OS 4 RAC 1 Std 20";
         setModes(new String[] { MODE_AC_SINGLE, MODE_RAC_TWO_SHOT, MODE_RAC_THREE_SHOT });
         heat = 7;
         damage = 20;

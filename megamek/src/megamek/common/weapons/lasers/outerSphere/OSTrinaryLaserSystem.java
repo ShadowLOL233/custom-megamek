@@ -39,7 +39,7 @@ public class OSTrinaryLaserSystem extends LaserWeapon {
         name = "Trinary Laser System";
         setInternalName("OSTrinaryLaserSystem");
         addLookupName("OS Trinary Laser System");
-        sortingName = "Laser Trinary D";
+        sortingName = "Laser OS 10 Trinary 1 Std D";
         heat = 24;
         damage = 24;
         shortRange = 5;

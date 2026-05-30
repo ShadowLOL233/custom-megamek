@@ -30,7 +30,7 @@ public class OSHeavyPPCX extends PPCXWeapon {
         name = "Heavy PPC-X";
         setInternalName("OSHeavyPPCX");
         addLookupName("OS Heavy PPC-X");
-        sortingName = "PPC X D";
+        sortingName = "PPC OS 5 X 3 Hvy 1 Std";
         heat = 15;
         damage = 4;       // Per sub-beam
         rackSize = 6;     // 6 sub-beams

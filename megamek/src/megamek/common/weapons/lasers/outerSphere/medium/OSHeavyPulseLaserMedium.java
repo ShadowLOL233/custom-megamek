@@ -30,7 +30,7 @@ public class OSHeavyPulseLaserMedium extends PulseLaserWeapon {
         setInternalName("OSHeavyMediumPulseLaser");
         addLookupName("OS Heavy Medium Pulse Laser");
         addLookupName("OSHeavyPulseLaserMedium");
-        sortingName = "Laser HeavyPulse B";
+        sortingName = "Laser OS 06 HeavyPulse 1 Std B";
         heat = 5;
         damage = 7;
         toHitModifier = -2;

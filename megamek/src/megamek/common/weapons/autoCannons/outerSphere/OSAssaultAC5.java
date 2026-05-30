@@ -39,7 +39,7 @@ public class OSAssaultAC5 extends AmmoWeapon {
         name = "Assault AC/5";
         setInternalName("OSAssaultAC5");
         addLookupName("OS Assault AC/5");
-        sortingName = "AC OS Assault 05";
+        sortingName = "AC OS 1 Std 2 ImpAsl 05";
         flags = flags.or(F_DIRECT_FIRE).or(F_BALLISTIC).or(F_MEK_WEAPON).or(F_AERO_WEAPON).or(F_TANK_WEAPON);
         ammoType = AmmoType.AmmoTypeEnum.AC_ASSAULT_OS;
         atClass = CLASS_AC;

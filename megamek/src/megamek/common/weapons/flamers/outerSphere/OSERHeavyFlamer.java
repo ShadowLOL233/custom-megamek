@@ -33,7 +33,7 @@ public class OSERHeavyFlamer extends FlamerWeapon {
         name = "ER Heavy Flamer";
         setInternalName("OSERHeavyFlamer");
         addLookupName("OS ER Heavy Flamer");
-        sortingName = "Flamer OS D ER Heavy";
+        sortingName = "Flamer OS 4 ERHeavy 1 Std";
         flags = flags.or(WeaponType.F_ER_FLAMER);
         heat = 7;
         damage = 5;

@@ -30,7 +30,7 @@ public class OSERHeavyLaserSmall extends LaserWeapon {
         setInternalName("OSERHeavySmallLaser");
         addLookupName("OS ER Heavy Small Laser");
         addLookupName("OSERHeavyLaserSmall");
-        sortingName = "Laser ERHeavy A";
+        sortingName = "Laser OS 04 ERHeavy 1 Std A";
         heat = 4;
         damage = 6;
         toHitModifier = 1;

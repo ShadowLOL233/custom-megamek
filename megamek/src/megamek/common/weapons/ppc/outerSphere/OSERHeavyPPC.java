@@ -33,7 +33,7 @@ public class OSERHeavyPPC extends PPCWeapon {
         name = "ER Heavy PPC";
         setInternalName("OSERHeavyPPC");
         addLookupName("OS ER Heavy PPC");
-        sortingName = "PPC ER Heavy D";
+        sortingName = "PPC OS 2 ER 3 Hvy 1 Std";
         heat = 22;
         damage = 18;
         shortRange = 7;

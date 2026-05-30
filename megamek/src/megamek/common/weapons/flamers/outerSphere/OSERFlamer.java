@@ -33,7 +33,7 @@ public class OSERFlamer extends FlamerWeapon {
         name = "ER Flamer";
         setInternalName("OSERFlamer");
         addLookupName("OS ER Flamer");
-        sortingName = "Flamer OS B ER";
+        sortingName = "Flamer OS 3 ER 1 Std";
         flags = flags.or(WeaponType.F_ER_FLAMER);
         heat = 3;
         damage = 2;

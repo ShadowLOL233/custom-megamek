@@ -27,7 +27,7 @@ public class OSRotaryAC2 extends RACWeapon {
         name = "RAC/2";
         setInternalName("OSRotaryAC2");
         addLookupName("OS Rotary AC/2");
-        sortingName = "AC OS RAC 02";
+        sortingName = "AC OS 4 RAC 1 Std 02";
         heat = 1;
         damage = 2;
         rackSize = 2;

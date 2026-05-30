@@ -42,7 +42,7 @@ public class OSERLaserLarge extends LaserWeapon {
         setInternalName("OSERLargeLaser");
         addLookupName("OS ER Large Laser");
         addLookupName("OSERLaserLarge");
-        sortingName = "Laser ER D";
+        sortingName = "Laser OS 03 ER 1 Std D";
         heat = 12;
         damage = 9;
         shortRange = 7;

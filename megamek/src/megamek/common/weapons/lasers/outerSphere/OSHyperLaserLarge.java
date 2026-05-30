@@ -40,7 +40,7 @@ public class OSHyperLaserLarge extends LaserWeapon {
         addLookupName("OS Hyper Laser");
         addLookupName("Hyper Laser");
         addLookupName("OS Large Hyper Laser");
-        sortingName = "Laser Hyper D";
+        sortingName = "Laser OS 12 Hyper 1 Std D";
         heat = 25;
         damage = 25;
         toHitModifier = -1;

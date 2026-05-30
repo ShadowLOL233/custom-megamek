@@ -26,7 +26,7 @@ public class OSImproveUltraAC20 extends UACWeapon {
         name = "Improve Ultra AC/20";
         setInternalName("OSImproveUltraAC20");
         addLookupName("OS Improve Ultra AC/20");
-        sortingName = "AC OS UAC Imp 20";
+        sortingName = "AC OS 3 UAC 2 Imp 20";
         ammoType = AmmoType.AmmoTypeEnum.AC_ULTRA;
         heat = 6;
         damage = 20;

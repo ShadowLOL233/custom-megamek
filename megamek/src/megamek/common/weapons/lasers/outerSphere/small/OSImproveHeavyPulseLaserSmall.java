@@ -1,0 +1,63 @@
+/*
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MegaMek.
+ */
+
+package megamek.common.weapons.lasers.outerSphere.small;
+
+import java.io.Serial;
+
+import megamek.common.SimpleTechLevel;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.Faction;
+import megamek.common.enums.TechBase;
+import megamek.common.enums.TechRating;
+import megamek.common.equipment.WeaponTypeFlag;
+import megamek.common.weapons.lasers.PulseLaserWeapon;
+
+/**
+ * Outer Sphere Improved Heavy Small Pulse Laser
+ * Damage 5 / Heat 3 / Range 1-2-3 / -2 ToHit, 0.5t / 1 crit
+ */
+public class OSImproveHeavyPulseLaserSmall extends PulseLaserWeapon {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    public OSImproveHeavyPulseLaserSmall() {
+        super();
+        name = "Improve Heavy Small Pulse Laser";
+        setInternalName("OSImproveHeavySmallPulseLaser");
+        addLookupName("OS Improve Heavy Small Pulse Laser");
+        addLookupName("OSImproveHeavyPulseLaserSmall");
+        sortingName = "Laser OS 06 HeavyPulse 2 Imp A";
+        heat = 3;
+        damage = 5;
+        toHitModifier = -2;
+        shortRange = 1;
+        mediumRange = 2;
+        longRange = 3;
+        extremeRange = 4;
+        waterShortRange = 1;
+        waterMediumRange = 2;
+        waterLongRange = 2;
+        waterExtremeRange = 4;
+        tonnage = 0.5;
+        criticalSlots = 1;
+        bv = 30;
+        cost = 55000;
+        shortAV = 5;
+        maxRange = RANGE_SHORT;
+        flags = flags.or(WeaponTypeFlag.HEAVY_LASER);
+        techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setIntroLevel(false)
+              .setUnofficial(false)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
+              .setISAdvancement(3135, 3140, 3145, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+    }
+}

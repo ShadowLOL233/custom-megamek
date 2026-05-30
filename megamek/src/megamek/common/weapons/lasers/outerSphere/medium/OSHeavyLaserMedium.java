@@ -30,7 +30,7 @@ public class OSHeavyLaserMedium extends LaserWeapon {
         setInternalName("OSHeavyMediumLaser");
         addLookupName("OS Heavy Medium Laser");
         addLookupName("OSHeavyLaserMedium");
-        sortingName = "Laser Heavy B";
+        sortingName = "Laser OS 02 Heavy 1 Std B";
         heat = 7;
         damage = 10;
         toHitModifier = 1;

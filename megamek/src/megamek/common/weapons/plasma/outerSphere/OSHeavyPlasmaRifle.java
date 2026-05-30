@@ -44,7 +44,7 @@ public class OSHeavyPlasmaRifle extends AmmoWeapon {
         name = "Heavy Plasma Rifle";
         setInternalName("OSHeavyPlasmaRifle");
         addLookupName("OS Heavy Plasma Rifle");
-        sortingName = "Plasma D Rifle Heavy";
+        sortingName = "Plasma OS 1 Rifle 4 Heavy";
         heat = 12;
         damage = 15;
         rackSize = 1;

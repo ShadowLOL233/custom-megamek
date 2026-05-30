@@ -44,7 +44,7 @@ public class OSPlasmaCannon extends AmmoWeapon {
         name = "Plasma Cannon";
         setInternalName("OSPlasmaCannon");
         addLookupName("OS Plasma Cannon");
-        sortingName = "Plasma E Cannon";
+        sortingName = "Plasma OS 2 Cannon 1 Std";
         heat = 6;
         damage = DAMAGE_VARIABLE;
         rackSize = 2;

@@ -38,7 +38,7 @@ public class OSSnubNoseRotaryPPC extends PPCRotaryWeapon {
         addLookupName("OS Rotary Snub-Nose PPC");
         addLookupName("Legion Rotary Snub-Nose PPC");
         addLookupName("RSPPC");
-        sortingName = "PPC Rotary Snub B";
+        sortingName = "PPC OS 4 Rotary 4 Snb 1 Std";
         heat = 8;
         damage = DAMAGE_VARIABLE;
         damageShort = 8;

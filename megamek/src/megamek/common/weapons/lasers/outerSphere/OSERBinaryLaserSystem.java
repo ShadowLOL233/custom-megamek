@@ -39,7 +39,7 @@ public class OSERBinaryLaserSystem extends LaserWeapon {
         name = "ER Binary Laser System";
         setInternalName("OSERBinaryLaserSystem");
         addLookupName("OS ER Binary Laser System");
-        sortingName = "Laser ERBinary D";
+        sortingName = "Laser OS 09 ERBinary 1 Std D";
         heat = 20;
         damage = 16;
         toHitModifier = -1;

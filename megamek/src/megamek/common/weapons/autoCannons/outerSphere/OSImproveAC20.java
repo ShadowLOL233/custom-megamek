@@ -18,10 +18,10 @@ import megamek.common.weapons.autoCannons.ACWeapon;
 
 /**
  * Outer Sphere Improve AC/20
- * Damage 20 / Heat 6 / Range 4-8-12 / 10t / 6 crit / ammo-fed
+ * Damage 20 / Heat 6 / Range 4-8-12 / 12t / 9 crit / ammo-fed
  *
- * Dramatically lightened AC/20 (10t/6 crit vs canon 14t/10 crit), cooler, and
- * longer-ranged (4-8-12 vs 3-6-9). A defining OS high-end brawler.
+ * Lighter (12 vs 14t), cooler (6 vs 7 heat), fewer-crit (9 vs 10), and
+ * longer-ranged (4-8-12 vs 3-6-9) than canon AC/20. A defining OS brawler.
  */
 public class OSImproveAC20 extends ACWeapon {
     @Serial
@@ -33,7 +33,7 @@ public class OSImproveAC20 extends ACWeapon {
         setInternalName("OSImproveAC20");
         addLookupName("OS Improve AC/20");
         addLookupName("Improve Autocannon/20");
-        sortingName = "AC OS Imp 20";
+        sortingName = "AC OS 1 Std 2 Imp 20";
         ammoType = AmmoType.AmmoTypeEnum.AC_IMP_OS;
         heat = 6;
         damage = 20;
@@ -43,8 +43,8 @@ public class OSImproveAC20 extends ACWeapon {
         mediumRange = 8;
         longRange = 12;
         extremeRange = 16;
-        tonnage = 10.0;
-        criticalSlots = 6;
+        tonnage = 12.0;
+        criticalSlots = 9;
         bv = 237;
         cost = 360000;
         explosionDamage = damage;

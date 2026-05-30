@@ -32,7 +32,7 @@ public class OSPPCX extends PPCXWeapon {
         name = "PPC-X";
         setInternalName("OSPPCX");
         addLookupName("OS PPC-X");
-        sortingName = "PPC X B";
+        sortingName = "PPC OS 5 X 2 Std 1 Std";
         heat = 10;
         damage = 2;       // Per sub-beam
         rackSize = 6;     // 6 sub-beams

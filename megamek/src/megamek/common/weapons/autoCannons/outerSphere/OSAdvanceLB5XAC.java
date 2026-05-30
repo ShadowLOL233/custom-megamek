@@ -39,7 +39,7 @@ public class OSAdvanceLB5XAC extends LBXACWeapon {
         name = "Advance LB 5-X";
         setInternalName("OSAdvanceLB5XAC");
         addLookupName("OS Advance LB 5-X AC");
-        sortingName = "AC OS LBX Adv 05";
+        sortingName = "AC OS 2 LBX 3 Adv 05";
         setModes(new String[] { MODE_AC_SINGLE, MODE_UAC_ULTRA });
         ammoType = AmmoType.AmmoTypeEnum.LBX_OS;
         heat = 1;
