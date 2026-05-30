@@ -24,7 +24,7 @@ public class OSRotaryAC5 extends RACWeapon {
 
     public OSRotaryAC5() {
         super();
-        name = "RAC/5";
+        name = "Rotary AC/5";
         setInternalName("OSRotaryAC5");
         addLookupName("OS Rotary AC/5");
         sortingName = "AC OS 4 RAC 1 Std 05";
@@ -50,6 +50,6 @@ public class OSRotaryAC5 extends RACWeapon {
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
-              .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
     }
 }

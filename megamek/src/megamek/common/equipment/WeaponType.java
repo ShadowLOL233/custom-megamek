@@ -1575,6 +1575,25 @@ public class WeaponType extends EquipmentType {
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAdvanceLB10XAC());
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAdvanceLB20XAC());
 
+        // Outer Sphere (OS) Gauss Rifles
+        EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSGaussRifle());
+        EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSImproveGauss());
+        EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSAdvanceGauss());
+        EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSLightGauss());
+        EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSUltraLightGauss());
+        EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSHeavyGauss());
+        EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSImproveHeavyGauss());
+        EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSAdvanceHeavyGauss());
+        EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSSuperHeavyGauss());
+        EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSAPGauss());
+        EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSMagshotGauss());
+        EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSHAG20());
+        EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSHAG30());
+        EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSHAG40());
+        EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSLBXGauss());
+        EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSImproveLBXGauss());
+        EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSHeavyLBXGauss());
+
         // Autocannons
         EquipmentType.addType(new ISAC2());
         EquipmentType.addType(new ISAC5());

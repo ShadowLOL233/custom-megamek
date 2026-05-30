@@ -9574,6 +9574,10 @@ public class MiscType extends EquipmentType {
         misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
         misc.hittable = false;
         misc.spreadable = true;
+        // Backward-compat: pre-rename names ("Imp." -> "Improve").
+        misc.addLookupName("Imp. Endo Steel (OS)");
+        misc.addLookupName("IS Imp. Endo Steel (OS)");
+        misc.addLookupName("Clan Imp. Endo Steel (OS)");
         misc.flags = misc.flags.or(F_OS_IMP_ENDO_STEEL);
         misc.omniFixedOnly = true;
         misc.bv = 0;
@@ -9595,6 +9599,10 @@ public class MiscType extends EquipmentType {
         misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
         misc.hittable = false;
         misc.spreadable = true;
+        // Backward-compat: pre-rename names ("Adv." -> "Advance").
+        misc.addLookupName("Adv. Endo Steel (OS)");
+        misc.addLookupName("IS Adv. Endo Steel (OS)");
+        misc.addLookupName("Clan Adv. Endo Steel (OS)");
         misc.flags = misc.flags.or(F_OS_ADV_ENDO_STEEL);
         misc.omniFixedOnly = true;
         misc.bv = 0;
@@ -9615,6 +9623,10 @@ public class MiscType extends EquipmentType {
         misc.tonnage = TONNAGE_VARIABLE;
         misc.criticalSlots = 0;
         misc.hittable = false;
+        // Backward-compat: pre-rename names ("Imp. Reinforce" -> "Improve Reinforced").
+        misc.addLookupName("Imp. Reinforce (OS)");
+        misc.addLookupName("IS Imp. Reinforce (OS)");
+        misc.addLookupName("Clan Imp. Reinforce (OS)");
         misc.flags = misc.flags.or(F_OS_IMP_REINFORCE);
         misc.omniFixedOnly = true;
         misc.bv = 0;
@@ -9635,6 +9647,10 @@ public class MiscType extends EquipmentType {
         misc.tonnage = TONNAGE_VARIABLE;
         misc.criticalSlots = 0;
         misc.hittable = false;
+        // Backward-compat: pre-rename names ("Reinforce" -> "Reinforced").
+        misc.addLookupName("Reinforce Composite (OS)");
+        misc.addLookupName("IS Reinforce Composite (OS)");
+        misc.addLookupName("Clan Reinforce Composite (OS)");
         misc.flags = misc.flags.or(F_OS_REINFORCE_COMPOSITE);
         misc.omniFixedOnly = true;
         misc.bv = 0;
@@ -9656,6 +9672,10 @@ public class MiscType extends EquipmentType {
         misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
         misc.hittable = false;
         misc.spreadable = true;
+        // Backward-compat: pre-rename names ("Reinforce" -> "Reinforced").
+        misc.addLookupName("Reinforce Endo Steel (OS)");
+        misc.addLookupName("IS Reinforce Endo Steel (OS)");
+        misc.addLookupName("Clan Reinforce Endo Steel (OS)");
         misc.flags = misc.flags.or(F_OS_REINFORCE_ENDO_STEEL);
         misc.omniFixedOnly = true;
         misc.bv = 0;
@@ -9677,6 +9697,10 @@ public class MiscType extends EquipmentType {
         misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
         misc.hittable = false;
         misc.spreadable = true;
+        // Backward-compat: pre-rename names ("Imp. Reinforce" -> "Improve Reinforced").
+        misc.addLookupName("Imp. Reinforce Endo Steel (OS)");
+        misc.addLookupName("IS Imp. Reinforce Endo Steel (OS)");
+        misc.addLookupName("Clan Imp. Reinforce Endo Steel (OS)");
         misc.flags = misc.flags.or(F_OS_IMP_REINFORCE_ENDO_STEEL);
         misc.omniFixedOnly = true;
         misc.bv = 0;
@@ -9698,6 +9722,10 @@ public class MiscType extends EquipmentType {
         misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
         misc.hittable = false;
         misc.spreadable = true;
+        // Backward-compat: pre-rename names ("Adv. Reinforce" -> "Advance Reinforced").
+        misc.addLookupName("Adv. Reinforce Endo Steel (OS)");
+        misc.addLookupName("IS Adv. Reinforce Endo Steel (OS)");
+        misc.addLookupName("Clan Adv. Reinforce Endo Steel (OS)");
         misc.flags = misc.flags.or(F_OS_ADV_REINFORCE_ENDO_STEEL);
         misc.omniFixedOnly = true;
         misc.bv = 0;
@@ -9719,6 +9747,10 @@ public class MiscType extends EquipmentType {
         misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
         misc.hittable = false;
         misc.spreadable = true;
+        // Backward-compat: pre-rename names ("Imp." -> "Improve").
+        misc.addLookupName("Imp. Endo-Composite (OS)");
+        misc.addLookupName("IS Imp. Endo-Composite (OS)");
+        misc.addLookupName("Clan Imp. Endo-Composite (OS)");
         misc.flags = misc.flags.or(F_OS_IMP_ENDO_COMPOSITE);
         misc.omniFixedOnly = true;
         misc.bv = 0;
@@ -9740,6 +9772,10 @@ public class MiscType extends EquipmentType {
         misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
         misc.hittable = false;
         misc.spreadable = true;
+        // Backward-compat: pre-rename names ("Adv." -> "Advance").
+        misc.addLookupName("Adv. Endo-Composite (OS)");
+        misc.addLookupName("IS Adv. Endo-Composite (OS)");
+        misc.addLookupName("Clan Adv. Endo-Composite (OS)");
         misc.flags = misc.flags.or(F_OS_ADV_ENDO_COMPOSITE);
         misc.omniFixedOnly = true;
         misc.bv = 0;
@@ -9807,6 +9843,10 @@ public class MiscType extends EquipmentType {
         misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
         misc.hittable = false;
         misc.spreadable = true;
+        // Backward-compat: pre-rename names ("Rein." -> "Reinforced").
+        misc.addLookupName("Rein. Heavy Duty (OS)");
+        misc.addLookupName("IS Rein. Heavy Duty (OS)");
+        misc.addLookupName("Clan Rein. Heavy Duty (OS)");
         misc.flags = misc.flags.or(F_OS_REINFORCE_HEAVY_DUTY);
         misc.omniFixedOnly = true;
         misc.bv = 0;
@@ -9828,6 +9868,10 @@ public class MiscType extends EquipmentType {
         misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
         misc.hittable = false;
         misc.spreadable = true;
+        // Backward-compat: pre-rename names ("Rein./Hvy" -> "Reinforced/Heavy").
+        misc.addLookupName("Rein. Hvy Duty Endo Steel (OS)");
+        misc.addLookupName("IS Rein. Hvy Duty Endo Steel (OS)");
+        misc.addLookupName("Clan Rein. Hvy Duty Endo Steel (OS)");
         misc.flags = misc.flags.or(F_OS_REINFORCE_HEAVY_DUTY_ENDO_STEEL);
         misc.omniFixedOnly = true;
         misc.bv = 0;
@@ -9853,6 +9897,10 @@ public class MiscType extends EquipmentType {
         misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
         misc.hittable = false;
         misc.spreadable = true;
+        // Backward-compat: pre-rename names ("Suphvy/Hvy-Duty" -> "Superheavy/Heavy-Duty").
+        misc.addLookupName("Suphvy Hvy-Duty Endo Steel (OS)");
+        misc.addLookupName("IS Suphvy Hvy-Duty Endo Steel (OS)");
+        misc.addLookupName("Clan Suphvy Hvy-Duty Endo Steel (OS)");
         misc.flags = misc.flags.or(F_OS_SH_DUTY_ENDO_STEEL);
         misc.omniFixedOnly = true;
         misc.bv = 0;
@@ -9860,7 +9908,7 @@ public class MiscType extends EquipmentType {
               .setISAdvancement(2990, 3010, 3030)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
-              .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
         return misc;
     }
 
@@ -9876,6 +9924,10 @@ public class MiscType extends EquipmentType {
         misc.tonnage = TONNAGE_VARIABLE;
         misc.criticalSlots = 0;
         misc.hittable = false;
+        // Backward-compat: pre-rename names ("Suphvy/Reinforce" -> "Superheavy/Reinforced").
+        misc.addLookupName("Suphvy Reinforce (OS)");
+        misc.addLookupName("IS Suphvy Reinforce (OS)");
+        misc.addLookupName("Clan Suphvy Reinforce (OS)");
         misc.flags = misc.flags.or(F_OS_SH_REINFORCE);
         misc.omniFixedOnly = true;
         misc.bv = 0;
@@ -9883,7 +9935,7 @@ public class MiscType extends EquipmentType {
               .setISAdvancement(2995, 3015, 3035)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
-              .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
         return misc;
     }
 
@@ -9900,6 +9952,10 @@ public class MiscType extends EquipmentType {
         misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
         misc.hittable = false;
         misc.spreadable = true;
+        // Backward-compat: pre-rename names ("Suphvy/Rein." -> "Superheavy/Reinforced").
+        misc.addLookupName("Suphvy Rein. Endo Steel (OS)");
+        misc.addLookupName("IS Suphvy Rein. Endo Steel (OS)");
+        misc.addLookupName("Clan Suphvy Rein. Endo Steel (OS)");
         misc.flags = misc.flags.or(F_OS_SH_REINFORCE_ENDO_STEEL);
         misc.omniFixedOnly = true;
         misc.bv = 0;
@@ -9907,7 +9963,7 @@ public class MiscType extends EquipmentType {
               .setISAdvancement(3000, 3025, 3050)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
-              .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
         return misc;
     }
 
@@ -9924,6 +9980,10 @@ public class MiscType extends EquipmentType {
         misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
         misc.hittable = false;
         misc.spreadable = true;
+        // Backward-compat: pre-rename names ("Suphvy/Rein." -> "Superheavy/Reinforced").
+        misc.addLookupName("Suphvy Rein. Endo-Composite (OS)");
+        misc.addLookupName("IS Suphvy Rein. Endo-Composite (OS)");
+        misc.addLookupName("Clan Suphvy Rein. Endo-Composite (OS)");
         misc.flags = misc.flags.or(F_OS_SH_REINFORCE_ENDO_COMPOSITE);
         misc.omniFixedOnly = true;
         misc.bv = 0;
@@ -9931,7 +9991,7 @@ public class MiscType extends EquipmentType {
               .setISAdvancement(3020, 3045, 3070)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
-              .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
         return misc;
     }
 
@@ -9945,6 +10005,10 @@ public class MiscType extends EquipmentType {
         misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
         misc.hittable = false;
         misc.spreadable = true;
+        // Backward-compat: pre-rename names ("Suphvy/Rein./Hvy-Duty" -> "Superheavy/Reinforced/Heavy-Duty").
+        misc.addLookupName("Suphvy Rein. Hvy-Duty (OS)");
+        misc.addLookupName("IS Suphvy Rein. Hvy-Duty (OS)");
+        misc.addLookupName("Clan Suphvy Rein. Hvy-Duty (OS)");
         misc.flags = misc.flags.or(F_OS_SH_REINFORCE_HEAVY_DUTY);
         misc.omniFixedOnly = true;
         misc.bv = 0;
@@ -9952,7 +10016,7 @@ public class MiscType extends EquipmentType {
               .setISAdvancement(3025, 3050, 3075)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
-              .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
         return misc;
     }
 
@@ -9966,6 +10030,10 @@ public class MiscType extends EquipmentType {
         misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
         misc.hittable = false;
         misc.spreadable = true;
+        // Backward-compat: pre-rename names ("Suphvy/Rein./Hvy" -> "Superheavy/Reinforced/Heavy").
+        misc.addLookupName("Suphvy Rein. Hvy Duty Endo Steel (OS)");
+        misc.addLookupName("IS Suphvy Rein. Hvy Duty Endo Steel (OS)");
+        misc.addLookupName("Clan Suphvy Rein. Hvy Duty Endo Steel (OS)");
         misc.flags = misc.flags.or(F_OS_SH_REINFORCE_HEAVY_DUTY_ENDO_STEEL);
         misc.omniFixedOnly = true;
         misc.bv = 0;
@@ -9973,7 +10041,7 @@ public class MiscType extends EquipmentType {
               .setISAdvancement(3035, 3060, 3085)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
-              .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
         return misc;
     }
 

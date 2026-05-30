@@ -4,7 +4,7 @@
  * This file is part of MegaMek.
  */
 
-package megamek.common.weapons.autoCannons.outerSphere;
+package megamek.common.weapons.gaussRifles.outerSphere;
 
 import java.io.Serial;
 
@@ -13,40 +13,41 @@ import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
 import megamek.common.enums.TechRating;
-import megamek.common.weapons.autoCannons.RACWeapon;
 
-/**
- * Outer Sphere Rotary AC/2 - up to 6 shots/turn (1 heat/shot). Uses canon AC_ROTARY ammo.
- */
-public class OSRotaryAC2 extends RACWeapon {
+/** Outer Sphere LB-X Gauss - 15 dmg slug / 15-pellet cluster / 15t / 7 crit. */
+public class OSLBXGauss extends OSLBXGaussWeapon {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public OSRotaryAC2() {
+    public OSLBXGauss() {
         super();
-        name = "Rotary AC/2";
-        setInternalName("OSRotaryAC2");
-        addLookupName("OS Rotary AC/2");
-        sortingName = "AC OS 4 RAC 1 Std 02";
+        name = "LB-X Gauss Rifle";
+        setInternalName("OSLBXGauss");
+        addLookupName("OS LB-X Gauss Rifle");
+        sortingName = "Gauss OS 5 LBX 1 Std";
         heat = 1;
-        damage = 2;
-        rackSize = 2;
-        minimumRange = 0;
+        damage = 15;
+        rackSize = 15;
+        minimumRange = 2;
         shortRange = 7;
-        mediumRange = 14;
-        longRange = 21;
-        extremeRange = 28;
-        tonnage = 7.0;
-        criticalSlots = 3;
-        bv = 185;
-        cost = 200000;
-        explosionDamage = damage;
+        mediumRange = 15;
+        longRange = 22;
+        extremeRange = 33;
+        tonnage = 15.0;
+        criticalSlots = 7;
+        bv = 300;
+        cost = 420000;
+        shortAV = 9;
+        medAV = 9;
+        longAV = 9;
+        maxRange = RANGE_LONG;
+        explosionDamage = 20;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setIntroLevel(false)
               .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
-              .setISAdvancement(3130, 3135, 3140, DATE_NONE, DATE_NONE)
+              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)

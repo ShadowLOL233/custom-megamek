@@ -2034,10 +2034,13 @@ public class ArmorType extends MiscType {
 
     private static ArmorType createOSImpFF() {
         ArmorType armor = new ArmorType();
-        armor.name = "Imp. Ferro-Fibrous (OS)";
-        armor.setInternalName("OS Imp. Ferro-Fibrous");
+        armor.name = "Improve Ferro-Fibrous (OS)";
+        armor.setInternalName("OS Improve Ferro-Fibrous");
         armor.addLookupName("Legion Imp. Ferro-Fibrous");
         armor.addLookupName("Imp. Ferro-Fibrous (Legion)");
+        // Backward-compat: pre-rename names ("Imp." -> "Improve")
+        armor.addLookupName("Imp. Ferro-Fibrous (OS)");
+        armor.addLookupName("OS Imp. Ferro-Fibrous");
         armor.cost = 20000.0;
         armor.criticalSlots = 9;
         armor.flags = armor.flags.or(F_FERRO_FIBROUS).or(F_MEK_EQUIPMENT);
@@ -2052,10 +2055,13 @@ public class ArmorType extends MiscType {
 
     private static ArmorType createOSAdvFF() {
         ArmorType armor = new ArmorType();
-        armor.name = "Adv. Ferro-Fibrous (OS)";
-        armor.setInternalName("OS Adv. Ferro-Fibrous");
+        armor.name = "Advance Ferro-Fibrous (OS)";
+        armor.setInternalName("OS Advance Ferro-Fibrous");
         armor.addLookupName("Legion Adv. Ferro-Fibrous");
         armor.addLookupName("Adv. Ferro-Fibrous (Legion)");
+        // Backward-compat: pre-rename names ("Adv." -> "Advance")
+        armor.addLookupName("Adv. Ferro-Fibrous (OS)");
+        armor.addLookupName("OS Adv. Ferro-Fibrous");
         armor.cost = 28000.0;
         armor.criticalSlots = 7;
         armor.flags = armor.flags.or(F_FERRO_FIBROUS).or(F_MEK_EQUIPMENT);
@@ -2088,10 +2094,13 @@ public class ArmorType extends MiscType {
 
     private static ArmorType createOSImpHeavyFF() {
         ArmorType armor = new ArmorType();
-        armor.name = "Imp. Heavy Ferro-Fibrous (OS)";
-        armor.setInternalName("OS Imp. Heavy Ferro-Fibrous");
+        armor.name = "Improve Heavy Ferro-Fibrous (OS)";
+        armor.setInternalName("OS Improve Heavy Ferro-Fibrous");
         armor.addLookupName("Legion Imp. Heavy Ferro-Fibrous");
         armor.addLookupName("Imp. Heavy Ferro-Fibrous (Legion)");
+        // Backward-compat: pre-rename names ("Imp." -> "Improve")
+        armor.addLookupName("Imp. Heavy Ferro-Fibrous (OS)");
+        armor.addLookupName("OS Imp. Heavy Ferro-Fibrous");
         armor.cost = 32000.0;
         armor.criticalSlots = 13;
         armor.flags = armor.flags.or(F_HEAVY_FERRO).or(F_MEK_EQUIPMENT);
@@ -2106,10 +2115,13 @@ public class ArmorType extends MiscType {
 
     private static ArmorType createOSImpLightFF() {
         ArmorType armor = new ArmorType();
-        armor.name = "Imp. Light Ferro-Fibrous (OS)";
-        armor.setInternalName("OS Imp. Light Ferro-Fibrous");
+        armor.name = "Improve Light Ferro-Fibrous (OS)";
+        armor.setInternalName("OS Improve Light Ferro-Fibrous");
         armor.addLookupName("Legion Imp. Light Ferro-Fibrous");
         armor.addLookupName("Imp. Light Ferro-Fibrous (Legion)");
+        // Backward-compat: pre-rename names ("Imp." -> "Improve")
+        armor.addLookupName("Imp. Light Ferro-Fibrous (OS)");
+        armor.addLookupName("OS Imp. Light Ferro-Fibrous");
         armor.cost = 18000.0;
         armor.criticalSlots = 6;
         armor.flags = armor.flags.or(F_FERRO_FIBROUS).or(F_MEK_EQUIPMENT);
@@ -2124,10 +2136,13 @@ public class ArmorType extends MiscType {
 
     private static ArmorType createOSImpHardened() {
         ArmorType armor = new ArmorType();
-        armor.name = "Imp. Hardened (OS)";
-        armor.setInternalName("OS Imp. Hardened");
+        armor.name = "Improve Hardened (OS)";
+        armor.setInternalName("OS Improve Hardened");
         armor.addLookupName("Legion Imp. Hardened");
         armor.addLookupName("Imp. Hardened (Legion)");
+        // Backward-compat: pre-rename names ("Imp." -> "Improve")
+        armor.addLookupName("Imp. Hardened (OS)");
+        armor.addLookupName("OS Imp. Hardened");
         armor.cost = 22000.0;
         armor.criticalSlots = 5;
         armor.spreadable = true;
@@ -2180,10 +2195,13 @@ public class ArmorType extends MiscType {
 
     private static ArmorType createOSAdvHardenedFF() {
         ArmorType armor = new ArmorType();
-        armor.name = "Adv. Hardened Ferro-Fibrous (OS)";
-        armor.setInternalName("OS Adv. Hardened Ferro-Fibrous");
+        armor.name = "Advance Hardened Ferro-Fibrous (OS)";
+        armor.setInternalName("OS Advance Hardened Ferro-Fibrous");
         armor.addLookupName("Legion Adv. Hardened Ferro-Fibrous");
         armor.addLookupName("Adv. Hardened Ferro-Fibrous (Legion)");
+        // Backward-compat: pre-rename names ("Adv." -> "Advance")
+        armor.addLookupName("Adv. Hardened Ferro-Fibrous (OS)");
+        armor.addLookupName("OS Adv. Hardened Ferro-Fibrous");
         armor.cost = 38000.0;
         armor.criticalSlots = 14;
         armor.flags = armor.flags.or(F_HARDENED_ARMOR).or(F_FERRO_FIBROUS).or(F_MEK_EQUIPMENT);
@@ -2217,10 +2235,13 @@ public class ArmorType extends MiscType {
 
     private static ArmorType createOSImpReactive() {
         ArmorType armor = new ArmorType();
-        armor.name = "Imp. Reactive (OS)";
-        armor.setInternalName("OS Imp. Reactive");
+        armor.name = "Improve Reactive (OS)";
+        armor.setInternalName("OS Improve Reactive");
         armor.addLookupName("Legion Imp. Reactive");
         armor.addLookupName("Imp. Reactive (Legion)");
+        // Backward-compat: pre-rename names ("Imp." -> "Improve")
+        armor.addLookupName("Imp. Reactive (OS)");
+        armor.addLookupName("OS Imp. Reactive");
         armor.cost = 40000.0;
         armor.criticalSlots = 5;
         armor.tankSlots = 1;
@@ -2389,10 +2410,13 @@ public class ArmorType extends MiscType {
 
     private static ArmorType createOSImpStealth() {
         ArmorType armor = new ArmorType();
-        armor.name = "Imp. Stealth (OS)";
-        armor.setInternalName("OS Imp. Stealth");
+        armor.name = "Improve Stealth (OS)";
+        armor.setInternalName("OS Improve Stealth");
         armor.addLookupName("Legion Imp. Stealth");
         armor.addLookupName("Imp. Stealth (Legion)");
+        // Backward-compat: pre-rename names ("Imp." -> "Improve")
+        armor.addLookupName("Imp. Stealth (OS)");
+        armor.addLookupName("OS Imp. Stealth");
         armor.cost = 75000.0;
         armor.criticalSlots = 10;
         armor.stealthHeat = 7;

@@ -76,7 +76,7 @@ public class ISAC10 extends ACWeapon {
         maxRange = RANGE_MED;
         explosionDamage = damage;
         rulesRefs = "208, TM";
-        techAdvancement.setTechBase(TechBase.ALL).setIntroLevel(true).setTechRating(TechRating.C)
+        techAdvancement.setTechBase(TechBase.IS).setIntroLevel(true).setTechRating(TechRating.C)
               .setAvailability(AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.D, AvailabilityValue.D)
               .setISAdvancement(2443, 2460, 2465, DATE_NONE, DATE_NONE)
               .setISApproximate(false, false, false, false, false)

@@ -4,7 +4,7 @@
  * This file is part of MegaMek.
  */
 
-package megamek.common.weapons.autoCannons.outerSphere;
+package megamek.common.weapons.gaussRifles.outerSphere;
 
 import java.io.Serial;
 
@@ -13,40 +13,43 @@ import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
 import megamek.common.enums.TechRating;
-import megamek.common.weapons.autoCannons.RACWeapon;
+import megamek.common.equipment.AmmoType;
+import megamek.common.weapons.gaussRifles.HAGWeapon;
 
-/**
- * Outer Sphere Rotary AC/2 - up to 6 shots/turn (1 heat/shot). Uses canon AC_ROTARY ammo.
- */
-public class OSRotaryAC2 extends RACWeapon {
+/** Outer Sphere Hyper-Assault Gauss/20 - cluster Gauss / 10t / 6 crit. */
+public class OSHAG20 extends HAGWeapon {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public OSRotaryAC2() {
+    public OSHAG20() {
         super();
-        name = "Rotary AC/2";
-        setInternalName("OSRotaryAC2");
-        addLookupName("OS Rotary AC/2");
-        sortingName = "AC OS 4 RAC 1 Std 02";
-        heat = 1;
-        damage = 2;
-        rackSize = 2;
-        minimumRange = 0;
-        shortRange = 7;
-        mediumRange = 14;
-        longRange = 21;
-        extremeRange = 28;
-        tonnage = 7.0;
-        criticalSlots = 3;
-        bv = 185;
-        cost = 200000;
-        explosionDamage = damage;
+        name = "HAG/20";
+        setInternalName("OSHAG20");
+        addLookupName("OS HAG/20");
+        sortingName = "Gauss OS 6 HAG 20";
+        ammoType = AmmoType.AmmoTypeEnum.HAG_OS;
+        heat = 4;
+        rackSize = 20;
+        minimumRange = 2;
+        shortRange = 8;
+        mediumRange = 16;
+        longRange = 24;
+        extremeRange = 32;
+        tonnage = 10.0;
+        criticalSlots = 6;
+        bv = 267;
+        cost = 400000;
+        shortAV = 12;
+        medAV = 12;
+        longAV = 12;
+        maxRange = RANGE_LONG;
+        explosionDamage = 20;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setIntroLevel(false)
               .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
-              .setISAdvancement(3130, 3135, 3140, DATE_NONE, DATE_NONE)
+              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)

@@ -203,7 +203,15 @@ public class AmmoType extends EquipmentType {
         // Ultra/Rotary reuse the canon AC_ULTRA/AC_ROTARY enums (their multi-shot heat is hard-keyed to those).
         AC_IMP_OS(120, "Improve Autocannon (OS)", AmmoCategory.Ballistic),
         AC_ASSAULT_OS(121, "Assault Autocannon (OS)", AmmoCategory.Ballistic),
-        LBX_OS(122, "LB-X Autocannon (OS)", AmmoCategory.Ballistic);
+        LBX_OS(122, "LB-X Autocannon (OS)", AmmoCategory.Ballistic),
+        // OS Gauss families - single-shot so safe to use custom enums (no engine multi-shot coupling).
+        GAUSS_OS(123, "Gauss Rifle (OS)", AmmoCategory.Ballistic),
+        GAUSS_LIGHT_OS(124, "Light Gauss Rifle (OS)", AmmoCategory.Ballistic),
+        GAUSS_HEAVY_OS(125, "Heavy Gauss Rifle (OS)", AmmoCategory.Ballistic),
+        GAUSS_AP_OS(126, "AP Gauss Rifle (OS)", AmmoCategory.Ballistic),
+        GAUSS_MAGSHOT_OS(127, "Magshot Gauss Rifle (OS)", AmmoCategory.Ballistic),
+        GAUSS_LBX_OS(128, "LB-X Gauss Rifle (OS)", AmmoCategory.Ballistic),
+        HAG_OS(129, "Hyper-Assault Gauss (OS)", AmmoCategory.Ballistic);
 
         private static final Map<Integer, AmmoTypeEnum> INDEX_LOOKUP = new HashMap<>();
 
@@ -3087,6 +3095,22 @@ public class AmmoType extends EquipmentType {
         EquipmentType.addType(AmmoType.createOSAssaultAC5Ammo());
         EquipmentType.addType(AmmoType.createOSAssaultAC10Ammo());
         EquipmentType.addType(AmmoType.createOSAssaultAC20Ammo());
+        // Outer Sphere (OS) Gauss ammo
+        EquipmentType.addType(AmmoType.createOSGaussAmmo());
+        EquipmentType.addType(AmmoType.createOSLightGaussAmmo());
+        EquipmentType.addType(AmmoType.createOSUltraLightGaussAmmo());
+        EquipmentType.addType(AmmoType.createOSHeavyGaussAmmo());
+        EquipmentType.addType(AmmoType.createOSImproveHeavyGaussAmmo());
+        EquipmentType.addType(AmmoType.createOSSuperHeavyGaussAmmo());
+        EquipmentType.addType(AmmoType.createOSAPGaussAmmo());
+        EquipmentType.addType(AmmoType.createOSMagshotGaussAmmo());
+        EquipmentType.addType(AmmoType.createOSLBXGauss15Ammo());
+        EquipmentType.addType(AmmoType.createOSLBXGauss15ClusterAmmo());
+        EquipmentType.addType(AmmoType.createOSLBXGauss20Ammo());
+        EquipmentType.addType(AmmoType.createOSLBXGauss20ClusterAmmo());
+        EquipmentType.addType(AmmoType.createOSHAG20Ammo());
+        EquipmentType.addType(AmmoType.createOSHAG30Ammo());
+        EquipmentType.addType(AmmoType.createOSHAG40Ammo());
         EquipmentType.addType(AmmoType.createCLAPGaussRifleAmmo());
         EquipmentType.addType(AmmoType.createCLMediumChemicalLaserAmmo());
         EquipmentType.addType(AmmoType.createCLSmallChemicalLaserAmmo());
@@ -12008,6 +12032,110 @@ public class AmmoType extends EquipmentType {
 
     private static AmmoType createOSAssaultAC20Ammo() {
         return makeOSACAmmo("Assault AC/20", "OSAssaultAC20Ammo", AmmoTypeEnum.AC_ASSAULT_OS, 20, 3, 34, 18000);
+    }
+
+    // OUTER SPHERE (OS) GAUSS RIFLE AMMO
+    // Gauss damagePerShot is carried by the ammo (not the weapon, unlike AC); rackSize binds caliber.
+
+    private static AmmoType makeOSGaussAmmo(String weaponName, String internal, AmmoTypeEnum type,
+          int damagePerShot, int rackSize, int shots, int bv, long cost) {
+        AmmoType ammo = new AmmoType();
+        ammo.name = weaponName + " Ammo";
+        ammo.shortName = weaponName;
+        ammo.setInternalName(internal);
+        ammo.addLookupName("OS " + weaponName + " Ammo");
+        ammo.damagePerShot = damagePerShot;
+        ammo.rackSize = rackSize;
+        ammo.ammoType = type;
+        ammo.shots = shots;
+        ammo.bv = bv;
+        ammo.cost = cost;
+        ammo.explosive = false;
+        ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setIntroLevel(false)
+              .setUnofficial(false)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
+              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION);
+        return ammo;
+    }
+
+    private static AmmoType makeOSLBXGaussClusterAmmo(String weaponName, String internal, int rackSize,
+          int shots, int bv, long cost) {
+        AmmoType ammo = makeOSGaussAmmo(weaponName + " Cluster", internal,
+              AmmoTypeEnum.GAUSS_LBX_OS, 1, rackSize, shots, bv, cost);
+        ammo.munitionType = EnumSet.of(Munitions.M_CLUSTER);
+        ammo.toHitModifier = -1;
+        return ammo;
+    }
+
+    // Standard Gauss line (Gauss / Improve Gauss / Advance Gauss share this ammo)
+    private static AmmoType createOSGaussAmmo() {
+        return makeOSGaussAmmo("Gauss Rifle", "OSGaussAmmo", AmmoTypeEnum.GAUSS_OS, 15, 0, 8, 40, 20000);
+    }
+
+    // Light Gauss line - one ammo per damage (rackSize distinguishes caliber)
+    private static AmmoType createOSLightGaussAmmo() {
+        return makeOSGaussAmmo("Light Gauss Rifle", "OSLightGaussAmmo", AmmoTypeEnum.GAUSS_LIGHT_OS, 8, 8, 16, 20, 20000);
+    }
+
+    private static AmmoType createOSUltraLightGaussAmmo() {
+        return makeOSGaussAmmo("Ultra-Light Gauss Rifle", "OSUltraLightGaussAmmo", AmmoTypeEnum.GAUSS_LIGHT_OS, 6, 6, 16, 15, 18000);
+    }
+
+    // Heavy Gauss line - 3 ammos (Heavy + Advance share rackSize 25; Improve = 22; Super-Heavy = 30)
+    private static AmmoType createOSHeavyGaussAmmo() {
+        return makeOSGaussAmmo("Heavy Gauss Rifle", "OSHeavyGaussAmmo", AmmoTypeEnum.GAUSS_HEAVY_OS, 25, 25, 4, 43, 30000);
+    }
+
+    private static AmmoType createOSImproveHeavyGaussAmmo() {
+        return makeOSGaussAmmo("Improve Heavy Gauss Rifle", "OSImproveHeavyGaussAmmo", AmmoTypeEnum.GAUSS_HEAVY_OS, 22, 22, 4, 38, 32000);
+    }
+
+    private static AmmoType createOSSuperHeavyGaussAmmo() {
+        return makeOSGaussAmmo("Super-Heavy Gauss Rifle", "OSSuperHeavyGaussAmmo", AmmoTypeEnum.GAUSS_HEAVY_OS, 30, 30, 4, 52, 40000);
+    }
+
+    // Specialty
+    private static AmmoType createOSAPGaussAmmo() {
+        return makeOSGaussAmmo("AP Gauss Rifle", "OSAPGaussAmmo", AmmoTypeEnum.GAUSS_AP_OS, 3, 0, 40, 3, 1000);
+    }
+
+    private static AmmoType createOSMagshotGaussAmmo() {
+        return makeOSGaussAmmo("Magshot Gauss Rifle", "OSMagshotGaussAmmo", AmmoTypeEnum.GAUSS_MAGSHOT_OS, 2, 0, 50, 2, 1000);
+    }
+
+    // LB-X Gauss line - slug + cluster per caliber (15-dmg shared by LB-X/Improve LB-X; 20-dmg for Heavy LB-X)
+    private static AmmoType createOSLBXGauss15Ammo() {
+        return makeOSGaussAmmo("LB-X Gauss Rifle", "OSLBXGauss15Ammo", AmmoTypeEnum.GAUSS_LBX_OS, 15, 15, 8, 38, 25000);
+    }
+
+    private static AmmoType createOSLBXGauss15ClusterAmmo() {
+        return makeOSLBXGaussClusterAmmo("LB-X Gauss Rifle", "OSLBXGauss15ClusterAmmo", 15, 8, 30, 30000);
+    }
+
+    private static AmmoType createOSLBXGauss20Ammo() {
+        return makeOSGaussAmmo("Heavy LB-X Gauss Rifle", "OSLBXGauss20Ammo", AmmoTypeEnum.GAUSS_LBX_OS, 20, 20, 4, 52, 35000);
+    }
+
+    private static AmmoType createOSLBXGauss20ClusterAmmo() {
+        return makeOSLBXGaussClusterAmmo("Heavy LB-X Gauss Rifle", "OSLBXGauss20ClusterAmmo", 20, 4, 42, 42000);
+    }
+
+    // HAG 20/30/40
+    private static AmmoType createOSHAG20Ammo() {
+        return makeOSGaussAmmo("HAG/20", "OSHAG20Ammo", AmmoTypeEnum.HAG_OS, 1, 20, 6, 33, 30000);
+    }
+
+    private static AmmoType createOSHAG30Ammo() {
+        return makeOSGaussAmmo("HAG/30", "OSHAG30Ammo", AmmoTypeEnum.HAG_OS, 1, 30, 4, 50, 40000);
+    }
+
+    private static AmmoType createOSHAG40Ammo() {
+        return makeOSGaussAmmo("HAG/40", "OSHAG40Ammo", AmmoTypeEnum.HAG_OS, 1, 40, 3, 67, 50000);
     }
 
     // RISC APDS

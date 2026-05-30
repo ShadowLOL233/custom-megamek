@@ -198,17 +198,17 @@ public class EquipmentType implements ITechnology {
     public static final String[] structureNames = {
         "Standard", "Industrial", "Endo Steel", "Endo Steel Prototype",
         "Reinforced", "Composite", "Endo-Composite",
-        // OS structures
-        "Imp. Endo Steel (OS)", "Adv. Endo Steel (OS)",
-        "Imp. Reinforce (OS)", "Reinforce Composite (OS)",
-        "Reinforce Endo Steel (OS)", "Imp. Reinforce Endo Steel (OS)",
-        "Adv. Reinforce Endo Steel (OS)",
-        "Imp. Endo-Composite (OS)", "Adv. Endo-Composite (OS)",
+        // OS structures (abbreviations expanded; old names preserved as lookup aliases per create method)
+        "Improve Endo Steel (OS)", "Advance Endo Steel (OS)",
+        "Improve Reinforced (OS)", "Reinforced Composite (OS)",
+        "Reinforced Endo Steel (OS)", "Improve Reinforced Endo Steel (OS)",
+        "Advance Reinforced Endo Steel (OS)",
+        "Improve Endo-Composite (OS)", "Advance Endo-Composite (OS)",
         "Heavy Duty (OS)", "Heavy Duty Endo Steel (OS)",
-        "Suphvy Hvy-Duty Endo Steel (OS)", "Suphvy Reinforce (OS)",
-        "Suphvy Rein. Endo Steel (OS)", "Suphvy Rein. Endo-Composite (OS)",
-        "Rein. Heavy Duty (OS)", "Rein. Hvy Duty Endo Steel (OS)",
-        "Suphvy Rein. Hvy-Duty (OS)", "Suphvy Rein. Hvy Duty Endo Steel (OS)"
+        "Superheavy Heavy-Duty Endo Steel (OS)", "Superheavy Reinforced (OS)",
+        "Superheavy Reinforced Endo Steel (OS)", "Superheavy Reinforced Endo-Composite (OS)",
+        "Reinforced Heavy Duty (OS)", "Reinforced Heavy Duty Endo Steel (OS)",
+        "Superheavy Reinforced Heavy-Duty (OS)", "Superheavy Reinforced Heavy Duty Endo Steel (OS)"
     };
 
     // Assume for now that prototype is not more expensive

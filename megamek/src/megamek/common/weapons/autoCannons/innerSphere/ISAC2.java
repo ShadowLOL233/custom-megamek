@@ -82,7 +82,7 @@ public class ISAC2 extends ACWeapon {
         maxRange = RANGE_LONG;
         explosionDamage = damage;
         rulesRefs = "208, TM";
-        techAdvancement.setTechBase(TechBase.ALL)
+        techAdvancement.setTechBase(TechBase.IS)
               .setIntroLevel(true)
               .setTechRating(TechRating.C)
               .setAvailability(AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.D, AvailabilityValue.D)

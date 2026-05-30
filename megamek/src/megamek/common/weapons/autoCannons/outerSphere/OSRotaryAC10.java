@@ -24,10 +24,10 @@ public class OSRotaryAC10 extends RACWeapon {
 
     public OSRotaryAC10() {
         super();
-        name = "RAC/10";
+        name = "Rotary AC/10";
         setInternalName("OSRotaryAC10");
         addLookupName("OS Rotary AC/10");
-        sortingName = "AC OS 4 RAC 1 Std 10";
+        sortingName = "AC OS 4 RAC 2 Adv 10";
         setModes(new String[] { MODE_AC_SINGLE, MODE_RAC_TWO_SHOT, MODE_RAC_THREE_SHOT,
                                 MODE_RAC_FOUR_SHOT, MODE_RAC_FIVE_SHOT });
         heat = 3;
@@ -52,6 +52,6 @@ public class OSRotaryAC10 extends RACWeapon {
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
-              .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
     }
 }
