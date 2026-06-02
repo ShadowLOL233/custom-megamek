@@ -37,7 +37,7 @@ public class OSImproveHeavyGauss extends GaussWeapon {
         setInternalName("OSImproveHeavyGauss");
         addLookupName("OS Improve Heavy Gauss Rifle");
         sortingName = "Gauss OS 3 Heavy 2 Imp";
-        heat = 2;
+        heat = 3;
         damage = 22;
         rackSize = 22;
         ammoType = AmmoType.AmmoTypeEnum.GAUSS_HEAVY_OS;
@@ -48,7 +48,7 @@ public class OSImproveHeavyGauss extends GaussWeapon {
         extremeRange = 30;
         tonnage = 18.0;
         criticalSlots = 10;
-        bv = 400;
+        bv = 430;
         cost = 720000;
         shortAV = 22;
         medAV = 22;

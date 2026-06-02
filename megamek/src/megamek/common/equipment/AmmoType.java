@@ -11992,7 +11992,7 @@ public class AmmoType extends EquipmentType {
         return makeOSACAmmo("Improve AC/20", "OSImproveAC20Ammo", AmmoTypeEnum.AC_IMP_OS, 20, 6, 24, 11000);
     }
 
-    // OS LB-X ammo (shared by standard / Improve / Advance LB-X tiers); slug + cluster per caliber
+    // OS LB-X ammo (shared by standard / Improve / Ultra LB-X tiers); slug + cluster per caliber
     private static AmmoType makeOSLBXClusterAmmo(String weaponName, String internal, int rackSize, int shots,
           int bv, long cost) {
         AmmoType ammo = makeOSACAmmo(weaponName + " Cluster", internal, AmmoTypeEnum.LBX_OS, rackSize, shots, bv, cost);

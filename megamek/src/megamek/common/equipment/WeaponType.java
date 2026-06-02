@@ -1576,10 +1576,10 @@ public class WeaponType extends EquipmentType {
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAssaultAC5());
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAssaultAC10());
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAssaultAC20());
-        // OS Advance LB-X (LB-X + Ultra-style double tap)
-        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAdvanceLB5XAC());
-        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAdvanceLB10XAC());
-        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAdvanceLB20XAC());
+        // OS Ultra LB-X (LB-X + Ultra-style double tap)
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSUltraLB5XAC());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSUltraLB10XAC());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSUltraLB20XAC());
 
         // Outer Sphere (OS) Gauss Rifles
         EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSGaussRifle());

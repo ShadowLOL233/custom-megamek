@@ -23,37 +23,40 @@ import megamek.common.game.Game;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.weapons.autoCannons.LBXACWeapon;
 import megamek.common.weapons.handlers.AttackHandler;
-import megamek.common.weapons.handlers.OSAdvanceLBXHandler;
+import megamek.common.weapons.handlers.OSUltraLBXHandler;
 import megamek.server.totalWarfare.TWGameManager;
 
 /**
- * Outer Sphere Advance LB 5-X - an LB-X with an Ultra-style double tap (Single/Ultra modes)
- * plus future specialized munitions. Heat 1/shot / Range 8-16-24 / 6t / 4 crit.
+ * Outer Sphere Ultra LB 10-X - LB-X with an Ultra-style double tap plus future
+ * specialized munitions. Heat 2/shot / Range 7-14-21 / 9t / 5 crit.
  */
-public class OSAdvanceLB5XAC extends LBXACWeapon {
+public class OSUltraLB10XAC extends LBXACWeapon {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public OSAdvanceLB5XAC() {
+    public OSUltraLB10XAC() {
         super();
-        name = "Advance LB 5-X";
-        setInternalName("OSAdvanceLB5XAC");
-        addLookupName("OS Advance LB 5-X AC");
-        sortingName = "AC OS 2 LBX 3 Adv 05";
+        name = "Ultra LB 10-X";
+        setInternalName("OSUltraLB10XAC");
+        addLookupName("OS Ultra LB 10-X AC");
+        addLookupName("OSAdvanceLB10XAC");
+        addLookupName("OS Advance LB 10-X AC");
+        addLookupName("Advance LB 10-X");
+        sortingName = "AC OS 2 LBX 3 Ult 10";
         setModes(new String[] { MODE_AC_SINGLE, MODE_UAC_ULTRA });
         ammoType = AmmoType.AmmoTypeEnum.LBX_OS;
-        heat = 1;
-        damage = 5;
-        rackSize = 5;
+        heat = 2;
+        damage = 10;
+        rackSize = 10;
         minimumRange = 0;
-        shortRange = 8;
-        mediumRange = 16;
-        longRange = 24;
-        extremeRange = 32;
-        tonnage = 6.0;
-        criticalSlots = 4;
-        bv = 150;
-        cost = 420000;
+        shortRange = 7;
+        mediumRange = 14;
+        longRange = 21;
+        extremeRange = 28;
+        tonnage = 9.0;
+        criticalSlots = 5;
+        bv = 275;
+        cost = 680000;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setIntroLevel(false)
               .setUnofficial(false)
@@ -71,7 +74,7 @@ public class OSAdvanceLB5XAC extends LBXACWeapon {
     public AttackHandler getCorrectHandler(ToHitData toHit, WeaponAttackAction waa, Game game,
           TWGameManager manager) {
         try {
-            return new OSAdvanceLBXHandler(toHit, waa, game, manager);
+            return new OSUltraLBXHandler(toHit, waa, game, manager);
         } catch (EntityLoadingException ignored) {
             LOGGER.warn("Get Correct Handler - Attach Handler Received Null Entity.");
         }

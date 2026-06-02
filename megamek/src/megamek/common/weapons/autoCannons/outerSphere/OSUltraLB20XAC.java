@@ -23,23 +23,26 @@ import megamek.common.game.Game;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.weapons.autoCannons.LBXACWeapon;
 import megamek.common.weapons.handlers.AttackHandler;
-import megamek.common.weapons.handlers.OSAdvanceLBXHandler;
+import megamek.common.weapons.handlers.OSUltraLBXHandler;
 import megamek.server.totalWarfare.TWGameManager;
 
 /**
- * Outer Sphere Advance LB 20-X - LB-X with an Ultra-style double tap plus future
+ * Outer Sphere Ultra LB 20-X - LB-X with an Ultra-style double tap plus future
  * specialized munitions. Heat 5/shot / Range 5-10-15 / 12t / 8 crit.
  */
-public class OSAdvanceLB20XAC extends LBXACWeapon {
+public class OSUltraLB20XAC extends LBXACWeapon {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public OSAdvanceLB20XAC() {
+    public OSUltraLB20XAC() {
         super();
-        name = "Advance LB 20-X";
-        setInternalName("OSAdvanceLB20XAC");
+        name = "Ultra LB 20-X";
+        setInternalName("OSUltraLB20XAC");
+        addLookupName("OS Ultra LB 20-X AC");
+        addLookupName("OSAdvanceLB20XAC");
         addLookupName("OS Advance LB 20-X AC");
-        sortingName = "AC OS 2 LBX 3 Adv 20";
+        addLookupName("Advance LB 20-X");
+        sortingName = "AC OS 2 LBX 3 Ult 20";
         setModes(new String[] { MODE_AC_SINGLE, MODE_UAC_ULTRA });
         ammoType = AmmoType.AmmoTypeEnum.LBX_OS;
         heat = 5;
@@ -71,7 +74,7 @@ public class OSAdvanceLB20XAC extends LBXACWeapon {
     public AttackHandler getCorrectHandler(ToHitData toHit, WeaponAttackAction waa, Game game,
           TWGameManager manager) {
         try {
-            return new OSAdvanceLBXHandler(toHit, waa, game, manager);
+            return new OSUltraLBXHandler(toHit, waa, game, manager);
         } catch (EntityLoadingException ignored) {
             LOGGER.warn("Get Correct Handler - Attach Handler Received Null Entity.");
         }

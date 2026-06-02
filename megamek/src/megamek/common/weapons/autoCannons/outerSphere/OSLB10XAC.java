@@ -37,7 +37,7 @@ public class OSLB10XAC extends LBXACWeapon {
         longRange = 18;
         extremeRange = 24;
         tonnage = 11.0;
-        criticalSlots = 6;
+        criticalSlots = 5;
         bv = 148;
         cost = 400000;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)

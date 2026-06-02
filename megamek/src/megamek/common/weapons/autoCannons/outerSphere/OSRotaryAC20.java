@@ -16,7 +16,7 @@ import megamek.common.enums.TechRating;
 import megamek.common.weapons.autoCannons.RACWeapon;
 
 /**
- * Outer Sphere Rotary AC/20 - up to 3 shots/turn (7 heat/shot, max-fire 21 heat). Canon AC_ROTARY ammo.
+ * Outer Sphere Rotary AC/20 - up to 4 shots/turn (7 heat/shot, max-fire 28 heat). Canon AC_ROTARY ammo.
  */
 public class OSRotaryAC20 extends RACWeapon {
     @Serial
@@ -28,18 +28,18 @@ public class OSRotaryAC20 extends RACWeapon {
         setInternalName("OSRotaryAC20");
         addLookupName("OS Rotary AC/20");
         sortingName = "AC OS 4 RAC 2 Adv 20";
-        setModes(new String[] { MODE_AC_SINGLE, MODE_RAC_TWO_SHOT, MODE_RAC_THREE_SHOT });
+        setModes(new String[] { MODE_AC_SINGLE, MODE_RAC_TWO_SHOT, MODE_RAC_THREE_SHOT, MODE_RAC_FOUR_SHOT });
         heat = 7;
         damage = 20;
         rackSize = 20;
         minimumRange = 0;
-        shortRange = 3;
-        mediumRange = 6;
-        longRange = 9;
-        extremeRange = 12;
+        shortRange = 4;
+        mediumRange = 9;
+        longRange = 13;
+        extremeRange = 17;
         tonnage = 16.0;
         criticalSlots = 12;
-        bv = 420;
+        bv = 620;
         cost = 860000;
         explosionDamage = damage;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)

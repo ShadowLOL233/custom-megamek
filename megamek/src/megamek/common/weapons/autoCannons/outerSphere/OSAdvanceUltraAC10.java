@@ -13,12 +13,13 @@ import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
 import megamek.common.enums.TechRating;
-import megamek.common.weapons.autoCannons.RACWeapon;
+import megamek.common.weapons.autoCannons.UACWeapon;
 
 /**
- * Outer Sphere Advance Ultra AC/10 - fires up to 3 shots/turn. Uses canon AC_ROTARY ammo.
+ * Outer Sphere Advance Ultra AC/10 - true Ultra double-tap (Single / Ultra modes) with a
+ * -1 to-hit refinement bonus. Uses canon AC_ULTRA ammo (inherited from UACWeapon).
  */
-public class OSAdvanceUltraAC10 extends RACWeapon {
+public class OSAdvanceUltraAC10 extends UACWeapon {
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -28,7 +29,7 @@ public class OSAdvanceUltraAC10 extends RACWeapon {
         setInternalName("OSAdvanceUltraAC10");
         addLookupName("OS Advance Ultra AC/10");
         sortingName = "AC OS 3 UAC 3 Adv 10";
-        setModes(new String[] { MODE_AC_SINGLE, MODE_RAC_TWO_SHOT, MODE_RAC_THREE_SHOT });
+        toHitModifier = -1;
         heat = 3;
         damage = 10;
         rackSize = 10;
@@ -37,8 +38,8 @@ public class OSAdvanceUltraAC10 extends RACWeapon {
         mediumRange = 14;
         longRange = 20;
         extremeRange = 27;
-        tonnage = 11.0;
-        criticalSlots = 5;
+        tonnage = 10.0;
+        criticalSlots = 4;
         bv = 320;
         cost = 510000;
         explosionDamage = damage;

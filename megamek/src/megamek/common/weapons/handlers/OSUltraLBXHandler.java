@@ -19,17 +19,17 @@ import megamek.common.loaders.EntityLoadingException;
 import megamek.server.totalWarfare.TWGameManager;
 
 /**
- * Handler for the Outer Sphere Advance LB-X Autocannon: an LB-X that can fire an
+ * Handler for the Outer Sphere Ultra LB-X Autocannon: an LB-X that can fire an
  * Ultra-style double tap. Reuses the Ultra multi-shot machinery (shot count from
  * the Single/Ultra mode, ammo consumption, jam-on-snake-eyes) and layers the LB-X
  * slug/cluster behavior on top: with cluster ammo each of the (1 or 2) shots bursts
  * into a full pellet spread; with slug ammo each shot is a single full-damage hit.
  */
-public class OSAdvanceLBXHandler extends UltraWeaponHandler {
+public class OSUltraLBXHandler extends UltraWeaponHandler {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public OSAdvanceLBXHandler(ToHitData t, WeaponAttackAction w, Game g, TWGameManager m)
+    public OSUltraLBXHandler(ToHitData t, WeaponAttackAction w, Game g, TWGameManager m)
           throws EntityLoadingException {
         super(t, w, g, m);
         sSalvoType = " pellet(s) ";
@@ -47,7 +47,6 @@ public class OSAdvanceLBXHandler extends UltraWeaponHandler {
 
     @Override
     protected int calcDamagePerHit() {
-        // Cluster pellets do 1 point each; slug uses the standard Ultra full-damage path.
         if (isClusterAmmo() && !target.isConventionalInfantry()) {
             return 1;
         }
@@ -56,11 +55,9 @@ public class OSAdvanceLBXHandler extends UltraWeaponHandler {
 
     @Override
     protected int calcHits(Vector<Report> vPhaseReport) {
-        // Slug mode: how many of the (1-2) shots connect, each full damage (inherited).
         if (!isClusterAmmo()) {
             return super.calcHits(vPhaseReport);
         }
-        // Cluster mode: one infantry lump, otherwise each shot bursts into a pellet spread.
         if (target.isConventionalInfantry()) {
             return 1;
         }

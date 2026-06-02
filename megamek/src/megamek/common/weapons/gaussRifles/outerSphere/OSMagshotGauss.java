@@ -26,7 +26,7 @@ import megamek.common.weapons.handlers.AttackHandler;
 import megamek.common.weapons.handlers.GRHandler;
 import megamek.server.totalWarfare.TWGameManager;
 
-/** Outer Sphere Magshot Gauss - 2 dmg / 0.5t / 2 crit / extended range vs canon Magshot. */
+/** Outer Sphere Magshot Gauss - 3 dmg / 0.5t / 1 crit / extended range vs canon Magshot. */
 public class OSMagshotGauss extends GaussWeapon {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -38,7 +38,7 @@ public class OSMagshotGauss extends GaussWeapon {
         addLookupName("OS Magshot Gauss Rifle");
         sortingName = "MG OS 4 Gauss 2 Magshot";
         heat = 1;
-        damage = 2;
+        damage = 3;
         ammoType = AmmoType.AmmoTypeEnum.GAUSS_MAGSHOT_OS;
         minimumRange = 0;
         shortRange = 4;
@@ -46,10 +46,10 @@ public class OSMagshotGauss extends GaussWeapon {
         longRange = 12;
         extremeRange = 16;
         tonnage = 0.5;
-        criticalSlots = 2;
+        criticalSlots = 1;
         bv = 18;
         cost = 9000;
-        shortAV = 2;
+        shortAV = 3;
         maxRange = RANGE_SHORT;
         explosionDamage = 3;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)

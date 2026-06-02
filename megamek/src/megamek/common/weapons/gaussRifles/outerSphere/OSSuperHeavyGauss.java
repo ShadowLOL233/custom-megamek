@@ -26,7 +26,7 @@ import megamek.common.weapons.handlers.AttackHandler;
 import megamek.common.weapons.handlers.HGRHandler;
 import megamek.server.totalWarfare.TWGameManager;
 
-/** Outer Sphere Super-Heavy Gauss - 30 dmg / 22t / 12 crit / Experimental. The biggest single-shot gun in the line. */
+/** Outer Sphere Super-Heavy Gauss - variable 35/30/25 by range / 22t / 14 crit / Experimental. The biggest single-shot gun in the line. */
 public class OSSuperHeavyGauss extends GaussWeapon {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -37,24 +37,27 @@ public class OSSuperHeavyGauss extends GaussWeapon {
         setInternalName("OSSuperHeavyGauss");
         addLookupName("OS Super-Heavy Gauss Rifle");
         sortingName = "Gauss OS 4 Super";
-        heat = 3;
-        damage = 30;
-        rackSize = 30;
+        heat = 5;
+        damage = DAMAGE_VARIABLE;
+        rackSize = 35;
         ammoType = AmmoType.AmmoTypeEnum.GAUSS_HEAVY_OS;
         minimumRange = 4;
-        shortRange = 5;
-        mediumRange = 11;
-        longRange = 17;
-        extremeRange = 25;
+        shortRange = 6;
+        mediumRange = 13;
+        longRange = 20;
+        extremeRange = 30;
+        damageShort = 35;
+        damageMedium = 30;
+        damageLong = 25;
         tonnage = 22.0;
-        criticalSlots = 12;
-        bv = 520;
+        criticalSlots = 14;
+        bv = 582;
         cost = 1100000;
-        shortAV = 30;
+        shortAV = 35;
         medAV = 30;
-        longAV = 30;
+        longAV = 25;
         maxRange = RANGE_LONG;
-        explosionDamage = 30;
+        explosionDamage = 35;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setIntroLevel(false)
               .setUnofficial(false)
@@ -65,6 +68,13 @@ public class OSSuperHeavyGauss extends GaussWeapon {
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
               .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+    }
+
+    @Override
+    public int getDamage(int range) {
+        if (range <= shortRange) return damageShort;
+        if (range <= mediumRange) return damageMedium;
+        return damageLong;
     }
 
     @Override

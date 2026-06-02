@@ -39,7 +39,7 @@ public class OSAC10 extends ACWeapon {
         longRange = 15;
         extremeRange = 20;
         tonnage = 12.0;
-        criticalSlots = 7;
+        criticalSlots = 6;
         bv = 123;
         cost = 200000;
         shortAV = 10;

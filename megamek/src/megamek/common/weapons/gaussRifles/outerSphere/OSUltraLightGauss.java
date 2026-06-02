@@ -36,7 +36,7 @@ public class OSUltraLightGauss extends GaussWeapon {
         name = "Ultra-Light Gauss Rifle";
         setInternalName("OSUltraLightGauss");
         addLookupName("OS Ultra-Light Gauss Rifle");
-        sortingName = "Gauss OS 1 Light 2 Ultra";
+        sortingName = "Gauss OS 1 Light 1 Ultra";
         heat = 1;
         damage = 6;
         rackSize = 6;

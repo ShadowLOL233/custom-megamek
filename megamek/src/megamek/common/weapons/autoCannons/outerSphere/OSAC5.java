@@ -34,7 +34,7 @@ public class OSAC5 extends ACWeapon {
         heat = 1;
         damage = 5;
         rackSize = 5;
-        minimumRange = 3;
+        minimumRange = 0;
         shortRange = 6;
         mediumRange = 12;
         longRange = 18;
