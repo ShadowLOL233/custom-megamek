@@ -66,6 +66,7 @@ import megamek.common.interfaces.ILocationExposureStatus;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntitySavingException;
 import megamek.common.loaders.MULParser;
+import megamek.common.units.Mek;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.weapons.infantry.InfantryWeapon;
@@ -1033,6 +1034,30 @@ public class EntityListFile {
                 output.write(indentStr(indentLvl + 1) + '<' + MULParser.ELE_FUEL + ' ' + MULParser.ATTR_LEFT + "=\"");
                 output.write(String.valueOf(a.getCurrentFuel()));
                 output.write("\"/>\n");
+            }
+
+            // OS persistent counters: EARS/DDS charges (Mek) + PFD round counters (any).
+            // Emit only when any field departs its default so .mul files stay tidy.
+            int earsCharges = (entity instanceof Mek m) ? m.getEarsCharges() : 5;
+            int ddsCharges = (entity instanceof Mek m) ? m.getDdsCharges() : 8;
+            int pfdRounds = entity.getOSPFDRounds();
+            int advPfdRounds = entity.getOSAdvPFDRounds();
+            boolean earsDefault = !(entity instanceof Mek) || earsCharges == 5;
+            boolean ddsDefault = !(entity instanceof Mek) || ddsCharges == 8;
+            if (!earsDefault || !ddsDefault || pfdRounds != 0 || advPfdRounds != 0) {
+                StringBuilder os = new StringBuilder(indentStr(indentLvl + 1)).append('<').append(MULParser.ELE_OS_STATE);
+                if (entity instanceof Mek) {
+                    os.append(" ears=\"").append(earsCharges).append('"');
+                    os.append(" dds=\"").append(ddsCharges).append('"');
+                }
+                if (pfdRounds != 0) {
+                    os.append(" pfd=\"").append(pfdRounds).append('"');
+                }
+                if (advPfdRounds != 0) {
+                    os.append(" advPfd=\"").append(advPfdRounds).append('"');
+                }
+                os.append("/>\n");
+                output.write(os.toString());
             }
 
             // Write the Bomb Data if needed

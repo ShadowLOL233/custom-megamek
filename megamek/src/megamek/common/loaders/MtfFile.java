@@ -811,6 +811,9 @@ public class MtfFile implements IMekLoader {
             }
         } else if (techBase.equalsIgnoreCase("Mixed (OS Chassis)")) {
             switch (Integer.parseInt(rulesLevel.substring(12).trim())) {
+                case 1:
+                    mek.setTechLevel(TechConstants.T_OUTER_SPHERE_INTRO);
+                    break;
                 case 2:
                     mek.setTechLevel(TechConstants.T_OUTER_SPHERE_STANDARD);
                     break;

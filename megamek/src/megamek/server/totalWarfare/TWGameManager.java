@@ -16810,7 +16810,7 @@ public class TWGameManager extends AbstractGameManager {
      *   (A) 30+ total round damage → distribute repair points evenly across all damaged armor locations
      *   (B) 15+ damage to a single location → concentrate repair on those locations
      * Each trigger costs one charge; both can fire in the same round (2 charges total).
-     * Repair amount per trigger = 5% of total armor capacity, rounded to nearest integer.
+     * Repair amount per trigger = 10% of total armor capacity, rounded to nearest integer.
      */
     void resolveEARSRepairs() {
         Report r;

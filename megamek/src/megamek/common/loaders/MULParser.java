@@ -136,6 +136,7 @@ public class MULParser {
     public static final String ELE_BAY_DOORS = "doors";
     public static final String ELE_BAY_DAMAGE = "damage";
     public static final String ELE_BOMBS = "bombs";
+    public static final String ELE_OS_STATE = "osState";
     public static final String ELE_BOMB = "bomb";
     public static final String ELE_BA_MEA = "modularEquipmentMount";
     public static final String ELE_BA_APM = "antiPersonnelMount";
@@ -646,6 +647,8 @@ public class MULParser {
                     parseTankCrit(currEle, entity);
                 } else if (nodeName.equalsIgnoreCase(ELE_BOMBS)) {
                     parseBombs(currEle, entity);
+                } else if (nodeName.equalsIgnoreCase(ELE_OS_STATE)) {
+                    parseOSState(currEle, entity);
                 } else if (nodeName.equalsIgnoreCase(ELE_C3I)) {
                     parseC3I(currEle, entity);
                 } else if (nodeName.equalsIgnoreCase(ELE_NC3)) {
@@ -2140,6 +2143,36 @@ public class MULParser {
             ((Aero) entity).setHeatSinks(newSinks);
         } catch (Exception ignored) {
             warning.append("Invalid heat sink value in heat sink tag.\n");
+        }
+    }
+
+    /**
+     * Parse an osState tag for the given Entity. Carries Outer Sphere persistent
+     * counters: EARS / DDS charges (Mek only) and PFD round counters (any Entity).
+     * Attributes are all optional; missing ones leave the field at its default.
+     */
+    private void parseOSState(Element tag, Entity entity) {
+        String ears = tag.getAttribute("ears");
+        String dds = tag.getAttribute("dds");
+        String pfd = tag.getAttribute("pfd");
+        String advPfd = tag.getAttribute("advPfd");
+        if (entity instanceof Mek mek) {
+            if (!ears.isEmpty()) {
+                try { mek.setEarsCharges(Integer.parseInt(ears)); }
+                catch (NumberFormatException e) { warning.append("Invalid osState ears value.\n"); }
+            }
+            if (!dds.isEmpty()) {
+                try { mek.setDdsCharges(Integer.parseInt(dds)); }
+                catch (NumberFormatException e) { warning.append("Invalid osState dds value.\n"); }
+            }
+        }
+        if (!pfd.isEmpty()) {
+            try { entity.setOSPFDRounds(Integer.parseInt(pfd)); }
+            catch (NumberFormatException e) { warning.append("Invalid osState pfd value.\n"); }
+        }
+        if (!advPfd.isEmpty()) {
+            try { entity.setOSAdvPFDRounds(Integer.parseInt(advPfd)); }
+            catch (NumberFormatException e) { warning.append("Invalid osState advPfd value.\n"); }
         }
     }
 

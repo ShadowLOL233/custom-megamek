@@ -14382,6 +14382,10 @@ public abstract class Entity extends TurnOrdered
         return osPFDRounds;
     }
 
+    public void setOSPFDRounds(int rounds) {
+        this.osPFDRounds = rounds;
+    }
+
     /**
      * @return true if the entity has a working OS Adv. PFD switched on
      */
@@ -14399,6 +14403,10 @@ public abstract class Entity extends TurnOrdered
 
     public int getOSAdvPFDRounds() {
         return osAdvPFDRounds;
+    }
+
+    public void setOSAdvPFDRounds(int rounds) {
+        this.osAdvPFDRounds = rounds;
     }
 
     public boolean isDropping() {

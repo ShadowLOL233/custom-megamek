@@ -2913,7 +2913,13 @@ public abstract class Mek extends Entity {
      * Auto-places EARS component mounts (one per required location).
      * Normal meks: CT, LT, RT, LA, RA, LL, RL (7 locations, no head).
      * SuperHeavy meks: LT, RT, LA, RA, LL, RL (6 locations, no head or CT).
+     *
+     * @deprecated Superseded by {@code MekUtil.updateEARSComponentPlacement} in MML,
+     *             which uses {@code createSpreadMounts} on the main OS_EARS equipment instead
+     *             of stamping legacy {@code OS_EARS_COMPONENT} crits. This method is kept
+     *             only for backward-compatibility loads; do not wire new callers.
      */
+    @Deprecated
     public void addEARSComponents() {
         if (!isOuterSphere()) {
             return;
@@ -2938,7 +2944,13 @@ public abstract class Mek extends Entity {
      * Auto-places DDS component mounts (one per required location).
      * Normal meks: CT, LT, RT, LA, RA, LL, RL (7 locations, no head).
      * SuperHeavy meks: LT, RT, LA, RA, LL, RL (6 locations, no head or CT).
+     *
+     * @deprecated Superseded by {@code MekUtil.updateDDSComponentPlacement} in MML,
+     *             which uses {@code createSpreadMounts} on the main OS_DDS equipment instead
+     *             of stamping legacy {@code OS_DDS_COMPONENT} crits. This method is kept
+     *             only for backward-compatibility loads; do not wire new callers.
      */
+    @Deprecated
     public void addDDSComponents() {
         if (!isOuterSphere()) {
             return;

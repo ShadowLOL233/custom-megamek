@@ -697,6 +697,9 @@ public class MekFileParser {
         }
 
         ent.addClanCase();
+        if (ent instanceof Mek mek) {
+            mek.addOSCase();
+        }
 
         if (ent instanceof BattleArmor) {
             // now, depending on equipment and chassis, BA might be able to do leg and swarm
