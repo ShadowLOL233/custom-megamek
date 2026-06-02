@@ -97,7 +97,17 @@ public class MekBVCalculator extends HeatTrackingBVCalculator {
         } else if (structureType == T_STRUCTURE_REINFORCED) {
             typeMultiplier = 2.0;
             modifiers.add("Reinf.");
+        } else if (isOSReinforceHeavyDutyStructure(structureType)) {
+            // Reinforce stacked with Heavy-Duty: extra HP beyond what either alone gives.
+            typeMultiplier = 2.5;
+            modifiers.add("Reinf.+HD (OS)");
+        } else if (isOSReinforceStructure(structureType)) {
+            // OS Reinforce / Heavy-Duty / SH Reinforce families: HP doubling like canon Reinforced.
+            // Endo Steel/Composite hybrids fall here because Reinforce dominates effective HP.
+            typeMultiplier = 2.0;
+            modifiers.add("Reinf. (OS)");
         }
+        // OS Endo Steel / Endo Composite / Reinforce Composite (Reinf x Comp = 1.0) stay at 1.0x.
         if (hasBlueShield) {
             typeMultiplier += 0.2;
             modifiers.add("Blue Shield");
@@ -580,5 +590,25 @@ public class MekBVCalculator extends HeatTrackingBVCalculator {
         } else {
             return runMP + (int) (Math.round(Math.max(jumpMP, umuMP) / 2.0));
         }
+    }
+
+    private static boolean isOSReinforceStructure(int structureType) {
+        return structureType == EquipmentType.T_STRUCTURE_OS_IMP_REINFORCE
+              || structureType == EquipmentType.T_STRUCTURE_OS_REINFORCE_ENDO_STEEL
+              || structureType == EquipmentType.T_STRUCTURE_OS_IMP_REINFORCE_ENDO_STEEL
+              || structureType == EquipmentType.T_STRUCTURE_OS_ADV_REINFORCE_ENDO_STEEL
+              || structureType == EquipmentType.T_STRUCTURE_OS_HEAVY_DUTY
+              || structureType == EquipmentType.T_STRUCTURE_OS_HEAVY_DUTY_ENDO_STEEL
+              || structureType == EquipmentType.T_STRUCTURE_OS_SH_DUTY_ENDO_STEEL
+              || structureType == EquipmentType.T_STRUCTURE_OS_SH_REINFORCE
+              || structureType == EquipmentType.T_STRUCTURE_OS_SH_REINFORCE_ENDO_STEEL
+              || structureType == EquipmentType.T_STRUCTURE_OS_SH_REINFORCE_ENDO_COMPOSITE;
+    }
+
+    private static boolean isOSReinforceHeavyDutyStructure(int structureType) {
+        return structureType == EquipmentType.T_STRUCTURE_OS_REINFORCE_HEAVY_DUTY
+              || structureType == EquipmentType.T_STRUCTURE_OS_REINFORCE_HEAVY_DUTY_ENDO_STEEL
+              || structureType == EquipmentType.T_STRUCTURE_OS_SH_REINFORCE_HEAVY_DUTY
+              || structureType == EquipmentType.T_STRUCTURE_OS_SH_REINFORCE_HEAVY_DUTY_ENDO_STEEL;
     }
 }

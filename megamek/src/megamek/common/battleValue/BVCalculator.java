@@ -1517,10 +1517,14 @@ public abstract class BVCalculator {
                  EquipmentType.T_ARMOR_REFLECTIVE,
                  EquipmentType.T_ARMOR_BALLISTIC_REINFORCED,
                  EquipmentType.T_ARMOR_OS_REACTIVE,
-                 EquipmentType.T_ARMOR_OS_IMP_REACTIVE,
-                 EquipmentType.T_ARMOR_OS_LASER_REFLECTIVE,
                  EquipmentType.T_ARMOR_OS_BALLISTIC_REINFORCED,
                  EquipmentType.T_ARMOR_OS_ENERGY_ABSORPTION -> 1.5;
+            // OS Improve Reactive: 55% missile reduction (+5% over canon Reactive's 50%),
+            // priced at 1.5 + 0.15 per +5% reduction step.
+            case EquipmentType.T_ARMOR_OS_IMP_REACTIVE -> 1.65;
+            // OS Laser Reflective: 65% energy reduction (+15% over canon Reflective's 50%),
+            // priced at 1.5 + 0.15 per +5% reduction step.
+            case EquipmentType.T_ARMOR_OS_LASER_REFLECTIVE -> 1.85;
             case EquipmentType.T_ARMOR_FERRO_LAMELLOR,
                  EquipmentType.T_ARMOR_ANTI_PENETRATIVE_ABLATION,
                  EquipmentType.T_ARMOR_OS_FERRO_LAMELLOR,
