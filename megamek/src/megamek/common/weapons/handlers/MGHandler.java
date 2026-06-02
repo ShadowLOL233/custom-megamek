@@ -167,13 +167,13 @@ public class MGHandler extends AmmoWeaponHandler {
 
             // TacOps p.102 Rapid Fire MG Rules
             switch (weaponType.getAmmoType()) {
-                case MG:
+                case MG, MG_OS:
                     nDamPerHit = Compute.d6();
                     break;
-                case MG_HEAVY:
+                case MG_HEAVY, MG_HEAVY_OS:
                     nDamPerHit = Compute.d6() + 1;
                     break;
-                case MG_LIGHT:
+                case MG_LIGHT, MG_LIGHT_OS:
                     nDamPerHit = Math.max(1, Compute.d6() - 1);
                     break;
                 default:

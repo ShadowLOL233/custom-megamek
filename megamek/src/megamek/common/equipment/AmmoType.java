@@ -211,7 +211,15 @@ public class AmmoType extends EquipmentType {
         GAUSS_AP_OS(126, "AP Gauss Rifle (OS)", AmmoCategory.Ballistic),
         GAUSS_MAGSHOT_OS(127, "Magshot Gauss Rifle (OS)", AmmoCategory.Ballistic),
         GAUSS_LBX_OS(128, "LB-X Gauss Rifle (OS)", AmmoCategory.Ballistic),
-        HAG_OS(129, "Hyper-Assault Gauss (OS)", AmmoCategory.Ballistic);
+        HAG_OS(129, "Hyper-Assault Gauss (OS)", AmmoCategory.Ballistic),
+        // OS Machine Gun families - new enums so mixed tech can show "(OS)" suffix.
+        // MG_OS / MG_LIGHT_OS / MG_HEAVY_OS are single-shot (no rapid-fire heat coupling like Ultra/Rotary AC).
+        // MACHINE_CANNON_OS / HEAVY_MACHINE_CANNON_OS support both standard and M_FLAK munitions.
+        MG_LIGHT_OS(130, "Light Machine Gun (OS)", AmmoCategory.Ballistic),
+        MG_OS(131, "Machine Gun (OS)", AmmoCategory.Ballistic),
+        MG_HEAVY_OS(132, "Heavy Machine Gun (OS)", AmmoCategory.Ballistic),
+        MACHINE_CANNON_OS(133, "Machine Cannon (OS)", AmmoCategory.Ballistic),
+        HEAVY_MACHINE_CANNON_OS(134, "Heavy Machine Cannon (OS)", AmmoCategory.Ballistic);
 
         private static final Map<Integer, AmmoTypeEnum> INDEX_LOOKUP = new HashMap<>();
 
@@ -3111,6 +3119,14 @@ public class AmmoType extends EquipmentType {
         EquipmentType.addType(AmmoType.createOSHAG20Ammo());
         EquipmentType.addType(AmmoType.createOSHAG30Ammo());
         EquipmentType.addType(AmmoType.createOSHAG40Ammo());
+        // OS Machine Gun family ammo (3 basic MGs + 2 Machine Cannons with standard + Flak variants)
+        EquipmentType.addType(AmmoType.createOSLightMGAmmo());
+        EquipmentType.addType(AmmoType.createOSMGAmmo());
+        EquipmentType.addType(AmmoType.createOSHeavyMGAmmo());
+        EquipmentType.addType(AmmoType.createOSMachineCannonAmmo());
+        EquipmentType.addType(AmmoType.createOSMachineCannonFlakAmmo());
+        EquipmentType.addType(AmmoType.createOSHeavyMachineCannonAmmo());
+        EquipmentType.addType(AmmoType.createOSHeavyMachineCannonFlakAmmo());
         EquipmentType.addType(AmmoType.createCLAPGaussRifleAmmo());
         EquipmentType.addType(AmmoType.createCLMediumChemicalLaserAmmo());
         EquipmentType.addType(AmmoType.createCLSmallChemicalLaserAmmo());
@@ -12136,6 +12152,47 @@ public class AmmoType extends EquipmentType {
 
     private static AmmoType createOSHAG40Ammo() {
         return makeOSGaussAmmo("HAG/40", "OSHAG40Ammo", AmmoTypeEnum.HAG_OS, 1, 40, 3, 67, 50000);
+    }
+
+    // OUTER SPHERE (OS) MACHINE GUN AMMO
+    // Reuses makeOSACAmmo for the common OS-branded fields. For MGs damagePerShot=1, rackSize=damage.
+
+    private static AmmoType createOSLightMGAmmo() {
+        return makeOSACAmmo("Light Machine Gun", "OSLightMGAmmo", AmmoTypeEnum.MG_LIGHT_OS, 1, 200, 1, 1000);
+    }
+
+    private static AmmoType createOSMGAmmo() {
+        return makeOSACAmmo("Machine Gun", "OSMGAmmo", AmmoTypeEnum.MG_OS, 2, 200, 1, 1000);
+    }
+
+    private static AmmoType createOSHeavyMGAmmo() {
+        return makeOSACAmmo("Heavy Machine Gun", "OSHeavyMGAmmo", AmmoTypeEnum.MG_HEAVY_OS, 3, 100, 1, 1000);
+    }
+
+    // Machine Cannon line: standard + Flak munitions share each AmmoTypeEnum (canon-style munition switching).
+    // Flak variant marks M_FLAK so ACFlakHandler picks it up and ComputeToHit applies the flak modifiers.
+
+    private static AmmoType createOSMachineCannonAmmo() {
+        return makeOSACAmmo("Machine Cannon", "OSMachineCannonAmmo", AmmoTypeEnum.MACHINE_CANNON_OS, 3, 80, 3, 1000);
+    }
+
+    private static AmmoType createOSMachineCannonFlakAmmo() {
+        AmmoType ammo = makeOSACAmmo("Machine Cannon Flak", "OSMachineCannonFlakAmmo",
+              AmmoTypeEnum.MACHINE_CANNON_OS, 3, 80, 3, 3000);
+        ammo.munitionType = EnumSet.of(Munitions.M_FLAK);
+        return ammo;
+    }
+
+    private static AmmoType createOSHeavyMachineCannonAmmo() {
+        return makeOSACAmmo("Heavy Machine Cannon", "OSHeavyMachineCannonAmmo",
+              AmmoTypeEnum.HEAVY_MACHINE_CANNON_OS, 5, 40, 6, 2000);
+    }
+
+    private static AmmoType createOSHeavyMachineCannonFlakAmmo() {
+        AmmoType ammo = makeOSACAmmo("Heavy Machine Cannon Flak", "OSHeavyMachineCannonFlakAmmo",
+              AmmoTypeEnum.HEAVY_MACHINE_CANNON_OS, 5, 40, 6, 6000);
+        ammo.munitionType = EnumSet.of(Munitions.M_FLAK);
+        return ammo;
     }
 
     // RISC APDS

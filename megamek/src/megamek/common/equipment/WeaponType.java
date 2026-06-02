@@ -771,8 +771,14 @@ public class WeaponType extends EquipmentType {
     public static final int WEAPON_BURST_5D6 = 12;
     public static final int WEAPON_BURST_6D6 = 13;
     public static final int WEAPON_BURST_7D6 = 14;
+    // Extended burst classes above canon's 7D6 cap (used by OS Heavy Machine Cannon).
+    // Keep contiguous with WEAPON_BURST_HALF_D6 (=7) so getDamageTypeString's
+    // "damageType - WEAPON_BURST_HALF_D6" gives the correct dice count.
+    public static final int WEAPON_BURST_8D6 = 15;
+    public static final int WEAPON_BURST_9D6 = 16;
+    public static final int WEAPON_BURST_10D6 = 17;
     // Used for BA vs BA damage for BA Plasma Rifle
-    public static final int WEAPON_PLASMA = 15;
+    public static final int WEAPON_PLASMA = 18;
 
     public static final int BF_CLASS_STANDARD = 0;
     public static final int BF_CLASS_LRM = 1;
@@ -1593,6 +1599,16 @@ public class WeaponType extends EquipmentType {
         EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSLBXGauss());
         EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSImproveLBXGauss());
         EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSHeavyLBXGauss());
+
+        // Outer Sphere (OS) Machine Gun family - 3 base MGs, 2 Machine Cannons (with Flak munition support), 3 MGAs
+        EquipmentType.addType(new megamek.common.weapons.mgs.outerSphere.OSLightMG());
+        EquipmentType.addType(new megamek.common.weapons.mgs.outerSphere.OSMachineGun());
+        EquipmentType.addType(new megamek.common.weapons.mgs.outerSphere.OSHeavyMG());
+        EquipmentType.addType(new megamek.common.weapons.mgs.outerSphere.OSMachineCannon());
+        EquipmentType.addType(new megamek.common.weapons.mgs.outerSphere.OSHeavyMachineCannon());
+        EquipmentType.addType(new megamek.common.weapons.mgs.outerSphere.OSLightMGA());
+        EquipmentType.addType(new megamek.common.weapons.mgs.outerSphere.OSMGA());
+        EquipmentType.addType(new megamek.common.weapons.mgs.outerSphere.OSHeavyMGA());
 
         // Autocannons
         EquipmentType.addType(new ISAC2());

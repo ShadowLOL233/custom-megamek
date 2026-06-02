@@ -6787,6 +6787,24 @@ public class Compute {
                     damage *= 0.5;
                 }
                 break;
+            case WeaponType.WEAPON_BURST_8D6:
+                damage = Compute.d6(8 * mgaSize);
+                if (isAttackThruBuilding) {
+                    damage *= 0.5;
+                }
+                break;
+            case WeaponType.WEAPON_BURST_9D6:
+                damage = Compute.d6(9 * mgaSize);
+                if (isAttackThruBuilding) {
+                    damage *= 0.5;
+                }
+                break;
+            case WeaponType.WEAPON_BURST_10D6:
+                damage = Compute.d6(10 * mgaSize);
+                if (isAttackThruBuilding) {
+                    damage *= 0.5;
+                }
+                break;
         }
         damage = Math.ceil(damage);
 
