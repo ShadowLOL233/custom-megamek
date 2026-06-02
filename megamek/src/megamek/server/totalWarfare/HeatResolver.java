@@ -333,12 +333,20 @@ class HeatResolver extends AbstractTWRuleHandler {
             // Outer Sphere Hyper Laser: while in "Charging" mode each turn the weapon generates
             // charge heat (approx. fire heat / 3). If the weapon fired this round (firing turn),
             // the charge heat is suppressed — only the full fire heat from the actual shot applies.
+            // While cooling down (post-fire lockout), report the unavailable state so the player
+            // sees why the weapon isn't ready.
             for (WeaponMounted weapon : entity.getWeaponList()) {
-                if (weapon.getType().hasFlag(WeaponType.F_HYPER)
-                      && !weapon.isDestroyed()
-                      && !weapon.isMissing()
-                      && weapon.getHyperLaserCooldown() == 0
-                      && "Charging".equals(weapon.curMode().getName())
+                if (!weapon.getType().hasFlag(WeaponType.F_HYPER)
+                      || weapon.isDestroyed()
+                      || weapon.isMissing()) {
+                    continue;
+                }
+                if (weapon.getHyperLaserCooldown() > 0) {
+                    Report coolReport = new Report(1263);
+                    coolReport.subject = entity.getId();
+                    coolReport.indent(1);
+                    heatEffectsReports.add(coolReport);
+                } else if ("Charging".equals(weapon.curMode().getName())
                       && !weapon.isUsedThisRound()) {
                     int chargeHeat = (int) Math.ceil(weapon.getType().getHeat() / 3.0);
                     entity.heatBuildup += chargeHeat;

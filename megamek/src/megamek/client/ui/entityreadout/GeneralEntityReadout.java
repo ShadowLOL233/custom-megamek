@@ -308,6 +308,8 @@ class GeneralEntityReadout implements EntityReadout {
         String techLevel = entity.getStaticTechLevel().toString();
         if (entity.isMixedTech()) {
             techLevel += Messages.getString(entity.isClan() ? "MekView.MixedClan" : "MekView.MixedIS");
+        } else if (entity.isAscended()) {
+            techLevel += Messages.getString("MekView.Ascended");
         } else if (entity.isOuterSphere()) {
             techLevel += Messages.getString("MekView.OS");
         } else {
