@@ -3535,6 +3535,7 @@ public class TWDamageManager implements IDamageManager {
                 report = new Report(6069);
                 report.subject = entityId;
                 report.indent(3);
+                report.add(damage);
                 int reportedDamage = damage / 2;
                 if ((damage % 2) > 0) {
                     report.add(reportedDamage + ".5");
