@@ -37,9 +37,10 @@ public class OSHHAG30 extends HAGWeapon {
 
     public OSHHAG30() {
         super();
-        name = "Heavy Hyper-Assault Gauss/30";
+        name = "Heavy HAG/30";
         setInternalName("OSHHAG30");
         addLookupName("OS Heavy HAG/30");
+        addLookupName("Heavy Hyper-Assault Gauss/30");
         addLookupName("OS HHAG/30");
         sortingName = "Gauss OS 7 HHAG 30";
         ammoType = AmmoType.AmmoTypeEnum.HAG_OS;
