@@ -1596,6 +1596,8 @@ public class WeaponType extends EquipmentType {
         EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSHAG20());
         EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSHAG30());
         EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSHAG40());
+        EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSHHAG30());
+        EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSHHAG40());
         EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSLBXGauss());
         EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSImproveLBXGauss());
         EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSHeavyLBXGauss());

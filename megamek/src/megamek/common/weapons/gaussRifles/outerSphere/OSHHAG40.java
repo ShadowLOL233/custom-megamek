@@ -21,50 +21,54 @@ import megamek.common.enums.TechRating;
 import megamek.common.equipment.AmmoType;
 import megamek.common.game.Game;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.weapons.gaussRifles.GaussWeapon;
+import megamek.common.weapons.gaussRifles.HAGWeapon;
 import megamek.common.weapons.handlers.AttackHandler;
-import megamek.common.weapons.handlers.HGRHandler;
+import megamek.common.weapons.handlers.OSHHAGWeaponHandler;
 import megamek.server.totalWarfare.TWGameManager;
 
-/** Outer Sphere Improve Heavy Gauss - fixed 22 dmg (no range decay) / 18t / 10 crit. */
-public class OSImproveHeavyGauss extends GaussWeapon {
+/**
+ * Outer Sphere Heavy Hyper-Assault Gauss/40 - the heaviest cluster Gauss in the line: longer
+ * range and a denser cluster (handler adds +2 to the cluster roll), paid for with heavy tonnage,
+ * high heat and a large crit footprint. Experimental tier (TechRating G).
+ */
+public class OSHHAG40 extends HAGWeapon {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public OSImproveHeavyGauss() {
+    public OSHHAG40() {
         super();
-        name = "Improve Heavy Gauss Rifle";
-        setInternalName("OSImproveHeavyGauss");
-        addLookupName("OS Improve Heavy Gauss Rifle");
-        sortingName = "Gauss OS 3 Heavy 2 Imp";
-        heat = 3;
-        damage = 22;
-        rackSize = 22;
-        ammoType = AmmoType.AmmoTypeEnum.GAUSS_HEAVY_OS;
-        minimumRange = 3;
-        shortRange = 7;
-        mediumRange = 13;
-        longRange = 20;
-        extremeRange = 30;
-        tonnage = 18.0;
-        criticalSlots = 10;
-        bv = 430;
-        cost = 720000;
-        shortAV = 22;
-        medAV = 22;
-        longAV = 22;
+        name = "Heavy Hyper-Assault Gauss/40";
+        setInternalName("OSHHAG40");
+        addLookupName("OS Heavy HAG/40");
+        addLookupName("OS HHAG/40");
+        sortingName = "Gauss OS 7 HHAG 40";
+        ammoType = AmmoType.AmmoTypeEnum.HAG_OS;
+        heat = 10;
+        rackSize = 40;
+        minimumRange = 2;
+        shortRange = 10;
+        mediumRange = 20;
+        longRange = 30;
+        extremeRange = 40;
+        tonnage = 19.0;
+        criticalSlots = 13;
+        bv = 690;
+        cost = 950000;
+        shortAV = 28;
+        medAV = 28;
+        longAV = 28;
         maxRange = RANGE_LONG;
-        explosionDamage = 22;
+        explosionDamage = 40;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setIntroLevel(false)
               .setUnofficial(false)
-              .setTechRating(TechRating.E)
-              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
-              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setTechRating(TechRating.G)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.F)
+              .setISAdvancement(3130, 3135, 3140, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
-              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+              .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
     }
 
     @Override
@@ -72,7 +76,7 @@ public class OSImproveHeavyGauss extends GaussWeapon {
     public AttackHandler getCorrectHandler(ToHitData toHit, WeaponAttackAction waa, Game game,
           TWGameManager manager) {
         try {
-            return new HGRHandler(toHit, waa, game, manager);
+            return new OSHHAGWeaponHandler(toHit, waa, game, manager);
         } catch (EntityLoadingException ignored) {
             LOGGER.warn("Get Correct Handler - Attach Handler Received Null Entity.");
         }

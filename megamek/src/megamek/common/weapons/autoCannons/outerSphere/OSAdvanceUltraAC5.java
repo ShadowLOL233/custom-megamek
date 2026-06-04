@@ -40,7 +40,7 @@ public class OSAdvanceUltraAC5 extends UACWeapon {
         extremeRange = 32;
         tonnage = 7.0;
         criticalSlots = 4;
-        bv = 185;
+        bv = 150;
         cost = 320000;
         explosionDamage = damage;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)

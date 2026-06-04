@@ -141,7 +141,8 @@ public class Engine implements Serializable, ITechnology {
     // These are the SUPPORT VEHICLE ENGINE WEIGHT MULTIPLIERS from TM PG 127
     // (MagLev from TO:AU&E pg 62)
     // The other engine types are assumed to have a value of 0 in the array
-    // if not listed.
+    // if not listed. Sized by TechRating.values().length, so the AU's G tier
+    // auto-extends here with 0.0 defaults; populate G rows when Ascended SV engines exist.
     private static final double[][] SV_ENGINE_RATINGS = new double[NUM_ENGINE_TYPES][TechRating.values().length];
 
     static {

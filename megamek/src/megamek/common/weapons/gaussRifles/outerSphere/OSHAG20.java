@@ -16,7 +16,7 @@ import megamek.common.enums.TechRating;
 import megamek.common.equipment.AmmoType;
 import megamek.common.weapons.gaussRifles.HAGWeapon;
 
-/** Outer Sphere Hyper-Assault Gauss/20 - cluster Gauss / 10t / 6 crit. */
+/** Outer Sphere Hyper-Assault Gauss/20 - cluster Gauss / 7t / 6 crit. Cooler + longer-ranged than Clan HAG. */
 public class OSHAG20 extends HAGWeapon {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -28,16 +28,16 @@ public class OSHAG20 extends HAGWeapon {
         addLookupName("OS HAG/20");
         sortingName = "Gauss OS 6 HAG 20";
         ammoType = AmmoType.AmmoTypeEnum.HAG_OS;
-        heat = 4;
+        heat = 3;
         rackSize = 20;
         minimumRange = 2;
-        shortRange = 8;
-        mediumRange = 16;
-        longRange = 24;
-        extremeRange = 32;
-        tonnage = 10.0;
+        shortRange = 9;
+        mediumRange = 17;
+        longRange = 25;
+        extremeRange = 33;
+        tonnage = 7.0;
         criticalSlots = 6;
-        bv = 267;
+        bv = 280;
         cost = 400000;
         shortAV = 12;
         medAV = 12;
@@ -47,7 +47,7 @@ public class OSHAG20 extends HAGWeapon {
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setIntroLevel(false)
               .setUnofficial(false)
-              .setTechRating(TechRating.F)
+              .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)

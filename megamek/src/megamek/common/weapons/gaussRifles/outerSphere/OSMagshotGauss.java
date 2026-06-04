@@ -47,7 +47,7 @@ public class OSMagshotGauss extends GaussWeapon {
         extremeRange = 16;
         tonnage = 0.5;
         criticalSlots = 1;
-        bv = 18;
+        bv = 27;
         cost = 9000;
         shortAV = 3;
         maxRange = RANGE_SHORT;
@@ -55,7 +55,7 @@ public class OSMagshotGauss extends GaussWeapon {
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setIntroLevel(false)
               .setUnofficial(false)
-              .setTechRating(TechRating.F)
+              .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)

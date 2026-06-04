@@ -45,7 +45,12 @@ public enum TechRating {
     C(2, "C"),
     D(3, "D"),
     E(4, "E"),
-    F(5, "F");
+    F(5, "F"),
+    /**
+     * Beyond-Clan tech tier for the Outer Sphere / Ascended AU. Holds OS Experimental-grade
+     * equipment and (future) Ascended gear that exceeds canon's F ceiling.
+     */
+    G(6, "G");
 
     private static final MMLogger logger = MMLogger.create(TechRating.class);
 
@@ -106,7 +111,7 @@ public enum TechRating {
     public static TechRating fromIndex(int idx) {
         TechRating tr = INDEX_LOOKUP.get(idx);
         if (tr == null) {
-            logger.warn("Invalid TechRating index: {} (valid range 0-5). Defaulting to C.", idx);
+            logger.warn("Invalid TechRating index: {} (valid range 0-6). Defaulting to C.", idx);
             return C;
         }
         return tr;
