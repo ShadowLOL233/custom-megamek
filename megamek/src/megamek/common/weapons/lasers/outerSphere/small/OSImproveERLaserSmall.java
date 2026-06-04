@@ -42,14 +42,14 @@ public class OSImproveERLaserSmall extends LaserWeapon {
         waterExtremeRange = 5;
         tonnage = 0.5;
         criticalSlots = 1;
-        bv = 32;
+        bv = 28;
         cost = 30000;
         shortAV = 5;
         maxRange = RANGE_SHORT;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setIntroLevel(false)
               .setUnofficial(false)
-              .setTechRating(TechRating.F)
+              .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(3125, 3130, 3135, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)

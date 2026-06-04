@@ -58,7 +58,7 @@ public class OSEMPPlasmaAccelerator extends AmmoWeapon {
         criticalSlots = 3;
         flags = flags.or(F_MEK_WEAPON).or(F_TANK_WEAPON).or(F_AERO_WEAPON)
               .or(F_DIRECT_FIRE).or(F_ENERGY);
-        bv = 250;
+        bv = 190;
         cost = 500000;
         shortAV = 0;
         maxRange = RANGE_MED;
@@ -66,7 +66,7 @@ public class OSEMPPlasmaAccelerator extends AmmoWeapon {
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setIntroLevel(false)
               .setUnofficial(false)
-              .setTechRating(TechRating.F)
+              .setTechRating(TechRating.G)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(3130, 3135, 3140, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)

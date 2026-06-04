@@ -46,7 +46,7 @@ public class OSERHeavyPPC extends PPCWeapon {
         waterExtremeRange = 18;
         tonnage = 9.0;
         criticalSlots = 4;
-        bv = 400;
+        bv = 420;
         cost = 700000;
         shortAV = 18;
         medAV = 18;

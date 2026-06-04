@@ -45,13 +45,13 @@ public class OSHeavyFlamer extends FlamerWeapon {
         tonnage = 1.5;
         criticalSlots = 1;
         bv = 30;
-        cost = 13500;
+        cost = 16000;
         shortAV = 5;
         maxRange = RANGE_SHORT;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setIntroLevel(false)
               .setUnofficial(false)
-              .setTechRating(TechRating.F)
+              .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)

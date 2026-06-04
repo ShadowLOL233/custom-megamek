@@ -44,7 +44,7 @@ public class OSERHeavyLaserSmall extends LaserWeapon {
         waterExtremeRange = 4;
         tonnage = 1.5;
         criticalSlots = 1;
-        bv = 22;
+        bv = 26;
         cost = 40000;
         shortAV = 6;
         maxRange = RANGE_SHORT;

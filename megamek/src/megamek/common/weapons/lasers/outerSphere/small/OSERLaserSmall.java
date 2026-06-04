@@ -55,14 +55,14 @@ public class OSERLaserSmall extends LaserWeapon {
         waterExtremeRange = 4;
         tonnage = 0.5;
         criticalSlots = 1;
-        bv = 25;
+        bv = 22;
         cost = 20000;
         shortAV = 4;
         maxRange = RANGE_SHORT;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setIntroLevel(false)
               .setUnofficial(false)
-              .setTechRating(TechRating.F)
+              .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(3120, 3125, 3130, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
