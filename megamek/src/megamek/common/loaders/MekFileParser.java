@@ -392,7 +392,8 @@ public class MekFileParser {
                 }
             } else if (m.getType().hasFlag(MiscType.F_ARTEMIS) ||
                   m.getType().hasFlag(MiscType.F_ARTEMIS_V) ||
-                  m.getType().hasFlag(MiscType.F_ARTEMIS_PROTO)) {
+                  m.getType().hasFlag(MiscType.F_ARTEMIS_PROTO) ||
+                  m.getType().hasFlag(MiscType.F_ORION_V)) {
 
                 // link up to a weapon in the same location
                 for (Mounted<?> mWeapon : ent.getTotalWeaponList()) {
@@ -472,8 +473,8 @@ public class MekFileParser {
                 }
             } // End link-PPC Capacitor
 
-            // Link MRM Apollo fire-control systems to their missile racks.
-            else if (m.getType().hasFlag(MiscType.F_APOLLO)) {
+            // Link MRM Apollo / OS Diana III fire-control systems to their missile racks.
+            else if (m.getType().hasFlag(MiscType.F_APOLLO) || m.getType().hasFlag(MiscType.F_DIANA_III)) {
 
                 // link up to a weapon in the same location
                 for (Mounted<?> mWeapon : ent.getTotalWeaponList()) {

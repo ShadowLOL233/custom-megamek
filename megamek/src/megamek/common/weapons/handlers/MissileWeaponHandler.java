@@ -205,6 +205,33 @@ public class MissileWeaponHandler extends AmmoWeaponHandler {
         } else if (((mLinker != null)
               && (mLinker.getType() instanceof MiscType)
               && !mLinker.isDestroyed() && !mLinker.isMissing()
+              && !mLinker.isBreached() && mLinker.getType().hasFlag(MiscType.F_ORION_V))
+              && (ammoType.getMunitionType().contains(AmmoType.Munitions.M_ARTEMIS_CAPABLE))) {
+            // OS Orion V integration FCS: +3 cluster on guided missiles (vs Artemis IV's +2).
+            if (bECMAffected) {
+                Report r = new Report(3330);
+                r.subject = subjectId;
+                r.newlines = 0;
+                vPhaseReport.addElement(r);
+            } else if (bMekTankStealthActive) {
+                Report r = new Report(3335);
+                r.subject = subjectId;
+                r.newlines = 0;
+                vPhaseReport.addElement(r);
+            } else {
+                nMissilesModifier += 3;
+            }
+        } else if (((mLinker != null)
+              && (mLinker.getType() instanceof MiscType)
+              && !mLinker.isDestroyed() && !mLinker.isMissing()
+              && !mLinker.isBreached() && mLinker.getType().hasFlag(MiscType.F_DIANA_III))
+              && (ammoType.getAmmoType() == AmmoType.AmmoTypeEnum.MRM)) {
+            // OS Diana III MRM FCS: cluster bonus (the additional -1 to-hit is applied where the OS
+            // MRM weapon resolves its attack roll).
+            nMissilesModifier += 2;
+        } else if (((mLinker != null)
+              && (mLinker.getType() instanceof MiscType)
+              && !mLinker.isDestroyed() && !mLinker.isMissing()
               && !mLinker.isBreached() && mLinker.getType().hasFlag(MiscType.F_APOLLO))
               && (ammoType.getAmmoType() == AmmoType.AmmoTypeEnum.MRM)) {
             // PLAYTEST3 MRM + apollo

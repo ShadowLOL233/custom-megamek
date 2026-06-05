@@ -129,6 +129,9 @@ public class MiscType extends EquipmentType {
     public static final MiscTypeFlag F_PARTIAL_WING = MiscTypeFlag.F_PARTIAL_WING;
     public static final MiscTypeFlag F_FERRO_LAMELLOR = MiscTypeFlag.F_FERRO_LAMELLOR;
     public static final MiscTypeFlag F_ARTEMIS_V = MiscTypeFlag.F_ARTEMIS_V;
+    // Outer Sphere (OS) missile fire-control systems
+    public static final MiscTypeFlag F_DIANA_III = MiscTypeFlag.F_DIANA_III;
+    public static final MiscTypeFlag F_ORION_V = MiscTypeFlag.F_ORION_V;
     // TODO: Implement me, so far only construction data
     public static final MiscTypeFlag F_TRACKS = MiscTypeFlag.F_TRACKS;
     // TODO: Implement me, so far only construction data
@@ -1642,6 +1645,10 @@ public class MiscType extends EquipmentType {
         EquipmentType.addType(MiscType.createNC3());
         EquipmentType.addType(MiscType.createISArtemis());
         EquipmentType.addType(MiscType.createCLArtemis());
+        // Outer Sphere (OS) missile fire-control systems
+        EquipmentType.addType(MiscType.createOSArtemis());
+        EquipmentType.addType(MiscType.createOSDianaIII());
+        EquipmentType.addType(MiscType.createOSOrionV());
         EquipmentType.addType(MiscType.createGECM());
         EquipmentType.addType(MiscType.createGECMPrototype());
         EquipmentType.addType(MiscType.createCLECM());
@@ -6616,6 +6623,108 @@ public class MiscType extends EquipmentType {
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.DC)
               .setProductionFactions(Faction.DC);
+        return misc;
+    }
+
+    // Outer Sphere (OS) Artemis IV FCS: identical to canon Artemis IV (F_ARTEMIS, +2 cluster) but
+    // on the OS tech base so Outer Sphere units may mount it. Display name matches canon.
+    public static MiscType createOSArtemis() {
+        MiscType misc = new MiscType();
+
+        misc.name = "Artemis IV FCS";
+        misc.setInternalName("OSArtemisIV");
+        misc.addLookupName("OS Artemis IV FCS");
+        misc.tonnage = 1.0f;
+        misc.criticalSlots = 1;
+        misc.tankSlots = 0;
+        misc.cost = 100000;
+        misc.flags = misc.flags.or(F_ARTEMIS,
+              F_WEAPON_ENHANCEMENT,
+              F_MEK_EQUIPMENT,
+              F_TANK_EQUIPMENT,
+              F_SUPPORT_TANK_EQUIPMENT,
+              F_FIGHTER_EQUIPMENT,
+              F_HEAVY_EQUIPMENT);
+        misc.rulesRefs = "206, TM";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setIntroLevel(false)
+              .setUnofficial(false)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
+              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+        return misc;
+    }
+
+    // Outer Sphere (OS) Diana III FCS: MRM-dedicated, replaces/upgrades the IS Apollo. Grants the
+    // OS MRM both a cluster bonus and an additional -1 to-hit (the to-hit half is applied where the
+    // OS MRM weapon resolves its attack roll; the cluster half is applied in MissileWeaponHandler).
+    public static MiscType createOSDianaIII() {
+        MiscType misc = new MiscType();
+
+        misc.name = "Diana III FCS";
+        misc.setInternalName("OSDianaIII");
+        misc.addLookupName("OS Diana III FCS");
+        misc.addLookupName("Diana III MRM FCS");
+        misc.tonnage = 1.0f;
+        misc.criticalSlots = 1;
+        misc.tankSlots = 0;
+        misc.cost = 150000;
+        misc.flags = misc.flags.or(F_DIANA_III,
+              F_WEAPON_ENHANCEMENT,
+              F_MEK_EQUIPMENT,
+              F_TANK_EQUIPMENT,
+              F_SUPPORT_TANK_EQUIPMENT,
+              F_FIGHTER_EQUIPMENT,
+              F_HEAVY_EQUIPMENT);
+        misc.rulesRefs = "OS";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setIntroLevel(false)
+              .setUnofficial(false)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
+              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        return misc;
+    }
+
+    // Outer Sphere (OS) Orion V FCS: high-end integration FCS. On cluster missiles it grants +3
+    // (vs Artemis IV's +2); on Streak launchers it instead assists the lock (handled by the Streak
+    // handler: -1 to the lock roll and immunity to standard ECM lock-breaking).
+    public static MiscType createOSOrionV() {
+        MiscType misc = new MiscType();
+
+        misc.name = "Orion V FCS";
+        misc.setInternalName("OSOrionV");
+        misc.addLookupName("OS Orion V FCS");
+        misc.tonnage = 1.5f;
+        misc.criticalSlots = 2;
+        misc.tankSlots = 0;
+        misc.cost = 250000;
+        misc.flags = misc.flags.or(F_ORION_V,
+              F_WEAPON_ENHANCEMENT,
+              F_MEK_EQUIPMENT,
+              F_TANK_EQUIPMENT,
+              F_SUPPORT_TANK_EQUIPMENT,
+              F_FIGHTER_EQUIPMENT,
+              F_HEAVY_EQUIPMENT);
+        misc.rulesRefs = "OS";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setIntroLevel(false)
+              .setUnofficial(false)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
+              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
         return misc;
     }
 

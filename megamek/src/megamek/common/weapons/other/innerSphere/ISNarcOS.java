@@ -69,7 +69,7 @@ public class ISNarcOS extends NarcWeapon {
         cost = 100000;
         rulesRefs = "232, TM";
         techAdvancement
-              .setTechBase(TechBase.ALL)
+              .setTechBase(TechBase.IS)
               .setIntroLevel(false)
               .setUnofficial(false)
               .setTechRating(TechRating.E)

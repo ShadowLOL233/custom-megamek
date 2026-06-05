@@ -1,0 +1,62 @@
+/*
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MegaMek.
+ */
+
+package megamek.common.weapons.missiles.outerSphere;
+
+import java.io.Serial;
+
+import megamek.common.SimpleTechLevel;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.Faction;
+import megamek.common.enums.TechBase;
+import megamek.common.enums.TechRating;
+import megamek.common.weapons.lrms.StreakLRMWeapon;
+
+/** Outer Sphere Extended Streak LRM 10 - lock-on full salvo at extended 12/22/38 reach. */
+public class OSExtendedStreakLRM10 extends StreakLRMWeapon {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    public OSExtendedStreakLRM10() {
+        super();
+        name = "Extended Streak LRM 10";
+        setInternalName("OSExtendedStreakLRM10");
+        addLookupName("OS Extended Streak LRM-10");
+        addLookupName("OS Extended Streak LRM 10");
+        sortingName = "Missile OS 1 4 3 10";
+        heat = 6;
+        rackSize = 10;
+        minimumRange = 10;
+        shortRange = 12;
+        mediumRange = 22;
+        longRange = 38;
+        extremeRange = 57;
+        tonnage = 8.0;
+        criticalSlots = 4;
+        bv = 200;
+        cost = 200000;
+        shortAV = 10;
+        medAV = 10;
+        longAV = 10;
+        extAV = 10;
+        maxRange = RANGE_EXT;
+        techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setIntroLevel(false)
+              .setUnofficial(false)
+              .setTechRating(TechRating.G)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.F)
+              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+    }
+
+    @Override
+    public String getSortingName() {
+        return sortingName;
+    }
+}

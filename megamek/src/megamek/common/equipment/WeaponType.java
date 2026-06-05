@@ -1612,6 +1612,110 @@ public class WeaponType extends EquipmentType {
         EquipmentType.addType(new megamek.common.weapons.mgs.outerSphere.OSMGA());
         EquipmentType.addType(new megamek.common.weapons.mgs.outerSphere.OSHeavyMGA());
 
+        // Outer Sphere (OS) LRM family - Improve / Advance / ER tiers (reuse canon LRM/EXLRM ammo)
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveLRM5());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveLRM10());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveLRM15());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveLRM20());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSAdvanceLRM5());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSAdvanceLRM10());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSAdvanceLRM15());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSAdvanceLRM20());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSERLRM10());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSERLRM15());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSERLRM20());
+        // OS Heavy LRM (double-fire: two volleys per turn, 2x ammo + 2x heat)
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSHeavyLRM10());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSHeavyLRM20());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSHeavyLRM30());
+
+        // Outer Sphere (OS) SRM family - Improve / Advance / Heavy(double-fire) tiers
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveSRM2());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveSRM4());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveSRM6());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSAdvanceSRM2());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSAdvanceSRM4());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSAdvanceSRM6());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSHeavySRM4());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSHeavySRM6());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSHeavySRM8());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSHeavySRM12());
+
+        // Outer Sphere (OS) MML family - base(better than IS) / Improve / Heavy(double-fire)
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSMML3());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSMML5());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSMML7());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSMML9());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveMML5());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveMML7());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveMML9());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveMML11());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSHeavyMML5());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSHeavyMML8());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSHeavyMML11());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSHeavyMML14());
+
+        // Outer Sphere (OS) Dragon Piercer family (renamed Thunderbolt) - concentrated + breach crit
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSDragonPiercer5());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSDragonPiercer10());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSDragonPiercer15());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSDragonPiercer20());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveDragonPiercer5());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveDragonPiercer10());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveDragonPiercer15());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveDragonPiercer20());
+
+        // Outer Sphere (OS) ATM family - MML upper-tier specialization (SRTM/APTM/LRTM payloads)
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSATM3());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSATM6());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSATM9());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSATM12());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveATM3());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveATM6());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveATM9());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveATM12());
+
+        // Outer Sphere (OS) MRM family - precise mid-range LRM (no base; Improve only) + Streak (later)
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveMRM10());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveMRM20());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveMRM30());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveMRM40());
+
+        // Outer Sphere (OS) Streak LRM - base / Improve / Extended (lock-on, all-or-nothing)
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSStreakLRM5());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSStreakLRM10());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSStreakLRM15());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSStreakLRM20());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveStreakLRM5());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveStreakLRM10());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveStreakLRM15());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveStreakLRM20());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSExtendedStreakLRM10());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSExtendedStreakLRM15());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSExtendedStreakLRM20());
+        // Outer Sphere (OS) Streak SRM - base / Improve (lock-on, all-or-nothing)
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSStreakSRM2());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSStreakSRM4());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSStreakSRM6());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSStreakSRM8());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveStreakSRM2());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveStreakSRM4());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveStreakSRM6());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveStreakSRM8());
+        // Outer Sphere (OS) Streak MRM (lock-on full salvo) + Streak MML (dual-mode lock-on)
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSStreakMRM10());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSStreakMRM20());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSStreakMRM30());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSStreakMML5());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSStreakMML7());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSStreakMML9());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSStreakMML11());
+
+        // Outer Sphere (OS) Narc beacon family - Narc / Seeker (lightweight) / Munin (multi-pod)
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSNarc());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSSeekerBeacon());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSMuninBeacon());
+
         // Autocannons
         EquipmentType.addType(new ISAC2());
         EquipmentType.addType(new ISAC5());

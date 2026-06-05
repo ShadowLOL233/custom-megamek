@@ -1,0 +1,62 @@
+/*
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MegaMek.
+ */
+
+package megamek.common.weapons.missiles.outerSphere;
+
+import java.io.Serial;
+
+import megamek.common.SimpleTechLevel;
+import megamek.common.enums.AvailabilityValue;
+import megamek.common.enums.Faction;
+import megamek.common.enums.TechBase;
+import megamek.common.enums.TechRating;
+import megamek.common.weapons.lrms.StreakLRMWeapon;
+
+/** Outer Sphere Extended Streak LRM 15 - lock-on full salvo at extended 12/22/38 reach. */
+public class OSExtendedStreakLRM15 extends StreakLRMWeapon {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    public OSExtendedStreakLRM15() {
+        super();
+        name = "Extended Streak LRM 15";
+        setInternalName("OSExtendedStreakLRM15");
+        addLookupName("OS Extended Streak LRM-15");
+        addLookupName("OS Extended Streak LRM 15");
+        sortingName = "Missile OS 1 4 3 15";
+        heat = 9;
+        rackSize = 15;
+        minimumRange = 10;
+        shortRange = 12;
+        mediumRange = 22;
+        longRange = 38;
+        extremeRange = 57;
+        tonnage = 11.0;
+        criticalSlots = 6;
+        bv = 300;
+        cost = 300000;
+        shortAV = 15;
+        medAV = 15;
+        longAV = 15;
+        extAV = 15;
+        maxRange = RANGE_EXT;
+        techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setIntroLevel(false)
+              .setUnofficial(false)
+              .setTechRating(TechRating.G)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.F)
+              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+    }
+
+    @Override
+    public String getSortingName() {
+        return sortingName;
+    }
+}

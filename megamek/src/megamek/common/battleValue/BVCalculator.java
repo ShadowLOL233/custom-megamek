@@ -857,6 +857,12 @@ public abstract class BVCalculator {
                 } else if (linkedBy.getType().hasFlag(MiscType.F_ARTEMIS_V)) {
                     weaponBV *= 1.3;
                     calculation += " x 1.3 (Art-V)";
+                } else if (linkedBy.getType().hasFlag(MiscType.F_ORION_V)) {
+                    weaponBV *= 1.3;
+                    calculation += " x 1.3 (Orion V)";
+                } else if (linkedBy.getType().hasFlag(MiscType.F_DIANA_III)) {
+                    weaponBV *= 1.25;
+                    calculation += " x 1.25 (Diana III)";
                 } else if (linkedBy.getType().hasFlag(MiscType.F_RISC_LASER_PULSE_MODULE) ||
                       linkedBy.getType().hasFlag(MiscType.F_APOLLO)) {
                     weaponBV *= 1.15;

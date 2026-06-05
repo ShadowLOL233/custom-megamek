@@ -69,7 +69,7 @@ public class ISLRM10OS extends LRMWeapon {
         longAV = 6;
         maxRange = RANGE_LONG;
         rulesRefs = "230, TM";
-        techAdvancement.setTechBase(TechBase.ALL)
+        techAdvancement.setTechBase(TechBase.IS)
               .setIntroLevel(false)
               .setUnofficial(false)
               .setTechRating(TechRating.C)

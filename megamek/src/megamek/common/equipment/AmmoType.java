@@ -3127,6 +3127,67 @@ public class AmmoType extends EquipmentType {
         EquipmentType.addType(AmmoType.createOSMachineCannonFlakAmmo());
         EquipmentType.addType(AmmoType.createOSHeavyMachineCannonAmmo());
         EquipmentType.addType(AmmoType.createOSHeavyMachineCannonFlakAmmo());
+        // Outer Sphere (OS) missile ammo for new rack sizes not present in canon
+        // (reuses canon ammoType enums so engine handlers/FCS behave normally)
+        EquipmentType.addType(AmmoType.createOSLRM30Ammo());
+        EquipmentType.addType(AmmoType.createOSHeavySRM8Ammo());
+        EquipmentType.addType(AmmoType.createOSHeavySRM12Ammo());
+        EquipmentType.addType(AmmoType.createOSMML8LRMAmmo());
+        EquipmentType.addType(AmmoType.createOSMML8SRMAmmo());
+        EquipmentType.addType(AmmoType.createOSMML11LRMAmmo());
+        EquipmentType.addType(AmmoType.createOSMML11SRMAmmo());
+        EquipmentType.addType(AmmoType.createOSMML14LRMAmmo());
+        EquipmentType.addType(AmmoType.createOSMML14SRMAmmo());
+        // OS ATM ammo (SRTM / APTM / LRTM payloads)
+        EquipmentType.addType(AmmoType.createOSSRTM3Ammo());
+        EquipmentType.addType(AmmoType.createOSSRTM6Ammo());
+        EquipmentType.addType(AmmoType.createOSSRTM9Ammo());
+        EquipmentType.addType(AmmoType.createOSSRTM12Ammo());
+        EquipmentType.addType(AmmoType.createOSAPTM3Ammo());
+        EquipmentType.addType(AmmoType.createOSAPTM6Ammo());
+        EquipmentType.addType(AmmoType.createOSAPTM9Ammo());
+        EquipmentType.addType(AmmoType.createOSAPTM12Ammo());
+        EquipmentType.addType(AmmoType.createOSLRTM3Ammo());
+        EquipmentType.addType(AmmoType.createOSLRTM6Ammo());
+        EquipmentType.addType(AmmoType.createOSLRTM9Ammo());
+        EquipmentType.addType(AmmoType.createOSLRTM12Ammo());
+        // OS MML ammo for canon rack sizes 3/5/7/9 (canon MML ammo is OS-rejected)
+        EquipmentType.addType(AmmoType.createOSMML3LRMAmmo());
+        EquipmentType.addType(AmmoType.createOSMML3SRMAmmo());
+        EquipmentType.addType(AmmoType.createOSMML5LRMAmmo());
+        EquipmentType.addType(AmmoType.createOSMML5SRMAmmo());
+        EquipmentType.addType(AmmoType.createOSMML7LRMAmmo());
+        EquipmentType.addType(AmmoType.createOSMML7SRMAmmo());
+        EquipmentType.addType(AmmoType.createOSMML9LRMAmmo());
+        EquipmentType.addType(AmmoType.createOSMML9SRMAmmo());
+        // OS ER-LRM ammo + OS Dragon Piercer ammo (canon equivalents are OS-rejected)
+        EquipmentType.addType(AmmoType.createOSERLRM10Ammo());
+        EquipmentType.addType(AmmoType.createOSERLRM15Ammo());
+        EquipmentType.addType(AmmoType.createOSERLRM20Ammo());
+        EquipmentType.addType(AmmoType.createOSDragonPiercer5Ammo());
+        EquipmentType.addType(AmmoType.createOSDragonPiercer10Ammo());
+        EquipmentType.addType(AmmoType.createOSDragonPiercer15Ammo());
+        EquipmentType.addType(AmmoType.createOSDragonPiercer20Ammo());
+        // OS MRM ammo (canon MRM ammo is OS-rejected)
+        EquipmentType.addType(AmmoType.createOSMRM10Ammo());
+        EquipmentType.addType(AmmoType.createOSMRM20Ammo());
+        EquipmentType.addType(AmmoType.createOSMRM30Ammo());
+        EquipmentType.addType(AmmoType.createOSMRM40Ammo());
+        // OS Streak ammo (canon Streak ammo is OS-rejected)
+        EquipmentType.addType(AmmoType.createOSStreakLRM5Ammo());
+        EquipmentType.addType(AmmoType.createOSStreakLRM10Ammo());
+        EquipmentType.addType(AmmoType.createOSStreakLRM15Ammo());
+        EquipmentType.addType(AmmoType.createOSStreakLRM20Ammo());
+        EquipmentType.addType(AmmoType.createOSStreakSRM2Ammo());
+        EquipmentType.addType(AmmoType.createOSStreakSRM4Ammo());
+        EquipmentType.addType(AmmoType.createOSStreakSRM6Ammo());
+        EquipmentType.addType(AmmoType.createOSStreakSRM8Ammo());
+        // OS Narc / Munin beacon ammo
+        EquipmentType.addType(AmmoType.createOSNarcAmmo());
+        EquipmentType.addType(AmmoType.createOSMuninAmmo());
+        EquipmentType.addType(AmmoType.createOSMuninECMAmmo());
+        EquipmentType.addType(AmmoType.createOSMuninHaywireAmmo());
+        EquipmentType.addType(AmmoType.createOSMuninNemesisAmmo());
         EquipmentType.addType(AmmoType.createCLAPGaussRifleAmmo());
         EquipmentType.addType(AmmoType.createCLMediumChemicalLaserAmmo());
         EquipmentType.addType(AmmoType.createCLSmallChemicalLaserAmmo());
@@ -11991,6 +12052,254 @@ public class AmmoType extends EquipmentType {
     private static AmmoType createOSImproveAC20Ammo() {
         return makeOSACAmmo("Improve AC/20", "OSImproveAC20Ammo", AmmoTypeEnum.AC_IMP_OS, 20, 6, 24, 11000);
     }
+
+    // Outer Sphere missile ammo for new rack sizes absent from canon. Reuses the canon ammoType
+    // enum (e.g. LRM/SRM) so engine handlers, Artemis/Narc bonuses, etc. all behave normally; only
+    // the rackSize differs. TechBase OUTER_SPHERE keeps it out of IS/Clan unit lists.
+    private static AmmoType makeOSClusterMissileAmmo(String name, String shortName, String internal,
+          AmmoTypeEnum type, int rackSize, int damagePerShot, int shots, int bv, long cost) {
+        AmmoType ammo = new AmmoType();
+        ammo.name = name + " Ammo";
+        ammo.shortName = shortName;
+        ammo.setInternalName(internal);
+        ammo.addLookupName("OS " + name + " Ammo");
+        ammo.damagePerShot = damagePerShot;
+        ammo.rackSize = rackSize;
+        ammo.ammoType = type;
+        ammo.shots = shots;
+        ammo.bv = bv;
+        ammo.cost = cost;
+        ammo.flags = ammo.flags.or(F_HOTLOAD);
+        ammo.setModes("", "HotLoad");
+        ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setIntroLevel(false)
+              .setUnofficial(false)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
+              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION);
+        return ammo;
+    }
+
+    private static AmmoType createOSLRM30Ammo() {
+        return makeOSClusterMissileAmmo("Heavy LRM 30", "Heavy LRM 30", "OSHeavyLRM30Ammo",
+              AmmoTypeEnum.LRM, 30, 1, 4, 35, 45000);
+    }
+
+    private static AmmoType createOSHeavySRM8Ammo() {
+        return makeOSClusterMissileAmmo("Heavy SRM 8", "Heavy SRM 8", "OSHeavySRM8Ammo",
+              AmmoTypeEnum.SRM, 8, 2, 10, 9, 36000);
+    }
+
+    private static AmmoType createOSHeavySRM12Ammo() {
+        return makeOSClusterMissileAmmo("Heavy SRM 12", "Heavy SRM 12", "OSHeavySRM12Ammo",
+              AmmoTypeEnum.SRM, 12, 2, 7, 14, 54000);
+    }
+
+    // OS MML ammo for new rack sizes (canon MML only covers 3/5/7/9). Reuses ammoType MML with the
+    // F_MML_LRM / F_MML_SRM sub-type flags so the MML dual-mode dispatch works as normal.
+    private static AmmoType makeOSMMLAmmo(int rackSize, boolean lrm, int shots, int bv, long cost) {
+        AmmoType ammo = new AmmoType();
+        String mode = lrm ? "LRM" : "SRM";
+        ammo.name = "MML " + rackSize + " " + mode + " Ammo";
+        ammo.shortName = "MML " + rackSize + "/" + mode;
+        ammo.setInternalName("OSMML" + rackSize + mode + "Ammo");
+        ammo.addLookupName("OS MML-" + rackSize + " " + mode + " Ammo");
+        ammo.damagePerShot = lrm ? 1 : 2;
+        ammo.rackSize = rackSize;
+        ammo.ammoType = AmmoTypeEnum.MML;
+        ammo.shots = shots;
+        ammo.bv = bv;
+        ammo.cost = cost;
+        ammo.flags = ammo.flags.or(F_HOTLOAD).or(lrm ? F_MML_LRM : F_MML_SRM);
+        ammo.setModes("", "HotLoad");
+        ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setIntroLevel(false)
+              .setUnofficial(false)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
+              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION);
+        return ammo;
+    }
+
+    private static AmmoType createOSMML8LRMAmmo() {
+        return makeOSMMLAmmo(8, true, 15, 9, 48000);
+    }
+
+    private static AmmoType createOSMML8SRMAmmo() {
+        return makeOSMMLAmmo(8, false, 12, 9, 48000);
+    }
+
+    private static AmmoType createOSMML11LRMAmmo() {
+        return makeOSMMLAmmo(11, true, 11, 12, 66000);
+    }
+
+    private static AmmoType createOSMML11SRMAmmo() {
+        return makeOSMMLAmmo(11, false, 9, 12, 66000);
+    }
+
+    private static AmmoType createOSMML14LRMAmmo() {
+        return makeOSMMLAmmo(14, true, 8, 16, 84000);
+    }
+
+    private static AmmoType createOSMML14SRMAmmo() {
+        return makeOSMMLAmmo(14, false, 7, 16, 84000);
+    }
+
+    // OS ATM ammo (canon ATM ammo is Clan-tech and illegal for OS units, so OS needs its own).
+    // Three OS payloads map onto the canon ATM munitions: SRTM=HE(3 dmg), APTM=standard(2 dmg),
+    // LRTM=ER(1 dmg). The bespoke effects (SRTM tandem-breach, APTM/LRTM -1 to-hit, LRTM streak)
+    // are layered on later via a custom handler; the damage/range backbone uses the canon ATMHandler.
+    private static AmmoType makeOSATMAmmo(String osName, int rackSize, int damage, Munitions munition,
+          int shots, int bv, long cost) {
+        AmmoType ammo = new AmmoType();
+        ammo.name = osName + " " + rackSize + " Ammo";
+        ammo.shortName = osName + " " + rackSize;
+        ammo.setInternalName("OS" + osName + rackSize + "Ammo");
+        ammo.addLookupName("OS " + osName + " " + rackSize + " Ammo");
+        ammo.damagePerShot = damage;
+        ammo.rackSize = rackSize;
+        ammo.ammoType = AmmoTypeEnum.ATM;
+        ammo.munitionType = EnumSet.of(munition);
+        // APTM (standard) and LRTM (ER) carry a -1 to-hit; SRTM (HE) does not.
+        ammo.toHitModifier = (munition == Munitions.M_HIGH_EXPLOSIVE) ? 0 : -1;
+        ammo.shots = shots;
+        ammo.bv = bv;
+        ammo.cost = cost;
+        ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setIntroLevel(false)
+              .setUnofficial(false)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
+              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION);
+        return ammo;
+    }
+
+    private static AmmoType createOSSRTM3Ammo()  { return makeOSATMAmmo("SRTM", 3,  3, Munitions.M_HIGH_EXPLOSIVE, 20, 14, 35000); }
+    private static AmmoType createOSSRTM6Ammo()  { return makeOSATMAmmo("SRTM", 6,  3, Munitions.M_HIGH_EXPLOSIVE, 10, 26, 75000); }
+    private static AmmoType createOSSRTM9Ammo()  { return makeOSATMAmmo("SRTM", 9,  3, Munitions.M_HIGH_EXPLOSIVE, 7,  36, 110000); }
+    private static AmmoType createOSSRTM12Ammo() { return makeOSATMAmmo("SRTM", 12, 3, Munitions.M_HIGH_EXPLOSIVE, 5,  52, 150000); }
+
+    private static AmmoType createOSAPTM3Ammo()  { return makeOSATMAmmo("APTM", 3,  2, Munitions.M_STANDARD, 20, 14, 35000); }
+    private static AmmoType createOSAPTM6Ammo()  { return makeOSATMAmmo("APTM", 6,  2, Munitions.M_STANDARD, 10, 26, 75000); }
+    private static AmmoType createOSAPTM9Ammo()  { return makeOSATMAmmo("APTM", 9,  2, Munitions.M_STANDARD, 7,  36, 110000); }
+    private static AmmoType createOSAPTM12Ammo() { return makeOSATMAmmo("APTM", 12, 2, Munitions.M_STANDARD, 5,  52, 150000); }
+
+    private static AmmoType createOSLRTM3Ammo()  { return makeOSATMAmmo("LRTM", 3,  1, Munitions.M_EXTENDED_RANGE, 20, 14, 35000); }
+    private static AmmoType createOSLRTM6Ammo()  { return makeOSATMAmmo("LRTM", 6,  1, Munitions.M_EXTENDED_RANGE, 10, 26, 75000); }
+    private static AmmoType createOSLRTM9Ammo()  { return makeOSATMAmmo("LRTM", 9,  1, Munitions.M_EXTENDED_RANGE, 7,  36, 110000); }
+    private static AmmoType createOSLRTM12Ammo() { return makeOSATMAmmo("LRTM", 12, 1, Munitions.M_EXTENDED_RANGE, 5,  52, 150000); }
+
+    // OS-techbase ammo for MML / ER-LRM / Dragon Piercer. Required because the canon equivalents are
+    // setIntroLevel(false) (STANDARD -> T_IS_TW_NON_BOX), which TechConstants.isLegal makes Outer
+    // Sphere units reject. These reuse the canon ammoType enums (MML / EXLRM / TBOLT_*) so the OS
+    // weapons match them automatically; TechBase.OUTER_SPHERE makes them OS-legal. (Canon LRM/SRM
+    // ammo is setIntroLevel(true) -> INTRO -> OS-accepted, so those lines need no OS ammo.)
+    private static AmmoType makeOSMissileAmmoBasic(String name, String shortName, String internal,
+          AmmoTypeEnum type, int rackSize, int damagePerShot, int shots, int bv, long cost) {
+        AmmoType ammo = new AmmoType();
+        ammo.name = name + " Ammo";
+        ammo.shortName = shortName;
+        ammo.setInternalName(internal);
+        ammo.addLookupName("OS " + name + " Ammo");
+        ammo.damagePerShot = damagePerShot;
+        ammo.rackSize = rackSize;
+        ammo.ammoType = type;
+        ammo.shots = shots;
+        ammo.bv = bv;
+        ammo.cost = cost;
+        ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setIntroLevel(false)
+              .setUnofficial(false)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
+              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION);
+        return ammo;
+    }
+
+    // OS MML ammo for canon rack sizes 3/5/7/9 (canon MML ammo is OS-rejected, see above)
+    private static AmmoType createOSMML3LRMAmmo()  { return makeOSMMLAmmo(3, true,  40, 4, 18000); }
+    private static AmmoType createOSMML3SRMAmmo()  { return makeOSMMLAmmo(3, false, 33, 4, 18000); }
+    private static AmmoType createOSMML5LRMAmmo()  { return makeOSMMLAmmo(5, true,  24, 6, 30000); }
+    private static AmmoType createOSMML5SRMAmmo()  { return makeOSMMLAmmo(5, false, 20, 6, 30000); }
+    private static AmmoType createOSMML7LRMAmmo()  { return makeOSMMLAmmo(7, true,  17, 8, 42000); }
+    private static AmmoType createOSMML7SRMAmmo()  { return makeOSMMLAmmo(7, false, 14, 8, 42000); }
+    private static AmmoType createOSMML9LRMAmmo()  { return makeOSMMLAmmo(9, true,  13, 10, 54000); }
+    private static AmmoType createOSMML9SRMAmmo()  { return makeOSMMLAmmo(9, false, 11, 10, 54000); }
+
+    // OS ER-LRM ammo (canon EXLRM ammo is OS-rejected)
+    private static AmmoType createOSERLRM10Ammo() { return makeOSMissileAmmoBasic("ER LRM 10", "ER LRM 10", "OSERLRM10Ammo", AmmoTypeEnum.EXLRM, 10, 1, 9,  20, 60000); }
+    private static AmmoType createOSERLRM15Ammo() { return makeOSMissileAmmoBasic("ER LRM 15", "ER LRM 15", "OSERLRM15Ammo", AmmoTypeEnum.EXLRM, 15, 1, 6,  30, 90000); }
+    private static AmmoType createOSERLRM20Ammo() { return makeOSMissileAmmoBasic("ER LRM 20", "ER LRM 20", "OSERLRM20Ammo", AmmoTypeEnum.EXLRM, 20, 1, 4,  40, 120000); }
+
+    // OS Dragon Piercer ammo (canon Thunderbolt ammo is OS-rejected); single concentrated missile
+    private static AmmoType createOSDragonPiercer5Ammo()  { return makeOSMissileAmmoBasic("Dragon Piercer 5",  "Dragon Piercer 5",  "OSDragonPiercer5Ammo",  AmmoTypeEnum.TBOLT_5,  5,  5,  6, 8,  30000); }
+    private static AmmoType createOSDragonPiercer10Ammo() { return makeOSMissileAmmoBasic("Dragon Piercer 10", "Dragon Piercer 10", "OSDragonPiercer10Ammo", AmmoTypeEnum.TBOLT_10, 10, 10, 4, 16, 50000); }
+    private static AmmoType createOSDragonPiercer15Ammo() { return makeOSMissileAmmoBasic("Dragon Piercer 15", "Dragon Piercer 15", "OSDragonPiercer15Ammo", AmmoTypeEnum.TBOLT_15, 15, 15, 3, 23, 70000); }
+    private static AmmoType createOSDragonPiercer20Ammo() { return makeOSMissileAmmoBasic("Dragon Piercer 20", "Dragon Piercer 20", "OSDragonPiercer20Ammo", AmmoTypeEnum.TBOLT_20, 20, 20, 2, 31, 90000); }
+
+    // OS MRM ammo (canon MRM ammo is OS-rejected)
+    private static AmmoType createOSMRM10Ammo() { return makeOSMissileAmmoBasic("MRM 10", "MRM 10", "OSMRM10Ammo", AmmoTypeEnum.MRM, 10, 1, 24, 7,  25000); }
+    private static AmmoType createOSMRM20Ammo() { return makeOSMissileAmmoBasic("MRM 20", "MRM 20", "OSMRM20Ammo", AmmoTypeEnum.MRM, 20, 1, 12, 14, 50000); }
+    private static AmmoType createOSMRM30Ammo() { return makeOSMissileAmmoBasic("MRM 30", "MRM 30", "OSMRM30Ammo", AmmoTypeEnum.MRM, 30, 1, 8,  21, 75000); }
+    private static AmmoType createOSMRM40Ammo() { return makeOSMissileAmmoBasic("MRM 40", "MRM 40", "OSMRM40Ammo", AmmoTypeEnum.MRM, 40, 1, 6,  28, 100000); }
+
+    // OS Streak ammo (canon Streak ammo is OS-rejected). Reuse LRM_STREAK / SRM_STREAK enums.
+    private static AmmoType createOSStreakLRM5Ammo()  { return makeOSMissileAmmoBasic("Streak LRM 5",  "Streak LRM 5",  "OSStreakLRM5Ammo",  AmmoTypeEnum.LRM_STREAK, 5,  1, 24, 11, 30000); }
+    private static AmmoType createOSStreakLRM10Ammo() { return makeOSMissileAmmoBasic("Streak LRM 10", "Streak LRM 10", "OSStreakLRM10Ammo", AmmoTypeEnum.LRM_STREAK, 10, 1, 12, 22, 60000); }
+    private static AmmoType createOSStreakLRM15Ammo() { return makeOSMissileAmmoBasic("Streak LRM 15", "Streak LRM 15", "OSStreakLRM15Ammo", AmmoTypeEnum.LRM_STREAK, 15, 1, 8,  33, 90000); }
+    private static AmmoType createOSStreakLRM20Ammo() { return makeOSMissileAmmoBasic("Streak LRM 20", "Streak LRM 20", "OSStreakLRM20Ammo", AmmoTypeEnum.LRM_STREAK, 20, 1, 6,  44, 120000); }
+    private static AmmoType createOSStreakSRM2Ammo()  { return makeOSMissileAmmoBasic("Streak SRM 2",  "Streak SRM 2",  "OSStreakSRM2Ammo",  AmmoTypeEnum.SRM_STREAK, 2,  2, 50, 4,  27000); }
+    private static AmmoType createOSStreakSRM4Ammo()  { return makeOSMissileAmmoBasic("Streak SRM 4",  "Streak SRM 4",  "OSStreakSRM4Ammo",  AmmoTypeEnum.SRM_STREAK, 4,  2, 25, 7,  54000); }
+    private static AmmoType createOSStreakSRM6Ammo()  { return makeOSMissileAmmoBasic("Streak SRM 6",  "Streak SRM 6",  "OSStreakSRM6Ammo",  AmmoTypeEnum.SRM_STREAK, 6,  2, 15, 11, 81000); }
+    private static AmmoType createOSStreakSRM8Ammo()  { return makeOSMissileAmmoBasic("Streak SRM 8",  "Streak SRM 8",  "OSStreakSRM8Ammo",  AmmoTypeEnum.SRM_STREAK, 8,  2, 11, 15, 108000); }
+
+    // OS Narc / Munin beacon ammo (canon Narc/iNarc ammo is OS-rejected). Beacon pods: rackSize 1,
+    // bv 0; munitionType selects the pod behaviour (Homing=null, ECM, Haywire, Nemesis).
+    private static AmmoType makeOSBeaconAmmo(String name, String shortName, String internal, AmmoTypeEnum type,
+          Munitions munition, int damagePerShot, int shots, long cost) {
+        AmmoType ammo = new AmmoType();
+        ammo.name = name;
+        ammo.shortName = shortName;
+        ammo.setInternalName(internal);
+        ammo.addLookupName("OS " + name);
+        ammo.damagePerShot = damagePerShot;
+        ammo.rackSize = 1;
+        ammo.ammoType = type;
+        if (munition != null) {
+            ammo.munitionType = EnumSet.of(munition);
+        }
+        ammo.shots = shots;
+        ammo.bv = 0;
+        ammo.cost = cost;
+        ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setIntroLevel(false)
+              .setUnofficial(false)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
+              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION);
+        return ammo;
+    }
+
+    private static AmmoType createOSNarcAmmo()         { return makeOSBeaconAmmo("Narc Pods",          "Narc",          "OSNarcPods",         AmmoTypeEnum.NARC,  null,               3, 6, 6000); }
+    private static AmmoType createOSMuninAmmo()        { return makeOSBeaconAmmo("Munin Pods",         "Munin",         "OSMuninPods",        AmmoTypeEnum.INARC, null,               3, 4, 7500); }
+    private static AmmoType createOSMuninECMAmmo()     { return makeOSBeaconAmmo("Munin ECM Pods",     "Munin ECM",     "OSMuninECMPods",     AmmoTypeEnum.INARC, Munitions.M_ECM,     3, 4, 15000); }
+    private static AmmoType createOSMuninHaywireAmmo() { return makeOSBeaconAmmo("Munin Haywire Pods", "Munin Haywire", "OSMuninHaywirePods", AmmoTypeEnum.INARC, Munitions.M_HAYWIRE, 3, 4, 20000); }
+    private static AmmoType createOSMuninNemesisAmmo() { return makeOSBeaconAmmo("Munin Nemesis Pods", "Munin Nemesis", "OSMuninNemesisPods", AmmoTypeEnum.INARC, Munitions.M_NEMESIS, 3, 4, 10000); }
 
     // OS LB-X ammo (shared by standard / Improve / Ultra LB-X tiers); slug + cluster per caliber
     private static AmmoType makeOSLBXClusterAmmo(String weaponName, String internal, int rackSize, int shots,
