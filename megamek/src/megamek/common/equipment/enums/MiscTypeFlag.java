@@ -402,6 +402,10 @@ public enum MiscTypeFlag implements EquipmentFlag {
     // this kind of works like MASC for the double cruise MP, so we will make it
     // a subtype
     S_JET_BOOSTER,
+    // Outer Sphere booster tiers (MASC/Supercharger). Improve = refined reliability;
+    // Heavy Duty = specialized survival branch built on Improve.
+    S_OS_IMPROVE,
+    S_OS_HEAVY_DUTY,
 
     // Secondary flags for Jump Jets
     S_STANDARD,

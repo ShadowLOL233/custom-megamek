@@ -183,6 +183,18 @@ public class EquipmentTypeLookup {
     @EquipmentName
     public static final String CLAN_MASC = "CLMASC";
     @EquipmentName
+    public static final String OS_MASC = "OSMASC";
+    @EquipmentName
+    public static final String OS_IMPROVE_MASC = "OSImproveMASC";
+    @EquipmentName
+    public static final String OS_HEAVY_DUTY_MASC = "OSHeavyDutyMASC";
+    @EquipmentName
+    public static final String OS_SUPERCHARGER = "OSSupercharger";
+    @EquipmentName
+    public static final String OS_IMPROVE_SUPERCHARGER = "OSImproveSupercharger";
+    @EquipmentName
+    public static final String OS_HEAVY_DUTY_SUPERCHARGER = "OSHeavyDutySupercharger";
+    @EquipmentName
     public static final String SPONSON_TURRET = "SponsonTurret";
     @EquipmentName
     public static final String PINTLE_TURRET = "PintleTurret";

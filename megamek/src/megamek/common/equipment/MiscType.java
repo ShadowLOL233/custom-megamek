@@ -593,11 +593,25 @@ public class MiscType extends EquipmentType {
                         return 0;
                     }
                     // pg 344, TO
-                    // 10% of engine weight
-                    return defaultRounding.round(e.getWeightEngine(entity, defaultRounding) / 10.0, entity);
+                    // 10% of engine weight (OS Improve 7.5%, OS Heavy Duty 12%)
+                    double scFactor = 0.10;
+                    if (getInternalName().equals(EquipmentTypeLookup.OS_IMPROVE_SUPERCHARGER)) {
+                        scFactor = 0.075;
+                    } else if (getInternalName().equals(EquipmentTypeLookup.OS_HEAVY_DUTY_SUPERCHARGER)) {
+                        scFactor = 0.12;
+                    }
+                    return defaultRounding.round(e.getWeightEngine(entity, defaultRounding) * scFactor, entity);
                 }
 
-                return Math.max(RoundWeight.nearestTon(entity.getWeight() * (isClan() ? 0.04 : 0.05)), 1);
+                double mascFactor = isClan() ? 0.04 : 0.05;
+                if (getInternalName().equals(EquipmentTypeLookup.OS_MASC)) {
+                    mascFactor = 0.04;
+                } else if (getInternalName().equals(EquipmentTypeLookup.OS_IMPROVE_MASC)) {
+                    mascFactor = 0.03;
+                } else if (getInternalName().equals(EquipmentTypeLookup.OS_HEAVY_DUTY_MASC)) {
+                    mascFactor = 0.05;
+                }
+                return Math.max(RoundWeight.nearestTon(entity.getWeight() * mascFactor), 1);
             }
         } else if (hasFlag(F_QUAD_TURRET) || hasFlag(F_SHOULDER_TURRET) || hasFlag(F_HEAD_TURRET)) {
             // Turrets weight 10% of the weight of equipment in them, not counting Heat
@@ -1033,16 +1047,30 @@ public class MiscType extends EquipmentType {
                     } else if (entity.isSupportVehicle()) {
                         costValue = e.getWeightEngine(entity) * 10000;
                     } else {
-                        costValue = e.getRating() * 10000;
+                        int scFactor = 10000;
+                        if (getInternalName().equals(EquipmentTypeLookup.OS_IMPROVE_SUPERCHARGER) ||
+                              getInternalName().equals(EquipmentTypeLookup.OS_HEAVY_DUTY_SUPERCHARGER)) {
+                            scFactor = 12000;
+                        }
+                        costValue = e.getRating() * scFactor;
                     }
                 } else {
                     int mascTonnage = 0;
+                    int mascCostFactor = 1000;
                     if (getInternalName().equals(EquipmentTypeLookup.IS_MASC)) {
                         mascTonnage = (int) Math.round(entity.getWeight() / 20.0f);
                     } else if (getInternalName().equals(EquipmentTypeLookup.CLAN_MASC)) {
                         mascTonnage = (int) Math.round(entity.getWeight() / 25.0f);
+                    } else if (getInternalName().equals(EquipmentTypeLookup.OS_MASC)) {
+                        mascTonnage = (int) Math.round(entity.getWeight() / 25.0f);
+                    } else if (getInternalName().equals(EquipmentTypeLookup.OS_IMPROVE_MASC)) {
+                        mascTonnage = (int) Math.round(entity.getWeight() / 35.0f);
+                        mascCostFactor = 1500;
+                    } else if (getInternalName().equals(EquipmentTypeLookup.OS_HEAVY_DUTY_MASC)) {
+                        mascTonnage = (int) Math.round(entity.getWeight() / 22.0f);
+                        mascCostFactor = 1500;
                     }
-                    costValue = (entity.hasEngine() ? entity.getEngine().getRating() : 0) * mascTonnage * 1000;
+                    costValue = (entity.hasEngine() ? entity.getEngine().getRating() : 0) * mascTonnage * mascCostFactor;
                 }
             } else if (hasFlag(MiscType.F_TARGETING_COMPUTER)) {
                 int tCompTons = 0;
@@ -1185,6 +1213,13 @@ public class MiscType extends EquipmentType {
         } else if (hasFlag(F_CLUB) && hasFlag(MiscTypeFlag.S_RETRACTABLE_BLADE)) {
             return 1 + (int) Math.ceil(entity.getWeight() / 20.0);
         } else if (hasFlag(F_MASC)) {
+            if (getInternalName().equals(EquipmentTypeLookup.OS_MASC)) {
+                return Math.max((int) Math.round(entity.getWeight() / 25.0), 1);
+            } else if (getInternalName().equals(EquipmentTypeLookup.OS_IMPROVE_MASC)) {
+                return Math.max((int) Math.round(entity.getWeight() / 35.0), 1);
+            } else if (getInternalName().equals(EquipmentTypeLookup.OS_HEAVY_DUTY_MASC)) {
+                return Math.max((int) Math.round(entity.getWeight() / 22.0), 1);
+            }
             if (TechConstants.isClan(getTechLevel(entity.getTechLevelYear()))) {
                 return Math.max((int) Math.round(entity.getWeight() / 25.0), 1);
             }
@@ -1637,6 +1672,9 @@ public class MiscType extends EquipmentType {
         EquipmentType.addType(MiscType.createOSAdvPFD());
         EquipmentType.addType(MiscType.createISMASC());
         EquipmentType.addType(MiscType.createCLMASC());
+        EquipmentType.addType(MiscType.createOSMASC());
+        EquipmentType.addType(MiscType.createOSImproveMASC());
+        EquipmentType.addType(MiscType.createOSHeavyDutyMASC());
         EquipmentType.addType(MiscType.createTSM());
         EquipmentType.addType(MiscType.createPrototypeTSM());
         EquipmentType.addType(MiscType.createC3S());
@@ -1736,6 +1774,9 @@ public class MiscType extends EquipmentType {
         EquipmentType.addType(MiscType.createVibroShovel());
         EquipmentType.addType(MiscType.createDemolitionCharge());
         EquipmentType.addType(MiscType.createISSuperCharger());
+        EquipmentType.addType(MiscType.createOSSuperCharger());
+        EquipmentType.addType(MiscType.createOSImproveSuperCharger());
+        EquipmentType.addType(MiscType.createOSHeavyDutySuperCharger());
         EquipmentType.addType(MiscType.createISMediumShield());
         EquipmentType.addType(MiscType.createISSmallShield());
         EquipmentType.addType(MiscType.createISLargeShield());
@@ -2307,6 +2348,159 @@ public class MiscType extends EquipmentType {
               .setProductionFactions(Faction.CIH)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E, AvailabilityValue.D);
+        return misc;
+    }
+
+    // Outer Sphere MASC family. Baseline = SLDF-preserved, Clan-grade efficiency. Improve refines
+    // reliability (gentler failure curve) at lower mass/slots. Heavy Duty is a survival-focused
+    // branch built on Improve: reinforced, so the gentlest curve plus single-leg failure damage.
+    public static MiscType createOSMASC() {
+        MiscType misc = new MiscType();
+
+        misc.name = "MASC";
+        misc.setInternalName(EquipmentTypeLookup.OS_MASC);
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
+        misc.cost = COST_VARIABLE;
+        misc.flags = misc.flags.or(F_MASC, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT, F_SUPPORT_TANK_EQUIPMENT)
+              .andNot(F_FIGHTER_EQUIPMENT);
+        misc.omniFixedOnly = true;
+        misc.bv = 0;
+        misc.setModes(new String[] { "Armed", "Off" });
+        misc.rulesRefs = "AU";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+              .setISAdvancement(3048, 3050, 3055, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+        return misc;
+    }
+
+    public static MiscType createOSImproveMASC() {
+        MiscType misc = new MiscType();
+
+        misc.name = "Improve MASC";
+        misc.setInternalName(EquipmentTypeLookup.OS_IMPROVE_MASC);
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
+        misc.cost = COST_VARIABLE;
+        misc.flags = misc.flags.or(F_MASC, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT, F_SUPPORT_TANK_EQUIPMENT,
+              MiscTypeFlag.S_OS_IMPROVE).andNot(F_FIGHTER_EQUIPMENT);
+        misc.omniFixedOnly = true;
+        misc.bv = 0;
+        misc.setModes(new String[] { "Armed", "Off" });
+        misc.rulesRefs = "AU";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+              .setISAdvancement(3058, 3060, 3063, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        return misc;
+    }
+
+    public static MiscType createOSHeavyDutyMASC() {
+        MiscType misc = new MiscType();
+
+        misc.name = "Heavy Duty MASC";
+        misc.setInternalName(EquipmentTypeLookup.OS_HEAVY_DUTY_MASC);
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
+        misc.cost = COST_VARIABLE;
+        misc.flags = misc.flags.or(F_MASC, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT, F_SUPPORT_TANK_EQUIPMENT,
+              MiscTypeFlag.S_OS_HEAVY_DUTY).andNot(F_FIGHTER_EQUIPMENT);
+        misc.omniFixedOnly = true;
+        misc.bv = 0;
+        misc.setModes(new String[] { "Armed", "Off" });
+        misc.rulesRefs = "AU";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+              .setISAdvancement(3065, 3068, 3070, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        return misc;
+    }
+
+    // Outer Sphere Supercharger family. Improve caps engine-damage on failure at 2 and is lighter.
+    // Heavy Duty inherits the capped governor, takes 2 crit slots, and a once-per-scenario redundant
+    // subsystem absorbs the first failure entirely.
+    public static MiscType createOSSuperCharger() {
+        MiscType misc = new MiscType();
+
+        misc.name = "Supercharger";
+        misc.setInternalName(EquipmentTypeLookup.OS_SUPERCHARGER);
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = 1;
+        misc.cost = COST_VARIABLE;
+        misc.flags = misc.flags.or(F_MASC, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT, F_SUPPORT_TANK_EQUIPMENT,
+              MiscTypeFlag.S_SUPERCHARGER);
+        misc.bv = 0;
+        misc.setModes(new String[] { "Armed", "Off" });
+        misc.rulesRefs = "AU";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+              .setISAdvancement(3053, 3055, 3058, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+        return misc;
+    }
+
+    public static MiscType createOSImproveSuperCharger() {
+        MiscType misc = new MiscType();
+
+        misc.name = "Improve Supercharger";
+        misc.setInternalName(EquipmentTypeLookup.OS_IMPROVE_SUPERCHARGER);
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = 1;
+        misc.cost = COST_VARIABLE;
+        misc.flags = misc.flags.or(F_MASC, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT, F_SUPPORT_TANK_EQUIPMENT,
+              MiscTypeFlag.S_SUPERCHARGER, MiscTypeFlag.S_OS_IMPROVE);
+        misc.bv = 0;
+        misc.setModes(new String[] { "Armed", "Off" });
+        misc.rulesRefs = "AU";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+              .setISAdvancement(3060, 3064, 3067, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        return misc;
+    }
+
+    public static MiscType createOSHeavyDutySuperCharger() {
+        MiscType misc = new MiscType();
+
+        misc.name = "Heavy Duty Supercharger";
+        misc.setInternalName(EquipmentTypeLookup.OS_HEAVY_DUTY_SUPERCHARGER);
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = 2;
+        misc.cost = COST_VARIABLE;
+        misc.flags = misc.flags.or(F_MASC, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT, F_SUPPORT_TANK_EQUIPMENT,
+              MiscTypeFlag.S_SUPERCHARGER, MiscTypeFlag.S_OS_HEAVY_DUTY);
+        misc.bv = 0;
+        misc.setModes(new String[] { "Armed", "Off" });
+        misc.rulesRefs = "AU";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+              .setISAdvancement(3066, 3069, 3072, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
         return misc;
     }
 

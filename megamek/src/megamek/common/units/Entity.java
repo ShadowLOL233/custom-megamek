@@ -926,6 +926,9 @@ public abstract class Entity extends TurnOrdered
     protected boolean bSuperchargerWentUp = false;
     protected boolean usedSupercharger = false; // Has Supercharger been used?
 
+    // OS Heavy Duty Supercharger: a redundant subsystem absorbs the first failure of the scenario.
+    protected boolean usedOSHeavyDutySuperchargerAbsorb = false;
+
     /**
      * Nova CEWS can adjust the network on the fly. This keeps track of the C3 net ID to be switched to on the next
      * turn.
@@ -14734,7 +14737,7 @@ public abstract class Entity extends TurnOrdered
     }
 
     public int getMASCTarget() {
-        return getMASCorSuperchargerTarget(nMASCLevel);
+        return getMASCorSuperchargerTarget(nMASCLevel, getMASC());
     }
 
     /**
@@ -14751,18 +14754,28 @@ public abstract class Entity extends TurnOrdered
 
     public int getSuperchargerTarget() {
         // uses same TNs as MASC
-        return getMASCorSuperchargerTarget(nSuperchargerLevel);
+        return getMASCorSuperchargerTarget(nSuperchargerLevel, getSuperCharger());
     }
 
-    /** @return Target number taking into account game options */
-    private int getMASCorSuperchargerTarget(int nLevel) {
-        if ((game != null) && gameOptions().booleanOption(OptionsConstants.ADVANCED_ALTERNATE_MASC_ENHANCED)) {
-            return ALTERNATE_MASC_FAILURE_ENHANCED[nLevel];
-        } else if (game != null && gameOptions().booleanOption(OptionsConstants.ADVANCED_ALTERNATE_MASC)) {
-            return ALTERNATE_MASC_FAILURE[nLevel];
+    /**
+     * @return Target number taking into account game options and the specific booster. OS Improve
+     *       boosters always use the gentler Alternate curve and OS Heavy Duty boosters the gentlest
+     *       Enhanced curve, regardless of game options.
+     */
+    private int getMASCorSuperchargerTarget(int nLevel, @Nullable MiscMounted booster) {
+        int[] curve;
+        if ((booster != null) && booster.getType().hasFlag(MiscTypeFlag.S_OS_HEAVY_DUTY)) {
+            curve = ALTERNATE_MASC_FAILURE_ENHANCED;
+        } else if ((booster != null) && booster.getType().hasFlag(MiscTypeFlag.S_OS_IMPROVE)) {
+            curve = ALTERNATE_MASC_FAILURE;
+        } else if ((game != null) && gameOptions().booleanOption(OptionsConstants.ADVANCED_ALTERNATE_MASC_ENHANCED)) {
+            curve = ALTERNATE_MASC_FAILURE_ENHANCED;
+        } else if ((game != null) && gameOptions().booleanOption(OptionsConstants.ADVANCED_ALTERNATE_MASC)) {
+            curve = ALTERNATE_MASC_FAILURE;
         } else {
-            return MASC_FAILURE[nLevel];
+            curve = MASC_FAILURE;
         }
+        return curve[Math.min(Math.max(nLevel, 0), curve.length - 1)];
     }
 
     /**
@@ -14836,6 +14849,8 @@ public abstract class Entity extends TurnOrdered
             int rollValue = diceRoll.getIntValue();
             String rollCalc = String.valueOf(rollValue);
             boolean isSupercharger = masc.getType().hasFlag(MiscTypeFlag.S_SUPERCHARGER);
+            boolean isOSImprove = masc.getType().hasFlag(MiscTypeFlag.S_OS_IMPROVE);
+            boolean isOSHeavyDuty = masc.getType().hasFlag(MiscTypeFlag.S_OS_HEAVY_DUTY);
             // WHY is this -1 here?
             if (isSupercharger &&
                   (((this instanceof Mek) && ((Mek) this).isIndustrial()) ||
@@ -14868,6 +14883,21 @@ public abstract class Entity extends TurnOrdered
                 r.choose(false);
                 vDesc.addElement(r);
 
+                // OS Heavy Duty Supercharger: a redundant subsystem absorbs the first failure of the
+                // scenario entirely - no engine damage and the supercharger survives.
+                if (isSupercharger && isOSHeavyDuty && !usedOSHeavyDutySuperchargerAbsorb) {
+                    usedOSHeavyDutySuperchargerAbsorb = true;
+                    Report rAbsorb = new Report(2374);
+                    rAbsorb.subject = getId();
+                    rAbsorb.indent();
+                    rAbsorb.addDesc(this);
+                    vDesc.addElement(rAbsorb);
+                    return false;
+                }
+
+                // OS Improve/Heavy Duty Superchargers cap engine damage on failure at 2 hits.
+                boolean cappedScDamage = isSupercharger && (isOSImprove || isOSHeavyDuty);
+
                 if (isSupercharger) {
                     // do the damage - engine critical slots
                     int hits = 0;
@@ -14877,7 +14907,27 @@ public abstract class Entity extends TurnOrdered
                     r.add(diceRoll2);
                     r.newlines = 0;
                     vDesc.addElement(r);
-                    if (diceRoll2.getIntValue() <= 7) {
+                    if (cappedScDamage) {
+                        if (diceRoll2.getIntValue() <= 9) {
+                            // no effect
+                            r = new Report(6005);
+                            r.subject = getId();
+                            r.newlines = 0;
+                            vDesc.addElement(r);
+                        } else if ((diceRoll2.getIntValue() == 10) || (diceRoll2.getIntValue() == 11)) {
+                            hits = 1;
+                            r = new Report(6315);
+                            r.subject = getId();
+                            r.newlines = 0;
+                            vDesc.addElement(r);
+                        } else if (diceRoll2.getIntValue() == 12) {
+                            hits = 2;
+                            r = new Report(6320);
+                            r.subject = getId();
+                            r.newlines = 0;
+                            vDesc.addElement(r);
+                        }
+                    } else if (diceRoll2.getIntValue() <= 7) {
                         // no effect
                         r = new Report(6005);
                         r.subject = getId();
@@ -14959,6 +15009,25 @@ public abstract class Entity extends TurnOrdered
                         }
                     }
 
+                } else if (isOSHeavyDuty) {
+                    // OS Heavy Duty MASC: reinforced myomer - only a single random leg takes a
+                    // critical slot on failure, instead of every leg.
+                    List<Integer> damageableLegs = new ArrayList<>();
+                    for (int loc = 0; loc < locations(); loc++) {
+                        if (locationIsLeg(loc) && (getHittableCriticalSlots(loc) > 0)) {
+                            damageableLegs.add(loc);
+                        }
+                    }
+                    if (!damageableLegs.isEmpty()) {
+                        int loc = damageableLegs.get(Compute.randomInt(damageableLegs.size()));
+                        CriticalSlot slot;
+                        do {
+                            int slotIndex = Compute.randomInt(getNumberOfCriticalSlots(loc));
+                            slot = getCritical(loc, slotIndex);
+                        } while ((slot == null) || !slot.isHittable());
+                        vCriticalSlots.put(loc, new LinkedList<>());
+                        vCriticalSlots.get(loc).add(slot);
+                    }
                 } else {
                     // do the damage. random critical slot on each leg, but MASC is not destroyed
                     for (int loc = 0; loc < locations(); loc++) {
