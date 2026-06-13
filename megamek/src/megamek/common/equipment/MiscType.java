@@ -2369,7 +2369,7 @@ public class MiscType extends EquipmentType {
         misc.setModes(new String[] { "Armed", "Off" });
         misc.rulesRefs = "AU";
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setTechRating(TechRating.F)
+              .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
               .setISAdvancement(3048, 3050, 3055, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
@@ -2394,7 +2394,7 @@ public class MiscType extends EquipmentType {
         misc.setModes(new String[] { "Armed", "Off" });
         misc.rulesRefs = "AU";
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setTechRating(TechRating.F)
+              .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
               .setISAdvancement(3058, 3060, 3063, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
@@ -2419,7 +2419,7 @@ public class MiscType extends EquipmentType {
         misc.setModes(new String[] { "Armed", "Off" });
         misc.rulesRefs = "AU";
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setTechRating(TechRating.F)
+              .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
               .setISAdvancement(3065, 3068, 3070, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
@@ -2446,7 +2446,7 @@ public class MiscType extends EquipmentType {
         misc.setModes(new String[] { "Armed", "Off" });
         misc.rulesRefs = "AU";
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setTechRating(TechRating.F)
+              .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
               .setISAdvancement(3053, 3055, 3058, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
@@ -2470,7 +2470,7 @@ public class MiscType extends EquipmentType {
         misc.setModes(new String[] { "Armed", "Off" });
         misc.rulesRefs = "AU";
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setTechRating(TechRating.F)
+              .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
               .setISAdvancement(3060, 3064, 3067, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
@@ -2494,7 +2494,7 @@ public class MiscType extends EquipmentType {
         misc.setModes(new String[] { "Armed", "Off" });
         misc.rulesRefs = "AU";
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setTechRating(TechRating.F)
+              .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
               .setISAdvancement(3066, 3069, 3072, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
