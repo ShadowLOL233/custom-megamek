@@ -59,15 +59,21 @@ hot-reloads jars — do a full clean rebuild + restart: `cd megameklab && .\grad
 
 ---
 
-## 1. Status snapshot (done & pushed)
+## 1. Status snapshot (implemented in code; several lines now PENDING tier-revision)
 
-- **Faction:** Republic of the Outer Sphere (`RoOS`).
-- **Engines:** full OS lineup (Standard/Improve/Advance × Fusion/Light/XL/XXL/Compact + superheavy).
+- **Faction:** Republic of the Outer Sphere (`RoOS`). — stable
+- **Engines:** full OS lineup (Standard/Improve/Advance × Fusion/Light/XL/XXL/Compact + superheavy)
+  is in code, **but ⏳PENDING:** the current "Advance" engines reclassify → **Enhanced**, and the new
+  **Advance / Experimental** engine tiers are TBD (see §6.4).
 - **Weapons (~224 files under `weapons/**/outerSphere`):** energy (lasers, PPCs incl. rotary/hyper,
-  plasma, flamers), kinetics (autocannons, gauss, MGs), full missile line (+3 FCS: Diana III, Orion V).
-- **Armor / BV:** OS structure + damage-reduction armor BV multipliers wired.
-- **Movement boosters:** OS MASC / Supercharger line (per-equipment failure mechanics).
-- **Tech rating G** added to `enums/TechRating.java`, wired into MekHQ maintenance & parts cost.
+  plasma, flamers), kinetics (autocannons, gauss, MGs), full missile line (+3 FCS: Diana III, Orion V)
+  are in code — **but DESIGN STATUS is now ⏳TBD/PENDING for energy, kinetic AND missile families:** the
+  **Advance** tier must be (re)designed under §0.2, and many "Advance"-named weapons reclassified →
+  **Enhanced** (§6.2). Treat these families as under revision, not finished.
+- **Armor / structure:** OS structure + damage-reduction armor BV multipliers wired — **but the
+  structure "Advance" line is ⏳PENDING → Enhanced reclassification + Advance/Experimental redesign (§6.4).**
+- **Movement boosters:** OS MASC / Supercharger line (per-equipment failure mechanics). — stable
+- **Tech rating G** added to `enums/TechRating.java`, wired into MekHQ maintenance & parts cost. — stable
 
 ---
 
@@ -223,3 +229,26 @@ Per decision 2026-06-13, HVAC's tier label (Improve vs Enhanced vs Advance) is *
 here so it is not forgotten; resolve alongside §6.2 and the HVAC stat finalization (§2). HVAC is the
 electrothermal-chemical AC; its heavy "range-over-weight" profile leans Advance, but its arms-
 consolidation lore leans earlier — undecided.
+
+### 6.4 Engines & internal structure — rename, reclassify, and redesign (added 2026-06-13)
+- **Reclassify (decided):** the current **"Advance"-tier ENGINES and INTERNAL STRUCTURE** are
+  refined-but-serviceable, not radical — reclassify them to the new **Enhanced** tier (rename
+  "Advance X" → "Enhanced X", re-date to ~3000–3050), mirroring §6.2 for weapons.
+- **Revisit naming (decided):** review the engine & structure naming overall for consistency with the
+  §0.2 ladder (Standard/Improve/Enhanced/Advance/Experimental) — current code uses "base/Improve/Advance".
+- **Redesign the now-vacant Advance tier** for engines & structure under §0.2 (genuinely radical /
+  "Clan-like", performance-max, mass-produced).
+- **Design a new Experimental tier** (Ascended-derived) for engines & structure.
+
+**Engine-physics design question (OPEN — pending user decision).** Does OS break BattleTech's fusion
+ceiling? Proposed working stance (NOT final):
+- **Advance engines stay WITHIN fusion** — the indigenous pinnacle of fusion engineering (max power
+  density; sacrifices the conservative safety/maintainability margins for output; still mass-produced).
+  No new physics — this keeps OS believable and "slower than the Clans" (who never broke the fusion
+  ceiling). "Cold-fusion"-style flavor (cleaner/denser fusion) fits HERE, if a flavor name is wanted.
+- **Only EXPERIMENTAL engines exceed fusion** — reverse-engineered from captured **Ascended** power
+  tech (candidate principles: **antimatter / matter-antimatter annihilation**, and/or a
+  **Lithium-Fusion-burst core** derived from the Ascended Super-Jumpdrive's energy-handling). The
+  literal **"借妖之力以败妖"**: monstrous power-to-weight, catastrophic instability (abandons safety),
+  barely producible. This is the ONLY OS power plant that breaks the ceiling — and it came from the
+  ENEMY, not OS genius, which fits the AU theme (OS humility vs Ascended hubristic transcendence).
