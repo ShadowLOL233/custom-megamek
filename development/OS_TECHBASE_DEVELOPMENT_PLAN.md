@@ -9,12 +9,48 @@ It is a living planning doc — update it as items land.
 ## 0. Design philosophy (applies to all new OS gear)
 
 OS is a **premium** tech base: higher damage / lighter / longer range than IS, at higher BV & cost.
-Naming tiers mirror the engines: **base / "Improve" / "Advance"** (+ superheavy).
 
-- base & Improve  → tech rating **E**
-- Advance         → tech rating **F**, top OS gear may use the new rating **G**
-- Static level: **code is authoritative.** Actual OS Improve AC/LB-X weapons use
-  `SimpleTechLevel.STANDARD`; Advance-tier → `EXPERIMENTAL`.
+### 0.1 Core engineering value — maintainability & modularity first
+OS weapon engineering prizes per-weapon **maintainability (整备性)** and **modularity** ABOVE raw
+performance. This is a deliberate cultural choice and the main reason OS tech advances **slower than
+the Clans** (the Clans sacrifice serviceability for performance; OS refuses to until the Advance /
+Experimental tiers). Because serviceability/modularity is built into every OS weapon, OS **rejects
+"do-everything / integrated" weapons**: combining functions (e.g. an Ultra+LB-X+HVAC platform) costs
+extra weight + crit slots and forfeits the family's low-weight/low-crit advantage to buy a flexibility
+the modular line ALREADY provides — 本末倒置. Specialized, modular, serviceable weapons are preferred
+over multi-role monoliths.
+
+### 0.2 Design-tier ladder (a weapon family may exist at several tiers)
+1. **Standard** — OS's first / baseline implementation of a technology (an attempt or preliminary
+   result). Naming: no prefix ("AC/10", "ER PPC").
+2. **Improve** — refines Standard: raises maintainability & modularity AND appropriately **reduces
+   weight & crit**, at comparable performance. Naming: "Improve X".
+3. **Enhanced** *(NEW tier — not yet in code)* — refines Improve, in ONE of two directions:
+   (a) further reduce weight & crit at Improve performance; OR (b) keep Improve's weight/crit + high
+   maintainability and push raw **performance** as high as possible. Naming: "Enhanced X".
+4. **Advance** — OS's most cutting-edge, most radical, most **Clan-like** design: abandons the
+   maintainability + weight/crit discipline to **maximize performance**, but still reaches
+   **mass production**. Naming: "Advance X".
+5. **Experimental** — **reverse-engineered Ascended tech** (during/after The Long War). More radical
+   than Advance; routinely abandons OS's traditional **safety AND maintainability**; ignores weight/crit
+   entirely. The ONLY tier connected to the Ascended — **all other tiers are purely indigenous, with
+   zero Ascended relation** (RoOS did not foresee the 3140 surprise attack). Naming: TBD.
+
+### 0.3 Implementation mapping (tentative — reconcile before mass edits)
+- Rating/level (tentative): Standard E/Standard · Improve E/Standard · Enhanced E–F/Standard–Advanced
+  · Advance F/Advanced · Experimental F–G/Experimental.
+- **Naming collision warning:** the DESIGN-tier "Experimental" ≠ the code field
+  `SimpleTechLevel.EXPERIMENTAL`. Keep the two concepts distinct in code/docs.
+- Indigenous-tier timeline (all pre-war, Ascended-independent): Standard ~2805–2840 · Improve
+  ~2900–2990 · Enhanced ~3000–3050 *(CONFIRMED — RoOS early-unification era)* · Advance ~3060–3080 ·
+  Experimental (Ascended) 3140+ / 3180–3195. (Fragmentation slowed Standard→Improve; OSR unification
+  ~3000–3059 accelerated Enhanced→Advance — the "unification dividend".)
+- **HVAC's tier — SHELVED** (decision deferred 2026-06-13). HVAC is the electrothermal-chemical AC
+  (mag-rail + chemical boost + LB-X-style elongated barrel for maximum muzzle velocity); it is heavy
+  (11t/7crit) and performance-pushing, yet its lore is an OSR-unification-era arms-consolidation bridge.
+  Tier label (Improve vs Enhanced vs Advance) is parked — see §6.3.
+- **Reclassification work** — the existing ~222 OS weapons mix "Improve/Advance" labels with
+  overlapping intro years and need reclassification + re-dating onto this 5-tier scheme. See §6.
 
 OS gear lives in `outerSphere` subpackages (e.g. `weapons/autoCannons/outerSphere`) or `OS_*` constants.
 
@@ -154,6 +190,36 @@ Tractor/Trailer, Armored/Heavy Chassis, Turrets (Head/Quad/Shoulder/Sponson/Pint
 - **HVAC stat tables (§2) are a tuning starting point — confirm final numbers before implementation.**
 - Decide OS HVAC ammo: dedicated `AC_HVAC_OS` vs reuse `AC_IMP_OS` (recommended: dedicated).
 - For each PRIORITY equipment category (A/B/C/E/G/I): decide which items get OS versions and design
-  base/Improve/Advance stat tables per the §0 philosophy.
+  per the §0.2 tier ladder.
 - Earlier memory note said "base/Improve → static Advanced"; corrected to **STANDARD** per code — keep
   this in mind when copying tech fields.
+
+---
+
+## 6. Naming & tier-reclassification work items (added 2026-06-13)
+
+### 6.1 Rename OS weapons that collide with canon names BUT diverge in design concept
+Where an OS weapon reuses a canon **Clan/IS weapon NAME** but its **design concept differs** from that
+canon weapon, it MUST be **renamed** — so the name doesn't imply it behaves like the canon namesake.
+- **Known cases to rename:** **ATM**, **HAG / HHAG** (the OS designs diverge from the canon Clan ATM /
+  Hyper-Assault Gauss concepts).
+- **Do NOT rename** weapons whose function/design is genuinely close to canon — Laser, PPC, Gauss,
+  LRM/SRM, etc. No pointless renaming.
+- TODO: audit all OS weapon names for canon collisions; flag the conceptually-divergent ones; propose
+  new OS-specific names for those.
+
+### 6.2 Reclassify "Advance"-named weapons that are really Enhanced
+Under the §0.2 ladder, **Advance** = the most radical / "Clan-like" tier (abandons maintainability +
+weight/crit discipline for performance, yet mass-produced). **Many weapons currently named "Advance X"
+are actually just refined, still-serviceable performance bumps** — those belong to the new **Enhanced**
+tier, not Advance.
+- TODO: audit every `Advance*` OS weapon; KEEP as Advance only the truly radical "Clan-like" designs;
+  rename the rest to **Enhanced X** and re-date them into the Enhanced ~3000–3050 band.
+- Current `Advance*` to review: Advance Ultra AC (2/5/10/20), Advance ER PPC, Advance ER Large Laser,
+  Advance ER Large Pulse Laser, Advance Gauss Rifle, Advance Heavy Gauss Rifle.
+
+### 6.3 HVAC tier classification — SHELVED
+Per decision 2026-06-13, HVAC's tier label (Improve vs Enhanced vs Advance) is **deferred**. Recorded
+here so it is not forgotten; resolve alongside §6.2 and the HVAC stat finalization (§2). HVAC is the
+electrothermal-chemical AC; its heavy "range-over-weight" profile leans Advance, but its arms-
+consolidation lore leans earlier — undecided.
