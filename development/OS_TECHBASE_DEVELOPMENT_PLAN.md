@@ -252,3 +252,17 @@ ceiling? Proposed working stance (NOT final):
   literal **"借妖之力以败妖"**: monstrous power-to-weight, catastrophic instability (abandons safety),
   barely producible. This is the ONLY OS power plant that breaks the ceiling — and it came from the
   ENEMY, not OS genius, which fits the AU theme (OS humility vs Ascended hubristic transcendence).
+
+### 6.5 Mobility-enhancement line — myomer / AES / equivalents (SHELVED, but on the roadmap)
+Discussion shelved 2026-06-13, recorded here as a planned design avenue. Background established:
+in BT, ground SPEED is engine-rating-bound (not myomer-bound), so the OS mobility levers are NOT
+"faster baseline myomer" but: actuator-enhancement (precision/agility), myomer overclock (burst speed
+at risk), and strength/heat myomer variants.
+- **Canon reference points:** Myomer (electroactive artificial muscle, engine-powered), TSM
+  (heat≥9 → ~2× physical strength), MASC (overclocks myomer for burst run MP, lock-up risk),
+  RISC Super-Cooled Myomer, and AES (Actuator Enhancement System — per-limb actuator boost; arm AES
+  +physical-attack accuracy, leg AES needs ALL legs; incompatible with MASC / Targeting Computer /
+  advanced myomers; `MiscType.createISAES`, TO:AUE p.91).
+- **OS design avenue (TBD):** OS-flavored AES / safer-MASC / next-gen myomer (improving strength,
+  cooling, reliability or agility — NOT breaking the engine-bound speed cap). Tier per §0.2.
+- Note: OS already has the MASC/Supercharger line (movement boosters) — extend from there.
