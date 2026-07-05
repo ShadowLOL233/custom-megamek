@@ -266,3 +266,70 @@ at risk), and strength/heat myomer variants.
 - **OS design avenue (TBD):** OS-flavored AES / safer-MASC / next-gen myomer (improving strength,
   cooling, reliability or agility — NOT breaking the engine-bound speed cap). Tier per §0.2.
 - Note: OS already has the MASC/Supercharger line (movement boosters) — extend from there.
+
+---
+
+## 7. Planned: BF (Burst-Fire) & RF (Rapid-Fire) AC variants — same-BV flavor sidegrades (added 2026-07-05)
+
+### Design intent
+BF and RF are **not** new power tiers or niches. They are **flavor / playstyle sidegrades of the standard
+OS AC**, carrying **identical BV, tonnage, heat and ammo** to the same-caliber standard AC. Players pick
+them for feel, not power. Calibers 2 / 5 / 10 / 20 for both. This scheme **removes the existing Assault AC
+line** (superseded — see below).
+
+### BF (Burst-Fire) — accuracy-shaped AC
+Identical to the standard OS AC in every stat. The only difference is a **range-bracket to-hit gradient**
+stacked on top of the normal range modifiers:
+- short **−1**, medium **0**, long **+1** (a "brawler's AC" — rewards closing).
+- BV = standard AC (short bonus and long penalty roughly cancel).
+
+Implementation (Option A — mirror the existing PPC-X):
+- Add a block in `actions/compute/ComputeToHit.java` mirroring the `PPCXWeapon` range-dispersion block
+  (~L1526-1543), gated on `weaponType instanceof BurstFireACWeapon`. Only the FIRST `getToHitModifier`
+  site (main compile) — the second (~L1814) is the artillery path, not relevant.
+- Marker base class `BurstFireACWeapon extends ACWeapon`; weapons `OSBurstAC{2,5,10,20}`.
+- Shares standard AC ammo — no new ammo enum.
+- Princess bot NOT patched (it will slightly misjudge, same as PPC-X — accepted).
+
+### RF (Rapid-Fire) — 3-round burst via cluster
+Fires a **3-round burst**: one to-hit roll (**no penalty**), then the **Cluster Hits Table (size 3,
+expected exactly 2.0 hits)** decides how many rounds land, each rolling its own hit location.
+
+Per-shot damage = **standard AC damage ÷ 2**. Because cluster-3 averages exactly 2.0,
+`2.0 × (std ÷ 2) = std` → effective damage equals the standard AC **at every range**, so BV = standard,
+exactly and range-independently. **No +1 penalty, no jam** (either would push effective below standard and
+break BV = standard).
+
+| Model    | shots × dmg | nominal | effective (×2.0) | vs std | BV          |
+|----------|:-----------:|:-------:|:----------------:|:------:|:-----------:|
+| RF AC/2  |    3 × 1    |    3    |        2         |  = std | = std AC/2  |
+| RF AC/5  |    3 × 3    |    9    |        6         | ~120%* | = std AC/5  |
+| RF AC/10 |    3 × 5    |   15    |       10         |  = std | = std AC/10 |
+| RF AC/20 |   3 × 10    |   30    |       20         |  = std | = std AC/20 |
+
+\* AC/5: std ÷ 2 = 2.5 has no integer split; **3 × 3** chosen (effective 6 vs std 5, ~120%). Accepted as a
+deliberate minor over-tune; BV kept at standard AC/5.
+
+Implementation:
+- Build on the **Rotary engine** (`AC_ROTARY` ammo). Required: shot-count / heat are hardwired to the
+  `AC_ULTRA` / `AC_ROTARY` enums, and the cluster-count mechanic is what yields the 2.0 average. Do **NOT**
+  use the old Assault "independent-hit" mechanic — 3 independent to-hits = 1.5× standard, which breaks
+  BV = standard.
+- Handler `OSRapidFireACHandler extends RACWeaponHandler`, overridden to fix **3 shots**, use cluster
+  hits, and **skip the jam roll**.
+- Per-shot damage on the weapon `damage` field; weapons `OSRapidFireAC{2,5,10,20}`.
+- RF shares `AC_ROTARY` ammo with the Rotary line (engine coupling).
+- Naming: MML "Rapid-Fire AC/10"; on the record sheet show the burst (e.g. "5×3" = 5 dmg × 3 shots) so
+  players don't misread the nominal (15) as concentrated damage.
+
+### Assault AC removal
+- Delete weapons `OSAssaultAC{2,5,10,20}` + their `addWeapon` registration.
+- Delete handler `OSAssaultACHandler` (its independent-hit logic is not reused by RF).
+- Ammo enum `AC_ASSAULT_OS` (idx 121): **deprecate / leave as placeholder** — do NOT remove the enum value
+  (ordinal shift would break old saves).
+- Save-compat: custom units referencing `OSAssaultAC*` will fail to load — confirm they are cleaned up.
+
+### Reference math (for tuning)
+- 2d6 to-hit P(≥TN): 7 → 58.3%, 8 → 41.7%, 9 → 27.8% (a ±1 modifier shifts one row).
+- `Compute.clusterHitsTable`: size 3 → rolls 2-4 = 1, 5-9 = 2, 10-12 = 3; P(1/2/3) = 16.7 / 66.7 / 16.7%;
+  **E = 2.00**. Size 2 (Ultra) → rolls 2-7 = 1, 8-12 = 2; E = 1.42.
