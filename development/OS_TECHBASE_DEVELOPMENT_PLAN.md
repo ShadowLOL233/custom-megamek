@@ -6,6 +6,24 @@ It is a living planning doc — update it as items land.
 
 ---
 
+## Contents
+
+Quick index — jump to a section instead of scanning the whole file.
+
+- **Section 0 — Design philosophy**: tier ladder, BV methodology, TechRating, implementation mapping (durable reference).
+- **Section 1 — Status snapshot**: what is implemented in code (some lines pending tier-revision).
+- **Section 2 — Planned: OS HVAC** [active]: electrothermal-chemical AC, heavy calibers 12/14/16/18.
+- **Section 3 — Planned: superheavy unit-cap extensions** [active]: >100t vehicles / VTOL / fighters.
+- **Section 4 — Dev focus: OS versions of canon special equipment** [active]: MiscType catalogue (priority A/B/C/E/G/I).
+- **Section 5 — Open tuning / review items** [active].
+- **Section 6 — Naming & tier-reclassification work items** [active]: subsections 6.3 & 6.5 shelved (see below).
+- **Section 7 — Planned: BF & RF AC variants** [active]: being reclassified to **Inner Sphere** (not OS).
+
+Shelved ideas are parked in **[OS_SHELVED_IDEAS.md](OS_SHELVED_IDEAS.md)**. Splitting this plan into
+per-topic files (weapons / units / equipment) is **deferred** until it grows further.
+
+---
+
 ## 0. Design philosophy (applies to all new OS gear)
 
 OS is a **premium** tech base: higher damage / lighter / longer range than IS, at higher BV & cost.
@@ -225,10 +243,7 @@ tier, not Advance.
   Advance ER Large Pulse Laser, Advance Gauss Rifle, Advance Heavy Gauss Rifle.
 
 ### 6.3 HVAC tier classification — SHELVED
-Per decision 2026-06-13, HVAC's tier label (Improve vs Enhanced vs Advance) is **deferred**. Recorded
-here so it is not forgotten; resolve alongside §6.2 and the HVAC stat finalization (§2). HVAC is the
-electrothermal-chemical AC; its heavy "range-over-weight" profile leans Advance, but its arms-
-consolidation lore leans earlier — undecided.
+Moved to [OS_SHELVED_IDEAS.md](OS_SHELVED_IDEAS.md). Resolve alongside §6.2 and the HVAC stats (§2).
 
 ### 6.4 Engines & internal structure — rename, reclassify, and redesign (added 2026-06-13)
 - **Reclassify (decided):** the current **"Advance"-tier ENGINES and INTERNAL STRUCTURE** are
@@ -253,41 +268,42 @@ ceiling? Proposed working stance (NOT final):
   barely producible. This is the ONLY OS power plant that breaks the ceiling — and it came from the
   ENEMY, not OS genius, which fits the AU theme (OS humility vs Ascended hubristic transcendence).
 
-### 6.5 Mobility-enhancement line — myomer / AES / equivalents (SHELVED, but on the roadmap)
-Discussion shelved 2026-06-13, recorded here as a planned design avenue. Background established:
-in BT, ground SPEED is engine-rating-bound (not myomer-bound), so the OS mobility levers are NOT
-"faster baseline myomer" but: actuator-enhancement (precision/agility), myomer overclock (burst speed
-at risk), and strength/heat myomer variants.
-- **Canon reference points:** Myomer (electroactive artificial muscle, engine-powered), TSM
-  (heat≥9 → ~2× physical strength), MASC (overclocks myomer for burst run MP, lock-up risk),
-  RISC Super-Cooled Myomer, and AES (Actuator Enhancement System — per-limb actuator boost; arm AES
-  +physical-attack accuracy, leg AES needs ALL legs; incompatible with MASC / Targeting Computer /
-  advanced myomers; `MiscType.createISAES`, TO:AUE p.91).
-- **OS design avenue (TBD):** OS-flavored AES / safer-MASC / next-gen myomer (improving strength,
-  cooling, reliability or agility — NOT breaking the engine-bound speed cap). Tier per §0.2.
-- Note: OS already has the MASC/Supercharger line (movement boosters) — extend from there.
+### 6.5 Mobility-enhancement line — myomer / AES / equivalents — SHELVED
+Moved to [OS_SHELVED_IDEAS.md](OS_SHELVED_IDEAS.md).
 
 ---
 
 ## 7. Planned: BF (Burst-Fire) & RF (Rapid-Fire) AC variants — same-BV flavor sidegrades (added 2026-07-05)
 
+> **Reclassification & status (updated 2026-07-05):** BF & RF are **Inner Sphere** tech, not OS. Resolved:
+> names use the MW5 form **"AC/N BF" / "AC/N RF"**; classes/handlers are `IS*` in the `innerSphere` package
+> (`ISRapidFireACHandler`, `ISBurstFireACHandler`); **every tech field mirrors the same-caliber standard IS
+> AC** (TechBase IS, TechRating C, IntroLevel, canon intro dates — a Succession-Wars field modification);
+> **faction unrestricted**; no special OS gating (Mixed-OS access is handled by the mixed-tech system).
+> **RF is implemented & compiles** — `ISRapidFireAC{2,5,10,20}` + `ISRapidFireACWeapon` + `ISRapidFireACHandler`,
+> registered right after `ISAC20`. **BF is implemented & compiles too** — `ISBurstFireAC{2,5,10,20}` + marker `ISBurstFireACWeapon`, plus the
+> range-gradient block in `ComputeToHit` right after the PPC-X block; **no handler needed** (the to-hit
+> modifier runs before any weapon handler).
+
 ### Design intent
 BF and RF are **not** new power tiers or niches. They are **flavor / playstyle sidegrades of the standard
-OS AC**, carrying **identical BV, tonnage, heat and ammo** to the same-caliber standard AC. Players pick
+IS AC**, carrying **identical BV, tonnage and ammo** (heat ≈ standard) to the same-caliber standard AC. Players pick
 them for feel, not power. Calibers 2 / 5 / 10 / 20 for both. This scheme **removes the existing Assault AC
 line** (superseded — see below).
 
 ### BF (Burst-Fire) — accuracy-shaped AC
-Identical to the standard OS AC in every stat. The only difference is a **range-bracket to-hit gradient**
+Identical to the standard IS AC in every stat. The only difference is a **range-bracket to-hit gradient**
 stacked on top of the normal range modifiers:
-- short **−1**, medium **0**, long **+1** (a "brawler's AC" — rewards closing).
-- BV = standard AC (short bonus and long penalty roughly cancel).
+- short **0**, medium **0**, long **−1** (a sustained burst that walks onto distant targets).
+- NOTE: this is now a *pure* accuracy bonus (no offsetting penalty), so BF is strictly >= standard AC; BV =
+  standard therefore under-prices it. Open decision: bump BF's BV for the long-range accuracy, or accept BF
+  mildly dominating standard AC.
 
 Implementation (Option A — mirror the existing PPC-X):
 - Add a block in `actions/compute/ComputeToHit.java` mirroring the `PPCXWeapon` range-dispersion block
-  (~L1526-1543), gated on `weaponType instanceof BurstFireACWeapon`. Only the FIRST `getToHitModifier`
+  (~L1526-1543), gated on `weaponType instanceof ISBurstFireACWeapon`. Only the FIRST `getToHitModifier`
   site (main compile) — the second (~L1814) is the artillery path, not relevant.
-- Marker base class `BurstFireACWeapon extends ACWeapon`; weapons `OSBurstAC{2,5,10,20}`.
+- Marker base class `ISBurstFireACWeapon extends ACWeapon`; weapons `ISBurstFireAC{2,5,10,20}` (names "AC/N BF").
 - Shares standard AC ammo — no new ammo enum.
 - Princess bot NOT patched (it will slightly misjudge, same as PPC-X — accepted).
 
@@ -315,12 +331,32 @@ Implementation:
   `AC_ULTRA` / `AC_ROTARY` enums, and the cluster-count mechanic is what yields the 2.0 average. Do **NOT**
   use the old Assault "independent-hit" mechanic — 3 independent to-hits = 1.5× standard, which breaks
   BV = standard.
-- Handler `OSRapidFireACHandler extends RACWeaponHandler`, overridden to fix **3 shots**, use cluster
+- Handler `ISRapidFireACHandler extends RACHandler`, overridden to fix **3 shots**, use cluster
   hits, and **skip the jam roll**.
-- Per-shot damage on the weapon `damage` field; weapons `OSRapidFireAC{2,5,10,20}`.
+- Per-shot damage on the weapon `damage` field; weapons `ISRapidFireAC{2,5,10,20}` (names "AC/N RF").
 - RF shares `AC_ROTARY` ammo with the Rotary line (engine coupling).
-- Naming: MML "Rapid-Fire AC/10"; on the record sheet show the burst (e.g. "5×3" = 5 dmg × 3 shots) so
+- Naming: MML "AC/10 RF"; on the record sheet show the burst (e.g. "5×3" = 5 dmg × 3 shots) so
   players don't misread the nominal (15) as concentrated damage.
+
+### Dedicated ammo for BF & RF (implemented — 2026-07-05)
+**Shipped & compiles:** enums `AC_BF`(135) / `AC_RF`(136); 8 ammo entries ("AC/N BF Ammo" / "AC/N RF Ammo")
+via the `createDedicatedACAmmo` helper (not added to `acAmmos`, so no munition variants); `getNumShots`
+patched to include `AC_RF` (path A) so RF's per-shot heat still scales x3; weapons wired
+(`ISBurstFireACWeapon` -> `AC_BF`, `ISRapidFireACWeapon` -> `AC_RF`).
+
+Background: BF fed standard `AC` ammo and RF fed `AC_ROTARY` ("Rotary AC/N Ammo") — the latter mislabels an
+RF weapon and lets both cross-load with unrelated ACs. Plan: give each its own ammo type so bins are
+labelled correctly and not shared with standard / Rotary AC.
+- **New enums** `AC_BF`, `AC_RF` (IS, no OS suffix). New entries "AC/N BF Ammo" / "AC/N RF Ammo";
+  shots/ton = standard AC (45 / 20 / 10 / 5); tech fields mirror standard AC ammo.
+- **Wire**: set `ammoType` on the marker bases (`ISBurstFireACWeapon` → `AC_BF`, `ISRapidFireACWeapon` → `AC_RF`).
+- **RF heat fix (engine, 1 line):** `Mounted.getNumShots` (~L892) keys the multi-shot count off the ammo enum
+  (AC_ULTRA / AC_ROTARY); a dedicated `AC_RF` would fall through → `getCurrentShots() = 1` → per-shot heat
+  stops scaling. Fix = add `AC_RF` to the `AC_ROTARY` branch (mirrors the MG_OS precedent), keeping per-shot
+  heat 0/0/1/2. *Alternative:* no patch, set RF base heat to the total 0/0/3/6 and accept `getCurrentShots()=1`.
+- Firing / cluster / ammo-consumption are handler + mode driven — unaffected by the enum change.
+- AmmoTypeEnum uses explicit indices — pick free ones (the freed `AC_ASSAULT_OS` slot is a candidate once
+  Assault is removed).
 
 ### Assault AC removal
 - Delete weapons `OSAssaultAC{2,5,10,20}` + their `addWeapon` registration.

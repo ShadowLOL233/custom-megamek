@@ -1,0 +1,3 @@
+# Normalize line endings for the OS development docs, to stop the CRLF-vs-LF "phantom modified" noise.
+# Applies on the next commit of each file; run `git add --renormalize development` once to apply in bulk.
+*.md text eol=lf
