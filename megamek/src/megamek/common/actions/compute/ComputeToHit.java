@@ -1542,6 +1542,17 @@ public class ComputeToHit {
             }
         }
 
+        // Burst-Fire AC (IS): +0 at short/medium, -1 to-hit at long range and beyond — the sustained
+        // burst walks onto a distant target more reliably (a net accuracy bonus at range only).
+        if (target != null
+              && weaponType instanceof megamek.common.weapons.autoCannons.innerSphere.ISBurstFireACWeapon) {
+            int nRange = ae.getPosition().distance(target.getPosition());
+            int[] nRanges = weaponType.getRanges(weapon, ammo);
+            if (nRange > nRanges[RangeType.RANGE_MEDIUM]) {
+                toHit.addModifier(-1, Messages.getString("WeaponAttackAction.WeaponMod"));
+            }
+        }
+
         // Indirect fire (LRMs, mortars and the like) has a +1 mod
         if (isIndirect) {
             toHit.addModifier(1, Messages.getString("WeaponAttackAction.Indirect"));

@@ -1721,6 +1721,16 @@ public class WeaponType extends EquipmentType {
         EquipmentType.addType(new ISAC5());
         EquipmentType.addType(new ISAC10());
         EquipmentType.addType(new ISAC20());
+        // IS Rapid-Fire AC (fixed 3-round cluster burst, no jam; MW5-style "AC/N RF", same-BV flavor of standard AC)
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.innerSphere.ISRapidFireAC2());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.innerSphere.ISRapidFireAC5());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.innerSphere.ISRapidFireAC10());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.innerSphere.ISRapidFireAC20());
+        // IS Burst-Fire AC (standard AC + range-bracket to-hit gradient -1/0/+1; MW5-style "AC/N BF")
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.innerSphere.ISBurstFireAC2());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.innerSphere.ISBurstFireAC5());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.innerSphere.ISBurstFireAC10());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.innerSphere.ISBurstFireAC20());
         EquipmentType.addType(new CLProtoMekAC2());
         EquipmentType.addType(new CLProtoMekAC4());
         EquipmentType.addType(new CLProtoMekAC8());

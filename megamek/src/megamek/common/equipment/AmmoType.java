@@ -219,7 +219,10 @@ public class AmmoType extends EquipmentType {
         MG_OS(131, "Machine Gun (OS)", AmmoCategory.Ballistic),
         MG_HEAVY_OS(132, "Heavy Machine Gun (OS)", AmmoCategory.Ballistic),
         MACHINE_CANNON_OS(133, "Machine Cannon (OS)", AmmoCategory.Ballistic),
-        HEAVY_MACHINE_CANNON_OS(134, "Heavy Machine Cannon (OS)", AmmoCategory.Ballistic);
+        HEAVY_MACHINE_CANNON_OS(134, "Heavy Machine Cannon (OS)", AmmoCategory.Ballistic),
+        // Dedicated IS Burst-Fire / Rapid-Fire AC ammo (own bins, not shared with standard / Rotary AC)
+        AC_BF(135, "Burst-Fire Autocannon", AmmoCategory.Ballistic),
+        AC_RF(136, "Rapid-Fire Autocannon", AmmoCategory.Ballistic);
 
         private static final Map<Integer, AmmoTypeEnum> INDEX_LOOKUP = new HashMap<>();
 
@@ -2696,6 +2699,16 @@ public class AmmoType extends EquipmentType {
         acAmmos.add(base);
         EquipmentType.addType(base);
 
+        // Dedicated Burst-Fire / Rapid-Fire AC ammo (not added to acAmmos, so no munition variants)
+        EquipmentType.addType(createDedicatedACAmmo(AmmoTypeEnum.AC_BF, "BF", 2, 45, 5, 1000, 2290, 2300, 2305));
+        EquipmentType.addType(createDedicatedACAmmo(AmmoTypeEnum.AC_BF, "BF", 5, 20, 9, 4500, 2240, 2250, 2255));
+        EquipmentType.addType(createDedicatedACAmmo(AmmoTypeEnum.AC_BF, "BF", 10, 10, 15, 6000, 2443, 2460, 2465));
+        EquipmentType.addType(createDedicatedACAmmo(AmmoTypeEnum.AC_BF, "BF", 20, 5, 22, 10000, 2488, 2500, 2502));
+        EquipmentType.addType(createDedicatedACAmmo(AmmoTypeEnum.AC_RF, "RF", 2, 45, 5, 1000, 2290, 2300, 2305));
+        EquipmentType.addType(createDedicatedACAmmo(AmmoTypeEnum.AC_RF, "RF", 5, 20, 9, 4500, 2240, 2250, 2255));
+        EquipmentType.addType(createDedicatedACAmmo(AmmoTypeEnum.AC_RF, "RF", 10, 10, 15, 6000, 2443, 2460, 2465));
+        EquipmentType.addType(createDedicatedACAmmo(AmmoTypeEnum.AC_RF, "RF", 20, 5, 22, 10000, 2488, 2500, 2502));
+
         base = AmmoType.createISLRM5Ammo();
         lrmAmmos.add(base);
         EquipmentType.addType(base);
@@ -4687,6 +4700,33 @@ public class AmmoType extends EquipmentType {
     }
 
     // AUTOCANNON AND RIFLE AMMO
+
+    // Dedicated Burst-Fire / Rapid-Fire AC ammo — a plain AC round in its own bin (own AmmoTypeEnum, so it
+    // is not interchangeable with standard AC or Rotary AC). Stats mirror the standard AC ammo of the same
+    // caliber; tag is "BF" or "RF".
+    private static AmmoType createDedicatedACAmmo(AmmoTypeEnum type, String tag, int rackSize, int shots,
+          int bv, int cost, int intro1, int intro2, int intro3) {
+        AmmoType ammo = new AmmoType();
+        ammo.name = "AC/" + rackSize + " " + tag + " Ammo";
+        ammo.shortName = "AC/" + rackSize + " " + tag;
+        ammo.setInternalName("IS Ammo AC/" + rackSize + " " + tag);
+        ammo.addLookupName("IS" + tag + "AC" + rackSize + " Ammo");
+        ammo.damagePerShot = 1;
+        ammo.rackSize = rackSize;
+        ammo.ammoType = type;
+        ammo.shots = shots;
+        ammo.bv = bv;
+        ammo.cost = cost;
+        ammo.techAdvancement.setTechBase(TechBase.ALL)
+              .setIntroLevel(true)
+              .setTechRating(TechRating.B)
+              .setAvailability(AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.D)
+              .setISAdvancement(intro1, intro2, intro3, DATE_NONE, DATE_NONE)
+              .setISApproximate(false, false, false, false, false)
+              .setClanAdvancement(intro1, intro2, intro3, 2850, DATE_NONE)
+              .setClanApproximate(false, false, false, true, false);
+        return ammo;
+    }
 
     private static AmmoType createISAC2Ammo() {
         AmmoType ammo = new AmmoType();

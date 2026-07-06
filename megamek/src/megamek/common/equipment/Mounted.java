@@ -890,6 +890,7 @@ public class Mounted<T extends EquipmentType> implements Serializable, RoundUpda
               (ignoreMode || ((mode != null) && mode.equals(Weapon.MODE_AC_RAPID)))) {
             return 2;
         } else if ((weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.AC_ROTARY) ||
+              (weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.AC_RF) ||
               weaponType.hasFlag(WeaponType.F_PPC_ROTARY) ||
               weaponType.getInternalName().equals(BattleArmor.MINE_LAUNCHER)) {
             if (ignoreMode || (mode == null) || mode.equals(Weapon.MODE_RAC_SIX_SHOT)) {
