@@ -1571,11 +1571,6 @@ public class WeaponType extends EquipmentType {
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSRotaryAC5());
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSRotaryAC10());
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSRotaryAC20());
-        // OS Assault AC (3-projectile burst)
-        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAssaultAC2());
-        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAssaultAC5());
-        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAssaultAC10());
-        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAssaultAC20());
         // OS Ultra LB-X (LB-X + Ultra-style double tap)
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSUltraLB5XAC());
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSUltraLB10XAC());

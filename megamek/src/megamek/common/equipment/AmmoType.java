@@ -202,6 +202,8 @@ public class AmmoType extends EquipmentType {
         // Outer Sphere (OS) autocannon ammo families - one enum per mechanism, calibers split by rackSize.
         // Ultra/Rotary reuse the canon AC_ULTRA/AC_ROTARY enums (their multi-shot heat is hard-keyed to those).
         AC_IMP_OS(120, "Improve Autocannon (OS)", AmmoCategory.Ballistic),
+        // DEPRECATED: Assault AC line removed (superseded by IS BF/RF autocannons). Enum value kept
+        // as a placeholder so later ordinals do not shift and break old saves. No AmmoType uses it.
         AC_ASSAULT_OS(121, "Assault Autocannon (OS)", AmmoCategory.Ballistic),
         LBX_OS(122, "LB-X Autocannon (OS)", AmmoCategory.Ballistic),
         // OS Gauss families - single-shot so safe to use custom enums (no engine multi-shot coupling).
@@ -3111,11 +3113,6 @@ public class AmmoType extends EquipmentType {
         EquipmentType.addType(AmmoType.createOSLB10XClusterAmmo());
         EquipmentType.addType(AmmoType.createOSLB20XAmmo());
         EquipmentType.addType(AmmoType.createOSLB20XClusterAmmo());
-        // Outer Sphere (OS) Assault AC ammo
-        EquipmentType.addType(AmmoType.createOSAssaultAC2Ammo());
-        EquipmentType.addType(AmmoType.createOSAssaultAC5Ammo());
-        EquipmentType.addType(AmmoType.createOSAssaultAC10Ammo());
-        EquipmentType.addType(AmmoType.createOSAssaultAC20Ammo());
         // Outer Sphere (OS) Gauss ammo
         EquipmentType.addType(AmmoType.createOSGaussAmmo());
         EquipmentType.addType(AmmoType.createOSLightGaussAmmo());
@@ -12380,23 +12377,6 @@ public class AmmoType extends EquipmentType {
 
     private static AmmoType createOSLB20XClusterAmmo() {
         return makeOSLBXClusterAmmo("LB 20-X", "OSLB20XClusterAmmo", 20, 6, 30, 30000);
-    }
-
-    // OS Assault AC ammo (one burst = one round; per-shot damage from the weapon)
-    private static AmmoType createOSAssaultAC2Ammo() {
-        return makeOSACAmmo("Assault AC/2", "OSAssaultAC2Ammo", AmmoTypeEnum.AC_ASSAULT_OS, 2, 20, 6, 2000);
-    }
-
-    private static AmmoType createOSAssaultAC5Ammo() {
-        return makeOSACAmmo("Assault AC/5", "OSAssaultAC5Ammo", AmmoTypeEnum.AC_ASSAULT_OS, 5, 10, 16, 7000);
-    }
-
-    private static AmmoType createOSAssaultAC10Ammo() {
-        return makeOSACAmmo("Assault AC/10", "OSAssaultAC10Ammo", AmmoTypeEnum.AC_ASSAULT_OS, 10, 5, 24, 12000);
-    }
-
-    private static AmmoType createOSAssaultAC20Ammo() {
-        return makeOSACAmmo("Assault AC/20", "OSAssaultAC20Ammo", AmmoTypeEnum.AC_ASSAULT_OS, 20, 3, 34, 18000);
     }
 
     // OUTER SPHERE (OS) GAUSS RIFLE AMMO
