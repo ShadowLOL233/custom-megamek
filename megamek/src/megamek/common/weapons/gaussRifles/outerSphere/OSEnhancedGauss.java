@@ -26,17 +26,19 @@ import megamek.common.weapons.handlers.AttackHandler;
 import megamek.common.weapons.handlers.GRHandler;
 import megamek.server.totalWarfare.TWGameManager;
 
-/** Outer Sphere Advance Gauss - 10t / 5 crit / extra-long range 9-18-27 / Experimental. */
-public class OSAdvanceGauss extends GaussWeapon {
+/** Outer Sphere Enhanced Gauss - 10t / 5 crit / extra-long range 9-18-27 / Experimental. */
+public class OSEnhancedGauss extends GaussWeapon {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public OSAdvanceGauss() {
+    public OSEnhancedGauss() {
         super();
-        name = "Advance Gauss Rifle";
-        setInternalName("OSAdvanceGauss");
+        name = "Enhanced Gauss Rifle";
+        setInternalName("OSEnhancedGauss");
+        addLookupName("OSAdvanceGauss");
+        addLookupName("Advance Gauss Rifle");
         addLookupName("OS Advance Gauss Rifle");
-        sortingName = "Gauss OS 2 Std 3 Adv";
+        sortingName = "Gauss OS 2 Std 3 Enh";
         heat = 1;
         damage = 15;
         ammoType = AmmoType.AmmoTypeEnum.GAUSS_OS;
@@ -59,11 +61,11 @@ public class OSAdvanceGauss extends GaussWeapon {
               .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
-              .setISAdvancement(3130, 3135, 3140, DATE_NONE, DATE_NONE)
+              .setISAdvancement(3000, 3025, 3050, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
-              .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
     }
 
     @Override

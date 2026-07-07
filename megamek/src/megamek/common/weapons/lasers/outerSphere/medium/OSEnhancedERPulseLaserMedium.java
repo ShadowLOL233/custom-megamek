@@ -19,17 +19,17 @@ import megamek.common.weapons.lasers.PulseLaserWeapon;
  * Outer Sphere Advanced ER Medium Pulse Laser
  * Damage 10 / Heat 12 / Range 4-8-12 / -3 ToHit, 2t / 2 crit
  */
-public class OSAdvanceERPulseLaserMedium extends PulseLaserWeapon {
+public class OSEnhancedERPulseLaserMedium extends PulseLaserWeapon {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public OSAdvanceERPulseLaserMedium() {
+    public OSEnhancedERPulseLaserMedium() {
         super();
-        name = "Advance ER Medium Pulse Laser";
-        setInternalName("OSAdvanceERMediumPulseLaser");
+        name = "Enhanced ER Medium Pulse Laser";
+        setInternalName("OSEnhancedERMediumPulseLaser");
         addLookupName("OS Advance ER Medium Pulse Laser");
-        addLookupName("OSAdvanceERPulseLaserMedium");
-        sortingName = "Laser OS 07 ERPulse 3 Adv B";
+        addLookupName("OSEnhancedERPulseLaserMedium");
+        sortingName = "Laser OS 07 ERPulse 3 Enh B";
         heat = 12;
         damage = 10;
         toHitModifier = -3;
@@ -54,10 +54,10 @@ public class OSAdvanceERPulseLaserMedium extends PulseLaserWeapon {
               .setUnofficial(false)
               .setTechRating(TechRating.G)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
-              .setISAdvancement(3140, 3145, 3150, DATE_NONE, DATE_NONE)
+              .setISAdvancement(3000, 3025, 3050, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
-              .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
     }
 }

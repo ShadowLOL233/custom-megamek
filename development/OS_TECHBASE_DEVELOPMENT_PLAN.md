@@ -49,26 +49,34 @@ over multi-role monoliths.
 4. **Advance** — OS's most cutting-edge, most radical, most **Clan-like** design: abandons the
    maintainability + weight/crit discipline to **maximize performance**, but still reaches
    **mass production**. Naming: "Advance X".
-5. **Experimental** — **reverse-engineered Ascended tech** (during/after The Long War). More radical
-   than Advance; routinely abandons OS's traditional **safety AND maintainability**; ignores weight/crit
-   entirely. The ONLY tier connected to the Ascended — **all other tiers are purely indigenous, with
-   zero Ascended relation** (RoOS did not foresee the 3140 surprise attack). Naming: TBD.
+5. **Experimental** — OS's most radical tier: more radical than Advance; routinely abandons OS's
+   traditional **safety AND maintainability**; ignores weight/crit entirely. **Dating rule (revised
+   2026-07-06):** Experimental gear is usable from **~3050** (`3045/3050/3055`) by default — it is NOT
+   auto-locked to the post-war era. Only items **explicitly designated as reverse-engineered Ascended
+   tech** are locked to **3140+**; everything else in this tier is indigenous. Naming: TBD.
 
 ### 0.3 Implementation mapping (tentative — reconcile before mass edits)
 - Rating/level (tentative): Standard E/Standard · Improve E/Standard · Enhanced E–F/Standard–Advanced
   · Advance F/Advanced · Experimental F–G/Experimental.
 - **Naming collision warning:** the DESIGN-tier "Experimental" ≠ the code field
   `SimpleTechLevel.EXPERIMENTAL`. Keep the two concepts distinct in code/docs.
-- Indigenous-tier timeline (all pre-war, Ascended-independent): Standard ~2805–2840 · Improve
-  ~2900–2990 · Enhanced ~3000–3050 *(CONFIRMED — RoOS early-unification era)* · Advance ~3060–3080 ·
-  Experimental (Ascended) 3140+ / 3180–3195. (Fragmentation slowed Standard→Improve; OSR unification
-  ~3000–3059 accelerated Enhanced→Advance — the "unification dividend".)
+- Tier timeline — concrete `ISAdvancement(prototype/production/common)` triplets (APPLIED to all OS
+  weapons 2026-07-06): Standard `2805/2820/2840` · Improve `2900/2930/2960` · Enhanced `3000/3025/3050`
+  *(CONFIRMED — RoOS early-unification era; no weapons tagged Enhanced yet)* · Advance `3060/3070/3080` ·
+  Experimental `3045/3050/3055` (indigenous, usable from ~3050). **Ascended reverse-engineered** gear is
+  a separately-flagged exception dated **3140+ / 3180–3195**. (Fragmentation slowed Standard→Improve;
+  OSR unification ~3000–3059 accelerated Enhanced→Advance — the "unification dividend".)
 - **HVAC's tier — SHELVED** (decision deferred 2026-06-13). HVAC is the electrothermal-chemical AC
   (mag-rail + chemical boost + LB-X-style elongated barrel for maximum muzzle velocity); it is heavy
   (11t/7crit) and performance-pushing, yet its lore is an OSR-unification-era arms-consolidation bridge.
   Tier label (Improve vs Enhanced vs Advance) is parked — see §6.3.
-- **Reclassification work** — the existing ~222 OS weapons mix "Improve/Advance" labels with
-  overlapping intro years and need reclassification + re-dating onto this 5-tier scheme. See §6.
+- **Re-dating — DONE (2026-07-06):** all 218 dated OS weapons were re-dated onto the triplets above,
+  classified by name token (Improve/Advance/Hyper) with a `SimpleTechLevel` fallback for untokened
+  weapons. Counts at re-dating: Standard 65 · Improve 67 · Advance 71 · Experimental 15.
+- **Advance→Enhanced weapon reclassification — DONE (2026-07-06):** all 20 `OSAdvance*`-named weapons
+  renamed `OSEnhanced*` ("Enhanced X"), re-dated to Enhanced `3000/3025/3050`, EXPERIMENTAL-static ones
+  dropped to ADVANCED; old internal/display names kept as `addLookupName` for save-compat. Engine &
+  structure Advance→Enhanced is still pending (see §6.4).
 
 OS gear lives in `outerSphere` subpackages (e.g. `weapons/autoCannons/outerSphere`) or `OS_*` constants.
 
@@ -232,15 +240,16 @@ canon weapon, it MUST be **renamed** — so the name doesn't imply it behaves li
 - TODO: audit all OS weapon names for canon collisions; flag the conceptually-divergent ones; propose
   new OS-specific names for those.
 
-### 6.2 Reclassify "Advance"-named weapons that are really Enhanced
-Under the §0.2 ladder, **Advance** = the most radical / "Clan-like" tier (abandons maintainability +
-weight/crit discipline for performance, yet mass-produced). **Many weapons currently named "Advance X"
-are actually just refined, still-serviceable performance bumps** — those belong to the new **Enhanced**
-tier, not Advance.
-- TODO: audit every `Advance*` OS weapon; KEEP as Advance only the truly radical "Clan-like" designs;
-  rename the rest to **Enhanced X** and re-date them into the Enhanced ~3000–3050 band.
-- Current `Advance*` to review: Advance Ultra AC (2/5/10/20), Advance ER PPC, Advance ER Large Laser,
-  Advance ER Large Pulse Laser, Advance Gauss Rifle, Advance Heavy Gauss Rifle.
+### 6.2 Reclassify "Advance"-named weapons that are really Enhanced — DONE (2026-07-06)
+Under the §0.2 ladder, **Advance** = the most radical / "Clan-like" tier. Per user decision, **ALL 20
+`OSAdvance*`-named weapons were reclassified to Enhanced** (none kept as Advance): renamed `OSEnhanced*`
+/ "Enhanced X", re-dated to Enhanced `3000/3025/3050`, EXPERIMENTAL-static → ADVANCED, old names kept as
+`addLookupName` for save-compat. Compiles.
+- Weapons reclassified: Enhanced Ultra AC (2/5/10/20), Enhanced ER PPC, Enhanced ER (Large/Medium/Small)
+  Laser, Enhanced ER (Large/Medium/Small) Pulse Laser, Enhanced Gauss Rifle, Enhanced Heavy Gauss Rifle,
+  Enhanced LRM (5/10/15/20), Enhanced SRM (2/4/6).
+- Note: the "Advance" tier now holds only untokened `ADVANCED`-static weapons (PPC-X, Rotary Light PPC,
+  etc.); a *new*, genuinely-radical Advance line can be designed later under §0.2.
 
 ### 6.3 HVAC tier classification — SHELVED
 Moved to [OS_SHELVED_IDEAS.md](OS_SHELVED_IDEAS.md). Resolve alongside §6.2 and the HVAC stats (§2).

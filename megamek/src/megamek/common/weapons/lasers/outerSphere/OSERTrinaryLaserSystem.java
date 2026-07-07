@@ -64,7 +64,7 @@ public class OSERTrinaryLaserSystem extends LaserWeapon {
               .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E)
-              .setISAdvancement(3138, 3142, 3148, DATE_NONE, DATE_NONE)
+              .setISAdvancement(3060, 3070, 3080, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)

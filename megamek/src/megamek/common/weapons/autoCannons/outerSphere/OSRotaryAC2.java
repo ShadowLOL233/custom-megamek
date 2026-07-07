@@ -46,7 +46,7 @@ public class OSRotaryAC2 extends RACWeapon {
               .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
-              .setISAdvancement(3130, 3135, 3140, DATE_NONE, DATE_NONE)
+              .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)

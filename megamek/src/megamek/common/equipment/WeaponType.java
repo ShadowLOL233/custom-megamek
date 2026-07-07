@@ -277,8 +277,8 @@ import megamek.common.weapons.lasers.outerSphere.OSERBinaryLaserSystem;
 import megamek.common.weapons.lasers.outerSphere.OSERTrinaryLaserSystem;
 import megamek.common.weapons.lasers.outerSphere.OSHyperLaserLarge;
 import megamek.common.weapons.lasers.outerSphere.OSTrinaryLaserSystem;
-import megamek.common.weapons.lasers.outerSphere.large.OSAdvanceERLaserLarge;
-import megamek.common.weapons.lasers.outerSphere.large.OSAdvanceERPulseLaserLarge;
+import megamek.common.weapons.lasers.outerSphere.large.OSEnhancedERLaserLarge;
+import megamek.common.weapons.lasers.outerSphere.large.OSEnhancedERPulseLaserLarge;
 import megamek.common.weapons.lasers.outerSphere.large.OSERHeavyLaserLarge;
 import megamek.common.weapons.lasers.outerSphere.large.OSERLaserLarge;
 import megamek.common.weapons.lasers.outerSphere.large.OSERPulseLaserLarge;
@@ -291,8 +291,8 @@ import megamek.common.weapons.lasers.outerSphere.large.OSImproveHeavyPulseLaserL
 import megamek.common.weapons.lasers.outerSphere.large.OSImproveLaserLarge;
 import megamek.common.weapons.lasers.outerSphere.large.OSLaserLarge;
 import megamek.common.weapons.lasers.outerSphere.large.OSImprovePulseLaserLarge;
-import megamek.common.weapons.lasers.outerSphere.medium.OSAdvanceERLaserMedium;
-import megamek.common.weapons.lasers.outerSphere.medium.OSAdvanceERPulseLaserMedium;
+import megamek.common.weapons.lasers.outerSphere.medium.OSEnhancedERLaserMedium;
+import megamek.common.weapons.lasers.outerSphere.medium.OSEnhancedERPulseLaserMedium;
 import megamek.common.weapons.lasers.outerSphere.medium.OSERHeavyLaserMedium;
 import megamek.common.weapons.lasers.outerSphere.medium.OSERLaserMedium;
 import megamek.common.weapons.lasers.outerSphere.medium.OSERPulseLaserMedium;
@@ -305,8 +305,8 @@ import megamek.common.weapons.lasers.outerSphere.medium.OSImproveHeavyPulseLaser
 import megamek.common.weapons.lasers.outerSphere.medium.OSImproveLaserMedium;
 import megamek.common.weapons.lasers.outerSphere.medium.OSLaserMedium;
 import megamek.common.weapons.lasers.outerSphere.medium.OSImprovePulseLaserMedium;
-import megamek.common.weapons.lasers.outerSphere.small.OSAdvanceERLaserSmall;
-import megamek.common.weapons.lasers.outerSphere.small.OSAdvanceERPulseLaserSmall;
+import megamek.common.weapons.lasers.outerSphere.small.OSEnhancedERLaserSmall;
+import megamek.common.weapons.lasers.outerSphere.small.OSEnhancedERPulseLaserSmall;
 import megamek.common.weapons.lasers.outerSphere.small.OSERHeavyLaserSmall;
 import megamek.common.weapons.lasers.outerSphere.small.OSERLaserSmall;
 import megamek.common.weapons.lasers.outerSphere.small.OSERPulseLaserSmall;
@@ -1424,9 +1424,9 @@ public class WeaponType extends EquipmentType {
         EquipmentType.addType(new OSImproveERLaserMedium());
         EquipmentType.addType(new OSImproveERLaserLarge());
         // Adv. ER Lasers (-1 ToHit)
-        EquipmentType.addType(new OSAdvanceERLaserSmall());
-        EquipmentType.addType(new OSAdvanceERLaserMedium());
-        EquipmentType.addType(new OSAdvanceERLaserLarge());
+        EquipmentType.addType(new OSEnhancedERLaserSmall());
+        EquipmentType.addType(new OSEnhancedERLaserMedium());
+        EquipmentType.addType(new OSEnhancedERLaserLarge());
         // Imp. Pulse Lasers (-2 ToHit)
         EquipmentType.addType(new OSImprovePulseLaserSmall());
         EquipmentType.addType(new OSImprovePulseLaserMedium());
@@ -1440,9 +1440,9 @@ public class WeaponType extends EquipmentType {
         EquipmentType.addType(new OSImproveERPulseLaserMedium());
         EquipmentType.addType(new OSImproveERPulseLaserLarge());
         // Adv. ER Pulse Lasers (-3 ToHit)
-        EquipmentType.addType(new OSAdvanceERPulseLaserSmall());
-        EquipmentType.addType(new OSAdvanceERPulseLaserMedium());
-        EquipmentType.addType(new OSAdvanceERPulseLaserLarge());
+        EquipmentType.addType(new OSEnhancedERPulseLaserSmall());
+        EquipmentType.addType(new OSEnhancedERPulseLaserMedium());
+        EquipmentType.addType(new OSEnhancedERPulseLaserLarge());
         // Heavy Lasers (+1 ToHit)
         EquipmentType.addType(new OSHeavyLaserSmall());
         EquipmentType.addType(new OSHeavyLaserMedium());
@@ -1492,7 +1492,7 @@ public class WeaponType extends EquipmentType {
         // Improve / Advance tier
         EquipmentType.addType(new megamek.common.weapons.ppc.outerSphere.OSImprovePPC());
         EquipmentType.addType(new megamek.common.weapons.ppc.outerSphere.OSImproveERPPC());
-        EquipmentType.addType(new megamek.common.weapons.ppc.outerSphere.OSAdvanceERPPC());
+        EquipmentType.addType(new megamek.common.weapons.ppc.outerSphere.OSEnhancedERPPC());
         // Light / Snub-Nose family
         EquipmentType.addType(new megamek.common.weapons.ppc.outerSphere.OSLightPPC());
         EquipmentType.addType(new megamek.common.weapons.ppc.outerSphere.OSSnubNosePPC());
@@ -1562,10 +1562,10 @@ public class WeaponType extends EquipmentType {
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSImproveUltraAC10());
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSImproveUltraAC20());
         // OS Advance Ultra AC (up to 3 shots; rotary-style multi-shot)
-        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAdvanceUltraAC2());
-        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAdvanceUltraAC5());
-        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAdvanceUltraAC10());
-        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSAdvanceUltraAC20());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSEnhancedUltraAC2());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSEnhancedUltraAC5());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSEnhancedUltraAC10());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSEnhancedUltraAC20());
         // OS Rotary AC
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSRotaryAC2());
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSRotaryAC5());
@@ -1579,12 +1579,12 @@ public class WeaponType extends EquipmentType {
         // Outer Sphere (OS) Gauss Rifles
         EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSGaussRifle());
         EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSImproveGauss());
-        EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSAdvanceGauss());
+        EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSEnhancedGauss());
         EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSLightGauss());
         EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSUltraLightGauss());
         EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSHeavyGauss());
         EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSImproveHeavyGauss());
-        EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSAdvanceHeavyGauss());
+        EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSEnhancedHeavyGauss());
         EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSSuperHeavyGauss());
         EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSAPGauss());
         EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSMagshotGauss());
@@ -1612,10 +1612,10 @@ public class WeaponType extends EquipmentType {
         EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveLRM10());
         EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveLRM15());
         EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveLRM20());
-        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSAdvanceLRM5());
-        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSAdvanceLRM10());
-        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSAdvanceLRM15());
-        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSAdvanceLRM20());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSEnhancedLRM5());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSEnhancedLRM10());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSEnhancedLRM15());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSEnhancedLRM20());
         EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSERLRM10());
         EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSERLRM15());
         EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSERLRM20());
@@ -1628,9 +1628,9 @@ public class WeaponType extends EquipmentType {
         EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveSRM2());
         EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveSRM4());
         EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSImproveSRM6());
-        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSAdvanceSRM2());
-        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSAdvanceSRM4());
-        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSAdvanceSRM6());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSEnhancedSRM2());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSEnhancedSRM4());
+        EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSEnhancedSRM6());
         EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSHeavySRM4());
         EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSHeavySRM6());
         EquipmentType.addType(new megamek.common.weapons.missiles.outerSphere.OSHeavySRM8());

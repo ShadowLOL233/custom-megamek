@@ -73,7 +73,7 @@ public class OSHyperLaserLarge extends LaserWeapon {
               .setUnofficial(false)
               .setTechRating(TechRating.G)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
-              .setISAdvancement(3140, 3145, 3150, DATE_NONE, DATE_NONE)
+              .setISAdvancement(3045, 3050, 3055, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)

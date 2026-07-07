@@ -13,50 +13,50 @@ import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
 import megamek.common.enums.TechRating;
-import megamek.common.weapons.lasers.PulseLaserWeapon;
+import megamek.common.weapons.lasers.LaserWeapon;
 
 /**
- * Outer Sphere Advanced ER Small Pulse Laser
- * Damage 5 / Heat 4 / Range 3-5-7 / -3 ToHit, 1t / 1 crit
+ * Outer Sphere Advanced ER Small Laser
+ * Damage 5 / Heat 3 / Range 3-5-8 / -1 ToHit, 0.5t / 1 crit
  */
-public class OSAdvanceERPulseLaserSmall extends PulseLaserWeapon {
+public class OSEnhancedERLaserSmall extends LaserWeapon {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public OSAdvanceERPulseLaserSmall() {
+    public OSEnhancedERLaserSmall() {
         super();
-        name = "Advance ER Small Pulse Laser";
-        setInternalName("OSAdvanceERSmallPulseLaser");
-        addLookupName("OS Advance ER Small Pulse Laser");
-        addLookupName("OSAdvanceERPulseLaserSmall");
-        sortingName = "Laser OS 07 ERPulse 3 Adv A";
-        heat = 4;
+        name = "Enhanced ER Small Laser";
+        setInternalName("OSEnhancedERSmallLaser");
+        addLookupName("OS Advance ER Small Laser");
+        addLookupName("OSEnhancedERLaserSmall");
+        sortingName = "Laser OS 03 ER 3 Enh A";
+        heat = 3;
         damage = 5;
-        toHitModifier = -3;
+        toHitModifier = -1;
         shortRange = 3;
         mediumRange = 5;
-        longRange = 7;
+        longRange = 8;
         extremeRange = 10;
         waterShortRange = 2;
         waterMediumRange = 3;
         waterLongRange = 5;
         waterExtremeRange = 6;
-        tonnage = 1.0;
+        tonnage = 0.5;
         criticalSlots = 1;
-        bv = 90;
-        cost = 120000;
+        bv = 50;
+        cost = 60000;
         shortAV = 5;
         medAV = 5;
         maxRange = RANGE_MED;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setIntroLevel(false)
               .setUnofficial(false)
-              .setTechRating(TechRating.G)
+              .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
-              .setISAdvancement(3140, 3145, 3150, DATE_NONE, DATE_NONE)
+              .setISAdvancement(3000, 3025, 3050, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
-              .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
     }
 }

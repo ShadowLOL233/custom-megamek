@@ -26,17 +26,19 @@ import megamek.common.weapons.handlers.AttackHandler;
 import megamek.common.weapons.handlers.HGRHandler;
 import megamek.server.totalWarfare.TWGameManager;
 
-/** Outer Sphere Advance Heavy Gauss - fixed 25 dmg (no range decay) / 17t / 9 crit / Experimental. */
-public class OSAdvanceHeavyGauss extends GaussWeapon {
+/** Outer Sphere Enhanced Heavy Gauss - fixed 25 dmg (no range decay) / 17t / 9 crit / Experimental. */
+public class OSEnhancedHeavyGauss extends GaussWeapon {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public OSAdvanceHeavyGauss() {
+    public OSEnhancedHeavyGauss() {
         super();
-        name = "Advance Heavy Gauss Rifle";
-        setInternalName("OSAdvanceHeavyGauss");
+        name = "Enhanced Heavy Gauss Rifle";
+        setInternalName("OSEnhancedHeavyGauss");
+        addLookupName("OSAdvanceHeavyGauss");
+        addLookupName("Advance Heavy Gauss Rifle");
         addLookupName("OS Advance Heavy Gauss Rifle");
-        sortingName = "Gauss OS 3 Heavy 3 Adv";
+        sortingName = "Gauss OS 3 Heavy 3 Enh";
         heat = 4;
         damage = 25;
         rackSize = 25;
@@ -60,7 +62,7 @@ public class OSAdvanceHeavyGauss extends GaussWeapon {
               .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
-              .setISAdvancement(3130, 3135, 3140, DATE_NONE, DATE_NONE)
+              .setISAdvancement(3000, 3025, 3050, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)

@@ -62,7 +62,7 @@ public class OSUltraLB10XAC extends LBXACWeapon {
               .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
-              .setISAdvancement(3130, 3135, 3140, DATE_NONE, DATE_NONE)
+              .setISAdvancement(3045, 3050, 3055, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)

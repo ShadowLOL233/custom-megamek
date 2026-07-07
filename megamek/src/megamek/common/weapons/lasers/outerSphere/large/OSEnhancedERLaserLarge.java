@@ -19,17 +19,17 @@ import megamek.common.weapons.lasers.LaserWeapon;
  * Outer Sphere Advanced ER Large Laser
  * Damage 11 / Heat 14 / Range 8-15-22 / -1 ToHit, 4.5t / 4 crit
  */
-public class OSAdvanceERLaserLarge extends LaserWeapon {
+public class OSEnhancedERLaserLarge extends LaserWeapon {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public OSAdvanceERLaserLarge() {
+    public OSEnhancedERLaserLarge() {
         super();
-        name = "Advance ER Large Laser";
-        setInternalName("OSAdvanceERLargeLaser");
+        name = "Enhanced ER Large Laser";
+        setInternalName("OSEnhancedERLargeLaser");
         addLookupName("OS Advance ER Large Laser");
-        addLookupName("OSAdvanceERLaserLarge");
-        sortingName = "Laser OS 03 ER 3 Adv D";
+        addLookupName("OSEnhancedERLaserLarge");
+        sortingName = "Laser OS 03 ER 3 Enh D";
         heat = 14;
         damage = 11;
         toHitModifier = -1;
@@ -54,7 +54,7 @@ public class OSAdvanceERLaserLarge extends LaserWeapon {
               .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
-              .setISAdvancement(3130, 3135, 3140, DATE_NONE, DATE_NONE)
+              .setISAdvancement(3000, 3025, 3050, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)

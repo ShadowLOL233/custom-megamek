@@ -15,15 +15,17 @@ import megamek.common.enums.TechBase;
 import megamek.common.enums.TechRating;
 import megamek.common.weapons.srms.SRMWeapon;
 
-/** Outer Sphere Advance SRM 6 - Clan-weight efficiency tier (same combat profile as Improve). */
-public class OSAdvanceSRM6 extends SRMWeapon {
+/** Outer Sphere Enhanced SRM 6 - Clan-weight efficiency tier (same combat profile as Improve). */
+public class OSEnhancedSRM6 extends SRMWeapon {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public OSAdvanceSRM6() {
+    public OSEnhancedSRM6() {
         super();
-        name = "Advance SRM 6";
-        setInternalName("OSAdvanceSRM6");
+        name = "Enhanced SRM 6";
+        setInternalName("OSEnhancedSRM6");
+        addLookupName("OSAdvanceSRM6");
+        addLookupName("Advance SRM 6");
         addLookupName("OS Advance SRM-6");
         addLookupName("OS Advance SRM 6");
         sortingName = "Missile OS 3 1 3 06";
@@ -45,7 +47,7 @@ public class OSAdvanceSRM6 extends SRMWeapon {
               .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
-              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISAdvancement(3000, 3025, 3050, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)

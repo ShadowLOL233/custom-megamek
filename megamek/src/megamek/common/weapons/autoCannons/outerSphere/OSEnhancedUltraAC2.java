@@ -16,42 +16,44 @@ import megamek.common.enums.TechRating;
 import megamek.common.weapons.autoCannons.UACWeapon;
 
 /**
- * Outer Sphere Advance Ultra AC/10 - true Ultra double-tap (Single / Ultra modes) with a
+ * Outer Sphere Enhanced Ultra AC/2 - true Ultra double-tap (Single / Ultra modes) with a
  * -1 to-hit refinement bonus. Uses canon AC_ULTRA ammo (inherited from UACWeapon).
  */
-public class OSAdvanceUltraAC10 extends UACWeapon {
+public class OSEnhancedUltraAC2 extends UACWeapon {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public OSAdvanceUltraAC10() {
+    public OSEnhancedUltraAC2() {
         super();
-        name = "Advance Ultra AC/10";
-        setInternalName("OSAdvanceUltraAC10");
-        addLookupName("OS Advance Ultra AC/10");
-        sortingName = "AC OS 3 UAC 3 Adv 10";
+        name = "Enhanced Ultra AC/2";
+        setInternalName("OSEnhancedUltraAC2");
+        addLookupName("OSAdvanceUltraAC2");
+        addLookupName("Advance Ultra AC/2");
+        addLookupName("OS Advance Ultra AC/2");
+        sortingName = "AC OS 3 UAC 3 Enh 02";
         toHitModifier = -1;
-        heat = 3;
-        damage = 10;
-        rackSize = 10;
+        heat = 1;
+        damage = 2;
+        rackSize = 2;
         minimumRange = 0;
-        shortRange = 7;
-        mediumRange = 14;
-        longRange = 20;
-        extremeRange = 27;
-        tonnage = 10.0;
-        criticalSlots = 4;
-        bv = 270;
-        cost = 510000;
+        shortRange = 9;
+        mediumRange = 18;
+        longRange = 25;
+        extremeRange = 34;
+        tonnage = 6.0;
+        criticalSlots = 2;
+        bv = 70;
+        cost = 190000;
         explosionDamage = damage;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setIntroLevel(false)
               .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
-              .setISAdvancement(3130, 3135, 3140, DATE_NONE, DATE_NONE)
+              .setISAdvancement(3000, 3025, 3050, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
-              .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
     }
 }

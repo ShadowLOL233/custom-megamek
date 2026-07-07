@@ -53,7 +53,7 @@ public class OSImprovePulseLaserLarge extends PulseLaserWeapon {
               .setUnofficial(false)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
-              .setISAdvancement(3120, 3125, 3130, DATE_NONE, DATE_NONE)
+              .setISAdvancement(2900, 2930, 2960, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)

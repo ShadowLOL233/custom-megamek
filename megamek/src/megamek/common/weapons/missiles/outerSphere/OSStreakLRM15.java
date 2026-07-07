@@ -47,7 +47,7 @@ public class OSStreakLRM15 extends StreakLRMWeapon {
               .setUnofficial(false)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
-              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISAdvancement(3060, 3070, 3080, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
