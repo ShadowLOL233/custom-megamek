@@ -794,7 +794,7 @@ public abstract class Mek extends Entity {
         return st == EquipmentType.T_STRUCTURE_OS_IMP_REINFORCE
               || st == EquipmentType.T_STRUCTURE_OS_REINFORCE_ENDO_STEEL
               || st == EquipmentType.T_STRUCTURE_OS_IMP_REINFORCE_ENDO_STEEL
-              || st == EquipmentType.T_STRUCTURE_OS_ADV_REINFORCE_ENDO_STEEL
+              || st == EquipmentType.T_STRUCTURE_OS_ENH_REINFORCE_ENDO_STEEL
               || st == EquipmentType.T_STRUCTURE_OS_SH_REINFORCE
               || st == EquipmentType.T_STRUCTURE_OS_SH_REINFORCE_ENDO_STEEL
               || st == EquipmentType.T_STRUCTURE_OS_SH_REINFORCE_ENDO_COMPOSITE
@@ -814,7 +814,7 @@ public abstract class Mek extends Entity {
             case EquipmentType.T_STRUCTURE_OS_REINFORCE_COMPOSITE -> 1.5;
             case EquipmentType.T_STRUCTURE_OS_REINFORCE_ENDO_STEEL -> 1.5;
             case EquipmentType.T_STRUCTURE_OS_IMP_REINFORCE_ENDO_STEEL -> 1.5;
-            case EquipmentType.T_STRUCTURE_OS_ADV_REINFORCE_ENDO_STEEL -> 1.5;
+            case EquipmentType.T_STRUCTURE_OS_ENH_REINFORCE_ENDO_STEEL -> 1.5;
             case EquipmentType.T_STRUCTURE_OS_HEAVY_DUTY -> 1.2;
             case EquipmentType.T_STRUCTURE_OS_HEAVY_DUTY_ENDO_STEEL -> 1.2;
             case EquipmentType.T_STRUCTURE_OS_SH_DUTY_ENDO_STEEL -> 1.25;

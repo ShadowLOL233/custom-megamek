@@ -176,14 +176,14 @@ public class EquipmentType implements ITechnology {
     public static final int T_STRUCTURE_ENDO_COMPOSITE = 6;
     // OS structure types
     public static final int T_STRUCTURE_OS_IMP_ENDO_STEEL = 7;
-    public static final int T_STRUCTURE_OS_ADV_ENDO_STEEL = 8;
+    public static final int T_STRUCTURE_OS_ENH_ENDO_STEEL = 8;
     public static final int T_STRUCTURE_OS_IMP_REINFORCE = 9;
     public static final int T_STRUCTURE_OS_REINFORCE_COMPOSITE = 10;
     public static final int T_STRUCTURE_OS_REINFORCE_ENDO_STEEL = 11;
     public static final int T_STRUCTURE_OS_IMP_REINFORCE_ENDO_STEEL = 12;
-    public static final int T_STRUCTURE_OS_ADV_REINFORCE_ENDO_STEEL = 13;
+    public static final int T_STRUCTURE_OS_ENH_REINFORCE_ENDO_STEEL = 13;
     public static final int T_STRUCTURE_OS_IMP_ENDO_COMPOSITE = 14;
-    public static final int T_STRUCTURE_OS_ADV_ENDO_COMPOSITE = 15;
+    public static final int T_STRUCTURE_OS_ENH_ENDO_COMPOSITE = 15;
     public static final int T_STRUCTURE_OS_HEAVY_DUTY = 16;
     public static final int T_STRUCTURE_OS_HEAVY_DUTY_ENDO_STEEL = 17;
     public static final int T_STRUCTURE_OS_SH_DUTY_ENDO_STEEL = 18;
@@ -199,11 +199,11 @@ public class EquipmentType implements ITechnology {
         "Standard", "Industrial", "Endo Steel", "Endo Steel Prototype",
         "Reinforced", "Composite", "Endo-Composite",
         // OS structures (abbreviations expanded; old names preserved as lookup aliases per create method)
-        "Improve Endo Steel (OS)", "Advance Endo Steel (OS)",
+        "Improve Endo Steel (OS)", "Enhanced Endo Steel (OS)",
         "Improve Reinforced (OS)", "Reinforced Composite (OS)",
         "Reinforced Endo Steel (OS)", "Improve Reinforced Endo Steel (OS)",
-        "Advance Reinforced Endo Steel (OS)",
-        "Improve Endo-Composite (OS)", "Advance Endo-Composite (OS)",
+        "Enhanced Reinforced Endo Steel (OS)",
+        "Improve Endo-Composite (OS)", "Enhanced Endo-Composite (OS)",
         "Heavy Duty (OS)", "Heavy Duty Endo Steel (OS)",
         "Superheavy Heavy-Duty Endo Steel (OS)", "Superheavy Reinforced (OS)",
         "Superheavy Reinforced Endo Steel (OS)", "Superheavy Reinforced Endo-Composite (OS)",
@@ -2154,14 +2154,14 @@ public class EquipmentType implements ITechnology {
         result.put(T_STRUCTURE_ENDO_COMPOSITE, getStructureTypeName(T_STRUCTURE_ENDO_COMPOSITE));
         // OS structures
         result.put(T_STRUCTURE_OS_IMP_ENDO_STEEL, getStructureTypeName(T_STRUCTURE_OS_IMP_ENDO_STEEL));
-        result.put(T_STRUCTURE_OS_ADV_ENDO_STEEL, getStructureTypeName(T_STRUCTURE_OS_ADV_ENDO_STEEL));
+        result.put(T_STRUCTURE_OS_ENH_ENDO_STEEL, getStructureTypeName(T_STRUCTURE_OS_ENH_ENDO_STEEL));
         result.put(T_STRUCTURE_OS_IMP_REINFORCE, getStructureTypeName(T_STRUCTURE_OS_IMP_REINFORCE));
         result.put(T_STRUCTURE_OS_REINFORCE_COMPOSITE, getStructureTypeName(T_STRUCTURE_OS_REINFORCE_COMPOSITE));
         result.put(T_STRUCTURE_OS_REINFORCE_ENDO_STEEL, getStructureTypeName(T_STRUCTURE_OS_REINFORCE_ENDO_STEEL));
         result.put(T_STRUCTURE_OS_IMP_REINFORCE_ENDO_STEEL, getStructureTypeName(T_STRUCTURE_OS_IMP_REINFORCE_ENDO_STEEL));
-        result.put(T_STRUCTURE_OS_ADV_REINFORCE_ENDO_STEEL, getStructureTypeName(T_STRUCTURE_OS_ADV_REINFORCE_ENDO_STEEL));
+        result.put(T_STRUCTURE_OS_ENH_REINFORCE_ENDO_STEEL, getStructureTypeName(T_STRUCTURE_OS_ENH_REINFORCE_ENDO_STEEL));
         result.put(T_STRUCTURE_OS_IMP_ENDO_COMPOSITE, getStructureTypeName(T_STRUCTURE_OS_IMP_ENDO_COMPOSITE));
-        result.put(T_STRUCTURE_OS_ADV_ENDO_COMPOSITE, getStructureTypeName(T_STRUCTURE_OS_ADV_ENDO_COMPOSITE));
+        result.put(T_STRUCTURE_OS_ENH_ENDO_COMPOSITE, getStructureTypeName(T_STRUCTURE_OS_ENH_ENDO_COMPOSITE));
         result.put(T_STRUCTURE_OS_HEAVY_DUTY, getStructureTypeName(T_STRUCTURE_OS_HEAVY_DUTY));
         result.put(T_STRUCTURE_OS_HEAVY_DUTY_ENDO_STEEL, getStructureTypeName(T_STRUCTURE_OS_HEAVY_DUTY_ENDO_STEEL));
         result.put(T_STRUCTURE_OS_SH_DUTY_ENDO_STEEL, getStructureTypeName(T_STRUCTURE_OS_SH_DUTY_ENDO_STEEL));

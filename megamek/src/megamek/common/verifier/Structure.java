@@ -101,7 +101,7 @@ public class Structure {
         // OS Internal Structures — use floor (round down) to half-ton
         } else if (structureType == EquipmentType.T_STRUCTURE_OS_IMP_ENDO_STEEL) {
             return TestEntity.floor(weight * 0.05 * multiplier, roundWeight);
-        } else if (structureType == EquipmentType.T_STRUCTURE_OS_ADV_ENDO_STEEL) {
+        } else if (structureType == EquipmentType.T_STRUCTURE_OS_ENH_ENDO_STEEL) {
             return TestEntity.floor(weight * 0.045 * multiplier, roundWeight);
         } else if (structureType == EquipmentType.T_STRUCTURE_OS_IMP_REINFORCE) {
             return TestEntity.floor(weight * 0.175 * multiplier, roundWeight);
@@ -111,11 +111,11 @@ public class Structure {
             return TestEntity.floor(weight * 0.145 * multiplier, roundWeight);
         } else if (structureType == EquipmentType.T_STRUCTURE_OS_IMP_REINFORCE_ENDO_STEEL) {
             return TestEntity.floor(weight * 0.135 * multiplier, roundWeight);
-        } else if (structureType == EquipmentType.T_STRUCTURE_OS_ADV_REINFORCE_ENDO_STEEL) {
+        } else if (structureType == EquipmentType.T_STRUCTURE_OS_ENH_REINFORCE_ENDO_STEEL) {
             return TestEntity.floor(weight * 0.125 * multiplier, roundWeight);
         } else if (structureType == EquipmentType.T_STRUCTURE_OS_IMP_ENDO_COMPOSITE) {
             return TestEntity.floor(weight * 0.075 * multiplier, roundWeight);
-        } else if (structureType == EquipmentType.T_STRUCTURE_OS_ADV_ENDO_COMPOSITE) {
+        } else if (structureType == EquipmentType.T_STRUCTURE_OS_ENH_ENDO_COMPOSITE) {
             return TestEntity.floor(weight * 0.065 * multiplier, roundWeight);
         } else if (structureType == EquipmentType.T_STRUCTURE_OS_HEAVY_DUTY) {
             return TestEntity.floor(weight * 0.135 * multiplier, roundWeight);

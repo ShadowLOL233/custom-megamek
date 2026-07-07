@@ -9894,7 +9894,7 @@ public class MiscType extends EquipmentType {
 
     public static MiscType createOSAdvEndoSteelStructure() {
         MiscType misc = new MiscType();
-        misc.name = EquipmentType.getStructureTypeName(T_STRUCTURE_OS_ADV_ENDO_STEEL);
+        misc.name = EquipmentType.getStructureTypeName(T_STRUCTURE_OS_ENH_ENDO_STEEL);
         misc.setInternalName(misc.name);
         misc.addLookupName("IS " + misc.name);
         misc.addLookupName("Clan " + misc.name);
@@ -9902,15 +9902,18 @@ public class MiscType extends EquipmentType {
         misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
         misc.hittable = false;
         misc.spreadable = true;
-        // Backward-compat: pre-rename names ("Adv." -> "Advance").
+        // Backward-compat: pre-rename names ("Adv."/"Advance" -> "Enhanced").
         misc.addLookupName("Adv. Endo Steel (OS)");
         misc.addLookupName("IS Adv. Endo Steel (OS)");
         misc.addLookupName("Clan Adv. Endo Steel (OS)");
+        misc.addLookupName("Advance Endo Steel (OS)");
+        misc.addLookupName("IS Advance Endo Steel (OS)");
+        misc.addLookupName("Clan Advance Endo Steel (OS)");
         misc.flags = misc.flags.or(F_OS_ADV_ENDO_STEEL);
         misc.omniFixedOnly = true;
         misc.bv = 0;
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setISAdvancement(2870, 2880, 2895)
+              .setISAdvancement(3000, 3025, 3050)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C, AvailabilityValue.B)
               .setStaticTechLevel(SimpleTechLevel.STANDARD);
@@ -10017,7 +10020,7 @@ public class MiscType extends EquipmentType {
 
     public static MiscType createOSAdvReinforceEndoSteelStructure() {
         MiscType misc = new MiscType();
-        misc.name = EquipmentType.getStructureTypeName(T_STRUCTURE_OS_ADV_REINFORCE_ENDO_STEEL);
+        misc.name = EquipmentType.getStructureTypeName(T_STRUCTURE_OS_ENH_REINFORCE_ENDO_STEEL);
         misc.setInternalName(misc.name);
         misc.addLookupName("IS " + misc.name);
         misc.addLookupName("Clan " + misc.name);
@@ -10025,15 +10028,18 @@ public class MiscType extends EquipmentType {
         misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
         misc.hittable = false;
         misc.spreadable = true;
-        // Backward-compat: pre-rename names ("Adv. Reinforce" -> "Advance Reinforced").
+        // Backward-compat: pre-rename names ("Adv. Reinforce"/"Advance Reinforced" -> "Enhanced Reinforced").
         misc.addLookupName("Adv. Reinforce Endo Steel (OS)");
         misc.addLookupName("IS Adv. Reinforce Endo Steel (OS)");
         misc.addLookupName("Clan Adv. Reinforce Endo Steel (OS)");
+        misc.addLookupName("Advance Reinforced Endo Steel (OS)");
+        misc.addLookupName("IS Advance Reinforced Endo Steel (OS)");
+        misc.addLookupName("Clan Advance Reinforced Endo Steel (OS)");
         misc.flags = misc.flags.or(F_OS_ADV_REINFORCE_ENDO_STEEL);
         misc.omniFixedOnly = true;
         misc.bv = 0;
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setISAdvancement(2910, 2930, 2950)
+              .setISAdvancement(3000, 3025, 3050)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
               .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
@@ -10067,7 +10073,7 @@ public class MiscType extends EquipmentType {
 
     public static MiscType createOSAdvEndoCompositeStructure() {
         MiscType misc = new MiscType();
-        misc.name = EquipmentType.getStructureTypeName(T_STRUCTURE_OS_ADV_ENDO_COMPOSITE);
+        misc.name = EquipmentType.getStructureTypeName(T_STRUCTURE_OS_ENH_ENDO_COMPOSITE);
         misc.setInternalName(misc.name);
         misc.addLookupName("IS " + misc.name);
         misc.addLookupName("Clan " + misc.name);
@@ -10075,15 +10081,18 @@ public class MiscType extends EquipmentType {
         misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
         misc.hittable = false;
         misc.spreadable = true;
-        // Backward-compat: pre-rename names ("Adv." -> "Advance").
+        // Backward-compat: pre-rename names ("Adv."/"Advance" -> "Enhanced").
         misc.addLookupName("Adv. Endo-Composite (OS)");
         misc.addLookupName("IS Adv. Endo-Composite (OS)");
         misc.addLookupName("Clan Adv. Endo-Composite (OS)");
+        misc.addLookupName("Advance Endo-Composite (OS)");
+        misc.addLookupName("IS Advance Endo-Composite (OS)");
+        misc.addLookupName("Clan Advance Endo-Composite (OS)");
         misc.flags = misc.flags.or(F_OS_ADV_ENDO_COMPOSITE);
         misc.omniFixedOnly = true;
         misc.bv = 0;
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setISAdvancement(2885, 2895, 2910)
+              .setISAdvancement(3000, 3025, 3050)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C)
               .setStaticTechLevel(SimpleTechLevel.ADVANCED);

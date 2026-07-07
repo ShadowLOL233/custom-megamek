@@ -596,7 +596,7 @@ public class MekBVCalculator extends HeatTrackingBVCalculator {
         return structureType == EquipmentType.T_STRUCTURE_OS_IMP_REINFORCE
               || structureType == EquipmentType.T_STRUCTURE_OS_REINFORCE_ENDO_STEEL
               || structureType == EquipmentType.T_STRUCTURE_OS_IMP_REINFORCE_ENDO_STEEL
-              || structureType == EquipmentType.T_STRUCTURE_OS_ADV_REINFORCE_ENDO_STEEL
+              || structureType == EquipmentType.T_STRUCTURE_OS_ENH_REINFORCE_ENDO_STEEL
               || structureType == EquipmentType.T_STRUCTURE_OS_HEAVY_DUTY
               || structureType == EquipmentType.T_STRUCTURE_OS_HEAVY_DUTY_ENDO_STEEL
               || structureType == EquipmentType.T_STRUCTURE_OS_SH_DUTY_ENDO_STEEL

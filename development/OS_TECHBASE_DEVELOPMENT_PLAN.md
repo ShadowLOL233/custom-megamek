@@ -16,7 +16,7 @@ Quick index — jump to a section instead of scanning the whole file.
 - **Section 3 — Planned: superheavy unit-cap extensions** [active]: >100t vehicles / VTOL / fighters.
 - **Section 4 — Dev focus: OS versions of canon special equipment** [active]: MiscType catalogue (priority A/B/C/E/G/I).
 - **Section 5 — Open tuning / review items** [active].
-- **Section 6 — Naming & tier-reclassification work items** [active]: **🔴 §6.4 engine/structure Advance→Enhanced rename = HIGH PRIORITY**; subsections 6.3 & 6.5 shelved (see below).
+- **Section 6 — Naming & tier-reclassification work items** [active]: §6.4 engine/structure/armor Advance→Enhanced rename **✅ DONE 2026-07-06**; subsections 6.3 & 6.5 shelved (see below).
 - **Section 7 — Planned: BF & RF AC variants** [active]: being reclassified to **Inner Sphere** (not OS).
 
 Shelved ideas are parked in **[OS_SHELVED_IDEAS.md](OS_SHELVED_IDEAS.md)**. Splitting this plan into
@@ -89,15 +89,15 @@ hot-reloads jars — do a full clean rebuild + restart: `cd megameklab && .\grad
 
 - **Faction:** Republic of the Outer Sphere (`RoOS`). — stable
 - **Engines:** full OS lineup (Standard/Improve/Advance × Fusion/Light/XL/XXL/Compact + superheavy)
-  is in code, **but ⏳PENDING:** the current "Advance" engines reclassify → **Enhanced**, and the new
-  **Advance / Experimental** engine tiers are TBD (see §6.4).
+  is in code; the old "Advance" engines were **renamed → Enhanced (✅ 2026-07-06, §6.4)**. Still ⏳PENDING:
+  designing the new **Advance / Experimental** engine tiers (see §6.4).
 - **Weapons (~224 files under `weapons/**/outerSphere`):** energy (lasers, PPCs incl. rotary/hyper,
   plasma, flamers), kinetics (autocannons, gauss, MGs), full missile line (+3 FCS: Diana III, Orion V)
   are in code — **but DESIGN STATUS is now ⏳TBD/PENDING for energy, kinetic AND missile families:** the
   **Advance** tier must be (re)designed under §0.2, and many "Advance"-named weapons reclassified →
   **Enhanced** (§6.2). Treat these families as under revision, not finished.
 - **Armor / structure:** OS structure + damage-reduction armor BV multipliers wired — **but the
-  structure "Advance" line is ⏳PENDING → Enhanced reclassification + Advance/Experimental redesign (§6.4).**
+  structure "Advance" line was **renamed → Enhanced (✅ 2026-07-06, §6.4)**; new Advance/Experimental structure redesign still ⏳PENDING (§6.4).**
 - **Movement boosters:** OS MASC / Supercharger line (per-equipment failure mechanics). — stable
 - **Tech rating G** added to `enums/TechRating.java`, wired into MekHQ maintenance & parts cost. — stable
 
@@ -255,15 +255,20 @@ Under the §0.2 ladder, **Advance** = the most radical / "Clan-like" tier. Per u
 Moved to [OS_SHELVED_IDEAS.md](OS_SHELVED_IDEAS.md). Resolve alongside §6.2 and the HVAC stats (§2).
 
 ### 6.4 Engines & internal structure — rename, reclassify, and redesign (added 2026-06-13)
-- **🔴 HIGH PRIORITY — rename ENGINES & INTERNAL STRUCTURE "Advance" → "Enhanced" (decided 2026-07-06).**
-  Now that the weapon Advance→Enhanced pass is done (§6.2), the engine/structure rename is the immediate
-  next task so the tech base stays internally consistent (no lingering "Advance"-labeled engines/structure
-  while weapons use "Enhanced"). The current **"Advance"-tier ENGINES and INTERNAL STRUCTURE** are
-  refined-but-serviceable, not radical — reclassify to the new **Enhanced** tier: rename `OSAdvance*` →
-  `OSEnhanced*` / "Advance X" → "Enhanced X", re-date to Enhanced `3000/3025/3050`, and keep old names as
-  `addLookupName` / old constants for save-compat. Mirrors the weapon pass in §6.2. NOTE: engine tier is
-  encoded in `Engine.java` constants (`OS_ADVANCE_*_ENGINE`, name strings like `OSAdvanceFusion`) and the
-  engine `TechAdvancement` blocks — more wiring than weapons; audit those before renaming.
+- **✅ DONE (2026-07-06) — renamed ENGINES, INTERNAL STRUCTURE & armor "Advance" → "Enhanced".** Per user
+  decision, also re-dated to Enhanced `3000/3025/3050` and included the 2 OS Advance armors. Details:
+  - **Engines (5):** `OS_ADVANCE_*_ENGINE` → `OS_ENHANCED_*_ENGINE` (constant **values 14/16/17/27/30 kept**);
+    `TYPE_KEYS` + `messages.properties` display → "Enhanced X (OS)"; `getEngineTypeByString` parser now
+    matches `enhanced X` **and keeps** `advance X`/`adv. X` for save-compat; 5 TAs re-dated to 3000/3025/3050.
+  - **Internal structure (3):** `T_STRUCTURE_OS_ADV_*` → `T_STRUCTURE_OS_ENH_*` (**IDs 8/13/15 kept**);
+    `structureNames` → "Enhanced …(OS)"; old "Advance …(OS)" (+IS/Clan) added as `addLookupName`; TAs re-dated.
+  - **Armor (2):** "Advance Ferro-Fibrous (OS)" / "Advance Hardened Ferro-Fibrous (OS)" → "Enhanced …";
+    old internal/display names kept as `addLookupName`; re-dated.
+  - Both `:megamek` and `:megameklab` compile. Internal `F_OS_ADV_*` MiscType flags + `createOSAdv*` factory
+    method names were left as-is (deep-internal, not user-visible / not save-critical). Static tech levels
+    left unchanged (structure Reinforced ES + Hardened FF armor remain EXPERIMENTAL — flag for review vs the
+    Enhanced-tier = Standard–Advanced convention). Genuinely-radical Advance engine/structure lines can be
+    (re)designed later under §0.2.
 - **Revisit naming (decided):** review the engine & structure naming overall for consistency with the
   §0.2 ladder (Standard/Improve/Enhanced/Advance/Experimental) — current code uses "base/Improve/Advance".
 - **Redesign the now-vacant Advance tier** for engines & structure under §0.2 (genuinely radical /

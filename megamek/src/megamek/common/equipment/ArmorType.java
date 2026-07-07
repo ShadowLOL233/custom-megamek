@@ -2055,20 +2055,22 @@ public class ArmorType extends MiscType {
 
     private static ArmorType createOSAdvFF() {
         ArmorType armor = new ArmorType();
-        armor.name = "Advance Ferro-Fibrous (OS)";
-        armor.setInternalName("OS Advance Ferro-Fibrous");
+        armor.name = "Enhanced Ferro-Fibrous (OS)";
+        armor.setInternalName("OS Enhanced Ferro-Fibrous");
         armor.addLookupName("Legion Adv. Ferro-Fibrous");
         armor.addLookupName("Adv. Ferro-Fibrous (Legion)");
-        // Backward-compat: pre-rename names ("Adv." -> "Advance")
+        // Backward-compat: pre-rename names ("Adv."/"Advance" -> "Enhanced")
         armor.addLookupName("Adv. Ferro-Fibrous (OS)");
         armor.addLookupName("OS Adv. Ferro-Fibrous");
+        armor.addLookupName("OS Advance Ferro-Fibrous");
+        armor.addLookupName("Advance Ferro-Fibrous (OS)");
         armor.cost = 28000.0;
         armor.criticalSlots = 7;
         armor.flags = armor.flags.or(F_FERRO_FIBROUS).or(F_MEK_EQUIPMENT);
         armor.rulesRefs = "OS Custom";
         armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
-              .setISAdvancement(2840, 2848, 2856).setStaticTechLevel(SimpleTechLevel.ADVANCED);
+              .setISAdvancement(3000, 3025, 3050).setStaticTechLevel(SimpleTechLevel.ADVANCED);
         armor.armorType = T_ARMOR_OS_ADV_FF;
         armor.pptMultiplier = 1.208;
         return armor;
@@ -2195,20 +2197,22 @@ public class ArmorType extends MiscType {
 
     private static ArmorType createOSAdvHardenedFF() {
         ArmorType armor = new ArmorType();
-        armor.name = "Advance Hardened Ferro-Fibrous (OS)";
-        armor.setInternalName("OS Advance Hardened Ferro-Fibrous");
+        armor.name = "Enhanced Hardened Ferro-Fibrous (OS)";
+        armor.setInternalName("OS Enhanced Hardened Ferro-Fibrous");
         armor.addLookupName("Legion Adv. Hardened Ferro-Fibrous");
         armor.addLookupName("Adv. Hardened Ferro-Fibrous (Legion)");
-        // Backward-compat: pre-rename names ("Adv." -> "Advance")
+        // Backward-compat: pre-rename names ("Adv."/"Advance" -> "Enhanced")
         armor.addLookupName("Adv. Hardened Ferro-Fibrous (OS)");
         armor.addLookupName("OS Adv. Hardened Ferro-Fibrous");
+        armor.addLookupName("OS Advance Hardened Ferro-Fibrous");
+        armor.addLookupName("Advance Hardened Ferro-Fibrous (OS)");
         armor.cost = 38000.0;
         armor.criticalSlots = 14;
         armor.flags = armor.flags.or(F_HARDENED_ARMOR).or(F_FERRO_FIBROUS).or(F_MEK_EQUIPMENT);
         armor.rulesRefs = "OS Custom";
         armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
-              .setISAdvancement(2870, 2882, 2896).setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+              .setISAdvancement(3000, 3025, 3050).setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
         armor.armorType = T_ARMOR_OS_ADV_HARDENED_FF;
         armor.pptMultiplier = 0.8125;
         return armor;
