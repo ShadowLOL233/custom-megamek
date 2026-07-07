@@ -11931,7 +11931,7 @@ public class AmmoType extends EquipmentType {
               .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
-              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION);
@@ -11957,7 +11957,7 @@ public class AmmoType extends EquipmentType {
               .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
-              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISAdvancement(3045, 3050, 3055, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION);
@@ -11984,7 +11984,7 @@ public class AmmoType extends EquipmentType {
               .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
-              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION);
@@ -12011,7 +12011,7 @@ public class AmmoType extends EquipmentType {
               .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
-              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISAdvancement(3045, 3050, 3055, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION);
@@ -12038,7 +12038,7 @@ public class AmmoType extends EquipmentType {
               .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
-              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISAdvancement(3045, 3050, 3055, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION);
@@ -12067,7 +12067,7 @@ public class AmmoType extends EquipmentType {
               .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
-              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION);
@@ -12113,7 +12113,7 @@ public class AmmoType extends EquipmentType {
               .setUnofficial(false)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
-              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION);
@@ -12157,7 +12157,7 @@ public class AmmoType extends EquipmentType {
               .setUnofficial(false)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
-              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION);
@@ -12213,7 +12213,7 @@ public class AmmoType extends EquipmentType {
               .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
-              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION);
@@ -12258,7 +12258,7 @@ public class AmmoType extends EquipmentType {
               .setUnofficial(false)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
-              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION);
@@ -12325,7 +12325,7 @@ public class AmmoType extends EquipmentType {
               .setUnofficial(false)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
-              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION);
@@ -12401,7 +12401,7 @@ public class AmmoType extends EquipmentType {
               .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
-              .setISAdvancement(3128, 3133, 3138, DATE_NONE, DATE_NONE)
+              .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION);
