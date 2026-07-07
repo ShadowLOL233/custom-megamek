@@ -16,7 +16,7 @@ Quick index — jump to a section instead of scanning the whole file.
 - **Section 3 — Planned: superheavy unit-cap extensions** [active]: >100t vehicles / VTOL / fighters.
 - **Section 4 — Dev focus: OS versions of canon special equipment** [active]: MiscType catalogue (priority A/B/C/E/G/I).
 - **Section 5 — Open tuning / review items** [active].
-- **Section 6 — Naming & tier-reclassification work items** [active]: subsections 6.3 & 6.5 shelved (see below).
+- **Section 6 — Naming & tier-reclassification work items** [active]: **🔴 §6.4 engine/structure Advance→Enhanced rename = HIGH PRIORITY**; subsections 6.3 & 6.5 shelved (see below).
 - **Section 7 — Planned: BF & RF AC variants** [active]: being reclassified to **Inner Sphere** (not OS).
 
 Shelved ideas are parked in **[OS_SHELVED_IDEAS.md](OS_SHELVED_IDEAS.md)**. Splitting this plan into
@@ -255,9 +255,15 @@ Under the §0.2 ladder, **Advance** = the most radical / "Clan-like" tier. Per u
 Moved to [OS_SHELVED_IDEAS.md](OS_SHELVED_IDEAS.md). Resolve alongside §6.2 and the HVAC stats (§2).
 
 ### 6.4 Engines & internal structure — rename, reclassify, and redesign (added 2026-06-13)
-- **Reclassify (decided):** the current **"Advance"-tier ENGINES and INTERNAL STRUCTURE** are
-  refined-but-serviceable, not radical — reclassify them to the new **Enhanced** tier (rename
-  "Advance X" → "Enhanced X", re-date to ~3000–3050), mirroring §6.2 for weapons.
+- **🔴 HIGH PRIORITY — rename ENGINES & INTERNAL STRUCTURE "Advance" → "Enhanced" (decided 2026-07-06).**
+  Now that the weapon Advance→Enhanced pass is done (§6.2), the engine/structure rename is the immediate
+  next task so the tech base stays internally consistent (no lingering "Advance"-labeled engines/structure
+  while weapons use "Enhanced"). The current **"Advance"-tier ENGINES and INTERNAL STRUCTURE** are
+  refined-but-serviceable, not radical — reclassify to the new **Enhanced** tier: rename `OSAdvance*` →
+  `OSEnhanced*` / "Advance X" → "Enhanced X", re-date to Enhanced `3000/3025/3050`, and keep old names as
+  `addLookupName` / old constants for save-compat. Mirrors the weapon pass in §6.2. NOTE: engine tier is
+  encoded in `Engine.java` constants (`OS_ADVANCE_*_ENGINE`, name strings like `OSAdvanceFusion`) and the
+  engine `TechAdvancement` blocks — more wiring than weapons; audit those before renaming.
 - **Revisit naming (decided):** review the engine & structure naming overall for consistency with the
   §0.2 ladder (Standard/Improve/Enhanced/Advance/Experimental) — current code uses "base/Improve/Advance".
 - **Redesign the now-vacant Advance tier** for engines & structure under §0.2 (genuinely radical /
