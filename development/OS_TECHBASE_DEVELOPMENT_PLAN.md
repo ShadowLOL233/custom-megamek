@@ -103,7 +103,14 @@ hot-reloads jars — do a full clean rebuild + restart: `cd megameklab && .\grad
 
 ---
 
-## 2. Planned: OS HVAC (High-Velocity Autocannon) — Improve tier, heavy calibers only
+## 2. OS HVAC (High-Velocity Autocannon) — heavy calibers only — IMPLEMENTED as Enhanced (2026-07-06)
+
+> **IMPLEMENTED as the Enhanced tier (2026-07-06).** Built `OSEnhancedHVAC{12,14,16,18}` (extends
+> `HVACWeapon`); names "Enhanced HVAC/N"; Enhanced dates `3000/3025/3050`; TechRating F; ADVANCED-static;
+> Faction LEGION. The user-approved draft stats below shipped as-is. **Ammo:** reused the canon
+> `HYPER_VELOCITY` enum (the HVAC base + handler are keyed to it) — added 4 entries "HVAC/12-18 Ammo" (OS,
+> via `createOSHVACAmmo`); **no** dedicated `AC_HVAC_OS`. Aero: AV = damage, maxRange = extreme. Compiles;
+> pending in-game test. (The draft table below still uses the old "Improve HVAC" labels — read as Enhanced.)
 
 ### Design decision
 - OS HVAC is rooted in **OS Improve AC + Improve LB-X** (NOT IS HVAC).
@@ -219,8 +226,9 @@ Tractor/Trailer, Armored/Heavy Chassis, Turrets (Head/Quad/Shoulder/Sponson/Pint
 
 ## 5. Open tuning / review items
 
-- **HVAC stat tables (§2) are a tuning starting point — confirm final numbers before implementation.**
-- Decide OS HVAC ammo: dedicated `AC_HVAC_OS` vs reuse `AC_IMP_OS` (recommended: dedicated).
+- ~~HVAC stat tables (§2)~~ — **DONE (2026-07-06):** user-approved draft shipped as Enhanced HVAC (§2).
+- ~~Decide OS HVAC ammo~~ — **DONE:** reused canon `HYPER_VELOCITY` (HVAC base/handler keyed to it), not a
+  dedicated enum.
 - For each PRIORITY equipment category (A/B/C/E/G/I): decide which items get OS versions and design
   per the §0.2 tier ladder.
 - Earlier memory note said "base/Improve → static Advanced"; corrected to **STANDARD** per code — keep
@@ -251,8 +259,9 @@ Under the §0.2 ladder, **Advance** = the most radical / "Clan-like" tier. Per u
 - Note: the "Advance" tier now holds only untokened `ADVANCED`-static weapons (PPC-X, Rotary Light PPC,
   etc.); a *new*, genuinely-radical Advance line can be designed later under §0.2.
 
-### 6.3 HVAC tier classification — SHELVED
-Moved to [OS_SHELVED_IDEAS.md](OS_SHELVED_IDEAS.md). Resolve alongside §6.2 and the HVAC stats (§2).
+### 6.3 HVAC tier classification — DECIDED: Enhanced (2026-07-06)
+Resolved: HVAC ships at the **Enhanced** tier (per §0.2, a performance-pushing weapon built on Improve
+AC / LB-X = Enhanced). Implemented as `OSEnhancedHVAC{12,14,16,18}` — see §2. (Un-shelved.)
 
 ### 6.4 Engines & internal structure — rename, reclassify, and redesign (added 2026-06-13)
 - **✅ DONE (2026-07-06) — renamed ENGINES, INTERNAL STRUCTURE & armor "Advance" → "Enhanced".** Per user
@@ -275,8 +284,9 @@ Moved to [OS_SHELVED_IDEAS.md](OS_SHELVED_IDEAS.md). Resolve alongside §6.2 and
   "Clan-like", performance-max, mass-produced).
 - **Design a new Experimental tier** (Ascended-derived) for engines & structure.
 
-**Engine-physics design question (OPEN — pending user decision).** Does OS break BattleTech's fusion
-ceiling? Proposed working stance (NOT final):
+**Engine-physics design question — DECIDED (2026-07-06).** OS *may* break the fusion ceiling: Advance
+engines stay within fusion; only Experimental (Ascended reverse-engineered) engines exceed it. The
+Ascended black-tech engine details are deferred (to finalize later). Accepted direction:
 - **Advance engines stay WITHIN fusion** — the indigenous pinnacle of fusion engineering (max power
   density; sacrifices the conservative safety/maintainability margins for output; still mass-produced).
   No new physics — this keeps OS believable and "slower than the Clans" (who never broke the fusion
@@ -315,9 +325,8 @@ line** (superseded — see below).
 Identical to the standard IS AC in every stat. The only difference is a **range-bracket to-hit gradient**
 stacked on top of the normal range modifiers:
 - short **0**, medium **0**, long **−1** (a sustained burst that walks onto distant targets).
-- NOTE: this is now a *pure* accuracy bonus (no offsetting penalty), so BF is strictly >= standard AC; BV =
-  standard therefore under-prices it. Open decision: bump BF's BV for the long-range accuracy, or accept BF
-  mildly dominating standard AC.
+- **DECIDED (2026-07-06): BV stays = standard AC.** The long-range -1 only softens the -4 long bracket to
+  -3 — a minor, situational bonus not worth repricing. BF ships at BV = standard.
 
 Implementation (Option A — mirror the existing PPC-X):
 - Add a block in `actions/compute/ComputeToHit.java` mirroring the `PPCXWeapon` range-dispersion block
