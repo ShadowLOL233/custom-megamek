@@ -1575,6 +1575,11 @@ public class WeaponType extends EquipmentType {
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSUltraLB5XAC());
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSUltraLB10XAC());
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSUltraLB20XAC());
+        // OS Enhanced HVAC (Enhanced-tier high-velocity AC; OS-new heavy calibers 12/14/16/18)
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSEnhancedHVAC12());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSEnhancedHVAC14());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSEnhancedHVAC16());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSEnhancedHVAC18());
 
         // Outer Sphere (OS) Gauss Rifles
         EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSGaussRifle());

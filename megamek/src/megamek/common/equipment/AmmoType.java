@@ -2880,6 +2880,11 @@ public class AmmoType extends EquipmentType {
         EquipmentType.addType(AmmoType.createISHVAC10Ammo());
         EquipmentType.addType(AmmoType.createISHVAC5Ammo());
         EquipmentType.addType(AmmoType.createISHVAC2Ammo());
+        // Outer Sphere Enhanced HVAC ammo (heavy calibers 12/14/16/18; HYPER_VELOCITY)
+        EquipmentType.addType(createOSHVACAmmo(12, 7, 24, 24000));
+        EquipmentType.addType(createOSHVACAmmo(14, 6, 28, 28000));
+        EquipmentType.addType(createOSHVACAmmo(16, 5, 32, 32000));
+        EquipmentType.addType(createOSHVACAmmo(18, 4, 36, 36000));
         EquipmentType.addType(AmmoType.createISMekTaserAmmo());
         EquipmentType.addType(AmmoType.createISAC2pAmmo());
         EquipmentType.addType(AmmoType.createISAC5pAmmo());
@@ -4975,6 +4980,32 @@ public class AmmoType extends EquipmentType {
               .setPrototypeFactions(Faction.CBS)
               .setProductionFactions(Faction.CBS)
               .setStaticTechLevel(SimpleTechLevel.STANDARD);
+        return ammo;
+    }
+
+    // Outer Sphere Enhanced HVAC ammo — HYPER_VELOCITY rounds for the OS-new heavy calibers (12/14/16/18).
+    // Reuses the canon HYPER_VELOCITY enum (the HVAC handler is keyed to it); new calibers isolate it from
+    // the canon HVAC 2/5/10 by rackSize.
+    private static AmmoType createOSHVACAmmo(int rackSize, int shots, int bv, int cost) {
+        AmmoType ammo = new AmmoType();
+        ammo.name = "HVAC/" + rackSize + " Ammo";
+        ammo.shortName = "HVAC/" + rackSize;
+        ammo.setInternalName("OS Ammo HVAC/" + rackSize);
+        ammo.addLookupName("OSHVAC" + rackSize + " Ammo");
+        ammo.damagePerShot = 1;
+        ammo.rackSize = rackSize;
+        ammo.ammoType = AmmoTypeEnum.HYPER_VELOCITY;
+        ammo.shots = shots;
+        ammo.bv = bv;
+        ammo.cost = cost;
+        ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
+              .setISAdvancement(3000, 3025, 3050, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
         return ammo;
     }
 
