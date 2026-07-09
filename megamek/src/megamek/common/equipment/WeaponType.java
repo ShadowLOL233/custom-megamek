@@ -1043,6 +1043,16 @@ public class WeaponType extends EquipmentType {
             lRange = (int) Math.round(lRange * 1.2);
             eRange = (int) Math.round(eRange * 1.2);
         }
+        // Outer Sphere LB-X GAAM (Guided Anti-Armor Missile): a guided long-reach profile with a minimum
+        // arming range. The medium band is a narrow guided sweet spot (handled in the handler / to-hit gate).
+        if ((getAmmoType() == AmmoTypeEnum.LBX_OS) && hasLoadedAmmo && (ammo.getType() instanceof AmmoType gaamAmmo)
+              && gaamAmmo.getMunitionType().contains(AmmoType.Munitions.M_GAAM)) {
+            minRange = 6;
+            sRange = 7;
+            mRange = 10;
+            lRange = 25;
+            eRange = 30;
+        }
         // Allow extremely long-range shots for bearings-only capital missiles
         if (weapon.isInBearingsOnlyMode()) {
             eRange = RangeType.RANGE_BEARINGS_ONLY_OUT;

@@ -2077,6 +2077,14 @@ public class AmmoType extends EquipmentType {
         M_CASELESS,
         // Outer Sphere custom AC munition: rocket-assisted round (short +1 / long -1 to-hit, +~20% range)
         M_ROCKET_PROPELLED,
+        // Outer Sphere LB-X special: Guided Anti-Armor Missile (single guided projectile, AP crit, medium-range bonus)
+        M_GAAM,
+        // Outer Sphere LB-X special: Anti-Myomer Flechette (cluster + forced PSR on hit + AP crit)
+        M_ANTI_MYOMER,
+        // Outer Sphere Ultra special: Improved Caseless (jam never destroys the weapon; extra shots)
+        M_IMP_CASELESS,
+        // Outer Sphere Ultra special: Armor-Piercing Discarding Sabot (reduced damage, AP crit, extra shots)
+        M_APDS,
 
         // ATM Munition Types
         M_EXTENDED_RANGE,
@@ -3163,6 +3171,19 @@ public class AmmoType extends EquipmentType {
         EquipmentType.addType(AmmoType.createOSUltraAC5Ammo());
         EquipmentType.addType(AmmoType.createOSUltraAC10Ammo());
         EquipmentType.addType(AmmoType.createOSUltraAC20Ammo());
+        // Outer Sphere (OS) Ultra AC special munitions (Phase 2): Precision / Improved Caseless / APDS
+        EquipmentType.addType(AmmoType.createOSUltraPrecisionAC2Ammo());
+        EquipmentType.addType(AmmoType.createOSUltraPrecisionAC5Ammo());
+        EquipmentType.addType(AmmoType.createOSUltraPrecisionAC10Ammo());
+        EquipmentType.addType(AmmoType.createOSUltraPrecisionAC20Ammo());
+        EquipmentType.addType(AmmoType.createOSUltraImpCaselessAC2Ammo());
+        EquipmentType.addType(AmmoType.createOSUltraImpCaselessAC5Ammo());
+        EquipmentType.addType(AmmoType.createOSUltraImpCaselessAC10Ammo());
+        EquipmentType.addType(AmmoType.createOSUltraImpCaselessAC20Ammo());
+        EquipmentType.addType(AmmoType.createOSUltraAPDSAC2Ammo());
+        EquipmentType.addType(AmmoType.createOSUltraAPDSAC5Ammo());
+        EquipmentType.addType(AmmoType.createOSUltraAPDSAC10Ammo());
+        EquipmentType.addType(AmmoType.createOSUltraAPDSAC20Ammo());
         // Outer Sphere (OS) Rotary AC ammo (reuses canon AC_ROTARY enum; intro 3060)
         EquipmentType.addType(AmmoType.createOSRotaryAC2Ammo());
         EquipmentType.addType(AmmoType.createOSRotaryAC5Ammo());
@@ -3177,6 +3198,13 @@ public class AmmoType extends EquipmentType {
         EquipmentType.addType(AmmoType.createOSLB10XClusterAmmo());
         EquipmentType.addType(AmmoType.createOSLB20XAmmo());
         EquipmentType.addType(AmmoType.createOSLB20XClusterAmmo());
+        // Outer Sphere (OS) LB-X special munitions (Phase 2): GAAM (5/10/20) + Anti-Myomer (5/10/20)
+        EquipmentType.addType(AmmoType.createOSLB5XGAAMAmmo());
+        EquipmentType.addType(AmmoType.createOSLB10XGAAMAmmo());
+        EquipmentType.addType(AmmoType.createOSLB20XGAAMAmmo());
+        EquipmentType.addType(AmmoType.createOSLB5XAntiMyomerAmmo());
+        EquipmentType.addType(AmmoType.createOSLB10XAntiMyomerAmmo());
+        EquipmentType.addType(AmmoType.createOSLB20XAntiMyomerAmmo());
         // Outer Sphere (OS) Gauss ammo
         EquipmentType.addType(AmmoType.createOSGaussAmmo());
         EquipmentType.addType(AmmoType.createOSLightGaussAmmo());
@@ -12254,6 +12282,69 @@ public class AmmoType extends EquipmentType {
         return tagOS(makeOSACAmmo("Ultra AC/20", "OSUltraAC20Ammo", AmmoTypeEnum.AC_ULTRA, 20, 5, 35, 20000));
     }
 
+    // OS Ultra AC special munitions (Phase 2) - reuse the canon AC_ULTRA enum so the OS Ultra weapons can
+    // load them; the double-tap effect is preserved by the handler dispatch. Explicit creation (not the
+    // MunitionMutator system) keeps these off the canon-shared AC_ULTRA name/cost switch. Damage/effect
+    // differences live in the handlers; the ammo only carries the munition flag, shot count and pricing.
+    private static AmmoType makeOSUltraSpecialAmmo(String weaponName, String internal, int rackSize, int shots,
+          int bv, long cost, Munitions munition, int proto, int prod, int common) {
+        AmmoType ammo = tagOS(makeOSACAmmoDated(weaponName, internal, AmmoTypeEnum.AC_ULTRA, rackSize, shots, bv,
+              cost, proto, prod, common));
+        ammo.munitionType = EnumSet.of(munition);
+        return ammo;
+    }
+
+    // Precision (M_PRECISION, intro 3000/Enhanced): -2 vs target movement mod, half shots, cost x6.
+    private static AmmoType createOSUltraPrecisionAC2Ammo() {
+        return makeOSUltraSpecialAmmo("Precision Ultra AC/2", "OSUltraPrecisionAC2Ammo", 2, 22, 7, 6000, Munitions.M_PRECISION, 3000, 3015, 3030);
+    }
+
+    private static AmmoType createOSUltraPrecisionAC5Ammo() {
+        return makeOSUltraSpecialAmmo("Precision Ultra AC/5", "OSUltraPrecisionAC5Ammo", 5, 10, 14, 54000, Munitions.M_PRECISION, 3000, 3015, 3030);
+    }
+
+    private static AmmoType createOSUltraPrecisionAC10Ammo() {
+        return makeOSUltraSpecialAmmo("Precision Ultra AC/10", "OSUltraPrecisionAC10Ammo", 10, 5, 26, 72000, Munitions.M_PRECISION, 3000, 3015, 3030);
+    }
+
+    private static AmmoType createOSUltraPrecisionAC20Ammo() {
+        return makeOSUltraSpecialAmmo("Precision Ultra AC/20", "OSUltraPrecisionAC20Ammo", 20, 2, 35, 120000, Munitions.M_PRECISION, 3000, 3015, 3030);
+    }
+
+    // Improved Caseless (M_IMP_CASELESS, intro 2900/Improve): jam only jams (never destroys weapon), ~1.5x shots, cost x1.5.
+    private static AmmoType createOSUltraImpCaselessAC2Ammo() {
+        return makeOSUltraSpecialAmmo("Improved Caseless Ultra AC/2", "OSUltraImpCaselessAC2Ammo", 2, 67, 7, 1500, Munitions.M_IMP_CASELESS, 2900, 2915, 2930);
+    }
+
+    private static AmmoType createOSUltraImpCaselessAC5Ammo() {
+        return makeOSUltraSpecialAmmo("Improved Caseless Ultra AC/5", "OSUltraImpCaselessAC5Ammo", 5, 30, 14, 13500, Munitions.M_IMP_CASELESS, 2900, 2915, 2930);
+    }
+
+    private static AmmoType createOSUltraImpCaselessAC10Ammo() {
+        return makeOSUltraSpecialAmmo("Improved Caseless Ultra AC/10", "OSUltraImpCaselessAC10Ammo", 10, 15, 26, 18000, Munitions.M_IMP_CASELESS, 2900, 2915, 2930);
+    }
+
+    private static AmmoType createOSUltraImpCaselessAC20Ammo() {
+        return makeOSUltraSpecialAmmo("Improved Caseless Ultra AC/20", "OSUltraImpCaselessAC20Ammo", 20, 7, 35, 30000, Munitions.M_IMP_CASELESS, 2900, 2915, 2930);
+    }
+
+    // APDS (M_APDS, intro 2900/Improve): ~-20% damage (handler) + AP crit + ~1.35x shots, cost x3.
+    private static AmmoType createOSUltraAPDSAC2Ammo() {
+        return makeOSUltraSpecialAmmo("APDS Ultra AC/2", "OSUltraAPDSAC2Ammo", 2, 61, 7, 3000, Munitions.M_APDS, 2900, 2915, 2930);
+    }
+
+    private static AmmoType createOSUltraAPDSAC5Ammo() {
+        return makeOSUltraSpecialAmmo("APDS Ultra AC/5", "OSUltraAPDSAC5Ammo", 5, 27, 14, 27000, Munitions.M_APDS, 2900, 2915, 2930);
+    }
+
+    private static AmmoType createOSUltraAPDSAC10Ammo() {
+        return makeOSUltraSpecialAmmo("APDS Ultra AC/10", "OSUltraAPDSAC10Ammo", 10, 14, 26, 36000, Munitions.M_APDS, 2900, 2915, 2930);
+    }
+
+    private static AmmoType createOSUltraAPDSAC20Ammo() {
+        return makeOSUltraSpecialAmmo("APDS Ultra AC/20", "OSUltraAPDSAC20Ammo", 20, 7, 35, 60000, Munitions.M_APDS, 2900, 2915, 2930);
+    }
+
     // OS Rotary AC ammo - REUSES canon AC_ROTARY enum (its 6-shot heat is hard-keyed to that enum).
     // Dates match the OS Rotary AC weapons (3060/3070/3080). Values mirror canon IS Rotary AC ammo.
     private static AmmoType createOSRotaryAC2Ammo() {
@@ -12591,6 +12682,49 @@ public class AmmoType extends EquipmentType {
 
     private static AmmoType createOSLB20XClusterAmmo() {
         return makeOSLBXClusterAmmo("LB 20-X", "OSLB20XClusterAmmo", 20, 6, 30, 30000);
+    }
+
+    // OS LB-X special munitions (Phase 2), calibers 5/10/20, intro 2900/Improve. Explicit creation on the
+    // OS-only LBX_OS enum; damage/effect logic lives in the handlers (GAAM guided single shot + AP crit;
+    // Anti-Myomer cluster + forced PSR + AP crit). Ammo carries only the munition flag, shots and pricing.
+    private static AmmoType makeOSLBXSpecialAmmo(String weaponName, String internal, int rackSize, int shots,
+          int bv, long cost, Munitions munition) {
+        AmmoType ammo = makeOSACAmmoDated(weaponName, internal, AmmoTypeEnum.LBX_OS, rackSize, shots, bv, cost,
+              2900, 2915, 2930);
+        ammo.munitionType = EnumSet.of(munition);
+        return ammo;
+    }
+
+    // GAAM - Guided Anti-Armor Missile (single guided projectile at rack damage, medium-range bonus, AP crit).
+    private static AmmoType createOSLB5XGAAMAmmo() {
+        return makeOSLBXSpecialAmmo("LB 5-X GAAM", "OSLB5XGAAMAmmo", 5, 11, 14, 30000, Munitions.M_GAAM);
+    }
+
+    private static AmmoType createOSLB10XGAAMAmmo() {
+        return makeOSLBXSpecialAmmo("LB 10-X GAAM", "OSLB10XGAAMAmmo", 10, 5, 20, 50000, Munitions.M_GAAM);
+    }
+
+    private static AmmoType createOSLB20XGAAMAmmo() {
+        return makeOSLBXSpecialAmmo("LB 20-X GAAM", "OSLB20XGAAMAmmo", 20, 3, 32, 90000, Munitions.M_GAAM);
+    }
+
+    // Anti-Myomer Flechette (cluster table + forces a PSR on the target on hit + slight AP crit).
+    private static AmmoType createOSLB5XAntiMyomerAmmo() {
+        AmmoType ammo = makeOSLBXSpecialAmmo("LB 5-X Anti-Myomer", "OSLB5XAntiMyomerAmmo", 5, 20, 13, 18000, Munitions.M_ANTI_MYOMER);
+        ammo.toHitModifier = -1;
+        return ammo;
+    }
+
+    private static AmmoType createOSLB10XAntiMyomerAmmo() {
+        AmmoType ammo = makeOSLBXSpecialAmmo("LB 10-X Anti-Myomer", "OSLB10XAntiMyomerAmmo", 10, 9, 19, 30000, Munitions.M_ANTI_MYOMER);
+        ammo.toHitModifier = -1;
+        return ammo;
+    }
+
+    private static AmmoType createOSLB20XAntiMyomerAmmo() {
+        AmmoType ammo = makeOSLBXSpecialAmmo("LB 20-X Anti-Myomer", "OSLB20XAntiMyomerAmmo", 20, 5, 28, 48000, Munitions.M_ANTI_MYOMER);
+        ammo.toHitModifier = -1;
+        return ammo;
     }
 
     // OUTER SPHERE (OS) GAUSS RIFLE AMMO

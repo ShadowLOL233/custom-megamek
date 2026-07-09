@@ -45,8 +45,10 @@ import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoType;
 import megamek.common.game.Game;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.units.Entity;
 import megamek.common.weapons.AmmoWeapon;
 import megamek.common.weapons.handlers.AttackHandler;
+import megamek.common.weapons.handlers.OSUltraAPDSHandler;
 import megamek.common.weapons.handlers.UltraWeaponHandler;
 import megamek.server.totalWarfare.TWGameManager;
 
@@ -80,6 +82,17 @@ public abstract class UACWeapon extends AmmoWeapon {
     public AttackHandler getCorrectHandler(ToHitData toHit, WeaponAttackAction waa, Game game,
           TWGameManager manager) {
         try {
+            // OS Ultra APDS routes to a dedicated handler (AP crit + reduced damage) that still
+            // inherits the Ultra double-tap. Precision and Improved Caseless need no special handler:
+            // their effects live in the ammo (half/extra shots) and the to-hit gate.
+            Entity entity = game.getEntity(waa.getEntityId());
+            if (entity != null) {
+                Object item = entity.getEquipment(waa.getWeaponId()).getLinked().getType();
+                if ((item instanceof AmmoType ammoType)
+                      && ammoType.getMunitionType().contains(AmmoType.Munitions.M_APDS)) {
+                    return new OSUltraAPDSHandler(toHit, waa, game, manager);
+                }
+            }
             return new UltraWeaponHandler(toHit, waa, game, manager);
         } catch (EntityLoadingException ignored) {
             LOGGER.warn("Get Correct Handler - Attach Handler Received Null Entity.");

@@ -1567,6 +1567,19 @@ public class ComputeToHit {
             }
         }
 
+        // GAAM (OS LB-X): -1 to-hit in the medium-range guided sweet spot, +1 at long range and beyond,
+        // where the guidance has more time to be spoofed. Mirrors the GAAM range profile in getRanges.
+        if (target != null && (ammoType != null)
+              && ammoType.getMunitionType().contains(AmmoType.Munitions.M_GAAM)) {
+            int nRange = ae.getPosition().distance(target.getPosition());
+            int[] nRanges = weaponType.getRanges(weapon, ammo);
+            if ((nRange > nRanges[RangeType.RANGE_SHORT]) && (nRange <= nRanges[RangeType.RANGE_MEDIUM])) {
+                toHit.addModifier(-1, Messages.getString("WeaponAttackAction.WeaponMod"));
+            } else if (nRange > nRanges[RangeType.RANGE_MEDIUM]) {
+                toHit.addModifier(1, Messages.getString("WeaponAttackAction.WeaponMod"));
+            }
+        }
+
         // Indirect fire (LRMs, mortars and the like) has a +1 mod
         if (isIndirect) {
             toHit.addModifier(1, Messages.getString("WeaponAttackAction.Indirect"));

@@ -21,6 +21,7 @@ import megamek.common.enums.TechRating;
 import megamek.common.equipment.AmmoType;
 import megamek.common.game.Game;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.units.Entity;
 import megamek.common.weapons.autoCannons.LBXACWeapon;
 import megamek.common.weapons.handlers.AttackHandler;
 import megamek.common.weapons.handlers.OSUltraLBXHandler;
@@ -74,6 +75,16 @@ public class OSUltraLB10XAC extends LBXACWeapon {
     public AttackHandler getCorrectHandler(ToHitData toHit, WeaponAttackAction waa, Game game,
           TWGameManager manager) {
         try {
+            Entity entity = game.getEntity(waa.getEntityId());
+            if (entity != null) {
+                Object item = entity.getEquipment(waa.getWeaponId()).getLinked().getType();
+                if (item instanceof AmmoType ammoType) {
+                    AttackHandler osSpecial = getOSLBSpecialHandler(ammoType, toHit, waa, game, manager);
+                    if (osSpecial != null) {
+                        return osSpecial;
+                    }
+                }
+            }
             return new OSUltraLBXHandler(toHit, waa, game, manager);
         } catch (EntityLoadingException ignored) {
             LOGGER.warn("Get Correct Handler - Attach Handler Received Null Entity.");

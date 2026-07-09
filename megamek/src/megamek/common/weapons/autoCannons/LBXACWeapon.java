@@ -50,7 +50,9 @@ import megamek.common.units.Entity;
 import megamek.common.weapons.AmmoWeapon;
 import megamek.common.weapons.handlers.AttackHandler;
 import megamek.common.weapons.handlers.LBXHandler;
+import megamek.common.weapons.handlers.OSAntiMyomerHandler;
 import megamek.common.weapons.handlers.ac.ACWeaponHandler;
+import megamek.common.weapons.handlers.ac.OSGAAMHandler;
 import megamek.server.totalWarfare.TWGameManager;
 
 /**
@@ -79,6 +81,10 @@ public abstract class LBXACWeapon extends AmmoWeapon {
                 Object item = entity.getEquipment(waa.getWeaponId()).getLinked().getType();
 
                 if (item instanceof AmmoType ammoType) {
+                    AttackHandler osSpecial = getOSLBSpecialHandler(ammoType, toHit, waa, game, manager);
+                    if (osSpecial != null) {
+                        return osSpecial;
+                    }
                     if (ammoType.getMunitionType().contains(AmmoType.Munitions.M_CLUSTER)) {
                         return new LBXHandler(toHit, waa, game, manager);
                     }
@@ -88,6 +94,23 @@ public abstract class LBXACWeapon extends AmmoWeapon {
             return new ACWeaponHandler(toHit, waa, game, manager);
         } catch (EntityLoadingException ignored) {
             LOGGER.warn("Get Correct Handler - Attach Handler Received Null Entity.");
+        }
+        return null;
+    }
+
+    /**
+     * Routes the Outer Sphere LB-X special munitions (GAAM guided round, Anti-Myomer flechette) to their
+     * dedicated handlers. Shared with the OS Ultra-LB weapons so both plain and double-tap LB-X honor the
+     * munition. Returns {@code null} when no OS special munition is loaded.
+     */
+    @Nullable
+    protected AttackHandler getOSLBSpecialHandler(AmmoType ammoType, ToHitData toHit, WeaponAttackAction waa,
+          Game game, TWGameManager manager) throws EntityLoadingException {
+        if (ammoType.getMunitionType().contains(AmmoType.Munitions.M_GAAM)) {
+            return new OSGAAMHandler(toHit, waa, game, manager);
+        }
+        if (ammoType.getMunitionType().contains(AmmoType.Munitions.M_ANTI_MYOMER)) {
+            return new OSAntiMyomerHandler(toHit, waa, game, manager);
         }
         return null;
     }

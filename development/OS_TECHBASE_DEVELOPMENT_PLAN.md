@@ -454,14 +454,71 @@ mutators (`OS_AC_*_MUTATOR`, TechBase OUTER_SPHERE, all intro 2805 so no gap):
 (`ComputeToHit`, mirrors the BF gradient); all range bands ×1.2 when loaded (`WeaponType.getRanges`,
 mirrors the ATM ammo-range mechanism). Plain slug damage (no special handler). Weight ratio 1.
 
-### OS AC special munitions — Phase 2: LB-X / Ultra (planned)
-- **Blocker:** `UACWeapon.getCorrectHandler` always returns `UltraWeaponHandler` (ignores munition);
-  `LBXACWeapon` only routes Cluster→`LBXHandler`, else→`ACWeaponHandler`. So special-munition **handlers
-  never fire** on Ultra/LB-X until those dispatchers are taught to honor munitions.
-- **Tiering is date-based, not per-weapon:** Improve & Enhanced tier weapons of a type share one ammo enum
-  (`LBX_OS` / `AC_ULTRA`) + rackSize, so ammo can't hard-restrict by weapon. Gate by intro date instead —
-  Improve specials ≈ 2900, Enhanced-only Precision ≈ 3000.
-- Only **Improve/Enhanced** LB-X/Ultra get specials (Standard-tier LB-X/Ultra stay Slug+Cluster / standard).
+### OS AC special munitions — Phase 2: LB-X / Ultra — IMPLEMENTED (2026-07-09)
+Decision (2026-07-08): LB-X and Ultra get **bespoke, family-specific** munitions (NOT the generic Phase 1
+set). Numbers below are the shipped values (per the OS BV/cost methodology — still tunable).
+
+> **Shipped & compiles (2026-07-09).** All 5 munitions (18 ammo entries) live under the reused `LBX_OS` /
+> `AC_ULTRA` enums via explicit creation (`makeOSLBXSpecialAmmo` / `makeOSUltraSpecialAmmo`); 4 new `Munitions`
+> values `M_GAAM` / `M_ANTI_MYOMER` / `M_IMP_CASELESS` / `M_APDS` (Precision reuses canon `M_PRECISION`).
+> **Handler dispatch (the core blocker) resolved:** `LBXACWeapon.getCorrectHandler` now calls a shared
+> `getOSLBSpecialHandler` (routes `M_GAAM`→`OSGAAMHandler`, `M_ANTI_MYOMER`→`OSAntiMyomerHandler`) — reused by
+> the 3 `OSUltraLB{5,10,20}XAC` overrides so both plain and double-tap LB-X honor the munition;
+> `UACWeapon.getCorrectHandler` routes `M_APDS`→`OSUltraAPDSHandler` (keeps the Ultra double-tap).
+> - **GAAM** → `OSGAAMHandler extends ACAPHandler` (single guided round, AP crit); min-range no-arm + medium
+>   +25% dmg in the handler; range profile in `WeaponType.getRanges` (LBX_OS + M_GAAM); to-hit −1 med / +1 long
+>   in `ComputeToHit`.
+> - **Anti-Myomer** → `OSAntiMyomerHandler extends LBXHandler`: `usesClusterTable()` forced true (base keys it
+>   to M_CLUSTER, which this round lacks), per-pellet AP crit via an `initHit` override (`makeArmorPiercing`),
+>   forced PSR vs falling Meks in `doChecks`; ammo carries the −1 to-hit.
+> - **Precision** → no handler: `−2` vs target movement mod wired by threading `AC_ULTRA` into
+>   `ComputeTargetToHitMods`; half shots come from the ammo.
+> - **Improved Caseless** → no handler: the default (non-PLAYTEST3) Ultra jam path already only jams (never
+>   destroys); being `M_IMP_CASELESS` (not `M_CASELESS`) it can't enter the PLAYTEST3 destroy branch. Value =
+>   the ~1.5× shots-per-ton in the ammo.
+> - **APDS** → `OSUltraAPDSHandler extends UltraWeaponHandler`: `calcDamagePerHit ×0.8` (floored) + AP crit via
+>   an overridden `handleEntityDamage`, double-tap preserved.
+> **Validated:** `:megamek:compileJava` + the AmmoType/EquipmentType/EquipmentTypeLookup tests pass (the 18 new
+> ammos initialize with no duplicate-name/tech-field errors). In-game behavior not yet playtested.
+> **Open tuning:** the per-pellet Anti-Myomer AP crit may read stronger than "slight" (≈7 crit-biased pellets on
+> an LB10-X spread) — revisit after a playtest. APDS/2 (1 dmg) shipped; confirm it earns its slot.
+
+**Base reference (existing OS slug/cluster ammo):** LB-X 5/10/20 → shots 22/10/6, ammoBV 11/16/24, cost
+9k/15k/24k · Ultra 2/5/10/20 → shots 45/20/10/5, ammoBV 7/14/26/35, cost 1k/9k/12k/20k.
+
+**LB-X specials (calibers 5/10/20-X; reuse `LBX_OS` enum):**
+- **GAAM** (Guided Anti-Armor Missile, `M_GAAM`, intro 2900): single guided projectile at rack damage;
+  ranges **min 6 · 7/10/25/30**; to-hit **medium −1 / long +1**; **medium hit +25% dmg**; **≤6 hex hit = 0
+  dmg** (can't arm); **AP crit**. Data /5·/10·/20: dmg 5·10·20 (med 6·12·25), shots 11·5·3, ammoBV
+  14·20·32, cost 30k·50k·90k. → new `OSGAAMHandler` + getRanges + ComputeToHit gradient.
+- **Anti-Myomer Flechette** (`M_ANTI_MYOMER`, intro 2900): **Cluster** (cluster table) + **forces a PSR on
+  the target on hit** + slight AP crit. Data /5·/10·/20: cluster 5·10·20, shots 20·9·5, ammoBV 13·19·28,
+  cost 18k·30k·48k. → handler extends `LBXHandler` (add PSR + AP).
+
+**Ultra specials (calibers 2/5/10/20; reuse `AC_ULTRA` enum):**
+- **Precision** (`M_PRECISION`, intro **3000** = Enhanced era): cancels target movement mod **−2**; **half
+  shots** (canon). shots 22/10/5/2, ammoBV = base, cost ×6 (6k/54k/72k/120k).
+- **Improve Caseless** (`M_IMP_CASELESS`, intro 2900): jam **never destroys the weapon** (only jams); shots
+  **≈1.5× slug** (between slug and canon caseless's 2×): 67/30/15/7; ammoBV = base; cost ×1.5.
+- **APDS** (`M_APDS`, intro 2900): **damage ≈−20% (floored) + AP crit + shots ≈1.35×** (discarding sabot).
+  dmg 1/4/8/16, shots 61/27/14/7; ammoBV ≈ base; cost ×3.
+
+**Tiering = date-soft-limit (hard per-weapon restriction is NOT possible):** Improve & the top tier of each
+family share one ammo enum + rackSize, so ammo can't hard-gate by weapon. Specials intro 2900 (Precision
+3000) so they surface at the Improve/Enhanced era; standard-tier weapons *can* technically load them once
+that era arrives (accepted). LB-X tiers are Standard/Improve/**Ultra-LB** (no Enhanced LB); Ultra AC tiers
+are Standard/Improve/**Enhanced**.
+
+**Implementation surface (all DONE 2026-07-09 — kept as a map of the touched code):**
+- **Handler dispatch (the core blocker) — DONE:** `LBXACWeapon.getOSLBSpecialHandler` (shared with the 3
+  `OSUltraLB*` overrides) + `UACWeapon` APDS route; the Ultra path keeps the double-tap.
+- **3 new handlers — DONE:** `OSGAAMHandler` (extends `ACAPHandler`), `OSAntiMyomerHandler` (extends
+  `LBXHandler`), `OSUltraAPDSHandler` (extends `UltraWeaponHandler`).
+- **Ammo — DONE:** explicit creation (not the canon mutator system) + 4 new `Munitions` values
+  (`M_GAAM`, `M_ANTI_MYOMER`, `M_IMP_CASELESS`, `M_APDS`; Precision reuses `M_PRECISION`).
+- **To-hit/range — DONE:** GAAM `getRanges` + `ComputeToHit` gradient; `AC_ULTRA` threaded into the
+  Precision −2 gate in `ComputeTargetToHitMods`.
+- **Remaining:** in-game playtest; retune Anti-Myomer AP crit if it over-performs; confirm APDS/2 slot.
 
 ### Assault AC removal
 - Delete weapons `OSAssaultAC{2,5,10,20}` + their `addWeapon` registration.

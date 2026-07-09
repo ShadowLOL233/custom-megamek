@@ -759,7 +759,7 @@ public class GUIPreferences extends PreferenceStoreProxy {
         store.setDefault(MEK_SELECTOR_INCLUDE_COST, true);
         store.setDefault(MEK_SELECTOR_UNIT_TYPE, 0);
         store.setDefault(MEK_SELECTOR_WEIGHT_CLASS, 15);
-        store.setDefault(MEK_SELECTOR_RULES_LEVELS, "[0]");
+        store.setDefault(MEK_SELECTOR_RULES_LEVELS, "");
         store.setDefault(MEK_SELECTOR_SORT_COLUMN, 0);
         store.setDefault(MEK_SELECTOR_SORT_ORDER, "ASCENDING");
         store.setDefault(MEK_SELECTOR_SHOW_ADVANCED, false);

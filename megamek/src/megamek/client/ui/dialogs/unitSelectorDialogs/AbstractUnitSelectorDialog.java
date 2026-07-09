@@ -648,6 +648,13 @@ public abstract class AbstractUnitSelectorDialog extends JDialog implements Runn
             selectionIdx++;
         }
         listTechLevel.setModel(techModel);
+        if (selectedIndices.length == 0) {
+            // Default to all tech levels selected so units are not hidden by an empty/blank filter.
+            selectedIndices = new int[techModel.getSize()];
+            for (int i = 0; i < selectedIndices.length; i++) {
+                selectedIndices[i] = i;
+            }
+        }
         listTechLevel.setSelectedIndices(selectedIndices);
         listTechLevel.addListSelectionListener(this);
     }

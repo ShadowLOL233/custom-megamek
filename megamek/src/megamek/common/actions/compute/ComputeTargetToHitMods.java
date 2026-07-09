@@ -214,7 +214,7 @@ public class ComputeTargetToHitMods {
             // precision ammo reduces this modifier
             // PLAYTEST3 for playtest ammo
             else if ((ammoType != null)
-                  && ammoType.getAmmoType().isAnyOf(AC, LAC, AC_IMP, PAC)
+                  && ammoType.getAmmoType().isAnyOf(AC, LAC, AC_IMP, PAC, AC_ULTRA)
                   && (munition.contains(AmmoType.Munitions.M_PRECISION) || munition.contains(AmmoType.Munitions.M_PRECISION_PLAYTEST))) {
                 int nAdjust = Math.min(2, thTemp.getValue());
                 if (nAdjust > 0) {
