@@ -1035,6 +1035,14 @@ public class WeaponType extends EquipmentType {
                 sRange = 6;
             }
         }
+        // Outer Sphere Rocket-Propelled AC ammo: rocket-assisted rounds extend every range band ~20%.
+        if (hasLoadedAmmo && (ammo.getType() instanceof AmmoType rpAmmo)
+              && rpAmmo.getMunitionType().contains(AmmoType.Munitions.M_ROCKET_PROPELLED)) {
+            sRange = (int) Math.round(sRange * 1.2);
+            mRange = (int) Math.round(mRange * 1.2);
+            lRange = (int) Math.round(lRange * 1.2);
+            eRange = (int) Math.round(eRange * 1.2);
+        }
         // Allow extremely long-range shots for bearings-only capital missiles
         if (weapon.isInBearingsOnlyMode()) {
             eRange = RangeType.RANGE_BEARINGS_ONLY_OUT;
@@ -1576,6 +1584,10 @@ public class WeaponType extends EquipmentType {
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSUltraLB10XAC());
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSUltraLB20XAC());
         // OS Enhanced HVAC (Enhanced-tier high-velocity AC; OS-new heavy calibers 12/14/16/18)
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSImproveHVAC12());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSImproveHVAC14());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSImproveHVAC16());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSImproveHVAC18());
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSEnhancedHVAC12());
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSEnhancedHVAC14());
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSEnhancedHVAC16());

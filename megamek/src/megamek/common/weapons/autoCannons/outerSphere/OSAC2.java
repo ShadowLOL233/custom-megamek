@@ -14,6 +14,7 @@ import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
 import megamek.common.enums.TechRating;
+import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.Mounted;
 import megamek.common.weapons.autoCannons.ACWeapon;
 
@@ -33,6 +34,7 @@ public class OSAC2 extends ACWeapon {
         addLookupName("OS Autocannon/2");
         addLookupName("Legion AC/2");
         sortingName = "AC OS 1 Std 1 Std 02";
+        ammoType = AmmoType.AmmoTypeEnum.AC_STD_OS;
         heat = 1;
         damage = 2;
         rackSize = 2;

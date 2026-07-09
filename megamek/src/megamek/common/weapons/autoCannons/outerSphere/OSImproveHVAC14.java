@@ -17,36 +17,36 @@ import megamek.common.equipment.Mounted;
 import megamek.common.weapons.autoCannons.HVACWeapon;
 
 /**
- * Outer Sphere Enhanced HVAC/18 — Enhanced-tier high-velocity autocannon (heavy calibers only).
- * The compact refinement of the Improve HVAC: same firepower/reach, but lighter, fewer crits and −1 heat
- * (refined electrothermal). Aerospace-capable (AV = damage, maxRange = extreme); ammo can detonate.
+ * Outer Sphere Improve HVAC/14 — Improve-tier high-velocity autocannon (heavy calibers only).
+ * The heavier, earlier HVAC pattern; the Enhanced tier is the lighter/cooler refinement of this.
+ * Aerospace-capable (AV = damage across all brackets, maxRange = extreme); ammo can detonate.
  */
-public class OSEnhancedHVAC18 extends HVACWeapon {
+public class OSImproveHVAC14 extends HVACWeapon {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public OSEnhancedHVAC18() {
+    public OSImproveHVAC14() {
         super();
-        name = "Enhanced HVAC/18";
-        setInternalName("OSEnhancedHVAC18");
-        addLookupName("OS Enhanced HVAC/18");
-        addLookupName("Enhanced HVAC/18");
-        sortingName = "AC OS 5 HVAC 3 Enh 18";
-        heat = 6;
-        damage = 18;
-        rackSize = 18;
-        shortRange = 5;
-        mediumRange = 11;
-        longRange = 18;
-        extremeRange = 24;
+        name = "Improve HVAC/14";
+        setInternalName("OSImproveHVAC14");
+        addLookupName("OS Improve HVAC/14");
+        addLookupName("Improve HVAC/14");
+        sortingName = "AC OS 5 HVAC 2 Imp 14";
+        heat = 5;
+        damage = 14;
+        rackSize = 14;
+        shortRange = 6;
+        mediumRange = 13;
+        longRange = 20;
+        extremeRange = 26;
         tonnage = 12.0;
-        criticalSlots = 7;
-        bv = 300;
-        cost = 760000;
-        shortAV = 18;
-        medAV = 18;
-        longAV = 18;
-        extAV = 18;
+        criticalSlots = 8;
+        bv = 230;
+        cost = 480000;
+        shortAV = 14;
+        medAV = 14;
+        longAV = 14;
+        extAV = 14;
         maxRange = RANGE_EXT;
         explosionDamage = damage;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
@@ -54,7 +54,7 @@ public class OSEnhancedHVAC18 extends HVACWeapon {
               .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
-              .setISAdvancement(3000, 3025, 3050, DATE_NONE, DATE_NONE)
+              .setISAdvancement(2900, 2930, 2960, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)

@@ -103,14 +103,24 @@ hot-reloads jars — do a full clean rebuild + restart: `cd megameklab && .\grad
 
 ---
 
-## 2. OS HVAC (High-Velocity Autocannon) — heavy calibers only — IMPLEMENTED as Enhanced (2026-07-06)
+## 2. OS HVAC (High-Velocity Autocannon) — heavy calibers only — IMPLEMENTED as Improve + Enhanced (2026-07-08)
 
-> **IMPLEMENTED as the Enhanced tier (2026-07-06).** Built `OSEnhancedHVAC{12,14,16,18}` (extends
-> `HVACWeapon`); names "Enhanced HVAC/N"; Enhanced dates `3000/3025/3050`; TechRating F; ADVANCED-static;
-> Faction LEGION. The user-approved draft stats below shipped as-is. **Ammo:** reused the canon
-> `HYPER_VELOCITY` enum (the HVAC base + handler are keyed to it) — added 4 entries "HVAC/12-18 Ammo" (OS,
-> via `createOSHVACAmmo`); **no** dedicated `AC_HVAC_OS`. Aero: AV = damage, maxRange = extreme. Compiles;
-> pending in-game test. (The draft table below still uses the old "Improve HVAC" labels — read as Enhanced.)
+> **NOW TWO TIERS + rebalanced (2026-07-08).** The original single Enhanced draft was judged too bulky/hot,
+> so it was rebased as the **Improve** tier and a lighter/cooler **Enhanced** tier added on top; then a
+> heat + ammo pass made the whole family fieldable (the canon HVAC profile stacked too many drawbacks).
+> - **Improve HVAC/{12,14,16,18}** (`OSImproveHVAC*`, dates `2900/2930/2960`): heat **4/5/6/7** (capped at
+>   the AC/20 ceiling, was 5/6/8/9) · 11/12/13/14 t · 7/8/8/9 crit · BV 195/230/265/300.
+> - **Enhanced HVAC/{12,14,16,18}** (`OSEnhancedHVAC*`, dates `3000/3025/3050`): the compact refinement —
+>   same damage/range/AV, **−2 t, −2 crit, −1 heat** (heat **3/4/5/6** · 9/10/11/12 t · 5/6/6/7 crit).
+>   **BV = Improve (195/230/265/300)** — per the ratified BV policy the shooter's self-heat and tonnage/
+>   crits never enter weapon BV, and damage/range are identical, so the tiers MUST share BV; the Enhanced's
+>   lighter/cooler build is the "OS Clan-tax equivalent" (mech-level advantage). Cost +100k (Enhanced
+>   manufacturing premium, independent of BV).
+> Both tiers: extend `HVACWeapon`; TechRating F; ADVANCED-static; Faction LEGION; aero AV = damage,
+> maxRange = extreme. **Ammo:** shared — reused the canon `HYPER_VELOCITY` enum (4 entries "HVAC/12-18 Ammo"
+> via `createOSHVACAmmo`, intro **2900**; same rackSize covers both tiers); shots/ton raised to **8/7/6/5**
+> (standard-AC density ≈100/rackSize, was canon 7/6/5/4 — the heavy weapon + explosive ammo warranted more,
+> per OS "better than IS canon"); **no** dedicated `AC_HVAC_OS`. Compiles; pending in-game test.
 
 ### Design decision
 - OS HVAC is rooted in **OS Improve AC + Improve LB-X** (NOT IS HVAC).
@@ -259,9 +269,10 @@ Under the §0.2 ladder, **Advance** = the most radical / "Clan-like" tier. Per u
 - Note: the "Advance" tier now holds only untokened `ADVANCED`-static weapons (PPC-X, Rotary Light PPC,
   etc.); a *new*, genuinely-radical Advance line can be designed later under §0.2.
 
-### 6.3 HVAC tier classification — DECIDED: Enhanced (2026-07-06)
-Resolved: HVAC ships at the **Enhanced** tier (per §0.2, a performance-pushing weapon built on Improve
-AC / LB-X = Enhanced). Implemented as `OSEnhancedHVAC{12,14,16,18}` — see §2. (Un-shelved.)
+### 6.3 HVAC tier classification — DECIDED: Improve + Enhanced (re-tiered 2026-07-08)
+Originally shipped as a single **Enhanced** tier (2026-07-06). On review the draft stats read as too heavy
+for Enhanced, so they were rebased as **Improve HVAC** and a lighter/cooler **Enhanced HVAC** (−2 t / −2 crit
+/ −1 heat, BV +10) was added above it. Two tiers now: `OSImproveHVAC*` + `OSEnhancedHVAC*` — see §2.
 
 ### 6.4 Engines & internal structure — rename, reclassify, and redesign (added 2026-06-13)
 - **✅ DONE (2026-07-06) — renamed ENGINES, INTERNAL STRUCTURE & armor "Advance" → "Enhanced".** Per user
@@ -386,6 +397,71 @@ labelled correctly and not shared with standard / Rotary AC.
 - Firing / cluster / ammo-consumption are handler + mode driven — unaffected by the enum change.
 - AmmoTypeEnum uses explicit indices — pick free ones (the freed `AC_ASSAULT_OS` slot is a candidate once
   Assault is removed).
+
+### OS AC-family native ammo — Standard / Ultra / Rotary (implemented — 2026-07-08)
+**Audit:** most OS ammo-using families already had OS-native bins (Improve AC `AC_IMP_OS`, LB-X `LBX_OS`,
+all Gauss/HAG `*_OS`, HVAC `HYPER_VELOCITY` OS entries, MML/Streak/MRM/ER-LRM/ATM reuse-enum bins). The only
+families still falling back on canon (IS/Clan) ammo were **Standard AC**, **Ultra AC** (Std/Improve/Enhanced),
+and **Rotary AC**. Ultra's canon IS ammo also goes *extinct 2915-3035*, straddling the Improve/Enhanced tiers.
+
+**Shipped & compiles:**
+- **Standard AC** → dedicated enum `AC_STD_OS`(137) (single-shot ⇒ no engine coupling, mirrors `AC_IMP_OS`).
+  4 entries via `makeOSACAmmo`, dates 2805, values mirror canon AC ammo. Weapons `OSAC{2,5,10,20}` wired to it.
+- **Ultra AC** → **reuses canon `AC_ULTRA`** (double-tap heat is hard-keyed to that enum — see the enum-decl
+  note; a dedicated enum would need patching `getNumShots`, `HeatTrackingBVCalculator`, `Compute`,
+  `ASDamageConverter`, UAC/RAC handlers, unjam in `TWGameManager` — ~8 files). 4 OS entries, TechBase OS,
+  intro **2805** (covers all three tiers continuously, no extinction). Weapons unchanged.
+- **Rotary AC** → **reuses canon `AC_ROTARY`** (same rationale). 4 OS entries, intro **3060** (matches the
+  OS Rotary weapon). Weapons unchanged.
+- Display names for all 12 share canon calibers, so tagged `(OS)` via a `tagOS` helper to disambiguate in MML.
+- **Rule confirmed (house convention):** behaviour-coupled AC mechanisms (Ultra/Rotary, like OS missiles)
+  *reuse* the canon ammoType enum; only behaviour-simple ones (standard AC, class-driven HAG) get a dedicated
+  `*_OS` enum. Documented inline at the `AmmoTypeEnum` declaration.
+- Save-compat: `OSAC{2,5,10,20}` now use `AC_STD_OS`; existing custom units may need standard-AC ammo re-picked.
+
+### OS missile-family native ammo — LRM / SRM standard racks (implemented — 2026-07-08)
+**Audit (all ~85 OS missile weapons):** every family whose *canon* ammo is introduced late already has an
+OS-native bin, so **no intro-date gaps remain** — ER-LRM (`EXLRM`), Streak LRM/SRM (`LRM_STREAK`/`SRM_STREAK`),
+MRM, MML, Dragon Piercer (`TBOLT_*`), ATM (SRTM/APTM/LRTM), Narc/Munin all covered. The only OS missile
+weapons still on canon ammo were **plain LRM at rack 5/10/15/20** (OSHeavy/Improve/Enhanced LRM) and **plain
+SRM at rack 2/4/6** (OSHeavy/Improve/Enhanced SRM); the OS designers had only built OS ammo for the *non-canon*
+racks (LRM30, SRM8/12). Canon LRM/SRM ammo is ancient (~2400/2370, never extinct) ⇒ **no functional gap**;
+adding OS ammo here is purely self-containment (same rationale as standard AC).
+
+**Shipped & compiles:** 7 entries via `makeOSClusterMissileAmmo` — `createOSLRM{5,10,15,20}Ammo` (reuse `LRM`)
++ `createOSSRM{2,4,6}Ammo` (reuse `SRM`), TechBase OS, intro **2805** (covers Heavy 2805 / Improve 2900 /
+Enhanced 3000), values mirror canon, `(OS)`-tagged names. **Weapons unchanged.**
+- **Reuse is mandatory for missiles** (unlike the dedicated `AC_STD_OS` used for standard AC): a dedicated
+  `LRM_OS`/`SRM_OS` enum would break Artemis IV / Narc / FCS bonuses, which are keyed to the `LRM`/`SRM` enum.
+  Consequence: OS LRM/SRM weapons load *both* canon and OS ammo (they keep their canon ammoType).
+
+### OS AC special munitions — Phase 1: Standard AC (implemented — 2026-07-08)
+**Scope decided:** munitions are AU-tiered. Standard AC (`AC_STD_OS`) gets the canon AC munitions **minus
+Precision** (Precision is reserved for the Enhanced tier), plus one OS-original round. LB-X / Ultra specials
+are **Phase 2** (need handler plumbing — see below).
+
+**Shipped & compiles:** 6 munitions on `OSAC{2,5,10,20}` via `createMunitions(osStdAcAmmos, …)` with new OS
+mutators (`OS_AC_*_MUTATOR`, TechBase OUTER_SPHERE, all intro 2805 so no gap):
+- **Armor-Piercing** (½ shots, +1 to-hit, `makeArmorPiercing` crit boost), **Caseless** (2× shots, jam/
+  destroy on natural-2 roll), **Flak** (flak table + 5-fragment cluster), **Flechette** (anti-infantry +
+  2× vs woods), **Tracer** (−1 dmg, −1 night to-hit), **Rocket-Propelled** (OS-original, see below).
+- Effects work because `ACWeapon.getCorrectHandler` dispatches on munition (independent of the `AC_STD_OS`
+  enum). Enum-gated to-hit effects were threaded: `AC_STD_OS` added to the AP `+1` check
+  (`ComputeToHit`), the Tracer/incendiary night check (`AbstractAttackAction`), and the munition
+  cost/BV + name-switch blocks in `AmmoType.createMunitionType`.
+
+**Rocket-Propelled (`M_ROCKET_PROPELLED`, custom):** +1 to-hit at short range, −1 at long/extreme
+(`ComputeToHit`, mirrors the BF gradient); all range bands ×1.2 when loaded (`WeaponType.getRanges`,
+mirrors the ATM ammo-range mechanism). Plain slug damage (no special handler). Weight ratio 1.
+
+### OS AC special munitions — Phase 2: LB-X / Ultra (planned)
+- **Blocker:** `UACWeapon.getCorrectHandler` always returns `UltraWeaponHandler` (ignores munition);
+  `LBXACWeapon` only routes Cluster→`LBXHandler`, else→`ACWeaponHandler`. So special-munition **handlers
+  never fire** on Ultra/LB-X until those dispatchers are taught to honor munitions.
+- **Tiering is date-based, not per-weapon:** Improve & Enhanced tier weapons of a type share one ammo enum
+  (`LBX_OS` / `AC_ULTRA`) + rackSize, so ammo can't hard-restrict by weapon. Gate by intro date instead —
+  Improve specials ≈ 2900, Enhanced-only Precision ≈ 3000.
+- Only **Improve/Enhanced** LB-X/Ultra get specials (Standard-tier LB-X/Ultra stay Slug+Cluster / standard).
 
 ### Assault AC removal
 - Delete weapons `OSAssaultAC{2,5,10,20}` + their `addWeapon` registration.

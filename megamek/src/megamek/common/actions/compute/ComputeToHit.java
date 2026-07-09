@@ -859,6 +859,7 @@ public class ComputeToHit {
             if (((ammoType.getAmmoType() == AmmoType.AmmoTypeEnum.AC) ||
                   (ammoType.getAmmoType() == AmmoType.AmmoTypeEnum.LAC) ||
                   (ammoType.getAmmoType() == AmmoType.AmmoTypeEnum.AC_IMP) ||
+                  (ammoType.getAmmoType() == AmmoType.AmmoTypeEnum.AC_STD_OS) ||
                   (ammoType.getAmmoType() == AmmoType.AmmoTypeEnum.PAC)) &&
                   (munition.contains(AmmoType.Munitions.M_ARMOR_PIERCING)
                         || munition.contains(AmmoType.Munitions.M_ARMOR_PIERCING_PLAYTEST))) {
@@ -1549,6 +1550,19 @@ public class ComputeToHit {
             int nRange = ae.getPosition().distance(target.getPosition());
             int[] nRanges = weaponType.getRanges(weapon, ammo);
             if (nRange > nRanges[RangeType.RANGE_MEDIUM]) {
+                toHit.addModifier(-1, Messages.getString("WeaponAttackAction.WeaponMod"));
+            }
+        }
+
+        // Rocket-Propelled AC ammo (OS): +1 to-hit at short range, -1 at long range and beyond. A close-in
+        // accuracy penalty traded for reach (this ammo's range bands are already extended ~20%).
+        if (target != null && (ammoType != null)
+              && ammoType.getMunitionType().contains(AmmoType.Munitions.M_ROCKET_PROPELLED)) {
+            int nRange = ae.getPosition().distance(target.getPosition());
+            int[] nRanges = weaponType.getRanges(weapon, ammo);
+            if (nRange <= nRanges[RangeType.RANGE_SHORT]) {
+                toHit.addModifier(1, Messages.getString("WeaponAttackAction.WeaponMod"));
+            } else if (nRange > nRanges[RangeType.RANGE_MEDIUM]) {
                 toHit.addModifier(-1, Messages.getString("WeaponAttackAction.WeaponMod"));
             }
         }

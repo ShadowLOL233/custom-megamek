@@ -192,6 +192,7 @@ public abstract class AbstractAttackAction extends AbstractEntityAction implemen
             if (((ammoType.getAmmoType() == AmmoType.AmmoTypeEnum.AC)
                   || (ammoType.getAmmoType() == AmmoType.AmmoTypeEnum.LAC)
                   || (ammoType.getAmmoType() == AmmoType.AmmoTypeEnum.AC_IMP)
+                  || (ammoType.getAmmoType() == AmmoType.AmmoTypeEnum.AC_STD_OS)
                   || (ammoType.getAmmoType() == AmmoType.AmmoTypeEnum.PAC))
                   && ((ammoType.getMunitionType().contains(AmmoType.Munitions.M_INCENDIARY_AC))
                   || (ammoType.getMunitionType().contains(AmmoType.Munitions.M_TRACER)))) {

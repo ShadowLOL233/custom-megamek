@@ -18,8 +18,8 @@ import megamek.common.weapons.autoCannons.HVACWeapon;
 
 /**
  * Outer Sphere Enhanced HVAC/16 — Enhanced-tier high-velocity autocannon (heavy calibers only).
- * Improve-AC mechanism + LB-X-class reach pushed further, traded against high heat; aerospace-capable
- * (AV = damage across all brackets, maxRange = extreme); ammo can detonate. Uses HYPER_VELOCITY ammo.
+ * The compact refinement of the Improve HVAC: same firepower/reach, but lighter, fewer crits and −1 heat
+ * (refined electrothermal). Aerospace-capable (AV = damage, maxRange = extreme); ammo can detonate.
  */
 public class OSEnhancedHVAC16 extends HVACWeapon {
     @Serial
@@ -32,17 +32,17 @@ public class OSEnhancedHVAC16 extends HVACWeapon {
         addLookupName("OS Enhanced HVAC/16");
         addLookupName("Enhanced HVAC/16");
         sortingName = "AC OS 5 HVAC 3 Enh 16";
-        heat = 8;
+        heat = 5;
         damage = 16;
         rackSize = 16;
         shortRange = 6;
         mediumRange = 12;
         longRange = 19;
         extremeRange = 25;
-        tonnage = 13.0;
-        criticalSlots = 8;
+        tonnage = 11.0;
+        criticalSlots = 6;
         bv = 265;
-        cost = 540000;
+        cost = 680000;
         shortAV = 16;
         medAV = 16;
         longAV = 16;

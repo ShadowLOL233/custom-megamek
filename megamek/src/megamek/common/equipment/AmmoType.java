@@ -224,7 +224,10 @@ public class AmmoType extends EquipmentType {
         HEAVY_MACHINE_CANNON_OS(134, "Heavy Machine Cannon (OS)", AmmoCategory.Ballistic),
         // Dedicated IS Burst-Fire / Rapid-Fire AC ammo (own bins, not shared with standard / Rotary AC)
         AC_BF(135, "Burst-Fire Autocannon", AmmoCategory.Ballistic),
-        AC_RF(136, "Rapid-Fire Autocannon", AmmoCategory.Ballistic);
+        AC_RF(136, "Rapid-Fire Autocannon", AmmoCategory.Ballistic),
+        // OS standard AC - single-shot, so a dedicated enum is safe (no engine multi-shot coupling),
+        // matching its AC_IMP_OS Improve-AC sibling. Ultra/Rotary deliberately stay on canon enums above.
+        AC_STD_OS(137, "Standard Autocannon (OS)", AmmoCategory.Ballistic);
 
         private static final Map<Integer, AmmoTypeEnum> INDEX_LOOKUP = new HashMap<>();
 
@@ -1239,6 +1242,35 @@ public class AmmoType extends EquipmentType {
                 .setStaticTechLevel(SimpleTechLevel.ADVANCED),
           "165, TO:AUE");
 
+    // --- Outer Sphere standard-AC munition mutators (Phase 1) ---
+    // Applied to the AC_STD_OS base rounds. Variants carry OUTER_SPHERE tech + LEGION factions and are all
+    // available from the OSAC intro (2805) so there is no ammo gap. Precision is intentionally excluded
+    // (reserved for the Enhanced tier per the OS munition policy). Rocket-Propelled is an OS-original round.
+    private static TechAdvancement osAcMunitionTech(TechRating rating) {
+        return new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
+              .setUnofficial(false)
+              .setTechRating(rating)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
+              .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+    }
+
+    private static final MunitionMutator OS_AC_ARMOR_PIERCING_MUTATOR = new MunitionMutator("Armor-Piercing", "AP",
+          2, Munitions.M_ARMOR_PIERCING, osAcMunitionTech(TechRating.E), "OS AU");
+    private static final MunitionMutator OS_AC_CASELESS_MUTATOR = new MunitionMutator("Caseless",
+          1, Munitions.M_CASELESS, osAcMunitionTech(TechRating.D), "OS AU");
+    private static final MunitionMutator OS_AC_FLAK_MUTATOR = new MunitionMutator("Flak",
+          1, Munitions.M_FLAK, osAcMunitionTech(TechRating.B), "OS AU");
+    private static final MunitionMutator OS_AC_FLECHETTE_MUTATOR = new MunitionMutator("Flechette",
+          1, Munitions.M_FLECHETTE, osAcMunitionTech(TechRating.E), "OS AU");
+    private static final MunitionMutator OS_AC_TRACER_MUTATOR = new MunitionMutator("Tracer",
+          1, Munitions.M_TRACER, osAcMunitionTech(TechRating.B), "OS AU");
+    private static final MunitionMutator OS_AC_ROCKET_PROPELLED_MUTATOR = new MunitionMutator("Rocket-Propelled", "RP",
+          1, Munitions.M_ROCKET_PROPELLED, osAcMunitionTech(TechRating.F), "OS AU");
+
     private static final MunitionMutator CLAN_IMPROVED_ARMOR_PIERCING_MUNITION_MUTATOR = new MunitionMutator(
           "Armor-Piercing", "AP",
           2,
@@ -2043,6 +2075,8 @@ public class AmmoType extends EquipmentType {
         M_TRACER,
         M_FLAK,
         M_CASELESS,
+        // Outer Sphere custom AC munition: rocket-assisted round (short +1 / long -1 to-hit, +~20% range)
+        M_ROCKET_PROPELLED,
 
         // ATM Munition Types
         M_EXTENDED_RANGE,
@@ -2881,10 +2915,10 @@ public class AmmoType extends EquipmentType {
         EquipmentType.addType(AmmoType.createISHVAC5Ammo());
         EquipmentType.addType(AmmoType.createISHVAC2Ammo());
         // Outer Sphere Enhanced HVAC ammo (heavy calibers 12/14/16/18; HYPER_VELOCITY)
-        EquipmentType.addType(createOSHVACAmmo(12, 7, 24, 24000));
-        EquipmentType.addType(createOSHVACAmmo(14, 6, 28, 28000));
-        EquipmentType.addType(createOSHVACAmmo(16, 5, 32, 32000));
-        EquipmentType.addType(createOSHVACAmmo(18, 4, 36, 36000));
+        EquipmentType.addType(createOSHVACAmmo(12, 8, 24, 24000));
+        EquipmentType.addType(createOSHVACAmmo(14, 7, 28, 28000));
+        EquipmentType.addType(createOSHVACAmmo(16, 6, 32, 32000));
+        EquipmentType.addType(createOSHVACAmmo(18, 5, 36, 36000));
         EquipmentType.addType(AmmoType.createISMekTaserAmmo());
         EquipmentType.addType(AmmoType.createISAC2pAmmo());
         EquipmentType.addType(AmmoType.createISAC5pAmmo());
@@ -3104,11 +3138,36 @@ public class AmmoType extends EquipmentType {
         EquipmentType.addType(AmmoType.createOSPlasmaCannonAmmo());
         EquipmentType.addType(AmmoType.createOSHeavyPlasmaCannonAmmo());
         EquipmentType.addType(AmmoType.createOSEMPPlasmaAcceleratorAmmo());
+        // Outer Sphere (OS) standard AC ammo (dedicated AC_STD_OS enum). Captured into a list so the
+        // special munition variants (AP/Caseless/Flak/Flechette/Tracer/Rocket-Propelled) can be built below.
+        ArrayList<AmmoType> osStdAcAmmos = new ArrayList<>(4);
+        base = AmmoType.createOSAC2Ammo();
+        osStdAcAmmos.add(base);
+        EquipmentType.addType(base);
+        base = AmmoType.createOSAC5Ammo();
+        osStdAcAmmos.add(base);
+        EquipmentType.addType(base);
+        base = AmmoType.createOSAC10Ammo();
+        osStdAcAmmos.add(base);
+        EquipmentType.addType(base);
+        base = AmmoType.createOSAC20Ammo();
+        osStdAcAmmos.add(base);
+        EquipmentType.addType(base);
         // Outer Sphere (OS) Improve AC ammo
         EquipmentType.addType(AmmoType.createOSImproveAC2Ammo());
         EquipmentType.addType(AmmoType.createOSImproveAC5Ammo());
         EquipmentType.addType(AmmoType.createOSImproveAC10Ammo());
         EquipmentType.addType(AmmoType.createOSImproveAC20Ammo());
+        // Outer Sphere (OS) Ultra AC ammo (reuses canon AC_ULTRA enum; intro 2805 covers all tiers)
+        EquipmentType.addType(AmmoType.createOSUltraAC2Ammo());
+        EquipmentType.addType(AmmoType.createOSUltraAC5Ammo());
+        EquipmentType.addType(AmmoType.createOSUltraAC10Ammo());
+        EquipmentType.addType(AmmoType.createOSUltraAC20Ammo());
+        // Outer Sphere (OS) Rotary AC ammo (reuses canon AC_ROTARY enum; intro 3060)
+        EquipmentType.addType(AmmoType.createOSRotaryAC2Ammo());
+        EquipmentType.addType(AmmoType.createOSRotaryAC5Ammo());
+        EquipmentType.addType(AmmoType.createOSRotaryAC10Ammo());
+        EquipmentType.addType(AmmoType.createOSRotaryAC20Ammo());
         // Outer Sphere (OS) LB-X ammo (slug + cluster)
         EquipmentType.addType(AmmoType.createOSLB2XAmmo());
         EquipmentType.addType(AmmoType.createOSLB2XClusterAmmo());
@@ -3147,6 +3206,14 @@ public class AmmoType extends EquipmentType {
         EquipmentType.addType(AmmoType.createOSLRM30Ammo());
         EquipmentType.addType(AmmoType.createOSHeavySRM8Ammo());
         EquipmentType.addType(AmmoType.createOSHeavySRM12Ammo());
+        // OS standard-rack LRM/SRM ammo (native OS bin for canon-rack LRM 5/10/15/20 + SRM 2/4/6)
+        EquipmentType.addType(AmmoType.createOSLRM5Ammo());
+        EquipmentType.addType(AmmoType.createOSLRM10Ammo());
+        EquipmentType.addType(AmmoType.createOSLRM15Ammo());
+        EquipmentType.addType(AmmoType.createOSLRM20Ammo());
+        EquipmentType.addType(AmmoType.createOSSRM2Ammo());
+        EquipmentType.addType(AmmoType.createOSSRM4Ammo());
+        EquipmentType.addType(AmmoType.createOSSRM6Ammo());
         EquipmentType.addType(AmmoType.createOSMML8LRMAmmo());
         EquipmentType.addType(AmmoType.createOSMML8SRMAmmo());
         EquipmentType.addType(AmmoType.createOSMML11LRMAmmo());
@@ -3742,6 +3809,16 @@ public class AmmoType extends EquipmentType {
         munitions.add(PRECISION_PLAYTEST_MUNITION_MUTATOR);
         munitions.add(TRACER_MUNITION_MUTATOR);
         AmmoType.createMunitions(acAmmos, munitions);
+
+        // Outer Sphere standard-AC special munitions (Phase 1). No Precision (reserved for Enhanced tier).
+        munitions.clear();
+        munitions.add(OS_AC_ARMOR_PIERCING_MUTATOR);
+        munitions.add(OS_AC_CASELESS_MUTATOR);
+        munitions.add(OS_AC_FLAK_MUTATOR);
+        munitions.add(OS_AC_FLECHETTE_MUTATOR);
+        munitions.add(OS_AC_TRACER_MUTATOR);
+        munitions.add(OS_AC_ROCKET_PROPELLED_MUTATOR);
+        AmmoType.createMunitions(osStdAcAmmos, munitions);
 
         // PLAYTEST create the munition types for RAC rounds.
         munitions.clear();
@@ -4998,10 +5075,12 @@ public class AmmoType extends EquipmentType {
         ammo.shots = shots;
         ammo.bv = bv;
         ammo.cost = cost;
+        // Intro 2900 so the Improve-tier OS HVAC (2900) has ammo from the start; the Enhanced tier (3000)
+        // shares the same HYPER_VELOCITY bin (same rackSize), so one ammo line per caliber covers both.
         ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
-              .setISAdvancement(3000, 3025, 3050, DATE_NONE, DATE_NONE)
+              .setISAdvancement(2900, 2930, 2960, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
@@ -12121,6 +12200,78 @@ public class AmmoType extends EquipmentType {
         return makeOSACAmmo("Improve AC/20", "OSImproveAC20Ammo", AmmoTypeEnum.AC_IMP_OS, 20, 6, 24, 11000);
     }
 
+    // makeOSACAmmo hard-codes Standard-tier dates (2805); this variant overrides them for later families.
+    private static AmmoType makeOSACAmmoDated(String weaponName, String internal, AmmoTypeEnum type,
+          int rackSize, int shots, int bv, long cost, int proto, int prod, int common) {
+        AmmoType ammo = makeOSACAmmo(weaponName, internal, type, rackSize, shots, bv, cost);
+        ammo.techAdvancement.setISAdvancement(proto, prod, common, DATE_NONE, DATE_NONE);
+        return ammo;
+    }
+
+    // Standard/Ultra/Rotary OS AC ammo share their display names with canon AC ammo (same calibers),
+    // so tag the display name/shortName with "(OS)" to disambiguate in the unit builder.
+    private static AmmoType tagOS(AmmoType ammo) {
+        ammo.name = ammo.name.replace(" Ammo", " (OS) Ammo");
+        ammo.shortName = ammo.shortName + " (OS)";
+        return ammo;
+    }
+
+    // OS standard AC ammo - dedicated AC_STD_OS enum (single-shot, no engine coupling; like AC_IMP_OS).
+    // Values mirror canon IS AC ammo (shots/bv/cost); dates 2805 match the OSAC weapons.
+    private static AmmoType createOSAC2Ammo() {
+        return tagOS(makeOSACAmmo("AC/2", "OSAC2Ammo", AmmoTypeEnum.AC_STD_OS, 2, 45, 5, 1000));
+    }
+
+    private static AmmoType createOSAC5Ammo() {
+        return tagOS(makeOSACAmmo("AC/5", "OSAC5Ammo", AmmoTypeEnum.AC_STD_OS, 5, 20, 9, 4500));
+    }
+
+    private static AmmoType createOSAC10Ammo() {
+        return tagOS(makeOSACAmmo("AC/10", "OSAC10Ammo", AmmoTypeEnum.AC_STD_OS, 10, 10, 15, 6000));
+    }
+
+    private static AmmoType createOSAC20Ammo() {
+        return tagOS(makeOSACAmmo("AC/20", "OSAC20Ammo", AmmoTypeEnum.AC_STD_OS, 20, 5, 22, 10000));
+    }
+
+    // OS Ultra AC ammo - REUSES canon AC_ULTRA enum (its double-tap heat is hard-keyed to that enum,
+    // per the enum-declaration note). TechBase OUTER_SPHERE + Standard-tier dates (2805) give the whole
+    // Ultra line (Std 2805 / Improve 2900 / Enhanced 3000) a continuous, intro-matched OS ammo bin.
+    // Values mirror canon IS Ultra AC ammo.
+    private static AmmoType createOSUltraAC2Ammo() {
+        return tagOS(makeOSACAmmo("Ultra AC/2", "OSUltraAC2Ammo", AmmoTypeEnum.AC_ULTRA, 2, 45, 7, 1000));
+    }
+
+    private static AmmoType createOSUltraAC5Ammo() {
+        return tagOS(makeOSACAmmo("Ultra AC/5", "OSUltraAC5Ammo", AmmoTypeEnum.AC_ULTRA, 5, 20, 14, 9000));
+    }
+
+    private static AmmoType createOSUltraAC10Ammo() {
+        return tagOS(makeOSACAmmo("Ultra AC/10", "OSUltraAC10Ammo", AmmoTypeEnum.AC_ULTRA, 10, 10, 26, 12000));
+    }
+
+    private static AmmoType createOSUltraAC20Ammo() {
+        return tagOS(makeOSACAmmo("Ultra AC/20", "OSUltraAC20Ammo", AmmoTypeEnum.AC_ULTRA, 20, 5, 35, 20000));
+    }
+
+    // OS Rotary AC ammo - REUSES canon AC_ROTARY enum (its 6-shot heat is hard-keyed to that enum).
+    // Dates match the OS Rotary AC weapons (3060/3070/3080). Values mirror canon IS Rotary AC ammo.
+    private static AmmoType createOSRotaryAC2Ammo() {
+        return tagOS(makeOSACAmmoDated("Rotary AC/2", "OSRotaryAC2Ammo", AmmoTypeEnum.AC_ROTARY, 2, 45, 15, 3000, 3060, 3070, 3080));
+    }
+
+    private static AmmoType createOSRotaryAC5Ammo() {
+        return tagOS(makeOSACAmmoDated("Rotary AC/5", "OSRotaryAC5Ammo", AmmoTypeEnum.AC_ROTARY, 5, 20, 31, 12000, 3060, 3070, 3080));
+    }
+
+    private static AmmoType createOSRotaryAC10Ammo() {
+        return tagOS(makeOSACAmmoDated("Rotary AC/10", "OSRotaryAC10Ammo", AmmoTypeEnum.AC_ROTARY, 10, 10, 37, 30000, 3060, 3070, 3080));
+    }
+
+    private static AmmoType createOSRotaryAC20Ammo() {
+        return tagOS(makeOSACAmmoDated("Rotary AC/20", "OSRotaryAC20Ammo", AmmoTypeEnum.AC_ROTARY, 20, 5, 59, 80000, 3060, 3070, 3080));
+    }
+
     // Outer Sphere missile ammo for new rack sizes absent from canon. Reuses the canon ammoType
     // enum (e.g. LRM/SRM) so engine handlers, Artemis/Narc bonuses, etc. all behave normally; only
     // the rackSize differs. TechBase OUTER_SPHERE keeps it out of IS/Clan unit lists.
@@ -12164,6 +12315,38 @@ public class AmmoType extends EquipmentType {
     private static AmmoType createOSHeavySRM12Ammo() {
         return makeOSClusterMissileAmmo("Heavy SRM 12", "Heavy SRM 12", "OSHeavySRM12Ammo",
               AmmoTypeEnum.SRM, 12, 2, 7, 14, 54000);
+    }
+
+    // OS standard-rack LRM/SRM ammo - reuses the canon LRM/SRM enum (mandatory: Artemis/Narc/FCS bonuses
+    // are keyed to it). Canon LRM/SRM ammo is ancient so there is no intro gap; these give OS units a
+    // native, OS-tech-base bin (dates 2805, mirroring OSHeavyLRM30 / OSHeavySRM8-12). Values mirror canon;
+    // names share canon calibers so are tagged "(OS)".
+    private static AmmoType createOSLRM5Ammo() {
+        return tagOS(makeOSClusterMissileAmmo("LRM 5", "LRM 5", "OSLRM5Ammo", AmmoTypeEnum.LRM, 5, 1, 24, 6, 30000));
+    }
+
+    private static AmmoType createOSLRM10Ammo() {
+        return tagOS(makeOSClusterMissileAmmo("LRM 10", "LRM 10", "OSLRM10Ammo", AmmoTypeEnum.LRM, 10, 1, 12, 11, 30000));
+    }
+
+    private static AmmoType createOSLRM15Ammo() {
+        return tagOS(makeOSClusterMissileAmmo("LRM 15", "LRM 15", "OSLRM15Ammo", AmmoTypeEnum.LRM, 15, 1, 8, 17, 30000));
+    }
+
+    private static AmmoType createOSLRM20Ammo() {
+        return tagOS(makeOSClusterMissileAmmo("LRM 20", "LRM 20", "OSLRM20Ammo", AmmoTypeEnum.LRM, 20, 1, 6, 23, 30000));
+    }
+
+    private static AmmoType createOSSRM2Ammo() {
+        return tagOS(makeOSClusterMissileAmmo("SRM 2", "SRM 2", "OSSRM2Ammo", AmmoTypeEnum.SRM, 2, 2, 50, 3, 27000));
+    }
+
+    private static AmmoType createOSSRM4Ammo() {
+        return tagOS(makeOSClusterMissileAmmo("SRM 4", "SRM 4", "OSSRM4Ammo", AmmoTypeEnum.SRM, 4, 2, 25, 5, 27000));
+    }
+
+    private static AmmoType createOSSRM6Ammo() {
+        return tagOS(makeOSClusterMissileAmmo("SRM 6", "SRM 6", "OSSRM6Ammo", AmmoTypeEnum.SRM, 6, 2, 15, 7, 27000));
     }
 
     // OS MML ammo for new rack sizes (canon MML only covers 3/5/7/9). Reuses ammoType MML with the
@@ -16836,6 +17019,7 @@ public class AmmoType extends EquipmentType {
                 case AC_PRIMITIVE:
                 case LAC:
                 case AC_IMP:
+                case AC_STD_OS:
                 case AC_ROTARY:
                 case PAC:
                     // Add the munition name to the beginning of the display name.
@@ -17054,6 +17238,7 @@ public class AmmoType extends EquipmentType {
 
             if ((munition.getAmmoType() == AmmoTypeEnum.AC) ||
                   (munition.getAmmoType() == AmmoTypeEnum.LAC) ||
+                  (munition.getAmmoType() == AmmoTypeEnum.AC_STD_OS) ||
                   (munition.getAmmoType() == AmmoTypeEnum.PAC)) {
                 // PLAYTEST3 ammo changes
                 if (munition.getMunitionType().contains(Munitions.M_ARMOR_PIERCING) || munition.getMunitionType().contains(Munitions.M_ARMOR_PIERCING_PLAYTEST)) {
