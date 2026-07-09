@@ -667,13 +667,8 @@ public class Engine implements Serializable, ITechnology {
         if (hasFlag(SUPPORT_VEE_ENGINE)) {
             return 0;
         }
-        // OS engines with enhanced integral cooling carry 15 weight-free heat sinks
-        // (Advance-tier engines, the base/Advance XXL, and all superheavy variants)
-        if ((engineType == OS_ENHANCED_FUSION_ENGINE) || (engineType == OS_ENHANCED_XL_ENGINE)
-              || (engineType == OS_ENHANCED_XXL_ENGINE) || (engineType == OS_STANDARD_XXL_ENGINE)
-              || (engineType == OS_ENHANCED_LIGHT_ENGINE) || (engineType == OS_ENHANCED_COMPACT_ENGINE)
-              || (engineType == OS_SH_XL_ENGINE) || (engineType == OS_SH_XXL_ENGINE)
-              || (engineType == OS_SH_STANDARD_ENGINE)) {
+        // OS engines with enhanced integral cooling carry 15 weight-free heat sinks.
+        if (hasEnhancedIntegralCooling()) {
             return 15;
         }
         if (isFusion()) {
@@ -696,11 +691,26 @@ public class Engine implements Serializable, ITechnology {
      * @return the maximum number of heat sinks built into the engine.
      */
     public int integralHeatSinkCapacity(boolean compact) {
-        if (compact) {
-            return (engineRating / 25) * 2;
-        } else {
-            return engineRating / 25;
+        int capacity = compact ? (engineRating / 25) * 2 : (engineRating / 25);
+        // OS enhanced-integral-cooling engines house up to 15 heat sinks integrally (crit-free),
+        // matching their 15 weight-free heat sinks (see getWeightFreeEngineHeatSinks).
+        if (hasEnhancedIntegralCooling()) {
+            capacity = Math.max(capacity, 15);
         }
+        return capacity;
+    }
+
+    /**
+     * @return true for OS engines with "enhanced integral cooling": they carry 15 weight-free heat sinks
+     *         and house up to 15 of them integrally (crit-free). Covers the Enhanced-tier engines, the OS
+     *         XXL (Standard + Enhanced), and all OS superheavy variants.
+     */
+    private boolean hasEnhancedIntegralCooling() {
+        return (engineType == OS_ENHANCED_FUSION_ENGINE) || (engineType == OS_ENHANCED_XL_ENGINE)
+              || (engineType == OS_ENHANCED_XXL_ENGINE) || (engineType == OS_STANDARD_XXL_ENGINE)
+              || (engineType == OS_ENHANCED_LIGHT_ENGINE) || (engineType == OS_ENHANCED_COMPACT_ENGINE)
+              || (engineType == OS_SH_XL_ENGINE) || (engineType == OS_SH_XXL_ENGINE)
+              || (engineType == OS_SH_STANDARD_ENGINE);
     }
 
     /**
