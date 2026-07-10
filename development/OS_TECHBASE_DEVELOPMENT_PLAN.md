@@ -12,12 +12,13 @@ Quick index — jump to a section instead of scanning the whole file.
 
 - **Section 0 — Design philosophy**: tier ladder, BV methodology, TechRating, implementation mapping (durable reference).
 - **Section 1 — Status snapshot**: what is implemented in code (some lines pending tier-revision).
-- **Section 2 — Planned: OS HVAC** [active]: electrothermal-chemical AC, heavy calibers 12/14/16/18.
+- **Section 2 — OS HVAC** [active]: shipped as Improve+Enhanced explosive-gamble AC; **now being REPURPOSED → long-barrel precision anti-armor AC** (see §8 related-decisions).
 - **Section 3 — Planned: superheavy unit-cap extensions** [active]: >100t vehicles / VTOL / fighters.
 - **Section 4 — Dev focus: OS versions of canon special equipment** [active]: MiscType catalogue (priority A/B/C/E/G/I).
 - **Section 5 — Open tuning / review items** [active].
 - **Section 6 — Naming & tier-reclassification work items** [active]: §6.4 engine/structure/armor Advance→Enhanced rename **✅ DONE 2026-07-06**; subsections 6.3 & 6.5 shelved (see below).
 - **Section 7 — Planned: BF & RF AC variants** [active]: being reclassified to **Inner Sphere** (not OS).
+- **Section 8 — Planned: Electromagnetic Lance** [active]: Advance-tier Gauss variant — coilgun supergun with power-gated AC munitions. Includes the HVAC-repurpose & Heavy-missile-Ultra decisions.
 
 Shelved ideas are parked in **[OS_SHELVED_IDEAS.md](OS_SHELVED_IDEAS.md)**. Splitting this plan into
 per-topic files (weapons / units / equipment) is **deferred** until it grows further.
@@ -531,3 +532,117 @@ are Standard/Improve/**Enhanced**.
 - 2d6 to-hit P(≥TN): 7 → 58.3%, 8 → 41.7%, 9 → 27.8% (a ±1 modifier shifts one row).
 - `Compute.clusterHitsTable`: size 3 → rolls 2-4 = 1, 5-9 = 2, 10-12 = 3; P(1/2/3) = 16.7 / 66.7 / 16.7%;
   **E = 2.00**. Size 2 (Ultra) → rolls 2-7 = 1, 8-12 = 2; E = 1.42.
+
+---
+
+## 8. Planned: Electromagnetic Lance — Advance-tier Gauss variant (added 2026-07-10)
+
+**Status: DESIGN — not yet coded.** Concept agreed this session; stats not pinned.
+
+### Concept
+An **Advance-tier variant of the OS Gauss family**: a coil-accelerated ferrous-slug supergun that fuses the
+Gauss coilgun mechanism with AC-style munition variety. Signature = **range exceeding the OS Gauss line**,
+**energy-adjustable output**, **inherent armor-piercing**, and — at throttled power — access to **AC munitions**.
+
+### Tier & tech
+**Advance, NOT Experimental.** It stays within known electromagnetic-accelerator physics — no fusion-ceiling
+break, no Ascended reverse-engineering — so it is OS's *indigenous* electromagnetic-weapon pinnacle, not stolen
+tech (fits "OS advances slower than the Clans, but on its own"). TechRating **F** (candidate), Faction LEGION.
+Heavy tonnage / high crit / high BV & cost — the Advance "abandons serviceability & safety discipline for raw
+performance" tax. Contrast: the **Railgun/Railcannon** idea (see below) would be the *Experimental* step beyond.
+
+### Core mechanic — power-gated munitions (the engineering problem turned into a feature)
+- **Physical basis:** launch acceleration ∝ muzzle energy. A full-power coil launch imposes thousands of g —
+  fine for rugged inert penetrators, **fatal to fuzed / payload / electronic rounds**.
+- **FULL power = rugged kinetic rounds only** (standard slug, AP/APDS): max range, max damage, inherent AP —
+  the "Gauss-killer" profile. **LOW power = fragile/payload rounds survive** (Flak, Flechette, HE/incendiary,
+  Precision) but **both range AND damage drop**.
+- This **converts an intractable materials problem** (harden every exotic round against hypersonic launch)
+  **into a tractable control-system + doctrine problem** (throttle down so the round survives). It sidesteps
+  the problem honestly rather than hand-waving it.
+- **Gate is by round RUGGEDNESS, not special-vs-standard:** AP is a "special" round but stays full-power (it is
+  a hardened penetrator), preserving the full-range AP signature.
+- **Edge cases to settle:** Caseless (casing, not fragility → likely full-power), Rocket-Propelled (own rocket
+  motor → maybe disallowed on EM Lance), Tracer (TBD).
+
+### Implementation path (when coding)
+Map onto the **existing ATM variable-profile mechanism** — the loaded ammo type selects the range/damage
+profile, exactly like ATM ER/Standard/HE in `WeaponType.getRanges` (`M_EXTENDED_RANGE` / `M_HIGH_EXPLOSIVE`
+blocks). Kinetic rounds → "ER/full-power profile"; payload rounds → "low-power/short profile + effect". The
+player's "output selection" = which ammo bin is fired; an optional manual throttle mode can be layered later.
+AP via `makeArmorPiercing` (ACAPHandler pattern, as used in Phase 2).
+
+### Lore anchors
+**Silver Bullet Gauss** (proves Gauss can fire sabot-delivered non-standard projectiles), **HAG**, **Magshot** —
+the design space is canon-explored; EM Lance pushes the Silver-Bullet sabot/payload idea to its limit plus
+variable coil output. Single hardest in-universe problem = munition survival under coil launch (solved by the
+power-gate above).
+
+### Philosophy (§0.1) resolution
+EM Lance *looks* like the "do-everything" weapon OS rejects — but the power-gate means it can **never** have
+versatility AND performance in the same shot. It **pays the "no do-everything" tax continuously, shot by shot**,
+rather than escaping it. That makes the Advance-tier exception self-consistent (internalizes the OS creed into
+the mechanism, not just into a high BV).
+
+### Open (before coding)
+Confirm Advance tier; exact ranges vs the OS Gauss line; how hard the low-power range/damage penalty is; final
+munition→power-tier assignment; heat model (coil discharge → more heat than a standard Gauss's ~1?); shared AC
+ammo enum vs dedicated EM Lance ammo.
+
+### Successor concept — Coil-Augmented Railgun (hybrid) — DESIGN NOTE (added 2026-07-10)
+**Status: CONCEPT — not yet specced.** A weapon that fuses the coilgun's and railgun's advantages, and is
+arguably **the single most "OS" weapon in the tech base** — because the real-engineering hybrid *is* the
+maintainability-first way to build a railgun.
+
+**Real engineering basis (both routes borrow the coil to cure the rail's flaw):** the railgun's death is
+**rail self-erosion** (megaamp current + hypervelocity sliding contact). Two real mitigations, both coil-based:
+1. **Field augmentation** — external coils boost the field B; since F = J×B, the same force needs far **less
+   current J** → less arcing/ablation → dramatically longer rail life.
+2. **Coil pre-acceleration + short rail final stage** — the coilgun launches the slug contactlessly to high
+   speed, so it only enters rail contact for the **last brief stage** → minimal contact time/erosion.
+Both leverage OS's existing coilgun mastery to tame the railgun's erosion while keeping its higher
+muzzle-velocity ceiling.
+
+**Why it's "most OS" (§0.1):** OS's defining move is to **engineer a flaw away** rather than accept it (the Clan
+way) or avoid it (the raw path). Facing the railgun, the raw-Experimental answer abandons maintainability; the
+OS answer is this hybrid — reclaim most of the railgun's violence *within* the maintainability creed. It is the
+thesis statement of OS engineering, grown from the EM Lance (§8) tech base as its **successor**.
+
+**Tier & placement:** **Advance — the crown of OS's *serviceable* electromagnetic line, sitting ABOVE EM Lance.**
+It breaks the pure-coilgun velocity ceiling (more range / damage / AP than EM Lance) but stays serviceable.
+Raw **Railgun/Railcannon** remain the **Experimental** creed-abandoning extreme (may end up narrative-only /
+unbuilt if the hybrid is OS's accepted answer).
+
+**Differentiation from EM Lance (so they coexist, not obsolete each other):**
+- EM Lance = pure coilgun: lighter, cheaper, **zero erosion**, the efficient premium.
+- Hybrid = coil-augmented rail: heavier, bulkier, costlier, higher BV, **mild NON-ZERO erosion**, mid heat —
+  the uncompromising apex that still *serves*.
+- Inherits EM Lance's **variable output + power-gated munitions** (the coil stage lets it throttle).
+
+**Mechanic hooks (vs the raw railgun's harsher ones):**
+- **Erosion (mild):** light degradation under sustained fire (small reliability/accuracy drift or a low jam
+  chance) — NOT the raw railgun's "may destroy the weapon per shot." This is its numeric identity vs pure coil.
+- **Heat:** between coilgun (~1) and raw railgun (high) — a mid value (augmentation cut the current, hence heat).
+- **Explosion:** bigger pulsed-power bank → worse crit blast than EM Lance, milder than a raw railgun.
+
+**Naming candidates:** keep the "Lance" bloodline — **Rail Lance / Augmented Lance / Induction Rail Lance** — or
+a new image, **Electromagnetic Pike**. TBD.
+
+**Open (before speccing):** confirm it sits as the Advance apex (vs promoting to Experimental); mild erosion vs
+zero (zero would collapse it into EM Lance — prefer mild); whether raw Railgun/Railcannon still get built at all.
+
+### Related decisions this session (their own write-ups still pending)
+- **HVAC repurpose (§2 redesign):** stop being the explosive-gamble aero AC; become a **long-barrel precision
+  anti-armor AC distinct from LB-X**. Signature = a to-hit gradient **medium −2 / long −3** (reuse the BF
+  `ComputeToHit` block, stronger values). **Calibers dropped 12/14/16/18 → 10/12/14/16** to cut tonnage/crit.
+  Paid with heavy tonnage + high crit + low ammo/ton (mech-level tax). **NB:** unlike BF's BV-neutral −1, this
+  accuracy bonus **raises weapon BV** — HVAC becomes a high-BV precision piece, not a cheap gun.
+- **Heavy LRM/SRM → Ultra-missile:** player chooses 1 or 2 volleys; **each volley rolls its own to-hit +
+  cluster**; jam on the double-tap. **Do the 2-volley version first** (template = `OSUltraLBXHandler`, which
+  already composes Ultra shot-count × per-shot cluster); the 4-volley (2 outputs × 2 volleys) escalation is
+  **deferred pending playtest**.
+- **Railgun / Railcannon:** a *more violent* future direction (real-rail Lorentz accelerator, not a coilgun).
+  Because its defining flaw is **self-erosion of the rails** — the antithesis of OS's maintainability creed —
+  it is **Experimental**, or a deliberate rupture of the OS identity. **OS's preferred answer is the
+  Coil-Augmented Railgun hybrid (see §8 successor note), which engineers the erosion away at Advance tier**; the
+  raw Railgun/Railcannon may end up narrative-only. Under analysis; not yet specced.
