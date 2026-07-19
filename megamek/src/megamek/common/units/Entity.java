@@ -6316,6 +6316,13 @@ public abstract class Entity extends TurnOrdered
         if (hasTCPAimedShotCapability()) {
             return true;
         }
+        // OS Combat Computer Core (dev plan §9) in "Aimed shot" mode grants aimed-shot capability. It deliberately
+        // does NOT set hasTargComp(), so it grants no Targeting-Computer -1 (accuracy comes from the CC modules).
+        for (MiscMounted m : getMisc()) {
+            if (m.getType().hasFlag(MiscTypeFlag.F_OS_COMBAT_COMPUTER) && m.curMode().equals("Aimed shot")) {
+                return !m.isInoperable();
+            }
+        }
         // Check Targeting Computer in "Aimed shot" mode
         for (MiscMounted m : getMisc()) {
             if (m.getType().hasFlag(MiscType.F_TARGETING_COMPUTER) && m.curMode().equals("Aimed shot")) {
