@@ -684,6 +684,16 @@ and `MtfFile` now builds one shared mount without pre-allocating slots (`addTarg
 loadout-derived variable-crit OS component added in future must be registered in `isOSCombatComputerModule()` and
 given a MML resize hook.
 
+**Verified — C3 Node = canon C3MM company hub (2026-07-19):** confirmed (design intent) that the C3 Node's `F_C3MBS`
+mapping gives the canon C3 hierarchy: **one** node = a C3 lance master (shows `(3S free)`), **two** nodes on one mech
+= a **company commander (C3MM)** that anchors a company-scale 12-unit network (2 master-to-master links + a 3-slave
+lance). New regression test `OSC3NodeCompanyCommandTest` (mirrors `C3MasterBVTest`, using `OSC3Node`/`OSC3Point`)
+asserts `hasC3MM()`, `calculateFreeC3MNodes()==2`, `calculateFreeC3Nodes()==3`, and that a full 12-unit company all
+reports `onSameC3NetworkAs` the commander — all pass. NOTE: the `(3S free)` a player sees on an *un-networked* two-node
+mech is just the lobby's unlinked-master rendering (`LobbyMekCellFormatter` `getC3Master()==null` branch never checks
+`hasC3MM()`); the `(2M, 3S free)` company-commander line appears once the unit is set as its own master in a C3 network.
+No code change needed — this is inherited canon behavior and matches the design.
+
 ### 9.0 Architecture & philosophy
 Two systems, each needing its **own core**; a mech may mount both, but two cores is a heavy tonnage/crit tax —
 that tax (NOT a per-attack arbitration rule) is the balancer.
