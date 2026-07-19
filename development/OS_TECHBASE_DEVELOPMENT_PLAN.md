@@ -652,9 +652,25 @@ zero (zero would collapse it into EM Lance — prefer mild); whether raw Railgun
 
 ## 9. OS Modular Electronics — Battle Computer System (BCS) & Combat Computer System (CCS) (added 2026-07-15, fully redesigned 2026-07-18)
 
-**Status: DESIGN — architecture & stats agreed; not yet coded.** A few ⏳ items noted inline. This supersedes the
-original single-"backbone" sketch (channel-arbitration model dropped). It is the electronics counterpart to the
-§8 weapon apex.
+**Status: IMPLEMENTED — core equipment + most mechanics (as of 2026-07-19; ~17 commits on `au-0.50.12`, unpushed,
+not yet playtested).** Supersedes the original single-"backbone" sketch (channel-arbitration model dropped); the
+electronics counterpart to the §8 weapon apex.
+
+**Implementation log (2026-07-19):**
+- **All §9 equipment defined, registered, buildable, compiling** (equipment-init tests pass) — CCS: C-2500 core, CC
+  Ballistic/Energy/Missile modules, Composite TC; BCS: B-2500 core, OS Guardian / Improve-Guardian / Improve-Angle
+  ECM, C3 Node + Improve-C3-Node (weapons), C3 Point (misc), Advance cores C-X280 Crow Nest / Raven CEWS / G-X100
+  Ghost Core, Demon Hacking System (weapon).
+- **Mechanics wired:** CCS weapon-type −1 to-hit (needs C-2500 + matching module / Composite); C-2500 aimed-shot
+  (grants no TC −1); B-2500 / Crow-Nest +1 initiative (ECM-suppressible); B-2500 per-turn 2d6 coordination roll →
+  network −1 direct-fire on 10+ (**UNTESTED**); OS ECM jams; OS C3 networks (Boosted).
+- **Construction legality:** CC modules / Composite require the C-2500 core; Composite ⊥ specialized; one BCS core per mek.
+- **Final stats:** both cores **2 t / 2 crit**. CC modules scale by weapon family — **max(2, ⌈family tonnage ÷ ratio⌉)**,
+  ratios ballistic **÷6**, missile **÷7**, energy **÷8**; Composite = total weapon tonnage **÷6**. Record-sheet short
+  names "C-2500 … FCM".
+- **Also landed this session (missile FCS):** re-dated the OS missile FCS to their tiers (Artemis IV → Standard
+  2805/2820/2840; Diana III → Standard E/2805; Orion V → Advance 3060/3070/3080); added **OS Artemis-capable missile
+  ammo** for all Artemis-compatible OS families (LRM 5–30, SRM 2–6, MML 3–14 LRM+SRM) via an OS-tech Artemis mutator.
 
 ### 9.0 Architecture & philosophy
 Two systems, each needing its **own core**; a mech may mount both, but two cores is a heavy tonnage/crit tax —
@@ -760,7 +776,14 @@ module).
   network cap raise (12→26); C-X280 pre-battle network lock.
 
 ### 9.5 Open (⏳)
-Cores/CC-modules Standard-vs-Improve tier confirm; exact per-module BV factors; whether C-X280's coordination roll
-matches B-2500's exactly; Enhanced Combat Computer revival + rename; final BCS Improve-line module weights (draft).
-Note: choosing Composite core-bound (not standalone) is what fixes the specialized modules at 3 t — a standalone
-Composite would let them drop to ~2 t.
+Mechanics-remaining (best implemented test-driven; all UNTESTED until the unified playtest):
+- B-2500 coordination roll — the **+2-initiative-on-12** branch (only the network −1 direct-fire is wired so far).
+- **Demon** per-turn to-hit debuff (+1/+2, doubled to +4 under friendly ECM, escalated on a Demon crit).
+- **Improve C3 Point** focus-fire −1 (needs Improve C3 Point defined as a TAG-capable component first).
+- **Network cap → 26** (company scale) + Improve C3 Node's 6-Point topology.
+- **Advance-core behaviors:** Crow Nest C3/Raven network lock + full +2 command; Raven 6-unit egalitarian net +
+  built-in Light TAG; Ghost stealth-system coexistence.
+- **BCS module → B-2500 core prerequisite** (currently C3/ECM work without a BCS core — inconsistent with the CCS
+  core-prereq).
+- Exact per-module BV factors; Enhanced Combat Computer revival + rename; optional Round-Report line for the
+  coordination roll (currently silent).
