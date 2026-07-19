@@ -7230,8 +7230,19 @@ public abstract class Entity extends TurnOrdered
      *
      * @param roundNumber the <code>int</code> number of the new round
      */
+    // OS Battle Computer System (dev plan §9.1): the per-round Tactical Coordination 2d6 roll (0 without a BCS core).
+    private int bcsCoordinationRoll = 0;
+
+    /** @return the per-round BCS Tactical Coordination roll (2d6) if a B-2500 / Crow Nest core is mounted, else 0. */
+    public int getBcsCoordinationRoll() {
+        return bcsCoordinationRoll;
+    }
+
     @Override
     public void newRound(int roundNumber) {
+        // UNTESTED (dev plan §9.1): roll the Tactical Coordination die each round for a BCS core bearer.
+        bcsCoordinationRoll = (hasWorkingMisc(MiscTypeFlag.F_OS_BATTLE_COMPUTER)
+              || hasWorkingMisc(MiscTypeFlag.F_OS_CROW_NEST)) ? Compute.d6(2) : 0;
         fell = false;
         struck = false;
         unloadedThisTurn = false;
