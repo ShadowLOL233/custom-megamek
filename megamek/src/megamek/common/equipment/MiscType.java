@@ -702,13 +702,38 @@ public class MiscType extends EquipmentType {
                 return RoundWeight.nextTon(fTons / 5.0);
             }
             return RoundWeight.nextTon(fTons / 4.0);
+        } else if (hasFlag(MiscTypeFlag.F_OS_CC_BALLISTIC)) {
+            // OS CC modules (dev plan §9.2): max(2t, ceil(that weapon family's tonnage / ratio)); ballistic /6
+            double t = 0.0;
+            for (Mounted<?> m : entity.getWeaponList()) {
+                if (((WeaponType) m.getType()).hasFlag(WeaponType.F_BALLISTIC)) {
+                    t += m.getTonnage();
+                }
+            }
+            return Math.max(2.0, Math.ceil(t / 6.0));
+        } else if (hasFlag(MiscTypeFlag.F_OS_CC_ENERGY)) {
+            double t = 0.0;
+            for (Mounted<?> m : entity.getWeaponList()) {
+                if (((WeaponType) m.getType()).hasFlag(WeaponType.F_ENERGY)) {
+                    t += m.getTonnage();
+                }
+            }
+            return Math.max(2.0, Math.ceil(t / 8.0));
+        } else if (hasFlag(MiscTypeFlag.F_OS_CC_MISSILE)) {
+            double t = 0.0;
+            for (Mounted<?> m : entity.getWeaponList()) {
+                if (((WeaponType) m.getType()).hasFlag(WeaponType.F_MISSILE)) {
+                    t += m.getTonnage();
+                }
+            }
+            return Math.max(2.0, Math.ceil(t / 7.0));
         } else if (hasFlag(MiscTypeFlag.F_OS_COMPOSITE_TC)) {
-            // OS Composite Targeting Computer (dev plan §9): covers all weapon types at Clan-standard ratio
+            // OS Composite Targeting Computer (dev plan §9.2): all weapon types, total tonnage / 6
             double fTons = 0.0;
             for (Mounted<?> m : entity.getWeaponList()) {
                 fTons += m.getTonnage();
             }
-            return RoundWeight.nextTon(fTons / 5.0);
+            return RoundWeight.nextTon(fTons / 6.0);
         } else if (hasFlag(MiscType.F_FERRO_FIBROUS) || hasFlag(MiscType.F_FERRO_FIBROUS_PROTO)) {
             double tons = 0.0;
             if (!entity.hasPatchworkArmor()) {
@@ -1258,12 +1283,36 @@ public class MiscType extends EquipmentType {
                 return (int) Math.ceil(fTons / 5.0f);
             }
             return (int) Math.ceil(fTons / 4.0f);
+        } else if (hasFlag(MiscTypeFlag.F_OS_CC_BALLISTIC)) {
+            double t = 0.0;
+            for (WeaponMounted m : entity.getWeaponList()) {
+                if (m.getType().hasFlag(WeaponType.F_BALLISTIC)) {
+                    t += m.getTonnage();
+                }
+            }
+            return (int) Math.max(2, Math.ceil(t / 6.0));
+        } else if (hasFlag(MiscTypeFlag.F_OS_CC_ENERGY)) {
+            double t = 0.0;
+            for (WeaponMounted m : entity.getWeaponList()) {
+                if (m.getType().hasFlag(WeaponType.F_ENERGY)) {
+                    t += m.getTonnage();
+                }
+            }
+            return (int) Math.max(2, Math.ceil(t / 8.0));
+        } else if (hasFlag(MiscTypeFlag.F_OS_CC_MISSILE)) {
+            double t = 0.0;
+            for (WeaponMounted m : entity.getWeaponList()) {
+                if (m.getType().hasFlag(WeaponType.F_MISSILE)) {
+                    t += m.getTonnage();
+                }
+            }
+            return (int) Math.max(2, Math.ceil(t / 7.0));
         } else if (hasFlag(MiscTypeFlag.F_OS_COMPOSITE_TC)) {
             double fTons = 0.0;
             for (WeaponMounted m : entity.getWeaponList()) {
                 fTons += m.getTonnage();
             }
-            return (int) Math.ceil(fTons / 5.0f);
+            return (int) Math.ceil(fTons / 6.0f);
         } else if (hasFlag(MiscType.F_FERRO_FIBROUS) || hasFlag(MiscType.F_REACTIVE)) {
             if (entity.isClanArmor(1) && !entity.hasPatchworkArmor()) {
                 if ((entity instanceof Mek) && entity.isSuperHeavy()) {
@@ -2565,8 +2614,8 @@ public class MiscType extends EquipmentType {
         misc.name = "C-2500 Ballistic Targeting & Recoil-Compensation Module";
         misc.setInternalName(EquipmentTypeLookup.OS_CC_BALLISTIC);
         misc.shortName = "CC Ballistic";
-        misc.tonnage = 3;
-        misc.criticalSlots = 3;
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
         misc.cost = 300000;
         misc.flags = misc.flags.or(MiscTypeFlag.F_OS_CC_BALLISTIC, F_MEK_EQUIPMENT);
         misc.bv = 0;
@@ -2587,8 +2636,8 @@ public class MiscType extends EquipmentType {
         misc.name = "C-2500 Energy Targeting & Tracking Module";
         misc.setInternalName(EquipmentTypeLookup.OS_CC_ENERGY);
         misc.shortName = "CC Energy";
-        misc.tonnage = 3;
-        misc.criticalSlots = 3;
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
         misc.cost = 300000;
         misc.flags = misc.flags.or(MiscTypeFlag.F_OS_CC_ENERGY, F_MEK_EQUIPMENT);
         misc.bv = 0;
@@ -2609,8 +2658,8 @@ public class MiscType extends EquipmentType {
         misc.name = "C-2500 Missile Targeting & Tracking Module";
         misc.setInternalName(EquipmentTypeLookup.OS_CC_MISSILE);
         misc.shortName = "CC Missile";
-        misc.tonnage = 3;
-        misc.criticalSlots = 3;
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
         misc.cost = 300000;
         misc.flags = misc.flags.or(MiscTypeFlag.F_OS_CC_MISSILE, F_MEK_EQUIPMENT);
         misc.bv = 0;

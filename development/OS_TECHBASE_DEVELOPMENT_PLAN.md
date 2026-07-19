@@ -723,12 +723,16 @@ module).
 
 | Component | Tier | t / crit | Effect |
 |---|---|---|---|
-| CC Ballistic Module | Standard | 3 / 3 | **−1 to-hit for ballistic** direct-fire weapons |
-| CC Energy Module | Standard | 3 / 3 | **−1 to-hit for energy** weapons |
-| CC Missile Module | Standard | 3 / 3 | **−1 to-hit for missile** weapons (canon TC can't); no aimed-shot; no cluster bonus (leave to Artemis) |
-| Composite Targeting Computer | Standard | total weapon tonnage **÷5** (Clan std) | **−1 to ALL** weapon types; **requires the core; mutually exclusive with the specialized modules** |
+| CC Ballistic Module | Standard | max(2, ⌈ballistic wpn t ÷6⌉) | **−1 to-hit for ballistic** direct-fire weapons |
+| CC Energy Module | Standard | max(2, ⌈energy wpn t ÷8⌉) | **−1 to-hit for energy** weapons |
+| CC Missile Module | Standard | max(2, ⌈missile wpn t ÷7⌉) | **−1 to-hit for missile** weapons (canon TC can't); no aimed-shot; no cluster bonus (leave to Artemis) |
+| Composite Targeting Computer | Standard | total weapon tonnage **÷6** | **−1 to ALL** weapon types; **requires the core; mutually exclusive with the specialized modules** |
 
-- Specialized module weight is **flat 3 t** (not scaling); **BV scales with served weapons** (prices the premium).
+- Specialized module weight/crit = **max(2, ⌈that weapon family's tonnage ÷ ratio⌉)** — ratios ballistic **÷6**
+  (heaviest; its −1 is the most valuable since ballistics have the fewest native accuracy options), missile
+  **÷7**, energy **÷8** (lightest). The 2 t/2c floor is the per-module overhead that preserves "one specialized ▸
+  Composite, several specialized ◂ Composite" (holds for realistic mixed loadouts up to ~30 t total; Composite ÷6
+  widens that a little). **BV also scales with served weapons** (prices the premium).
 - Module names keep "**& Recoil-Compensation / & Tracking**" as engineering *flavor only* — no extra mechanics (BT
   does not model mech-scale recoil; a forced movement-penalty proxy was dropped as counter-intuitive).
 - **Efficiency relationship:** one specialized module (focused loadout) beats the Composite; several specialized
