@@ -483,4 +483,9 @@ public enum MiscTypeFlag implements EquipmentFlag {
     F_OS_CC_MISSILE,
     F_OS_COMPOSITE_TC,
 
+    // OS Modular Electronics (dev plan §9) — BCS Advance specialized cores
+    F_OS_CROW_NEST,
+    F_OS_RAVEN_CEWS,
+    F_OS_GHOST_CORE,
+
 }

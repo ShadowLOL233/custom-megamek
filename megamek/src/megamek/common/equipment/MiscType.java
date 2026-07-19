@@ -1802,6 +1802,10 @@ public class MiscType extends EquipmentType {
         EquipmentType.addType(MiscType.createOSImproveGuardianECM());
         EquipmentType.addType(MiscType.createOSImproveAngleECM());
         EquipmentType.addType(MiscType.createOSC3Point());
+        // OS Modular Electronics (dev plan §9) — BCS Advance specialized cores
+        EquipmentType.addType(MiscType.createOSCrowNest());
+        EquipmentType.addType(MiscType.createOSRavenCEWS());
+        EquipmentType.addType(MiscType.createOSGhostCore());
         EquipmentType.addType(MiscType.createISMediumShield());
         EquipmentType.addType(MiscType.createISSmallShield());
         EquipmentType.addType(MiscType.createISLargeShield());
@@ -2764,6 +2768,83 @@ public class MiscType extends EquipmentType {
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
               .setStaticTechLevel(SimpleTechLevel.STANDARD);
+        return misc;
+    }
+
+    // ===== BCS Advance specialized cores (dev plan §9) — self-contained combined EW; single-core, mutually
+    // exclusive with the B-2500 (single-core legality is mechanics-remaining). Distinctive behaviors — Crow Nest's
+    // C3/Raven network lock + full +2 command, Raven's 6-unit egalitarian net + built-in Light TAG, Ghost's
+    // stealth-system coexistence — are TODO in the mechanics pass; for now they function as combined EW jammers.
+
+    public static MiscType createOSCrowNest() {
+        MiscType misc = new MiscType();
+        misc.name = "Crow Nest EW System Core (C-X280)";
+        misc.setInternalName(EquipmentTypeLookup.OS_CROW_NEST);
+        misc.shortName = "Crow Nest";
+        misc.tonnage = 4;
+        misc.criticalSlots = 3;
+        misc.cost = 2500000;
+        misc.flags = misc.flags.or(MiscTypeFlag.F_OS_CROW_NEST, F_ECM, F_BAP, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT);
+        misc.bv = 68;
+        misc.setModes("ECM");
+        misc.setInstantModeSwitch(false);
+        misc.rulesRefs = "AU";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
+              .setISAdvancement(3060, 3070, 3080, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        return misc;
+    }
+
+    public static MiscType createOSRavenCEWS() {
+        MiscType misc = new MiscType();
+        misc.name = "Raven Composite Electronic Warfare System (CEWS)";
+        misc.setInternalName(EquipmentTypeLookup.OS_RAVEN_CEWS);
+        misc.shortName = "Raven CEWS";
+        misc.tonnage = 2;
+        misc.criticalSlots = 2;
+        misc.cost = 2000000;
+        misc.flags = misc.flags.or(MiscTypeFlag.F_OS_RAVEN_CEWS, F_ECM, F_BAP, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT);
+        misc.bv = 68;
+        misc.setModes("ECM");
+        misc.setInstantModeSwitch(false);
+        misc.rulesRefs = "AU";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
+              .setISAdvancement(3060, 3070, 3080, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        return misc;
+    }
+
+    public static MiscType createOSGhostCore() {
+        MiscType misc = new MiscType();
+        misc.name = "Ghost Core Electronic Warfare System";
+        misc.setInternalName(EquipmentTypeLookup.OS_GHOST_CORE);
+        misc.shortName = "Ghost Core";
+        misc.tonnage = 2;
+        misc.criticalSlots = 2;
+        misc.cost = 2500000;
+        misc.flags = misc.flags.or(MiscTypeFlag.F_OS_GHOST_CORE, F_ECM, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT);
+        misc.bv = 61;
+        misc.setModes("ECM");
+        misc.setInstantModeSwitch(false);
+        misc.rulesRefs = "AU";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
+              .setISAdvancement(3060, 3070, 3080, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
         return misc;
     }
 

@@ -919,9 +919,11 @@ public final class Player extends TurnOrdered {
             return true;
         }
 
-        // OS Battle Computer Core (dev plan §9) — carries the BCS command/initiative bonus (ECM-suppressible via
-        // the TCP path). The per-turn coordination roll (+2 on 12, network -1 on 10+) is wired separately.
-        if (entity.hasWorkingMisc(MiscTypeFlag.F_OS_BATTLE_COMPUTER)) {
+        // OS Battle Computer Core / Crow Nest core (dev plan §9) — carry the BCS command/initiative bonus
+        // (ECM-suppressible via the TCP path). The per-turn coordination roll (+2 on 12, network -1 on 10+) is
+        // wired separately; Crow Nest's stronger +2 command is a mechanics-remaining upgrade.
+        if (entity.hasWorkingMisc(MiscTypeFlag.F_OS_BATTLE_COMPUTER)
+              || entity.hasWorkingMisc(MiscTypeFlag.F_OS_CROW_NEST)) {
             return true;
         }
 

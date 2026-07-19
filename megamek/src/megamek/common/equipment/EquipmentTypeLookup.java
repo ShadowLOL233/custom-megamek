@@ -214,6 +214,13 @@ public class EquipmentTypeLookup {
     public static final String OS_CC_MISSILE = "OSCCMissileModule";
     @EquipmentName
     public static final String OS_COMPOSITE_TC = "OSCompositeTargetingComputer";
+    // OS Modular Electronics (dev plan §9) — BCS Advance specialized cores
+    @EquipmentName
+    public static final String OS_CROW_NEST = "OSCrowNest";
+    @EquipmentName
+    public static final String OS_RAVEN_CEWS = "OSRavenCEWS";
+    @EquipmentName
+    public static final String OS_GHOST_CORE = "OSGhostCore";
     @EquipmentName
     public static final String SPONSON_TURRET = "SponsonTurret";
     @EquipmentName
