@@ -674,7 +674,7 @@ modifies served weapons' BV**). Tier dating per §0.3: Standard `2805/2820/2840`
 
 **Track 1 — Modular: B-2500 core + plug-in modules.**
 
-**Tacticon B-2500 Battle Computer Core — 3 t / 3 crit — Standard tier — prerequisite for all BCS modules**
+**Tacticon B-2500 Battle Computer Core — 2 t / 2 crit — Standard tier — prerequisite for all BCS modules**
 (designation *B-3000* is reserved for a future evolved core). Native "Tactical
 Coordination" (**ECM-suppressible, NOT immune** — if the B-2500 mech sits under hostile ECM the whole effect is
 jammed, preserving Guardian/Angle's value):

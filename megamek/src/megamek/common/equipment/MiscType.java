@@ -2658,8 +2658,8 @@ public class MiscType extends EquipmentType {
         misc.name = "Battle Computer Core (B-2500)";
         misc.setInternalName(EquipmentTypeLookup.OS_BATTLE_COMPUTER);
         misc.shortName = "B-2500";
-        misc.tonnage = 3;
-        misc.criticalSlots = 3;
+        misc.tonnage = 2;
+        misc.criticalSlots = 2;
         misc.cost = 1000000;
         misc.flags = misc.flags.or(MiscTypeFlag.F_OS_BATTLE_COMPUTER, F_MEK_EQUIPMENT);
         misc.bv = 0;
