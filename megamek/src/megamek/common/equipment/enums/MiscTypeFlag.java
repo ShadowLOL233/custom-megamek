@@ -473,4 +473,14 @@ public enum MiscTypeFlag implements EquipmentFlag {
     // OS Advanced Particle Field Damper (Adv. PFD)
     F_OS_ADV_PFD,
 
+    // OS Modular Electronics (dev plan §9) — Battle Computer System (BCS)
+    F_OS_BATTLE_COMPUTER,
+
+    // OS Modular Electronics (dev plan §9) — Combat Computer System (CCS)
+    F_OS_COMBAT_COMPUTER,
+    F_OS_CC_BALLISTIC,
+    F_OS_CC_ENERGY,
+    F_OS_CC_MISSILE,
+    F_OS_COMPOSITE_TC,
+
 }

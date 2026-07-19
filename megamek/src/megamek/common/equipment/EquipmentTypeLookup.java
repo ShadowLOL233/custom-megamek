@@ -194,6 +194,26 @@ public class EquipmentTypeLookup {
     public static final String OS_IMPROVE_SUPERCHARGER = "OSImproveSupercharger";
     @EquipmentName
     public static final String OS_HEAVY_DUTY_SUPERCHARGER = "OSHeavyDutySupercharger";
+    // OS Modular Electronics (dev plan §9) — Battle Computer System (BCS)
+    @EquipmentName
+    public static final String OS_BATTLE_COMPUTER = "OSBattleComputer";
+    @EquipmentName
+    public static final String OS_GUARDIAN_ECM = "OSGuardianECM";
+    @EquipmentName
+    public static final String OS_IMPROVE_GUARDIAN_ECM = "OSImproveGuardianECM";
+    @EquipmentName
+    public static final String OS_IMPROVE_ANGLE_ECM = "OSImproveAngleECM";
+    // OS Modular Electronics (dev plan §9) — Combat Computer System (CCS)
+    @EquipmentName
+    public static final String OS_COMBAT_COMPUTER = "OSCombatComputer";
+    @EquipmentName
+    public static final String OS_CC_BALLISTIC = "OSCCBallisticModule";
+    @EquipmentName
+    public static final String OS_CC_ENERGY = "OSCCEnergyModule";
+    @EquipmentName
+    public static final String OS_CC_MISSILE = "OSCCMissileModule";
+    @EquipmentName
+    public static final String OS_COMPOSITE_TC = "OSCompositeTargetingComputer";
     @EquipmentName
     public static final String SPONSON_TURRET = "SponsonTurret";
     @EquipmentName

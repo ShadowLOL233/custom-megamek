@@ -702,6 +702,13 @@ public class MiscType extends EquipmentType {
                 return RoundWeight.nextTon(fTons / 5.0);
             }
             return RoundWeight.nextTon(fTons / 4.0);
+        } else if (hasFlag(MiscTypeFlag.F_OS_COMPOSITE_TC)) {
+            // OS Composite Targeting Computer (dev plan §9): covers all weapon types at Clan-standard ratio
+            double fTons = 0.0;
+            for (Mounted<?> m : entity.getWeaponList()) {
+                fTons += m.getTonnage();
+            }
+            return RoundWeight.nextTon(fTons / 5.0);
         } else if (hasFlag(MiscType.F_FERRO_FIBROUS) || hasFlag(MiscType.F_FERRO_FIBROUS_PROTO)) {
             double tons = 0.0;
             if (!entity.hasPatchworkArmor()) {
@@ -1251,6 +1258,12 @@ public class MiscType extends EquipmentType {
                 return (int) Math.ceil(fTons / 5.0f);
             }
             return (int) Math.ceil(fTons / 4.0f);
+        } else if (hasFlag(MiscTypeFlag.F_OS_COMPOSITE_TC)) {
+            double fTons = 0.0;
+            for (WeaponMounted m : entity.getWeaponList()) {
+                fTons += m.getTonnage();
+            }
+            return (int) Math.ceil(fTons / 5.0f);
         } else if (hasFlag(MiscType.F_FERRO_FIBROUS) || hasFlag(MiscType.F_REACTIVE)) {
             if (entity.isClanArmor(1) && !entity.hasPatchworkArmor()) {
                 if ((entity instanceof Mek) && entity.isSuperHeavy()) {
@@ -1777,6 +1790,17 @@ public class MiscType extends EquipmentType {
         EquipmentType.addType(MiscType.createOSSuperCharger());
         EquipmentType.addType(MiscType.createOSImproveSuperCharger());
         EquipmentType.addType(MiscType.createOSHeavyDutySuperCharger());
+        // OS Modular Electronics (dev plan §9) — Combat Computer System (CCS)
+        EquipmentType.addType(MiscType.createOSCombatComputerCore());
+        EquipmentType.addType(MiscType.createOSCCBallisticModule());
+        EquipmentType.addType(MiscType.createOSCCEnergyModule());
+        EquipmentType.addType(MiscType.createOSCCMissileModule());
+        EquipmentType.addType(MiscType.createOSCompositeTargetingComputer());
+        // OS Modular Electronics (dev plan §9) — Battle Computer System (BCS)
+        EquipmentType.addType(MiscType.createOSBattleComputerCore());
+        EquipmentType.addType(MiscType.createOSGuardianECM());
+        EquipmentType.addType(MiscType.createOSImproveGuardianECM());
+        EquipmentType.addType(MiscType.createOSImproveAngleECM());
         EquipmentType.addType(MiscType.createISMediumShield());
         EquipmentType.addType(MiscType.createISSmallShield());
         EquipmentType.addType(MiscType.createISLargeShield());
@@ -2501,6 +2525,220 @@ public class MiscType extends EquipmentType {
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
               .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        return misc;
+    }
+
+    // ===== OS Modular Electronics (dev plan §9) — Combat Computer System (CCS) =====
+    // C-2500 core = prerequisite + aiming brain (grants Aimed Shot). Weapon-type modules supply the -1 to-hit
+    // (wired in ComputeAttackerToHitMods in a later pass). Composite covers all weapon types at Clan-standard weight.
+
+    public static MiscType createOSCombatComputerCore() {
+        MiscType misc = new MiscType();
+        misc.name = "Combat Computer Core (C-2500)";
+        misc.setInternalName(EquipmentTypeLookup.OS_COMBAT_COMPUTER);
+        misc.shortName = "C-2500";
+        misc.tonnage = 2;
+        misc.criticalSlots = 2;
+        misc.cost = 500000;
+        misc.flags = misc.flags.or(MiscTypeFlag.F_OS_COMBAT_COMPUTER, F_MEK_EQUIPMENT);
+        misc.setModes(new String[] { "Normal", "Aimed shot" });
+        misc.bv = 0;
+        misc.rulesRefs = "AU";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+              .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+        return misc;
+    }
+
+    public static MiscType createOSCCBallisticModule() {
+        MiscType misc = new MiscType();
+        misc.name = "Ballistic Targeting & Recoil-Compensation Module";
+        misc.setInternalName(EquipmentTypeLookup.OS_CC_BALLISTIC);
+        misc.shortName = "CC Ballistic";
+        misc.tonnage = 3;
+        misc.criticalSlots = 3;
+        misc.cost = 300000;
+        misc.flags = misc.flags.or(MiscTypeFlag.F_OS_CC_BALLISTIC, F_MEK_EQUIPMENT);
+        misc.bv = 0;
+        misc.rulesRefs = "AU";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+              .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+        return misc;
+    }
+
+    public static MiscType createOSCCEnergyModule() {
+        MiscType misc = new MiscType();
+        misc.name = "Energy Targeting & Tracking Module";
+        misc.setInternalName(EquipmentTypeLookup.OS_CC_ENERGY);
+        misc.shortName = "CC Energy";
+        misc.tonnage = 3;
+        misc.criticalSlots = 3;
+        misc.cost = 300000;
+        misc.flags = misc.flags.or(MiscTypeFlag.F_OS_CC_ENERGY, F_MEK_EQUIPMENT);
+        misc.bv = 0;
+        misc.rulesRefs = "AU";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+              .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+        return misc;
+    }
+
+    public static MiscType createOSCCMissileModule() {
+        MiscType misc = new MiscType();
+        misc.name = "Missile Targeting & Tracking Module";
+        misc.setInternalName(EquipmentTypeLookup.OS_CC_MISSILE);
+        misc.shortName = "CC Missile";
+        misc.tonnage = 3;
+        misc.criticalSlots = 3;
+        misc.cost = 300000;
+        misc.flags = misc.flags.or(MiscTypeFlag.F_OS_CC_MISSILE, F_MEK_EQUIPMENT);
+        misc.bv = 0;
+        misc.rulesRefs = "AU";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+              .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+        return misc;
+    }
+
+    public static MiscType createOSCompositeTargetingComputer() {
+        MiscType misc = new MiscType();
+        misc.name = "Composite Targeting Computer";
+        misc.setInternalName(EquipmentTypeLookup.OS_COMPOSITE_TC);
+        misc.shortName = "Composite TC";
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
+        misc.cost = 750000;
+        misc.flags = misc.flags.or(MiscTypeFlag.F_OS_COMPOSITE_TC, F_MEK_EQUIPMENT);
+        misc.setModes(new String[] { "Normal", "Aimed shot" });
+        misc.bv = 0;
+        misc.rulesRefs = "AU";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+              .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+        return misc;
+    }
+
+    // ===== OS Modular Electronics (dev plan §9) — Battle Computer System (BCS) =====
+    // B-2500 core = prerequisite + command/coordination (Tactical Coordination roll + initiative wired in a later
+    // pass). Designation B-3000 reserved for a future evolved core. OS ECM reuses F_ECM/F_ANGEL_ECM, OS-lightened.
+
+    public static MiscType createOSBattleComputerCore() {
+        MiscType misc = new MiscType();
+        misc.name = "Battle Computer Core (B-2500)";
+        misc.setInternalName(EquipmentTypeLookup.OS_BATTLE_COMPUTER);
+        misc.shortName = "B-2500";
+        misc.tonnage = 3;
+        misc.criticalSlots = 3;
+        misc.cost = 1000000;
+        misc.flags = misc.flags.or(MiscTypeFlag.F_OS_BATTLE_COMPUTER, F_MEK_EQUIPMENT);
+        misc.bv = 0;
+        misc.rulesRefs = "AU";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+              .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+        return misc;
+    }
+
+    public static MiscType createOSGuardianECM() {
+        MiscType misc = new MiscType();
+        misc.name = "Guardian ECM Suite (OS)";
+        misc.setInternalName(EquipmentTypeLookup.OS_GUARDIAN_ECM);
+        misc.shortName = "OS Guardian ECM";
+        misc.tonnage = 1;
+        misc.criticalSlots = 1;
+        misc.cost = 200000;
+        misc.flags = misc.flags.or(F_ECM, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT);
+        misc.bv = 61;
+        misc.setModes("ECM");
+        misc.setInstantModeSwitch(false);
+        misc.rulesRefs = "AU";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+              .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+        return misc;
+    }
+
+    public static MiscType createOSImproveGuardianECM() {
+        MiscType misc = new MiscType();
+        misc.name = "Improve Guardian ECM Suite";
+        misc.setInternalName(EquipmentTypeLookup.OS_IMPROVE_GUARDIAN_ECM);
+        misc.shortName = "Improve Guardian ECM";
+        misc.tonnage = 0.5f;
+        misc.criticalSlots = 1;
+        misc.cost = 250000;
+        misc.flags = misc.flags.or(F_ECM, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT);
+        misc.bv = 61;
+        misc.setModes("ECM");
+        misc.setInstantModeSwitch(false);
+        misc.rulesRefs = "AU";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+              .setISAdvancement(2900, 2930, 2960, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+        return misc;
+    }
+
+    public static MiscType createOSImproveAngleECM() {
+        MiscType misc = new MiscType();
+        misc.name = "Improve Angle ECM Suite";
+        misc.setInternalName(EquipmentTypeLookup.OS_IMPROVE_ANGLE_ECM);
+        misc.shortName = "Improve Angle ECM";
+        misc.tonnage = 1;
+        misc.criticalSlots = 1;
+        misc.cost = 750000;
+        misc.flags = misc.flags.or(F_ECM, F_ANGEL_ECM, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT);
+        misc.bv = 100;
+        misc.setModes("ECM");
+        misc.setInstantModeSwitch(false);
+        misc.rulesRefs = "AU";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
+              .setISAdvancement(2900, 2930, 2960, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
         return misc;
     }
 

@@ -19,6 +19,7 @@ Quick index — jump to a section instead of scanning the whole file.
 - **Section 6 — Naming & tier-reclassification work items** [active]: §6.4 engine/structure/armor Advance→Enhanced rename **✅ DONE 2026-07-06**; subsections 6.3 & 6.5 shelved (see below).
 - **Section 7 — Planned: BF & RF AC variants** [active]: being reclassified to **Inner Sphere** (not OS).
 - **Section 8 — Planned: Electromagnetic Lance** [active]: Advance-tier Gauss variant — coilgun supergun with power-gated AC munitions. Includes the HVAC-repurpose & Heavy-missile-Ultra decisions.
+- **Section 9 — OS Modular Electronics: BCS & CCS** [active/DESIGN]: two systems — **BCS** (Battle Computer System: info/command/EW, Tacticon B-2500 lineage, modular track + Advance specialized cores C-X280/Raven/G-X100) and **CCS** (Combat Computer System: single-mech fire control, C-2500 core + weapon-type modules + Composite). Dissolves canon AES⊥TC / AES⊥MASC / standalone-C3 into a modular ecosystem balanced by a two-core tonnage tax.
 
 Shelved ideas are parked in **[OS_SHELVED_IDEAS.md](OS_SHELVED_IDEAS.md)**. Splitting this plan into
 per-topic files (weapons / units / equipment) is **deferred** until it grows further.
@@ -646,3 +647,116 @@ zero (zero would collapse it into EM Lance — prefer mild); whether raw Railgun
   it is **Experimental**, or a deliberate rupture of the OS identity. **OS's preferred answer is the
   Coil-Augmented Railgun hybrid (see §8 successor note), which engineers the erosion away at Advance tier**; the
   raw Railgun/Railcannon may end up narrative-only. Under analysis; not yet specced.
+
+---
+
+## 9. OS Modular Electronics — Battle Computer System (BCS) & Combat Computer System (CCS) (added 2026-07-15, fully redesigned 2026-07-18)
+
+**Status: DESIGN — architecture & stats agreed; not yet coded.** A few ⏳ items noted inline. This supersedes the
+original single-"backbone" sketch (channel-arbitration model dropped). It is the electronics counterpart to the
+§8 weapon apex.
+
+### 9.0 Architecture & philosophy
+Two systems, each needing its **own core**; a mech may mount both, but two cores is a heavy tonnage/crit tax —
+that tax (NOT a per-attack arbitration rule) is the balancer.
+- **BCS — Battle Computer System** (*lateral*: battlefield info / command / coordination / EW). Lineage: the SLDF
+  Cyclops **Tacticon B-2000 Battle Computer**, which OS democratizes into a serviceable modular family.
+- **CCS — Combat Computer System** (*vertical*: one mech putting rounds precisely on target). Lineage: **TC + AES**.
+- BCS/CCS resolve the canon incompatibilities (AES⊥TC, AES⊥MASC, standalone C3/TAG) not by picking one, but by
+  making them a modular ecosystem on shared cores. Modular tracks = §0.1 serviceability ideal; the integrated
+  Advance cores = §0.2 "abandon modularity for integrated performance."
+
+Common fields: TechBase **OUTER_SPHERE**, Faction **LEGION**. BV follows the TC pattern (**bv=0 on the item,
+modifies served weapons' BV**). Tier dating per §0.3: Standard `2805/2820/2840`, Improve `2900/2930/2960`, Advance
+`3060/3070/3080`.
+
+### 9.1 BCS — two tracks
+
+**Track 1 — Modular: B-2500 core + plug-in modules.**
+
+**Tacticon B-2500 Battle Computer Core — 3 t / 3 crit — Standard tier — prerequisite for all BCS modules**
+(designation *B-3000* is reserved for a future evolved core). Native "Tactical
+Coordination" (**ECM-suppressible, NOT immune** — if the B-2500 mech sits under hostile ECM the whole effect is
+jammed, preserving Guardian/Angle's value):
+- Constant: **+1 initiative** to the force.
+- Each turn roll **2d6**: on **10+ (16.7%)** all networked units get **−1 to-hit vs DIRECT-FIRE weapons** that turn.
+- On **12 (2.8%)**: initiative bumps to **+2** that turn.
+- Anti-stack: this network −1 does **not** stack with the Improve C3 Point focus-fire −1 (BCS network-coordination
+  cap = −1 total).
+
+Modules (weights shared-chassis-discounted — the core owns the backbone; "**Boosted for free**" = every OS C3 link
+is ECM-resistant, a signature priced into BV; ⏳ Improve-line weights are draft):
+
+| Module | Tier | t / crit | Effect | Maps to |
+|---|---|---|---|---|
+| C3 Node | Standard | 2 / 2 | Boosted C3-Master equiv; links 3 Nodes/Points | F_C3M / F_C3SBS |
+| C3 Point | Standard | 1 / 1 | Boosted C3-Slave equiv | F_C3S / F_C3SBS |
+| Guardian ECM | Standard | 1 / 1 | ECM bubble | F_ECM |
+| Improve C3 Node | Improve | 2 / 2 | links 3 Nodes + **6 Points** | F_C3M + code |
+| Improve C3 Point | Improve | 1.5 / 1 | built-in TAG + **focus-fire**: network units attacking a target this network TAG'd get **−1** | F_C3S + F_TAG + new |
+| Improve Guardian ECM | Improve | 0.5 / 1 | lighter ECM | F_ECM |
+| Improve Angle ECM | Improve | 1 / 1 | lighter Angel-class ECM (display name "Angle" per design) | F_ANGEL_ECM |
+| **Demon Aggressive Hacking System** | **Advance** | 1.5 / 1 | offensive EW — see below | new (crit-capable TAG) |
+
+**Demon Aggressive Hacking System (Advance):** a TAG-like designator that rolls to-hit **and can score a critical
+hit** (the only TAG-type system that can). Against the hacked target this turn, when it shoots at your units: hit →
+**+1** to-hit penalty; crit → **+2**; and if the target is also inside a same-network Guardian/Angle ECM bubble the
+penalty **doubles → max +4** (crit+ECM). +4 kept as the Advance signature (needs the full hit-crit-in-your-ECM combo).
+
+**Track 2 — Specialized Advance cores** (self-contained cores developed *from* BCS tech; **mutually exclusive with
+the B-2500 and with each other** — one core per mech; do NOT host modules, no shared-chassis discount):
+
+| Core | Effect |
+|---|---|
+| **C-X280 Crow Nest EW Core** | integrates a battle-computer + C3-Node; network **locked pre-battle to EITHER the C3 net OR the Raven net** (no mid-battle switch). Command: **+2 initiative + the B-2500 coordination roll** (ECM-suppressible). |
+| **Raven CEWS** | Watchdog-class combined EW + a C3i-style **6-unit egalitarian "Raven net"** + built-in Light TAG + Improve Guardian ECM. **No** initiative bonus. |
+| **G-X100 Ghost Core** | derived from Raven CEWS; Nova-CEWS-style stealth compatibility (coexists with Null-Sig + Chameleon LPS; since NSS⊥Stealth-Armor you effectively pick one). Drops TAG, keeps Guardian ECM. **No** initiative bonus. |
+
+**Network size cap:** normal OS C3 reaches **company scale (~26 units)**; battalion scale reserved for future
+superheavy units. ⏳ code: canon assumes a 12-unit cap.
+
+### 9.2 CCS — core + modules
+
+**C-2500 Combat Computer Core — 2 t / 2 crit — prerequisite for all CC modules. Baseline effect = Aimed Shot**
+(the "aiming brain" lives on the core; modules only supply the −1, so aimed-shot is not bound to any one weapon-type
+module).
+
+| Component | Tier | t / crit | Effect |
+|---|---|---|---|
+| CC Ballistic Module | Standard | 3 / 3 | **−1 to-hit for ballistic** direct-fire weapons |
+| CC Energy Module | Standard | 3 / 3 | **−1 to-hit for energy** weapons |
+| CC Missile Module | Standard | 3 / 3 | **−1 to-hit for missile** weapons (canon TC can't); no aimed-shot; no cluster bonus (leave to Artemis) |
+| Composite Targeting Computer | Standard | total weapon tonnage **÷5** (Clan std) | **−1 to ALL** weapon types; **requires the core; mutually exclusive with the specialized modules** |
+
+- Specialized module weight is **flat 3 t** (not scaling); **BV scales with served weapons** (prices the premium).
+- Module names keep "**& Recoil-Compensation / & Tracking**" as engineering *flavor only* — no extra mechanics (BT
+  does not model mech-scale recoil; a forced movement-penalty proxy was dropped as counter-intuitive).
+- **Efficiency relationship:** one specialized module (focused loadout) beats the Composite; several specialized
+  modules (mixed loadout) lose to the Composite. Holds for realistic loadouts (focused >15 t → specialized; 2-type
+  <30 t / 3-type <45 t → Composite).
+- **Enhanced Combat Computer** — SHELVED for now (was to be the Advance do-everything apex; the name also collided
+  with the §0.2 "Enhanced" tier).
+
+### 9.3 Cross-system rules & tiers
+- **Direct-fire stacking:** a direct-fire weapon may take **CCS module −1 + BCS network −1 = −2** total (allowed).
+  The BCS-internal network-coordination cap (−1) still holds; the −2 is the BCS×CCS cross-system sum, reachable only
+  on a B-2500 10+ turn with both cores mounted.
+- **Tiers:** **Standard** = B-2500 Core, C-2500 Core, C3 Node, C3 Point, Guardian ECM, all three CC Modules,
+  Composite Targeting Computer. **Improve** = the four "Improve X" modules. **Advance** = C-X280 Crow Nest, Raven
+  CEWS, G-X100 Ghost Core, Demon. *(Cores/CC-modules at Standard extends the "C3 Node = Standard" ruling; ⏳ adjust
+  if the cores should sit at Improve.)*
+
+### 9.4 Implementation hooks
+- **Reuse:** C3 (F_C3S/M/SBS/I @ MiscType 4589–4767), ECM (F_ECM/F_ANGEL_ECM @ 5992/6106), TAG (F_TAG), combined-EW
+  pattern (createWatchdogECM/createNovaCEWS @ 6229/6271), TC accuracy (ComputeAttackerToHitMods:259) + Aimed-Shot
+  mode, initiative/command (Player.getCommandConsoleBonus:740 / hasTCPCommandEquipment:915 / isEntityECMAffected:939),
+  stealth-exemption precedent (TestMek:1381 Nova-CEWS null-sig exemption).
+- **New wiring:** B-2500 per-turn coordination roll + ECM-suppression gate; Improve C3 Point focus-fire −1; Demon
+  offensive to-hit debuff (crit-capable TAG); C-2500/module "requires core" gate; Composite⊥specialized rule;
+  network cap raise (12→26); C-X280 pre-battle network lock.
+
+### 9.5 Open (⏳)
+Cores/CC-modules Standard-vs-Improve tier confirm; exact per-module BV factors; whether C-X280's coordination roll
+matches B-2500's exactly; Enhanced Combat Computer revival + rename; final BCS Improve-line module weights (draft).
+Note: choosing Composite core-bound (not standalone) is what fixes the specialized modules at 3 t — a standalone
+Composite would let them drop to ~2 t.
