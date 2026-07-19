@@ -119,6 +119,7 @@ import megamek.common.weapons.bombs.innerSphere.ISBombTAG;
 import megamek.common.weapons.bombs.innerSphere.ISLAAMissileWeapon;
 import megamek.common.weapons.c3.ISC3M;
 import megamek.common.weapons.c3.ISC3MBS;
+import megamek.common.weapons.c3.OSC3Node;
 import megamek.common.weapons.c3.ISC3RemoteSensorLauncher;
 import megamek.common.weapons.capitalWeapons.*;
 import megamek.common.weapons.capitalWeapons.naval.*;
@@ -2086,6 +2087,8 @@ public class WeaponType extends EquipmentType {
         EquipmentType.addType(new ISTAG());
         EquipmentType.addType(new ISC3M());
         EquipmentType.addType(new ISC3MBS());
+        // OS Modular Electronics (dev plan §9) — BCS C3 Node (Boosted C3 master equivalent)
+        EquipmentType.addType(new OSC3Node());
         EquipmentType.addType(new CLLightTAG());
         EquipmentType.addType(new CLTAG());
         EquipmentType.addType(new CLBALightTAG());

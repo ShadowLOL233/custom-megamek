@@ -1801,6 +1801,7 @@ public class MiscType extends EquipmentType {
         EquipmentType.addType(MiscType.createOSGuardianECM());
         EquipmentType.addType(MiscType.createOSImproveGuardianECM());
         EquipmentType.addType(MiscType.createOSImproveAngleECM());
+        EquipmentType.addType(MiscType.createOSC3Point());
         EquipmentType.addType(MiscType.createISMediumShield());
         EquipmentType.addType(MiscType.createISSmallShield());
         EquipmentType.addType(MiscType.createISLargeShield());
@@ -2735,6 +2736,30 @@ public class MiscType extends EquipmentType {
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(2900, 2930, 2960, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+        return misc;
+    }
+
+    // BCS C3 Point — a Boosted (ECM-resistant) C3 slave equivalent. The C3 Node (master) is a weapon (OSC3Node).
+    public static MiscType createOSC3Point() {
+        MiscType misc = new MiscType();
+        misc.name = "C3 Point";
+        misc.setInternalName("OSC3Point");
+        misc.addLookupName("OS C3 Point");
+        misc.shortName = "C3 Point";
+        misc.tonnage = 1;
+        misc.criticalSlots = 1;
+        misc.cost = 500000;
+        misc.flags = misc.flags.or(F_C3SBS, MiscTypeFlag.ANY_C3, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT);
+        misc.bv = 0;
+        misc.rulesRefs = "AU";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+              .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
