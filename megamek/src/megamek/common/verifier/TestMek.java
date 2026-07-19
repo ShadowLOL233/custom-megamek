@@ -789,6 +789,10 @@ public class TestMek extends TestEntity {
         boolean hasCombatComputer = false;
         boolean hasCCModule = false;
         boolean hasComposite = false;
+        boolean hasBattleComputer = false;
+        boolean hasCrowNest = false;
+        boolean hasRaven = false;
+        boolean hasGhost = false;
         EquipmentType advancedMyomer = null;
         HashSet<Integer> shieldLocations = new HashSet<>();
 
@@ -812,6 +816,10 @@ public class TestMek extends TestEntity {
             hasCCModule |= m.getType().hasFlag(MiscTypeFlag.F_OS_CC_BALLISTIC)
                   || m.getType().hasFlag(MiscTypeFlag.F_OS_CC_ENERGY)
                   || m.getType().hasFlag(MiscTypeFlag.F_OS_CC_MISSILE);
+            hasBattleComputer |= m.getType().hasFlag(MiscTypeFlag.F_OS_BATTLE_COMPUTER);
+            hasCrowNest |= m.getType().hasFlag(MiscTypeFlag.F_OS_CROW_NEST);
+            hasRaven |= m.getType().hasFlag(MiscTypeFlag.F_OS_RAVEN_CEWS);
+            hasGhost |= m.getType().hasFlag(MiscTypeFlag.F_OS_GHOST_CORE);
             if (m.getType().hasFlag(MiscType.F_TSM)
                   || m.getType().hasFlag(MiscType.F_INDUSTRIAL_TSM)
                   || m.getType().hasFlag(MiscType.F_SCM)) {
@@ -1380,6 +1388,15 @@ public class TestMek extends TestEntity {
         }
         if (hasComposite && hasCCModule) {
             buff.append("The Composite Targeting Computer is incompatible with specialized CC modules.\n");
+            illegal = true;
+        }
+        // OS Battle Computer System (dev plan §9.1): at most one BCS core per mek (the B-2500 and the Advance cores
+        // C-X280 Crow Nest / Raven CEWS / G-X100 Ghost Core are mutually exclusive).
+        int bcsCoreCount = (hasBattleComputer ? 1 : 0) + (hasCrowNest ? 1 : 0)
+              + (hasRaven ? 1 : 0) + (hasGhost ? 1 : 0);
+        if (bcsCoreCount > 1) {
+            buff.append("Only one Battle Computer System core may be mounted "
+                  + "(B-2500 / Crow Nest / Raven / Ghost are mutually exclusive).\n");
             illegal = true;
         }
 
