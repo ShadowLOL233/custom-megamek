@@ -46,7 +46,7 @@ public class OSDemonHackingSystem extends TAGWeapon {
 
     public OSDemonHackingSystem() {
         super();
-        name = "Demon Aggressive Hacking System";
+        name = "B-2500 Demon Aggressive Hacking System";
         shortName = "Demon Hacking System";
         setInternalName("OSDemonHackingSystem");
         addLookupName("OS Demon Hacking System");

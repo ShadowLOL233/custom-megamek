@@ -42,7 +42,7 @@ public class OSC3Node extends TAGWeapon {
 
     public OSC3Node() {
         super();
-        name = "C3 Node";
+        name = "B-2500 C3 Node";
         shortName = "C3 Node";
         setInternalName("OSC3Node");
         addLookupName("OS C3 Node");

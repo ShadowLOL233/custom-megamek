@@ -2539,9 +2539,9 @@ public class MiscType extends EquipmentType {
 
     public static MiscType createOSCombatComputerCore() {
         MiscType misc = new MiscType();
-        misc.name = "Combat Computer Core (C-2500)";
+        misc.name = "C-2500 Combat Computer";
         misc.setInternalName(EquipmentTypeLookup.OS_COMBAT_COMPUTER);
-        misc.shortName = "C-2500";
+        misc.shortName = "C-2500 Combat Computer";
         misc.tonnage = 2;
         misc.criticalSlots = 2;
         misc.cost = 500000;
@@ -2562,7 +2562,7 @@ public class MiscType extends EquipmentType {
 
     public static MiscType createOSCCBallisticModule() {
         MiscType misc = new MiscType();
-        misc.name = "Ballistic Targeting & Recoil-Compensation Module";
+        misc.name = "C-2500 Ballistic Targeting & Recoil-Compensation Module";
         misc.setInternalName(EquipmentTypeLookup.OS_CC_BALLISTIC);
         misc.shortName = "CC Ballistic";
         misc.tonnage = 3;
@@ -2584,7 +2584,7 @@ public class MiscType extends EquipmentType {
 
     public static MiscType createOSCCEnergyModule() {
         MiscType misc = new MiscType();
-        misc.name = "Energy Targeting & Tracking Module";
+        misc.name = "C-2500 Energy Targeting & Tracking Module";
         misc.setInternalName(EquipmentTypeLookup.OS_CC_ENERGY);
         misc.shortName = "CC Energy";
         misc.tonnage = 3;
@@ -2606,7 +2606,7 @@ public class MiscType extends EquipmentType {
 
     public static MiscType createOSCCMissileModule() {
         MiscType misc = new MiscType();
-        misc.name = "Missile Targeting & Tracking Module";
+        misc.name = "C-2500 Missile Targeting & Tracking Module";
         misc.setInternalName(EquipmentTypeLookup.OS_CC_MISSILE);
         misc.shortName = "CC Missile";
         misc.tonnage = 3;
@@ -2628,7 +2628,7 @@ public class MiscType extends EquipmentType {
 
     public static MiscType createOSCompositeTargetingComputer() {
         MiscType misc = new MiscType();
-        misc.name = "Composite Targeting Computer";
+        misc.name = "C-2500 Composite Targeting Computer";
         misc.setInternalName(EquipmentTypeLookup.OS_COMPOSITE_TC);
         misc.shortName = "Composite TC";
         misc.tonnage = TONNAGE_VARIABLE;
@@ -2655,9 +2655,9 @@ public class MiscType extends EquipmentType {
 
     public static MiscType createOSBattleComputerCore() {
         MiscType misc = new MiscType();
-        misc.name = "Battle Computer Core (B-2500)";
+        misc.name = "B-2500 Battle Computer";
         misc.setInternalName(EquipmentTypeLookup.OS_BATTLE_COMPUTER);
-        misc.shortName = "B-2500";
+        misc.shortName = "B-2500 Battle Computer";
         misc.tonnage = 2;
         misc.criticalSlots = 2;
         misc.cost = 1000000;
@@ -2677,7 +2677,7 @@ public class MiscType extends EquipmentType {
 
     public static MiscType createOSGuardianECM() {
         MiscType misc = new MiscType();
-        misc.name = "Guardian ECM Suite (OS)";
+        misc.name = "B-2500 Guardian ECM Suite";
         misc.setInternalName(EquipmentTypeLookup.OS_GUARDIAN_ECM);
         misc.shortName = "OS Guardian ECM";
         misc.tonnage = 1;
@@ -2701,7 +2701,7 @@ public class MiscType extends EquipmentType {
 
     public static MiscType createOSImproveGuardianECM() {
         MiscType misc = new MiscType();
-        misc.name = "Improve Guardian ECM Suite";
+        misc.name = "B-2500 Improve Guardian ECM Suite";
         misc.setInternalName(EquipmentTypeLookup.OS_IMPROVE_GUARDIAN_ECM);
         misc.shortName = "Improve Guardian ECM";
         misc.tonnage = 0.5f;
@@ -2725,7 +2725,7 @@ public class MiscType extends EquipmentType {
 
     public static MiscType createOSImproveAngleECM() {
         MiscType misc = new MiscType();
-        misc.name = "Improve Angle ECM Suite";
+        misc.name = "B-2500 Improve Angle ECM Suite";
         misc.setInternalName(EquipmentTypeLookup.OS_IMPROVE_ANGLE_ECM);
         misc.shortName = "Improve Angle ECM";
         misc.tonnage = 1;
@@ -2750,7 +2750,7 @@ public class MiscType extends EquipmentType {
     // BCS C3 Point — a Boosted (ECM-resistant) C3 slave equivalent. The C3 Node (master) is a weapon (OSC3Node).
     public static MiscType createOSC3Point() {
         MiscType misc = new MiscType();
-        misc.name = "C3 Point";
+        misc.name = "B-2500 C3 Point";
         misc.setInternalName("OSC3Point");
         misc.addLookupName("OS C3 Point");
         misc.shortName = "C3 Point";
@@ -2778,7 +2778,7 @@ public class MiscType extends EquipmentType {
 
     public static MiscType createOSCrowNest() {
         MiscType misc = new MiscType();
-        misc.name = "Crow Nest EW System Core (C-X280)";
+        misc.name = "B-2500 Crow Nest EW Core (C-X280)";
         misc.setInternalName(EquipmentTypeLookup.OS_CROW_NEST);
         misc.shortName = "Crow Nest";
         misc.tonnage = 4;
@@ -2802,7 +2802,7 @@ public class MiscType extends EquipmentType {
 
     public static MiscType createOSRavenCEWS() {
         MiscType misc = new MiscType();
-        misc.name = "Raven Composite Electronic Warfare System (CEWS)";
+        misc.name = "B-2500 Raven CEWS";
         misc.setInternalName(EquipmentTypeLookup.OS_RAVEN_CEWS);
         misc.shortName = "Raven CEWS";
         misc.tonnage = 2;
@@ -2826,7 +2826,7 @@ public class MiscType extends EquipmentType {
 
     public static MiscType createOSGhostCore() {
         MiscType misc = new MiscType();
-        misc.name = "Ghost Core Electronic Warfare System";
+        misc.name = "B-2500 Ghost Core (G-X100)";
         misc.setInternalName(EquipmentTypeLookup.OS_GHOST_CORE);
         misc.shortName = "Ghost Core";
         misc.tonnage = 2;

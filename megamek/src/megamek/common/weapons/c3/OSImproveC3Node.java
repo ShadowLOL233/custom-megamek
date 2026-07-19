@@ -41,7 +41,7 @@ public class OSImproveC3Node extends TAGWeapon {
 
     public OSImproveC3Node() {
         super();
-        name = "Improve C3 Node";
+        name = "B-2500 Improve C3 Node";
         shortName = "Improve C3 Node";
         setInternalName("OSImproveC3Node");
         addLookupName("OS Improve C3 Node");
