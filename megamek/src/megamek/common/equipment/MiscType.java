@@ -2613,7 +2613,7 @@ public class MiscType extends EquipmentType {
         MiscType misc = new MiscType();
         misc.name = "C-2500 Ballistic Targeting & Recoil-Compensation Module";
         misc.setInternalName(EquipmentTypeLookup.OS_CC_BALLISTIC);
-        misc.shortName = "CC Ballistic";
+        misc.shortName = "C-2500 Ballistic FCM";
         misc.tonnage = TONNAGE_VARIABLE;
         misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
         misc.cost = 300000;
@@ -2635,7 +2635,7 @@ public class MiscType extends EquipmentType {
         MiscType misc = new MiscType();
         misc.name = "C-2500 Energy Targeting & Tracking Module";
         misc.setInternalName(EquipmentTypeLookup.OS_CC_ENERGY);
-        misc.shortName = "CC Energy";
+        misc.shortName = "C-2500 Energy FCM";
         misc.tonnage = TONNAGE_VARIABLE;
         misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
         misc.cost = 300000;
@@ -2657,7 +2657,7 @@ public class MiscType extends EquipmentType {
         MiscType misc = new MiscType();
         misc.name = "C-2500 Missile Targeting & Tracking Module";
         misc.setInternalName(EquipmentTypeLookup.OS_CC_MISSILE);
-        misc.shortName = "CC Missile";
+        misc.shortName = "C-2500 Missile FCM";
         misc.tonnage = TONNAGE_VARIABLE;
         misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
         misc.cost = 300000;
@@ -2679,7 +2679,7 @@ public class MiscType extends EquipmentType {
         MiscType misc = new MiscType();
         misc.name = "C-2500 Composite Targeting Computer";
         misc.setInternalName(EquipmentTypeLookup.OS_COMPOSITE_TC);
-        misc.shortName = "Composite TC";
+        misc.shortName = "C-2500 Composite FCM";
         misc.tonnage = TONNAGE_VARIABLE;
         misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
         misc.cost = 750000;
