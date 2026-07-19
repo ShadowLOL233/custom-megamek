@@ -144,5 +144,8 @@ public enum WeaponTypeFlag implements EquipmentFlag {
     /**
      * Denotes Clan Heavy Lasers (S, M, L)
      */
-    HEAVY_LASER
+    HEAVY_LASER,
+
+    /** OS Demon Aggressive Hacking System (dev plan §9) — a crit-capable TAG-like offensive-EW designator. */
+    F_OS_DEMON_HACKING
 }
