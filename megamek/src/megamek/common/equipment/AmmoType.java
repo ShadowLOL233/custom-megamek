@@ -480,6 +480,23 @@ public class AmmoType extends EquipmentType {
                 .setStaticTechLevel(SimpleTechLevel.STANDARD),
           "230, TM");
 
+    // Outer Sphere (OS) Artemis-capable munition mutator — same M_ARTEMIS_CAPABLE effect, but on the OS tech base
+    // and dated to the OS Standard tier (matching the OS Artemis IV FCS), so OS missile ammo stays OS-native.
+    private static final MunitionMutator OS_ARTEMIS_CAPABLE_MUNITION_MUTATOR = new MunitionMutator("Artemis-capable",
+          "Artemis",
+          1,
+          Munitions.M_ARTEMIS_CAPABLE,
+          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
+                .setUnofficial(false)
+                .setTechRating(TechRating.E)
+                .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+                .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
+                .setISApproximate(true, false, false, false, false)
+                .setPrototypeFactions(Faction.LEGION)
+                .setProductionFactions(Faction.LEGION)
+                .setStaticTechLevel(SimpleTechLevel.STANDARD),
+          "AU");
+
     private static final MunitionMutator DEAD_FIRE_MUNITION_MUTATOR = new MunitionMutator("Dead-Fire",
           1,
           Munitions.M_DEAD_FIRE,
@@ -3847,6 +3864,37 @@ public class AmmoType extends EquipmentType {
         munitions.add(OS_AC_TRACER_MUTATOR);
         munitions.add(OS_AC_ROCKET_PROPELLED_MUTATOR);
         AmmoType.createMunitions(osStdAcAmmos, munitions);
+
+        // Outer Sphere (OS) Artemis-capable missile ammo: apply the OS Artemis munition to every Artemis-compatible
+        // OS missile family (standard LRM/SRM and MML) so OS launchers running the OS Artemis IV FCS have OS-native
+        // guided ammo. Fresh templates (the base rounds are already registered above); ER-LRM / Streak / Heavy SRM /
+        // MRM are intentionally excluded (not Artemis IV compatible).
+        ArrayList<AmmoType> osArtemisMissileAmmos = new ArrayList<>();
+        osArtemisMissileAmmos.add(AmmoType.createOSLRM5Ammo());
+        osArtemisMissileAmmos.add(AmmoType.createOSLRM10Ammo());
+        osArtemisMissileAmmos.add(AmmoType.createOSLRM15Ammo());
+        osArtemisMissileAmmos.add(AmmoType.createOSLRM20Ammo());
+        osArtemisMissileAmmos.add(AmmoType.createOSLRM30Ammo());
+        osArtemisMissileAmmos.add(AmmoType.createOSSRM2Ammo());
+        osArtemisMissileAmmos.add(AmmoType.createOSSRM4Ammo());
+        osArtemisMissileAmmos.add(AmmoType.createOSSRM6Ammo());
+        osArtemisMissileAmmos.add(AmmoType.createOSMML3LRMAmmo());
+        osArtemisMissileAmmos.add(AmmoType.createOSMML5LRMAmmo());
+        osArtemisMissileAmmos.add(AmmoType.createOSMML7LRMAmmo());
+        osArtemisMissileAmmos.add(AmmoType.createOSMML8LRMAmmo());
+        osArtemisMissileAmmos.add(AmmoType.createOSMML9LRMAmmo());
+        osArtemisMissileAmmos.add(AmmoType.createOSMML11LRMAmmo());
+        osArtemisMissileAmmos.add(AmmoType.createOSMML14LRMAmmo());
+        osArtemisMissileAmmos.add(AmmoType.createOSMML3SRMAmmo());
+        osArtemisMissileAmmos.add(AmmoType.createOSMML5SRMAmmo());
+        osArtemisMissileAmmos.add(AmmoType.createOSMML7SRMAmmo());
+        osArtemisMissileAmmos.add(AmmoType.createOSMML8SRMAmmo());
+        osArtemisMissileAmmos.add(AmmoType.createOSMML9SRMAmmo());
+        osArtemisMissileAmmos.add(AmmoType.createOSMML11SRMAmmo());
+        osArtemisMissileAmmos.add(AmmoType.createOSMML14SRMAmmo());
+        munitions.clear();
+        munitions.add(OS_ARTEMIS_CAPABLE_MUNITION_MUTATOR);
+        AmmoType.createMunitions(osArtemisMissileAmmos, munitions);
 
         // PLAYTEST create the munition types for RAC rounds.
         munitions.clear();
