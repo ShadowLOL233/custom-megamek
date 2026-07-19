@@ -345,6 +345,22 @@ public class ComputeAttackerToHitMods {
             }
         }
 
+        // OS Combat Computer System (dev plan §9): weapon-type module -1 to-hit, gated on the C-2500 core.
+        // A specialized module covers its weapon family; the Composite covers all. Stacks with the B-2500
+        // network coordination -1 (§9.3: a direct-fire weapon may reach -2 total).
+        if ((weaponType != null) && attacker.hasWorkingMisc(MiscTypeFlag.F_OS_COMBAT_COMPUTER)) {
+            boolean ccMatch = attacker.hasWorkingMisc(MiscTypeFlag.F_OS_COMPOSITE_TC)
+                  || (weaponType.hasFlag(WeaponType.F_BALLISTIC)
+                        && attacker.hasWorkingMisc(MiscTypeFlag.F_OS_CC_BALLISTIC))
+                  || (weaponType.hasFlag(WeaponType.F_ENERGY)
+                        && attacker.hasWorkingMisc(MiscTypeFlag.F_OS_CC_ENERGY))
+                  || (weaponType.hasFlag(WeaponType.F_MISSILE)
+                        && attacker.hasWorkingMisc(MiscTypeFlag.F_OS_CC_MISSILE));
+            if (ccMatch) {
+                toHit.addModifier(-1, "OS Combat Computer");
+            }
+        }
+
         // penalty for an active void signature system
         if (attacker.isVoidSigActive()) {
             toHit.addModifier(1, Messages.getString("WeaponAttackAction.AeVoidSig"));
