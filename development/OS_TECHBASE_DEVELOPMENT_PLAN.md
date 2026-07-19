@@ -799,3 +799,34 @@ Mechanics-remaining (best implemented test-driven; all UNTESTED until the unifie
   core-prereq).
 - Exact per-module BV factors; Enhanced Combat Computer revival + rename; optional Round-Report line for the
   coordination roll (currently silent).
+
+## 10. OS design saves — cross-device import (added 2026-07-19)
+
+My custom OS unit designs are version-controlled in **`development/os-designs/`** (27 `.mtf` files as of
+2026-07-19). MegaMek/MegaMekLab actually *read* them from **`megamek/userdata/data/mekfiles/`**, which is
+git-ignored (`.gitignore` → `megamek/userdata/**`), so the tracked copy under `development/` is the source of truth
+that travels with this repo. Import = copy them from `development/os-designs/` into the userdata mekfiles folder.
+
+**Import on another device (Windows / PowerShell), run from the megamek repo root:**
+
+```powershell
+# 1. Get the latest branch + design files
+git checkout au-0.50.12
+git pull origin au-0.50.12
+
+# 2. Copy the tracked designs into the (git-ignored) userdata folder MML/MM loads from
+New-Item -ItemType Directory -Force "megamek\userdata\data\mekfiles" | Out-Null
+Copy-Item "development\os-designs\*.mtf" "megamek\userdata\data\mekfiles\" -Force
+
+# 3. Rebuild + launch MegaMekLab so it picks up this fork's equipment, then open the designs
+cd ..\megameklab
+.\gradlew.bat clean run
+```
+
+macOS/Linux equivalent for step 2: `mkdir -p megamek/userdata/data/mekfiles && cp development/os-designs/*.mtf
+megamek/userdata/data/mekfiles/`.
+
+**Sync new/edited designs back:** copy them the other direction and commit —
+`Copy-Item "megamek\userdata\data\mekfiles\*.mtf" "development\os-designs\" -Force`, then
+`git add development/os-designs && git commit`. (The tracked `development/os-designs/` copy is what's shared; the
+`userdata/` copy stays local and git-ignored.)

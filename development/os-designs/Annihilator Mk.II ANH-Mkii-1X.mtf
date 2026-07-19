@@ -1,0 +1,188 @@
+generator:MegaMek Suite 0.50.13 on 2026-07-08
+chassis:Annihilator Mk.II
+model:ANH-Mkii-1X
+
+Config:Biped
+techbase:OS
+era:2990
+rules level:2
+role:Juggernaut
+
+quirk:easy_maintain
+
+mass:100
+engine:300 Improve Light (OS) Engine
+structure:IS Improve Endo Steel (OS)
+myomer:Standard
+
+heat sinks:12 IS Double
+nocrit:OSCASE:CT
+nocrit:OSCASE:RT
+nocrit:OSCASE:LT
+walk mp:3
+jump mp:0
+
+armor:Standard(Inner Sphere)
+LA armor:34
+RA armor:34
+LT armor:32
+RT armor:32
+CT armor:46
+HD armor:9
+LL armor:41
+RL armor:41
+RTL armor:10
+RTR armor:10
+RTC armor:15
+
+Weapons:10
+Improve LB 10-X, Right Arm
+Improve LB 10-X, Left Arm
+Improve Ultra AC/10, Right Torso
+Improve Ultra AC/10, Left Torso
+Improve Medium Laser, Left Torso
+Improve Medium Laser, Right Arm
+Improve Medium Laser, Left Arm
+Improve Medium Laser, Right Torso
+Heavy Flamer, Center Torso
+ER Flamer, Head
+
+Left Arm:
+Shoulder
+Upper Arm Actuator
+Lower Arm Actuator
+OSImproveMediumLaser
+OSImproveLB10XAC
+OSImproveLB10XAC
+OSImproveLB10XAC
+OSImproveLB10XAC
+OSImproveLB10XAC
+Improve Endo Steel (OS)
+Improve Endo Steel (OS)
+Improve Endo Steel (OS)
+
+Right Arm:
+Shoulder
+Upper Arm Actuator
+Lower Arm Actuator
+OSImproveMediumLaser
+OSImproveLB10XAC
+OSImproveLB10XAC
+OSImproveLB10XAC
+OSImproveLB10XAC
+OSImproveLB10XAC
+Improve Endo Steel (OS)
+Improve Endo Steel (OS)
+Improve Endo Steel (OS)
+
+Left Torso:
+Fusion Engine
+Fusion Engine
+OSImproveMediumLaser
+OSImproveUltraAC10
+OSImproveUltraAC10
+OSImproveUltraAC10
+OSImproveUltraAC10
+OSImproveUltraAC10
+OSImproveUltraAC10
+OSUltraAC10Ammo
+OSLB10XAmmo
+OSLB10XAmmo
+
+Right Torso:
+Fusion Engine
+Fusion Engine
+OSImproveMediumLaser
+OSImproveUltraAC10
+OSImproveUltraAC10
+OSImproveUltraAC10
+OSImproveUltraAC10
+OSImproveUltraAC10
+OSImproveUltraAC10
+OSUltraAC10Ammo
+OSUltraAC10Ammo
+OSLB10XClusterAmmo
+
+Center Torso:
+Fusion Engine
+Fusion Engine
+Fusion Engine
+Gyro
+Gyro
+Gyro
+Gyro
+Fusion Engine
+Fusion Engine
+Fusion Engine
+OSHeavyFlamer
+OSLB10XClusterAmmo
+
+Head:
+Life Support
+Sensors
+Cockpit
+OSERFlamer
+Sensors
+Life Support
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Left Leg:
+Hip
+Upper Leg Actuator
+Lower Leg Actuator
+Foot Actuator
+Improve Endo Steel (OS)
+Improve Endo Steel (OS)
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Right Leg:
+Hip
+Upper Leg Actuator
+Lower Leg Actuator
+Foot Actuator
+Improve Endo Steel (OS)
+Improve Endo Steel (OS)
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+overview:<p>The Annihilator is a 100-ton assault BattleMech conceived during the final years of the Amaris Civil War as the Star League Defense Force's answer to urban assault and fixed-position defense. First produced in 2779 by the Babylon BattleMech Consortium and Strana Mechty MechWorks, the design was built to anchor defensive positions against any threat, trading all pretense of mobility for devastating firepower and heavy armor protection. One of the slowest BattleMechs ever fielded at just 32 kilometers per hour, the Annihilator was intended to hold ground rather than take it.</p><p>Though it arrived too late to affect the outcome of the civil war, the design became a powerful symbol of Kerensky's Clans during the Exodus and Pentagon campaigns. Production was limited and sporadic, and by the late 29th century most examples had been mothballed in favor of faster OmniMech designs. The Annihilator remained virtually unknown in the Inner Sphere until Wolf's Dragoons arrived in 3005 carrying downgraded examples, and the design did not enter widespread production until Arc-Royal MechWorks began manufacturing upgraded variants during the FedCom Civil War era.</p>
+
+capabilities:<p>The Annihilator's design philosophy is simple: overwhelm the enemy with firepower from a near-impregnable platform. The ANH-2A, the most widely produced Inner Sphere variant, mounts four Mydron Excel LB 10-X autocannons capable of firing both standard and cluster munitions, paired with four Magna 400P medium pulse lasers for close-range defense. This combination makes the design devastating in close-quarter engagements, capable of shredding vehicles, infantry formations, and even heavily armored assault 'Mechs with concentrated salvos.</p><p>The Star League MN-01 chassis provides a robust foundation, and the compact frame with easy-to-repair components keeps maintenance requirements manageable despite the design's complexity. Twelve and a half tons of Starshield Special-b armor with CASE protection offer solid survivability, though this falls well short of maximum potential for the tonnage class. The Garret T19-G communications system and Wasat Aggressor Type 5 targeting system round out the electronics suite.</p><p>The Annihilator's greatest weakness remains its glacial speed. At just 32 kilometers per hour, it cannot pursue retreating enemies or reposition quickly, making it entirely dependent on proper deployment. Ammunition dependency is another concern, as aggressive pilots can exhaust their autocannon bins in protracted engagements. Newer variants incorporating compact engines and gyros have addressed the tonnage constraints, opening space for heavier armor and more advanced weaponry.</p>
+
+deployment:<p>The original Annihilator, designated ANH-1X, entered production in 2779 at facilities on Babylon and Strana Mechty. Mounting four Blackenburg LB 10-X autocannons alongside four Magna Mk. II medium lasers, two Starflash Plus small pulse lasers, and a single ExoStar small laser, the design packed extraordinary firepower into its 100-ton frame. The early Clan version carried a full nineteen tons of Dagda Mining and Forging Starshield Special-B armor with CASE (over fifty percent more protection than later Inner Sphere variants) and utilized double heat sinks for superior thermal management. Only a limited number were completed before the Pentagon Civil War disrupted production.</p>
+
+history:<p>The Annihilator emerged from the devastation of the Amaris Civil War, conceived as the ultimate urban defense platform for the reconstituted SLDF. Production began at two facilities (the Babylon BattleMech Consortium on Babylon and Strana Mechty MechWorks in the Jaguar Enclave) but the design's timing proved unfortunate. Only a handful of Annihilators saw action before the Pentagon Civil War erupted, destroying the Babylon factory and disrupting all Clan manufacturing for over fifteen years.</p><p>When production resumed, the Clans built Annihilators sparingly, assigning them primarily to garrison binaries during the buildup toward the Golden Century. Clans Coyote and Star Adder fielded a modified version designated the ANH-1G, incorporating lessons from the Pentagon Campaign, while Clan Wolf upgraded surviving chassis to the Annihilator C standard with Endo Steel frames, more powerful engines, and Clan-grade weaponry. Despite these improvements, the design's fundamental lack of speed rendered it increasingly obsolete as faster OmniMechs dominated Clan doctrine. By the end of the 29th century, most Annihilators had been mothballed or relegated to deep reserve.</p><p>Wolf's Dragoons changed the design's fortunes when they retrieved several mothballed units from Clan Wolf's stockpiles for their mission to the Inner Sphere. Arriving in 3005 with downgraded ANH-1A models fitted with Succession Wars-era technology, the Dragoons fielded a 'Mech no Inner Sphere intelligence agency could identify. The Annihilator remained a Dragoon exclusive for decades, its true origins a closely guarded secret. Even after the Clan Invasion revealed the broader context, the design saw limited distribution due to the Dragoons' proprietary hold on the technical data.</p><p>The FedCom Civil War broke this exclusivity. As the close relationship between the Kell Hounds, Wolves-in-Exile, and Dragoons deepened, Annihilators began appearing among all three mercenary commands. Kell Hound technicians experimented with newly acquired light autocannon technology, using the Annihilator as a test bed, and when the remnants of the Dragoons relocated to Arc-Royal after the Word of Blake's destruction of Outreach, they brought whatever limited design data they had recovered from their now-destroyed computer network.</p><p>With the original Annihilator data now available to them, Arc-Royal MechWorks developed several upgraded variants incorporating compact engines, advanced armor configurations, and heavy-class weaponry. The ANH-3A and ANH-4A proved particularly impressive, catching the attention of visiting Clan Hell's Horses merchants. Rumors of a multi-caste deal for either direct sales or a collaborative venture on a new BattleMech design indicated the Exiles were actively expanding their commercial relationships beyond the Lyran Alliance. This collaboration ultimately produced the ANH-5W, a Gauss rifle-armed variant developed jointly by Arc-Royal MechWorks and the Dragoons that entered production in the Dark Age era. Blackwell Corporation on Outreach may have also maintained a production line during the Dragoons' tenure on that world, though this facility's output was disrupted by the Jihad and the planet changed hands multiple times afterward.</p>
+
+manufacturer:Babylon BattleMech Consortium|Strana Mechty MechWorks
+
+primaryfactory:Babylon (Solath)|Strana Mechty (Jaguar Enclave)
+
+fluffdate:2026-02-28 17:47:08
+
+systemmanufacturer:CHASSIS:Unknown
+systemmode:CHASSIS:Star League MN-01
+systemmanufacturer:ENGINE:Babylon Motors
+systemmode:ENGINE:Nissan 200
+systemmanufacturer:ARMOR:Dagda Mining & Forging
+systemmode:ARMOR:Starshield Special-B with CASE
+systemmanufacturer:COMMUNICATIONS:Circe Tech
+systemmode:COMMUNICATIONS:Garret T19-G
+systemmanufacturer:TARGETING:Eden Microelectronics
+systemmode:TARGETING:Wasat Aggressor Type 5
+
+icon:iVBORw0KGgoAAAANSUhEUgAAAFQAAABICAYAAABof9IhAAARlElEQVR4Xu3bhY9lxRIGcPLyEv4HXIK7u7u7u7u7u7u7u1twd4fgEJzgEJzg9Muvkpr09N6ZubO7bPaFW8nJnXtuW31V9VV1nzPjjNOTnvSkJz3pSU960pOe9KQnPelJT3rSk570pCc96UlPxnJZfvnly8ILL1xWXHHF0v7WjSy77LJl3nnnLfPNN1+Zf/7549Plftu2k6y22mplqaWWKksuuWR8+t62GROywgorBA4+29+6FkpvtNFGZcsttyybbrrpsAdbeumly+qrrx4ArrXWWmW99dYra6+9dllwwQXjc7DxAMeIN9xwQ7nrrrvK3XffHZ++r7zyymMU2OWWW65ssskmfTiMrHONM/fcc5fddtutHHXUUWW//fYrCy20UNcDLbLIImWVVVYJ8PRbfPHFyxJLLBGffltsscUC4NZTV1111VjwddddVx577LHyww8/lFp+/PHH8sQTT5Trr78+2o0JYDnEPvvsU4499thywAEHhKe2bbqSmWeeOTxru+22K5tttlmZZ555uh5IX3QBUF6uPwDXXXfdGBOovs8111zlP/8dN9ry6PPPP7/ceuut5b333ivfffdd+fvvv/sB6vv3339f3n///XLbbbeVCy64IIzCeO0aRpfMMccc4Zm77rpreOlwHKufTDPNNGWllVaKQYAy/fTTBwBCoG3birZAMrlwAeTss89eZppppjLLLLOEcdZcc80YE7jHHXdcgHnzzTdHaLvuu+++8vTTT5cXXnih7/Ld/WyjPVBPOeWUss466/RbV/L/YNQymHCGWWedtUw77bRl4403LjvttFPZfPPNw0natl3JVFNNFdY3CEBnnHHG8C5/SxBt+5QNN9yw6MsY6YnABCpLGwOwQlY4nXvuueWBBx4ozz//fPn666/DAx9//PHy5JNPlj/++KOfh/ruvt+1016/hx9+uFx99dUxNo9HL0AYWd7jOPrga3qLsFH20CmmmCIWuOeee8ZgrOXvvfbaKyax6LYP4RlTTz11hKE2gNQXDx1zzDHR3+/GOP7448uVV14Z4a7fc8891w/AoUT7pAu8esYZZ0QU8fx99913pHiP8SeffPIAcYcddoi177333rFWY400oAaVRHiYi1fxzvRWCaQNf4mMd/rdxBalPU5NK/tEJxZ+6KGHhhdrgxqE5xdffNHi1lG0014//Y1z2GGHxbjGHxmvmnPOOQsdJp100vBQ1QhdzLHzzjuXLbbYYuRD3qBCUuhy/emmmy7KIJmVBwDT79l+0UUXDU9BB7yEEbbeeutQljGE4I477hifs802WznttNMiARmDN7ko/sEHH7TYdRTttM++xjHe6aefHuPnfMPhvSmnnDLWOvHEE4czAZXe+N54AFZPt/26Eh4q7GeYYYbwMCBaqBDwN8tllnaxrvADNC/hwUBNA6y//vrBZ+5R/oorrih33nlnJCgJBTW4/+KLL7bYdRTttNdPf+MYz7jum8d8gFhggQW6AmGSSSYpE0wwQQDKy1Nv+tBVxu/WOP0kATjwwAPL2WefXS699NLIpIj/qquuivoUpwizBNRkkpga02JkR6AbCw3wcouinIwpPIW8BVowQHj5TTfdNEJ2by+/a6e9fvobx3jGNb55hC/D1pE0mHAiDoD/6XfRRReF3vhZmaaqUI0Mu/4FAM644447oub79NNPy4MPPli++eab8vnnn0dYKV8AWHuoMNEXNeAuIYd/slSirDHffPPN2P0IW4nlkEMOiYLd919//bV1xo6infb66W8c341rfPMcfvjhAWa3HCpZ7r777mGQZ599tnz88ceht4qC2FjcfvvtsRVu+w4qQJGNn3rqqfLLL7+U3377Lf5WWFPkwgsvDEWEdwLK+3gnK+Mai9pll10CyJNOOimsfMstt8TilD/PPPNMjPfzzz+X8847Lwz1119/NbCV8ueff0Z7n61or5/+xjGecbU3j/luvPHGKM14aqtnKyLroIMOCk62uaA7vWthsGEDamClgvruyy+/jHrv0UcfjUV+9dVXsUC/Ie0ElHcCdLLJJgsP3XbbbaPs4Lm2kjydEVLUjwRQ55xzTnnooYfCK3iaT23vueeeMN5ZZ50Vn767X7fTT/8EPMcl2n700UeRrLoBQQJCcwB9/fXXo5KgN88kP/30U2wo2upmUMF9gOKhF198cShh0TjE/toihdO1115bTjzxxODG2ktVBzhGhrdtxa34jiEAkIILCS/DVYyWYg//0ksvlWuuuSYMwsA+fXe/3uPrp396d45LzPftt99GshoK0NQb1Z166qmhr3D3aSPBgLzVd/za9XZXZsd7PMLiLQh31paiBK+49957+/Goi/LJobw0AdWn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
+

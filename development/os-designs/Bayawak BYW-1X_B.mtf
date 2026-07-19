@@ -1,0 +1,162 @@
+generator:MegaMek Suite 0.50.13 on 2026-07-08
+chassis:Bayawak
+model:BYW-1X/B
+
+Config:Biped
+techbase:Mixed (IS Chassis)
+era:3065
+rules level:5
+role:Sniper
+
+
+mass:100
+engine:400 XL (Clan) Engine
+structure:IS Endo Steel
+myomer:Standard
+clancaseoptedoutlocs:RT,LT
+
+heat sinks:16 IS Double
+walk mp:4
+jump mp:0
+
+armor:Standard(Inner Sphere)
+LA armor:31
+RA armor:31
+LT armor:31
+RT armor:31
+CT armor:45
+HD armor:9
+LL armor:39
+RL armor:39
+RTL armor:9
+RTR armor:9
+RTC armor:14
+
+Weapons:11
+ER Medium Laser, Left Arm
+ER Medium Laser, Left Arm
+ER Medium Laser, Left Arm
+ER Medium Laser, Left Arm
+ER Medium Laser, Left Arm
+ER Medium Laser, Left Arm
+Ultra AC/10, Right Arm
+LRM 15, Left Torso
+Re-Engineering PPC, Right Torso
+Streak SRM 6, Center Torso
+ER Small Laser, Head
+
+Left Arm:
+Shoulder
+Upper Arm Actuator
+Lower Arm Actuator
+Hand Actuator
+CLERMediumLaser
+CLERMediumLaser
+CLERMediumLaser
+CLERMediumLaser
+CLERMediumLaser
+CLERMediumLaser
+IS Endo Steel
+IS Endo Steel
+
+Right Arm:
+Shoulder
+Upper Arm Actuator
+Lower Arm Actuator
+Hand Actuator
+CLUltraAC10
+CLUltraAC10
+CLUltraAC10
+CLUltraAC10
+IS Endo Steel
+IS Endo Steel
+IS Endo Steel
+IS Endo Steel
+
+Left Torso:
+Fusion Engine
+Fusion Engine
+CLLRM15
+CLLRM15
+IS Ammo LRM-15
+IS Streak SRM 6 Ammo
+IS Ultra AC/10 Ammo
+IS Ultra AC/10 Ammo
+IS Ultra AC/10 Ammo
+IS Ultra AC/10 Ammo
+ISCASE
+-Empty-
+
+Right Torso:
+Fusion Engine
+Fusion Engine
+CLReEngineeringPPC
+CLReEngineeringPPC
+CLReEngineeringPPC
+CLReEngineeringPPC
+IS Endo Steel
+IS Endo Steel
+IS Endo Steel
+IS Endo Steel
+-Empty-
+-Empty-
+
+Center Torso:
+Fusion Engine
+Fusion Engine
+Fusion Engine
+Gyro
+Gyro
+Gyro
+Gyro
+Fusion Engine
+Fusion Engine
+Fusion Engine
+CLStreakSRM6
+CLStreakSRM6
+
+Head:
+Life Support
+Sensors
+Cockpit
+CLERSmallLaser
+Sensors
+Life Support
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Left Leg:
+Hip
+Upper Leg Actuator
+Lower Leg Actuator
+Foot Actuator
+IS Endo Steel
+IS Endo Steel
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Right Leg:
+Hip
+Upper Leg Actuator
+Lower Leg Actuator
+Foot Actuator
+IS Endo Steel
+IS Endo Steel
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+
+icon:iVBORw0KGgoAAAANSUhEUgAAAFQAAABICAYAAABof9IhAAAE+ElEQVR4Xu2ZDW6kOhCEc6XcMPfIZXKzeSqLssrlNjQwDPNm/UktwO7fwsxG2q+vyWQymUwmk8lkMplMPoKH2Cu5q+6lPH5+fqrh2R0u4q66l3PXYHfVvZzH7+9vNTy7w0XcVfdy7jopd9W9nLsGu6vuEDZwthEOo/YKvObZuqf0qG/15Nt9APyG6RXr7vhknl33lB7+VncnEM4M5vX39HKmboTXT+d6/P39lbeAKwzN4Io9dzbcpzwfHKzWja7Y9wDjaN2Ipr7qgz13dmoAEtASzUQ//luCruZDHxHJQYrvoO5eag7aLkEZQJLNPFPQKibuo2timOI3qLuXJgfggcOeOzvvcEJVsOqvcXcJSnvJCf3+/i6Ge67BNMdeQc23PieGWau7lyYHOHRCSbKZS06o+dbndxA00UPh8Ak1QRsRBoNF+cLPPXreGGit7l6aHOBlJxRXfPaIYUHN8UmCbtSvHBUUFF8XlPdqWPfghUZQWBBXbGOgruZG3TUaHcCtgmqORK5Sn746hK9tDFT99Yp1d0zQ5AD/O0FdSAf7GwNVP71i3R0TNDnArYLyXg3rYspZQWteryl191JrklsF1RyaC3WCpupfC2vQx2M1J4jqin+WJgd4qaC4qmkOzUVEmKYuRYtsK3atrlmGJgfYJag3T8OeOwfUYlsnxZuLXiQ/f79uxa7VVX88N93HdFpkNSmFiDZO4ONBwq7BcA9T/yOC6j1zrtVVf770ZoqW6k+0/lp8J6A/A/gFVnPsEZS4KMD9ia9HsSBbNxDEZ6v+JOrJchSa00lHh35qS7K6d+Sk+L37E1+PYsFaXfZmgg5nc7yn4KUUOkd/ho+LznWKx0Z1D0SDEfirRf7E16NYkK2rfeseiUSNeoLPomOlE0scq2HNDetojjmODOb37k98PYoF2boUjP37bJzPNVDSJ5RrmthFVz/ujwaj6TqIRHEhiK9HsSBbl2Kwf0f3VQeFa0VFoRPLAyMfrvMNq3EvEkVzR6LoACMbxYKtut4r+3eiT96fd51Qfx4Jqs0yjz676X4kCn28J1+PYrN19Rn3Pi/ICMrYoqLQieWBkQ/X+Ya1eReH+GCRKC4c8fUolnlHsfDTPrV/JyPo8IS6WFjzwu6jfrgCH3Y0GP0jUQDrKr4WxXofZNSX969kfkPTgjJYTRNrAX3Do8aJDgIiUeCDfryWro9ivQ/iMdoH+/dasEgDZZegSuTDdRYGo8aJDgLgp0YfGMXzq9bwWO+DjPry/pXok/e8hwUF9FNbknWDeOMkEpRQmEhEv6qImsf7IKO+tP9oNsfzjgQF3Rt3g09gNV4LeuNkS1D6RCLy6jX03vsgHmOC1hncXAM3i+/oGgFYw547G9UXeONEB8G9i+Jiuul6FOt9kFFf8Lc5nC4XYC13dk4Ff9mbZaznAvAB8OMnpgJ5HNH1KJZ5PV4F1T6l9xFdLpDVpDj6b0k2eKE2y8LeCOC+Djh6CU4kTlZQ7S8512lNmqJiRyiDumGdjeFe/dnsGhwwiuW612RdxML4f1+WY4RrkY27hEYMPJspdeA16BPFqyl4ZtwBQd+KbjB3EM6cUOWjBQV6ctZ4lqBAazZiUtBl76MpQlG0CK4nBAWNqIH9E1TR/FTpOvw8cED4j5M7fTrdnyj6jH0PWGEKuuCf59FPdQp6AWdeyGQymUwmk8lkMplMJu/EfwvPeFHQaErsAAAAAElFTkSuQmCC
+
