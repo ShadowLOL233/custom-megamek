@@ -672,6 +672,18 @@ electronics counterpart to the §8 weapon apex.
   2805/2820/2840; Diana III → Standard E/2805; Orion V → Advance 3060/3070/3080); added **OS Artemis-capable missile
   ammo** for all Artemis-compatible OS families (LRM 5–30, SRM 2–6, MML 3–14 LRM+SRM) via an OS-tech Artemis mutator.
 
+**Bugfix — CC modules duplicated on MTF load (2026-07-19):** the CC Ballistic/Energy/Missile + Composite modules
+are *loadout-derived variable-crit* equipment, but the MTF loader was allocating all their slots up front from a
+not-yet-fully-parsed weapon list. The allocated slot count didn't match the slot lines written in the file, so the
+"slot already full → skip" dedup missed and the loader spawned duplicate CC Energy/Ballistic mounts (worse after any
+change to the tonnage/crit formula, since old saves then carried a stale slot count). Fix: route these modules
+through the same slot-by-slot path the Targeting Computer uses — new predicate `MiscType.isOSCombatComputerModule()`,
+and `MtfFile` now builds one shared mount without pre-allocating slots (`addTargCompWithoutSlots`) and adds a
+`CriticalSlot` per file line. `:megamek:compileJava`, `MtfFileTest`, and `BulkRoundTripTest` all pass. **Known gap
+(separate):** MML in-editor weapon edits still don't auto-resize these modules (no `updateTC`-equivalent hook) — any
+loadout-derived variable-crit OS component added in future must be registered in `isOSCombatComputerModule()` and
+given a MML resize hook.
+
 ### 9.0 Architecture & philosophy
 Two systems, each needing its **own core**; a mech may mount both, but two cores is a heavy tonnage/crit tax —
 that tax (NOT a per-attack arbitration rule) is the balancer.

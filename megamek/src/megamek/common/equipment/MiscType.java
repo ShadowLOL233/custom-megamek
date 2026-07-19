@@ -487,6 +487,19 @@ public class MiscType extends EquipmentType {
         return hasFlag(F_VARIABLE_SIZE);
     }
 
+    /**
+     * @return True for the OS Combat Computer System modules (dev plan §9.2) whose critical-slot footprint is derived
+     *       from the mech's weapon loadout. Like the targeting computer, these must be loaded slot-by-slot instead of
+     *       allocating all their slots up front, because the loadout isn't fully assembled while the crit slots are
+     *       parsed.
+     */
+    public boolean isOSCombatComputerModule() {
+        return hasFlag(MiscTypeFlag.F_OS_CC_BALLISTIC)
+              || hasFlag(MiscTypeFlag.F_OS_CC_ENERGY)
+              || hasFlag(MiscTypeFlag.F_OS_CC_MISSILE)
+              || hasFlag(MiscTypeFlag.F_OS_COMPOSITE_TC);
+    }
+
     @Override
     public Double variableStepSize() {
         if (hasFlag(F_CARGO) || hasFlag(F_LIQUID_CARGO) || hasFlag(F_CARGO_LIFTER)) {

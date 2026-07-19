@@ -1046,9 +1046,13 @@ public class MtfFile implements IMekLoader {
 
                             m.setSize(size);
                         }
-                    } else if (etype instanceof MiscType && etype.hasFlag(MiscType.F_TARGETING_COMPUTER)) {
-                        // Targeting computers are special, they need to be loaded like spreadable
-                        // equipment, but they aren't spreadable
+                    } else if (etype instanceof MiscType && (etype.hasFlag(MiscType.F_TARGETING_COMPUTER)
+                          || ((MiscType) etype).isOSCombatComputerModule())) {
+                        // Targeting computers (and the OS Combat Computer System modules) are special: their crit-slot
+                        // footprint is derived from the weapon loadout, so they must be loaded like spreadable
+                        // equipment (slot-by-slot, referencing one shared mount) even though they aren't spreadable.
+                        // Allocating all slots up front misfires because the loadout isn't fully parsed yet, which
+                        // leaves a size mismatch that spawns duplicate mounts.
                         Mounted<?> m = hSharedEquip.get(etype);
                         if (m == null) {
                             m = mek.addTargCompWithoutSlots((MiscType) etype, loc, isOmniPod, isArmored);
