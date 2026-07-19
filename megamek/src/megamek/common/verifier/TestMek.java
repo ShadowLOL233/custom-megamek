@@ -786,6 +786,9 @@ public class TestMek extends TestEntity {
         boolean hasPartialWing = false;
         boolean hasOSPFD = false;
         boolean hasOSAdvPFD = false;
+        boolean hasCombatComputer = false;
+        boolean hasCCModule = false;
+        boolean hasComposite = false;
         EquipmentType advancedMyomer = null;
         HashSet<Integer> shieldLocations = new HashSet<>();
 
@@ -804,6 +807,11 @@ public class TestMek extends TestEntity {
             hasAES |= m.getType().hasFlag(MiscType.F_ACTUATOR_ENHANCEMENT_SYSTEM);
             hasOSPFD |= m.getType().hasFlag(MiscType.F_OS_PFD);
             hasOSAdvPFD |= m.getType().hasFlag(MiscType.F_OS_ADV_PFD);
+            hasCombatComputer |= m.getType().hasFlag(MiscTypeFlag.F_OS_COMBAT_COMPUTER);
+            hasComposite |= m.getType().hasFlag(MiscTypeFlag.F_OS_COMPOSITE_TC);
+            hasCCModule |= m.getType().hasFlag(MiscTypeFlag.F_OS_CC_BALLISTIC)
+                  || m.getType().hasFlag(MiscTypeFlag.F_OS_CC_ENERGY)
+                  || m.getType().hasFlag(MiscTypeFlag.F_OS_CC_MISSILE);
             if (m.getType().hasFlag(MiscType.F_TSM)
                   || m.getType().hasFlag(MiscType.F_INDUSTRIAL_TSM)
                   || m.getType().hasFlag(MiscType.F_SCM)) {
@@ -1363,6 +1371,16 @@ public class TestMek extends TestEntity {
                     illegal = true;
                 }
             }
+        }
+
+        // OS Combat Computer System (dev plan §9) legality
+        if ((hasCCModule || hasComposite) && !hasCombatComputer) {
+            buff.append("Combat Computer System modules require a Combat Computer Core.\n");
+            illegal = true;
+        }
+        if (hasComposite && hasCCModule) {
+            buff.append("The Composite Targeting Computer is incompatible with specialized CC modules.\n");
+            illegal = true;
         }
 
         if (hasNullSig) {
