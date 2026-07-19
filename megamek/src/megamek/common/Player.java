@@ -48,6 +48,7 @@ import megamek.common.compute.ComputeECM;
 import megamek.common.equipment.ICarryable;
 import megamek.common.equipment.Minefield;
 import megamek.common.equipment.MiscType;
+import megamek.common.equipment.enums.MiscTypeFlag;
 import megamek.common.game.Game;
 import megamek.common.game.IGame;
 import megamek.common.game.InGameObject;
@@ -915,6 +916,12 @@ public final class Player extends TurnOrdered {
     private boolean hasTCPCommandEquipment(Entity entity) {
         // Cockpit Command Module
         if (entity.hasCommandConsoleBonus()) {
+            return true;
+        }
+
+        // OS Battle Computer Core (dev plan §9) — carries the BCS command/initiative bonus (ECM-suppressible via
+        // the TCP path). The per-turn coordination roll (+2 on 12, network -1 on 10+) is wired separately.
+        if (entity.hasWorkingMisc(MiscTypeFlag.F_OS_BATTLE_COMPUTER)) {
             return true;
         }
 
