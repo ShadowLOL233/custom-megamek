@@ -2950,6 +2950,41 @@ public class TWGameManager extends AbstractGameManager {
 
         addNewLines();
 
+        // OS Battle Computer System — Tactical Coordination (dev plan §9.1): report each active BCS core's per-round
+        // 2d6 coordination roll here, in the initiative report (shown before the Movement phase). Honors double-blind:
+        // PUBLIC in normal games, owner/subject-visible under doBlind() (no shared section header when blind).
+        boolean bcsHeaderWritten = false;
+        for (Entity bcsUnit : game.getEntitiesVector()) {
+            boolean hasBcsCore = bcsUnit.hasWorkingMisc(MiscTypeFlag.F_OS_BATTLE_COMPUTER)
+                  || bcsUnit.hasWorkingMisc(MiscTypeFlag.F_OS_CROW_NEST);
+            if (!hasBcsCore || bcsUnit.isDestroyed() || !bcsUnit.isDeployed() || bcsUnit.isOffBoard()) {
+                continue;
+            }
+            if (!doBlind() && !bcsHeaderWritten) {
+                addReport(new Report(1268, Report.PUBLIC));
+                bcsHeaderWritten = true;
+            }
+            int coordRoll = bcsUnit.getBcsCoordinationRoll();
+            String coordEffect;
+            if (coordRoll >= 12) {
+                coordEffect = "network -1 to-hit vs direct-fire and force initiative +2 this round (negated by hostile ECM)";
+            } else if (coordRoll >= 10) {
+                coordEffect = "network -1 to-hit vs direct-fire this round (negated by hostile ECM)";
+            } else {
+                coordEffect = "no coordination effect this round";
+            }
+            Report coordReport = new Report(1269);
+            coordReport.subject = bcsUnit.getId();
+            coordReport.indent();
+            coordReport.addDesc(bcsUnit);
+            coordReport.add(coordRoll);
+            coordReport.add(coordEffect);
+            if (!doBlind()) {
+                coordReport.type = Report.PUBLIC;
+            }
+            addReport(coordReport);
+        }
+
         if (!abbreviatedReport) {
             // remaining deployments
             Comparator<Entity> comp = Comparator.comparingInt(Entity::getDeployRound);

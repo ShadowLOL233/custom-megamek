@@ -455,6 +455,7 @@ public abstract class TurnOrdered implements ITurnOrdered {
                                   p.getCommandConsoleBonus(),
                                   p.getCrewCommandBonus(),
                                   p.getTCPInitBonus(),
+                                  p.getBcsCoordinationInitBonus(),
                                   p.getConstantInitBonus(),
                                   bInitCompBonus ? p.getInitCompensationBonus() : 0,
                                   0
@@ -468,6 +469,7 @@ public abstract class TurnOrdered implements ITurnOrdered {
                               base.console(),
                               base.crewCommand(),
                               base.tcp(),
+                              base.bcs(),
                               base.constant(),
                               base.compensation(),
                               entity.getCrew().getInitBonus()

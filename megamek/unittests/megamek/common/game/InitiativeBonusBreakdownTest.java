@@ -50,27 +50,27 @@ class InitiativeBonusBreakdownTest {
 
     @Test
     void totalWithSinglePositiveReturnsValue() {
-        var breakdown = new InitiativeBonusBreakdown(0, 0, null, 0, 0, 3, 0, 0, 0);
+        var breakdown = new InitiativeBonusBreakdown(0, 0, null, 0, 0, 3, 0, 0, 0, 0);
         assertEquals(3, breakdown.total());
     }
 
     @Test
     void totalWithMultiplePositivesReturnsHighestOnly() {
         // hq=2, quirk=1, tcp=3 -> should return 3 (highest)
-        var breakdown = new InitiativeBonusBreakdown(2, 1, "Command Mek", 0, 0, 3, 0, 0, 0);
+        var breakdown = new InitiativeBonusBreakdown(2, 1, "Command Mek", 0, 0, 3, 0, 0, 0, 0);
         assertEquals(3, breakdown.total());
     }
 
     @Test
     void totalWithSingleNegativeReturnsValue() {
-        var breakdown = new InitiativeBonusBreakdown(0, 0, null, 0, 0, 0, -2, 0, 0);
+        var breakdown = new InitiativeBonusBreakdown(0, 0, null, 0, 0, 0, 0, -2, 0, 0);
         assertEquals(-2, breakdown.total());
     }
 
     @Test
     void totalWithMultipleNegativesReturnsCumulativeSum() {
         // constant=-1, compensation=-2, crew=-3 -> should return -6 (all stack)
-        var breakdown = new InitiativeBonusBreakdown(0, 0, null, 0, 0, 0, -1, -2, -3);
+        var breakdown = new InitiativeBonusBreakdown(0, 0, null, 0, 0, 0, 0, -1, -2, -3);
         assertEquals(-6, breakdown.total());
     }
 
@@ -78,7 +78,7 @@ class InitiativeBonusBreakdownTest {
     void totalWithMixedReturnsHighestPositivePlusAllNegatives() {
         // tcp=3, console=2 (positives), constant=-1, compensation=-2 (negatives)
         // Result: 3 (highest positive) + (-1) + (-2) = 0
-        var breakdown = new InitiativeBonusBreakdown(0, 0, null, 2, 0, 3, -1, -2, 0);
+        var breakdown = new InitiativeBonusBreakdown(0, 0, null, 2, 0, 3, 0, -1, -2, 0);
         assertEquals(0, breakdown.total());
     }
 
@@ -91,7 +91,7 @@ class InitiativeBonusBreakdownTest {
     @Test
     void rawTotalReturnsSumOfAllComponents() {
         // Should sum all regardless of stacking rules
-        var breakdown = new InitiativeBonusBreakdown(2, 1, null, 3, 0, 2, -1, 0, 0);
+        var breakdown = new InitiativeBonusBreakdown(2, 1, null, 3, 0, 2, 0, -1, 0, 0);
         assertEquals(7, breakdown.rawTotal()); // 2+1+3+2-1 = 7
     }
 
@@ -105,7 +105,7 @@ class InitiativeBonusBreakdownTest {
 
     @Test
     void breakdownStringWithSinglePositiveShowsNoStackingNote() {
-        var breakdown = new InitiativeBonusBreakdown(0, 0, null, 0, 0, 3, 0, 0, 0);
+        var breakdown = new InitiativeBonusBreakdown(0, 0, null, 0, 0, 3, 0, 0, 0, 0);
         String result = breakdown.toBreakdownString();
 
         assertTrue(result.contains("+3 TCP"));
@@ -115,7 +115,7 @@ class InitiativeBonusBreakdownTest {
 
     @Test
     void breakdownStringWithMultiplePositivesShowsStackingNote() {
-        var breakdown = new InitiativeBonusBreakdown(2, 1, "Command Mek", 0, 0, 3, 0, 0, 0);
+        var breakdown = new InitiativeBonusBreakdown(2, 1, "Command Mek", 0, 0, 3, 0, 0, 0, 0);
         String result = breakdown.toBreakdownString();
 
         assertTrue(result.contains("(using highest modifier only)"));
@@ -123,7 +123,7 @@ class InitiativeBonusBreakdownTest {
 
     @Test
     void breakdownStringWithMultiplePositivesBoldsHighest() {
-        var breakdown = new InitiativeBonusBreakdown(2, 1, "Command Mek", 0, 0, 3, 0, 0, 0);
+        var breakdown = new InitiativeBonusBreakdown(2, 1, "Command Mek", 0, 0, 3, 0, 0, 0, 0);
         String result = breakdown.toBreakdownString();
 
         assertTrue(result.contains("<b>+3 TCP</b>"));
@@ -132,7 +132,7 @@ class InitiativeBonusBreakdownTest {
     @Test
     void breakdownStringSortsHighestFirst() {
         // tcp=3, hq=2, quirk=1 -> should appear as "+3 TCP, +2 HQ, +1 Command Mek"
-        var breakdown = new InitiativeBonusBreakdown(2, 1, "Command Mek", 0, 0, 3, 0, 0, 0);
+        var breakdown = new InitiativeBonusBreakdown(2, 1, "Command Mek", 0, 0, 3, 0, 0, 0, 0);
         String result = breakdown.toBreakdownString();
 
         int tcpIndex = result.indexOf("+3 TCP");
@@ -145,7 +145,7 @@ class InitiativeBonusBreakdownTest {
 
     @Test
     void breakdownStringShowsNegativesWithoutBold() {
-        var breakdown = new InitiativeBonusBreakdown(0, 0, null, 0, 0, 3, -2, 0, 0);
+        var breakdown = new InitiativeBonusBreakdown(0, 0, null, 0, 0, 3, 0, -2, 0, 0);
         String result = breakdown.toBreakdownString();
 
         assertTrue(result.contains("-2 Base"));
@@ -154,7 +154,7 @@ class InitiativeBonusBreakdownTest {
 
     @Test
     void breakdownStringUsesQuirkNameWhenProvided() {
-        var breakdown = new InitiativeBonusBreakdown(0, 2, "Battle Computer", 0, 0, 0, 0, 0, 0);
+        var breakdown = new InitiativeBonusBreakdown(0, 2, "Battle Computer", 0, 0, 0, 0, 0, 0, 0);
         String result = breakdown.toBreakdownString();
 
         assertTrue(result.contains("Battle Computer"));
@@ -163,7 +163,7 @@ class InitiativeBonusBreakdownTest {
 
     @Test
     void breakdownStringUsesDefaultQuirkLabelWhenNameNull() {
-        var breakdown = new InitiativeBonusBreakdown(0, 2, null, 0, 0, 0, 0, 0, 0);
+        var breakdown = new InitiativeBonusBreakdown(0, 2, null, 0, 0, 0, 0, 0, 0, 0);
         String result = breakdown.toBreakdownString();
 
         assertTrue(result.contains("Quirk"));
@@ -173,8 +173,8 @@ class InitiativeBonusBreakdownTest {
 
     @Test
     void addCombinesAllComponents() {
-        var first = new InitiativeBonusBreakdown(1, 0, null, 2, 0, 0, 0, 0, 0);
-        var second = new InitiativeBonusBreakdown(0, 1, "Command Mek", 0, 1, 3, 0, 0, 0);
+        var first = new InitiativeBonusBreakdown(1, 0, null, 2, 0, 0, 0, 0, 0, 0);
+        var second = new InitiativeBonusBreakdown(0, 1, "Command Mek", 0, 1, 3, 0, 0, 0, 0);
 
         var combined = first.add(second);
 
@@ -187,8 +187,8 @@ class InitiativeBonusBreakdownTest {
 
     @Test
     void addKeepsHigherQuirkName() {
-        var first = new InitiativeBonusBreakdown(0, 3, "Battle Computer", 0, 0, 0, 0, 0, 0);
-        var second = new InitiativeBonusBreakdown(0, 1, "Command Mek", 0, 0, 0, 0, 0, 0);
+        var first = new InitiativeBonusBreakdown(0, 3, "Battle Computer", 0, 0, 0, 0, 0, 0, 0);
+        var second = new InitiativeBonusBreakdown(0, 1, "Command Mek", 0, 0, 0, 0, 0, 0, 0);
 
         var combined = first.add(second);
 

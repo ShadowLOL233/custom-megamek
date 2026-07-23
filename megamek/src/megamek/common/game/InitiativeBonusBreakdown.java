@@ -49,6 +49,7 @@ import megamek.client.ui.Messages;
  * @param console      Command console or tech officer bonus (+2)
  * @param crewCommand  Crew command skill bonus (RPG option)
  * @param tcp          Triple Core Processor implant bonus
+ * @param bcs          OS Battle Computer System coordination bonus (+2 when a B-2500/Crow Nest core rolls 12; dev plan §9.1)
  * @param constant     Player's constant init bonus
  * @param compensation Initiative compensation bonus
  * @param crew         Individual crew init bonus (for individual initiative mode)
@@ -62,18 +63,19 @@ public record InitiativeBonusBreakdown(
       int console,
       int crewCommand,
       int tcp,
+      int bcs,
       int constant,
       int compensation,
       int crew
 ) implements Serializable {
     @Serial
-    private static final long serialVersionUID = 3L;
+    private static final long serialVersionUID = 4L;
 
     /**
      * Creates a breakdown with all zeros.
      */
     public static InitiativeBonusBreakdown zero() {
-        return new InitiativeBonusBreakdown(0, 0, null, 0, 0, 0, 0, 0, 0);
+        return new InitiativeBonusBreakdown(0, 0, null, 0, 0, 0, 0, 0, 0, 0);
     }
 
     /**
@@ -81,7 +83,7 @@ public record InitiativeBonusBreakdown(
      * "constant" component.
      */
     public static InitiativeBonusBreakdown fromTotal(int total) {
-        return new InitiativeBonusBreakdown(0, 0, null, 0, 0, 0, total, 0, 0);
+        return new InitiativeBonusBreakdown(0, 0, null, 0, 0, 0, 0, total, 0, 0);
     }
 
     /**
@@ -96,7 +98,7 @@ public record InitiativeBonusBreakdown(
      * @return The total initiative bonus with stacking rules applied
      */
     public int total() {
-        int[] components = { hq, quirk, console, crewCommand, tcp, constant, compensation, crew };
+        int[] components = { hq, quirk, console, crewCommand, tcp, bcs, constant, compensation, crew };
 
         int negativeSum = 0;
         int highestPositive = 0;
@@ -119,7 +121,7 @@ public record InitiativeBonusBreakdown(
      * @return The raw sum of all bonus components
      */
     public int rawTotal() {
-        return hq + quirk + console + crewCommand + tcp + constant + compensation + crew;
+        return hq + quirk + console + crewCommand + tcp + bcs + constant + compensation + crew;
     }
 
     /**
@@ -157,6 +159,10 @@ public record InitiativeBonusBreakdown(
         if (tcp != 0) {
             components.add(new int[] { tcp, components.size() });
             labels.add(Messages.getString("InitiativeBonusBreakdown.TCP"));
+        }
+        if (bcs != 0) {
+            components.add(new int[] { bcs, components.size() });
+            labels.add(Messages.getString("InitiativeBonusBreakdown.BCS"));
         }
         if (constant != 0) {
             components.add(new int[] { constant, components.size() });
@@ -247,6 +253,7 @@ public record InitiativeBonusBreakdown(
               this.console + other.console,
               this.crewCommand + other.crewCommand,
               this.tcp + other.tcp,
+              this.bcs + other.bcs,
               this.constant + other.constant,
               this.compensation + other.compensation,
               this.crew + other.crew

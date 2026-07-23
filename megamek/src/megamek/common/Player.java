@@ -910,6 +910,34 @@ public final class Player extends TurnOrdered {
     }
 
     /**
+     * OS Battle Computer System — Tactical Coordination initiative bonus (dev plan §9.1). Each round a B-2500 / Crow
+     * Nest core rolls 2d6 in {@link Entity#getBcsCoordinationRoll()}; on a 12 the force's initiative bumps to +2 that
+     * round. ECM-suppressible: a core sitting under hostile ECM (without its own counter-ECM) contributes nothing.
+     *
+     * @return 2 if any of this player's active, on-board BCS cores rolled a 12 this round (and is not ECM-jammed), else 0
+     */
+    public int getBcsCoordinationInitBonus() {
+        if (game == null) {
+            return 0;
+        }
+        for (InGameObject object : game.getInGameObjects()) {
+            if (!(object instanceof Entity entity) || !entity.getOwner().equals(this)) {
+                continue;
+            }
+            if (!isActiveForCommandBonus(entity)) {
+                continue;
+            }
+            boolean hasBcsCore = entity.hasWorkingMisc(MiscTypeFlag.F_OS_BATTLE_COMPUTER)
+                  || entity.hasWorkingMisc(MiscTypeFlag.F_OS_CROW_NEST);
+            if (hasBcsCore && (entity.getBcsCoordinationRoll() == 12)
+                  && !(isEntityECMAffected(entity) && !entity.hasECM())) {
+                return 2;
+            }
+        }
+        return 0;
+    }
+
+    /**
      * Check if an entity has command equipment that qualifies for TCP +1 initiative bonus. This includes: Cockpit
      * Command Module, C3/C3i systems, or >3 tons of communications equipment.
      */

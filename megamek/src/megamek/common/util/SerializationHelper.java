@@ -357,6 +357,7 @@ public class SerializationHelper {
                 int crewCommand = 0;
                 int tcp = 0;
                 int constant = 0;
+                int bcs = 0;
                 int compensation = 0;
                 int crew = 0;
 
@@ -370,6 +371,7 @@ public class SerializationHelper {
                             case "console" -> console = Integer.parseInt(reader.getValue());
                             case "crewCommand" -> crewCommand = Integer.parseInt(reader.getValue());
                             case "tcp" -> tcp = Integer.parseInt(reader.getValue());
+                            case "bcs" -> bcs = Integer.parseInt(reader.getValue());
                             case "constant" -> constant = Integer.parseInt(reader.getValue());
                             case "compensation" -> compensation = Integer.parseInt(reader.getValue());
                             case "crew" -> crew = Integer.parseInt(reader.getValue());
@@ -381,7 +383,7 @@ public class SerializationHelper {
                     }
                 }
                 return new InitiativeBonusBreakdown(hq, quirk, quirkName, console, crewCommand,
-                      tcp, constant, compensation, crew);
+                      tcp, bcs, constant, compensation, crew);
             }
 
             @Override

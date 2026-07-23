@@ -694,6 +694,27 @@ mech is just the lobby's unlinked-master rendering (`LobbyMekCellFormatter` `get
 `hasC3MM()`); the `(2M, 3S free)` company-commander line appears once the unit is set as its own master in a C3 network.
 No code change needed — this is inherited canon behavior and matches the design.
 
+**Implemented — B-2500 Tactical Coordination: report line + 12→initiative+2 (2026-07-23):** the per-round 2d6
+coordination roll (`Entity.newRound` → `getBcsCoordinationRoll`) is now surfaced and its +2 branch wired.
+- **Report (before Movement):** `TWGameManager.writeInitiativeReport()` emits one line per active B-2500 / Crow Nest
+  core in the INITIATIVE_REPORT phase (which renders before the Movement phase, per the requested timing). Shows the
+  2d6 roll + effect (≥12 → network −1 vs direct-fire **and** force initiative +2; 10–11 → network −1; <10 → no effect),
+  all "negated by hostile ECM". **Double-blind aware:** `Report.PUBLIC` in normal games, owner/subject-visible under
+  `doBlind()` (no shared header when blind). Report templates 1268/1269 (OS 1260s block).
+- **12 → initiative +2:** new `bcs` component on `InitiativeBonusBreakdown` (positive, non-stacking per Xotl) fed by
+  `Player.getBcsCoordinationInitBonus()` (returns 2 when an active, on-board, non-ECM-jammed BCS core rolled 12).
+  Threaded through `Team` (team init) **and** `TurnOrdered` (individual init) **and** `SerializationHelper` (save
+  compat, old saves default 0). Displays as "+2 B-2500 Coordination" in the init breakdown. Added
+  `Entity.setBcsCoordinationRoll` (test hook).
+- **Bug caught during test:** `Report.addDesc()` emits **two** `<data>` tokens (unit + owner), so template 1269 needed
+  the canon `<data> (<data>) …` prefix; the first draft dropped the effect text (only the roll showed). Fixed + guarded
+  by a `Report.text()` rendering assertion.
+- **Tests:** new `OSBattleComputerInitiativeTest` (6) — no bonus <12, +2 on 12, no core / inactive → none, breakdown
+  stacking, and report rendering; updated the existing `InitiativeBonusBreakdownTest` (19) for the new field. All pass.
+- **Still open (pre-existing):** the B-2500's *constant* +1 initiative only applies via the TCP-implant path
+  (`getTCPInitBonus` is gated on `MD_TRIPLE_CORE_PROCESSOR` + VDNI/BVDNI), so a normal-pilot B-2500 gives +0 on non-12
+  turns and only the new +2 on a 12. Making the constant +1 grant standalone is a separate follow-up.
+
 ### 9.0 Architecture & philosophy
 Two systems, each needing its **own core**; a mech may mount both, but two cores is a heavy tonnage/crit tax —
 that tax (NOT a per-attack arbitration rule) is the balancer.
@@ -799,7 +820,7 @@ module).
 
 ### 9.5 Open (⏳)
 Mechanics-remaining (best implemented test-driven; all UNTESTED until the unified playtest):
-- B-2500 coordination roll — the **+2-initiative-on-12** branch (only the network −1 direct-fire is wired so far).
+- ~~B-2500 coordination roll — the **+2-initiative-on-12** branch~~ ✅ DONE 2026-07-23 (network −1 was already wired; +2 now wired + reported).
 - **Demon** per-turn to-hit debuff (+1/+2, doubled to +4 under friendly ECM, escalated on a Demon crit).
 - **Improve C3 Point** focus-fire −1 (needs Improve C3 Point defined as a TAG-capable component first).
 - **Network cap → 26** (company scale) + Improve C3 Node's 6-Point topology.
@@ -807,8 +828,9 @@ Mechanics-remaining (best implemented test-driven; all UNTESTED until the unifie
   built-in Light TAG; Ghost stealth-system coexistence.
 - **BCS module → B-2500 core prerequisite** (currently C3/ECM work without a BCS core — inconsistent with the CCS
   core-prereq).
-- Exact per-module BV factors; Enhanced Combat Computer revival + rename; optional Round-Report line for the
-  coordination roll (currently silent).
+- Exact per-module BV factors; Enhanced Combat Computer revival + rename. ~~optional Round-Report line for the
+  coordination roll~~ ✅ DONE 2026-07-23 (initiative-report line, double-blind aware).
+- **B-2500 constant +1 initiative** currently only applies through the TCP-implant path — make it grant standalone.
 
 ## 10. OS design saves — cross-device import (added 2026-07-19)
 

@@ -7238,6 +7238,11 @@ public abstract class Entity extends TurnOrdered
         return bcsCoordinationRoll;
     }
 
+    /** Sets the per-round BCS Tactical Coordination roll. Normally set by {@link #newRound(int)}; exposed for testing. */
+    public void setBcsCoordinationRoll(int roll) {
+        bcsCoordinationRoll = roll;
+    }
+
     @Override
     public void newRound(int roundNumber) {
         // UNTESTED (dev plan §9.1): roll the Tactical Coordination die each round for a BCS core bearer.

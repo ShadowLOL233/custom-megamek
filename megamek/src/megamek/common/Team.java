@@ -251,6 +251,7 @@ public final class Team extends TurnOrdered {
         int consoleBonus = 0;
         int crewCommandBonus = 0;
         int tcpBonus = 0;
+        int bcsBonus = 0;
 
         for (Player player : players) {
             // Track each source separately - these bonuses are always >= 0
@@ -266,6 +267,7 @@ public final class Team extends TurnOrdered {
             consoleBonus = Math.max(consoleBonus, player.getCommandConsoleBonus());
             crewCommandBonus = Math.max(crewCommandBonus, player.getCrewCommandBonus());
             tcpBonus = Math.max(tcpBonus, player.getTCPInitBonus());
+            bcsBonus = Math.max(bcsBonus, player.getBcsCoordinationInitBonus());
         }
 
         // Constant bonus can be negative, so we need to take max across players properly
@@ -280,6 +282,7 @@ public final class Team extends TurnOrdered {
               consoleBonus,
               crewCommandBonus,
               tcpBonus,
+              bcsBonus,
               constantBonus,
               compensationBonus,
               0  // crew bonus is for individual initiative mode only
