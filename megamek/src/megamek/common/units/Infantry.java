@@ -1724,8 +1724,9 @@ public class Infantry extends Entity {
         if ((spec & TRENCH_ENGINEERS) > 0 && (infSpecs & TRENCH_ENGINEERS) == 0) {
             // Add vibro shovels if not already present (may already be loaded from file)
             boolean hasShovels = getEquipment().stream()
-                  .anyMatch(m -> m.getType().hasFlag(MiscType.F_TOOLS)
-                        && m.getType().hasFlag(MiscTypeFlag.S_VIBRO_SHOVEL));
+                  .anyMatch(m -> m.getType() instanceof MiscType misc
+                        && misc.hasFlag(MiscType.F_TOOLS)
+                        && misc.hasFlag(MiscTypeFlag.S_VIBRO_SHOVEL));
             if (!hasShovels) {
                 try {
                     EquipmentType shovels = EquipmentType.get(EquipmentTypeLookup.VIBRO_SHOVEL);
@@ -1738,7 +1739,8 @@ public class Infantry extends Entity {
             // Need to remove vibro shovels
             List<Mounted<?>> eqToRemove = new ArrayList<>();
             for (Mounted<?> eq : getEquipment()) {
-                if (eq.getType().hasFlag(MiscType.F_TOOLS) && eq.getType().hasFlag(MiscTypeFlag.S_VIBRO_SHOVEL)) {
+                if (eq.getType() instanceof MiscType misc && misc.hasFlag(MiscType.F_TOOLS)
+                          && misc.hasFlag(MiscTypeFlag.S_VIBRO_SHOVEL)) {
                     eqToRemove.add(eq);
                 }
             }
@@ -1755,8 +1757,9 @@ public class Infantry extends Entity {
         if ((spec & DEMO_ENGINEERS) > 0 && (infSpecs & DEMO_ENGINEERS) == 0) {
             // Add demolition charge if not already present (may already be loaded from file)
             boolean hasCharge = getEquipment().stream()
-                  .anyMatch(m -> m.getType().hasFlag(MiscType.F_TOOLS)
-                        && m.getType().hasFlag(MiscTypeFlag.S_DEMOLITION_CHARGE));
+                  .anyMatch(m -> m.getType() instanceof MiscType misc
+                        && misc.hasFlag(MiscType.F_TOOLS)
+                        && misc.hasFlag(MiscTypeFlag.S_DEMOLITION_CHARGE));
             if (!hasCharge) {
                 try {
                     EquipmentType charge = EquipmentType.get(EquipmentTypeLookup.DEMOLITION_CHARGE);
@@ -1769,7 +1772,8 @@ public class Infantry extends Entity {
             // Need to remove vibro shovels
             List<Mounted<?>> eqToRemove = new ArrayList<>();
             for (Mounted<?> eq : getEquipment()) {
-                if (eq.getType().hasFlag(MiscType.F_TOOLS) && eq.getType().hasFlag(MiscTypeFlag.S_DEMOLITION_CHARGE)) {
+                if (eq.getType() instanceof MiscType misc && misc.hasFlag(MiscType.F_TOOLS)
+                          && misc.hasFlag(MiscTypeFlag.S_DEMOLITION_CHARGE)) {
                     eqToRemove.add(eq);
                 }
             }
