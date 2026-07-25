@@ -591,13 +591,10 @@ public abstract class AbstractUnitSelectorDialog extends JDialog implements Runn
             }
         }
 
-        int maxTech = switch (gameTechLevel) {
-            case TechConstants.T_SIMPLE_INTRO -> TechConstants.T_INTRO_BOX_SET;
-            case TechConstants.T_SIMPLE_STANDARD -> TechConstants.T_TW_ALL;
-            case TechConstants.T_SIMPLE_ADVANCED -> TechConstants.T_CLAN_ADVANCED;
-            case TechConstants.T_SIMPLE_EXPERIMENTAL -> TechConstants.T_CLAN_EXPERIMENTAL;
-            default -> TechConstants.T_CLAN_UNOFFICIAL;
-        };
+        // Always list every IS/Clan tech level regardless of the game's tech-level cap, to stay
+        // consistent with the OS and Ascended levels below (which are always added). Year/canon/
+        // legality filters still apply; this only controls which tech levels are selectable here.
+        int maxTech = TechConstants.T_CLAN_UNOFFICIAL;
 
         techLevelListToIndex.clear();
         DefaultComboBoxModel<String> techModel = new DefaultComboBoxModel<>();
