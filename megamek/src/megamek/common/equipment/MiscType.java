@@ -2462,7 +2462,7 @@ public class MiscType extends EquipmentType {
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
-              .setISAdvancement(3048, 3050, 3055, DATE_NONE, DATE_NONE)
+              .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
@@ -2487,11 +2487,11 @@ public class MiscType extends EquipmentType {
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
-              .setISAdvancement(3058, 3060, 3063, DATE_NONE, DATE_NONE)
+              .setISAdvancement(2900, 2930, 2960, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
-              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
         return misc;
     }
 
@@ -2512,11 +2512,11 @@ public class MiscType extends EquipmentType {
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
-              .setISAdvancement(3065, 3068, 3070, DATE_NONE, DATE_NONE)
+              .setISAdvancement(2900, 2930, 2960, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
-              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
         return misc;
     }
 
@@ -2539,7 +2539,7 @@ public class MiscType extends EquipmentType {
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
-              .setISAdvancement(3053, 3055, 3058, DATE_NONE, DATE_NONE)
+              .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
@@ -2563,11 +2563,11 @@ public class MiscType extends EquipmentType {
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
-              .setISAdvancement(3060, 3064, 3067, DATE_NONE, DATE_NONE)
+              .setISAdvancement(2900, 2930, 2960, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
-              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
         return misc;
     }
 
@@ -2587,11 +2587,11 @@ public class MiscType extends EquipmentType {
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
-              .setISAdvancement(3066, 3069, 3072, DATE_NONE, DATE_NONE)
+              .setISAdvancement(2900, 2930, 2960, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
-              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
         return misc;
     }
 

@@ -14918,8 +14918,10 @@ public abstract class Entity extends TurnOrdered
                     return false;
                 }
 
-                // OS Improve/Heavy Duty Superchargers cap engine damage on failure at 2 hits.
-                boolean cappedScDamage = isSupercharger && (isOSImprove || isOSHeavyDuty);
+                // All OS Superchargers (baseline, Improve, Heavy Duty) cap engine damage on failure at 2 hits;
+                // canon superchargers can still take 3. The baseline still uses the standard failure curve.
+                boolean isOSSupercharger = masc.getType().getInternalName().equals(EquipmentTypeLookup.OS_SUPERCHARGER);
+                boolean cappedScDamage = isSupercharger && (isOSImprove || isOSHeavyDuty || isOSSupercharger);
 
                 if (isSupercharger) {
                     // do the damage - engine critical slots
