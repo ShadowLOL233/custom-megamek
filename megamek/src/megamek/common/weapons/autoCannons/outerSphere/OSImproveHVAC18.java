@@ -14,14 +14,13 @@ import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
 import megamek.common.enums.TechRating;
 import megamek.common.equipment.Mounted;
-import megamek.common.weapons.autoCannons.HVACWeapon;
 
 /**
  * Outer Sphere Improve HVAC/18 — Improve-tier high-velocity autocannon (heavy calibers only).
  * The heavier, earlier HVAC pattern; the Enhanced tier is the lighter/cooler refinement of this.
- * Aerospace-capable (AV = damage across all brackets, maxRange = extreme); ammo can detonate.
+ * Aerospace-capable (AV = damage across all brackets, maxRange = extreme); electromagnetic-chemical action — no cook-off.
  */
-public class OSImproveHVAC18 extends HVACWeapon {
+public class OSImproveHVAC18 extends OSHVACWeapon {
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -48,7 +47,6 @@ public class OSImproveHVAC18 extends HVACWeapon {
         longAV = 18;
         extAV = 18;
         maxRange = RANGE_EXT;
-        explosionDamage = damage;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setIntroLevel(false)
               .setUnofficial(false)
