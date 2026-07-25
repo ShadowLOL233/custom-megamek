@@ -590,47 +590,69 @@ Confirm Advance tier; exact ranges vs the OS Gauss line; how hard the low-power 
 munition→power-tier assignment; heat model (coil discharge → more heat than a standard Gauss's ~1?); shared AC
 ammo enum vs dedicated EM Lance ammo.
 
-### Successor concept — Coil-Augmented Railgun (hybrid) — DESIGN NOTE (added 2026-07-10)
-**Status: CONCEPT — not yet specced.** A weapon that fuses the coilgun's and railgun's advantages, and is
-arguably **the single most "OS" weapon in the tech base** — because the real-engineering hybrid *is* the
-maintainability-first way to build a railgun.
+### Successor concept — Coil Augmented Railgun (hybrid) — SPECCED (design pinned 2026-07-24)
+**Status: DESIGN FINALIZED — stats pinned, not yet coded.** The hybrid that fuses coilgun + railgun and is
+arguably **the single most "OS" weapon in the tech base** — the real-engineering hybrid *is* the
+maintainability-first way to build a railgun. **Base version name = Coil Augmented Railgun.**
 
 **Real engineering basis (both routes borrow the coil to cure the rail's flaw):** the railgun's death is
 **rail self-erosion** (megaamp current + hypervelocity sliding contact). Two real mitigations, both coil-based:
-1. **Field augmentation** — external coils boost the field B; since F = J×B, the same force needs far **less
-   current J** → less arcing/ablation → dramatically longer rail life.
+1. **Field augmentation** — external coils boost field B; since F = J×B, the same force needs far **less current
+   J** → less arcing/ablation → dramatically longer rail life.
 2. **Coil pre-acceleration + short rail final stage** — the coilgun launches the slug contactlessly to high
-   speed, so it only enters rail contact for the **last brief stage** → minimal contact time/erosion.
-Both leverage OS's existing coilgun mastery to tame the railgun's erosion while keeping its higher
-muzzle-velocity ceiling.
+   speed, so it enters rail contact only for the **last brief stage** → minimal contact time/erosion.
+Both leverage OS's coilgun mastery to tame the railgun's erosion while keeping its higher muzzle-velocity ceiling.
 
-**Why it's "most OS" (§0.1):** OS's defining move is to **engineer a flaw away** rather than accept it (the Clan
-way) or avoid it (the raw path). Facing the railgun, the raw-Experimental answer abandons maintainability; the
-OS answer is this hybrid — reclaim most of the railgun's violence *within* the maintainability creed. It is the
-thesis statement of OS engineering, grown from the EM Lance (§8) tech base as its **successor**.
+**Why it's "most OS" (§0.1):** OS engineers a flaw away rather than accepting it (Clan) or avoiding it (raw) — it
+reclaims most of the railgun's violence *within* the maintainability creed, grown from the EM Lance (§8) as its
+successor.
 
-**Tier & placement:** **Advance — the crown of OS's *serviceable* electromagnetic line, sitting ABOVE EM Lance.**
-It breaks the pure-coilgun velocity ceiling (more range / damage / AP than EM Lance) but stays serviceable.
-Raw **Railgun/Railcannon** remain the **Experimental** creed-abandoning extreme (may end up narrative-only /
-unbuilt if the hybrid is OS's accepted answer).
+**Tier & placement (CONFIRMED):** **Advance — the crown of OS's *serviceable* electromagnetic line, ABOVE EM
+Lance.** Raw **Railgun / Railcannon = SHELVED** for now (the hybrid is OS's accepted answer; the raw rail may
+return later as the Experimental creed-abandoning extreme).
 
-**Differentiation from EM Lance (so they coexist, not obsolete each other):**
-- EM Lance = pure coilgun: lighter, cheaper, **zero erosion**, the efficient premium.
-- Hybrid = coil-augmented rail: heavier, bulkier, costlier, higher BV, **mild NON-ZERO erosion**, mid heat —
-  the uncompromising apex that still *serves*.
-- Inherits EM Lance's **variable output + power-gated munitions** (the coil stage lets it throttle).
+**Identity vs EM Lance — TRADES flexibility for pure kinetic supremacy (NOT a strict upgrade):**
+- **EM Lance = flexible premium:** power-gated variable output + multi-munition, lighter, cheaper, zero erosion.
+- **Coil Augmented Railgun = pure single-slug AP penetrator apex:** longest range + highest single-shot damage +
+  inherent AP, but fires **ONE munition only** (a rugged AP kinetic slug) — **NO munition variety, NO variable
+  output**. It gives up the EM Lance's entire flexibility to buy raw performance; both stay relevant.
+  *(Corrects the earlier draft that had the hybrid "inherit" the power-gated munitions.)*
 
-**Mechanic hooks (vs the raw railgun's harsher ones):**
-- **Erosion (mild):** light degradation under sustained fire (small reliability/accuracy drift or a low jam
-  chance) — NOT the raw railgun's "may destroy the weapon per shot." This is its numeric identity vs pure coil.
-- **Heat:** between coilgun (~1) and raw railgun (high) — a mid value (augmentation cut the current, hence heat).
-- **Explosion:** bigger pulsed-power bank → worse crit blast than EM Lance, milder than a raw railgun.
+**Pinned stats:**
+| field | value |
+|---|---|
+| Damage | **30**, flat (no range falloff) |
+| Range | **min 0 — no minimum-range penalty** / S 9 / M 18 / L 27 / E 36 |
+| Heat | **6** (hottest Gauss-family — residual rail ohmic/contact heat) |
+| Tonnage | **22** |
+| Crit slots | **13** |
+| Ammo | **dedicated NEW Railgun ammo, 3 shots/ton** — inert AP slug, does NOT explode |
+| Weapon crit-explosion | **30** (= damage); bigger than EM Lance, milder than raw rail |
+| To-hit modifier | **none** at baseline (accuracy lane belongs to the repurposed precision HVAC) |
+| BV / cost | ≈ 700+ / ≈ 1.1M (compute via formula) |
+| Tier / rating / faction | **Advance** · TechRating **F** · LEGION |
 
-**Naming candidates:** keep the "Lance" bloodline — **Rail Lance / Augmented Lance / Induction Rail Lance** — or
-a new image, **Electromagnetic Pike**. TBD.
+**Special mechanics:**
+- **Inherent AP (long-barrel only):** every hit rolls a **through-armor critical** (reuse the `OSGAAMHandler` /
+  `ACAPHandler` pattern). AP is velocity-driven, so it is **LOST in barrel-shed mode** (see below).
+- **Barrel wear (the erosion identity):** the barrel fires **stably for the first 9–12 shots per battle** (≈ 3–4
+  tons of ammo at 3/ton). **Past that threshold**, the weapon takes a flat **+2 to-hit penalty (does NOT stack)** and
+  each further shot **jams on a natural-2 attack roll**. **Every jam then adds a cumulative +1 penalty; when that jam
+  stack reaches +5 the weapon is *scrapped* (报废) — permanently inoperable for the rest of the battle.** Reliable in
+  a burst; degrades and can self-destruct under sustained spam.
+- **Barrel-shed mode (player escape hatch — ONE-WAY):** at any point the player may **jettison the rail barrel**.
+  Irreversible for the battle: range collapses to **min 0 / S 4 / M 6 / L 9 / E 12** and damage drops to **25**, in
+  exchange for a **fully stable weapon — no barrel-wear, no +2, no jam, no degradation stack**. Turns the long-range
+  apex into a reliable short-range 25-dmg brawler — the way to keep fighting once the barrel is spent, or to pre-empt
+  the wear spiral. **Inherent AP is LOST** (velocity-driven — the coil-only shot no longer reaches the AP threshold;
+  it deals ordinary 25 damage). The weapon can still crit-explode.
+- **Flat damage / no falloff:** full damage at every bracket in both configs (30 long-barrel / 25 shed).
+- **Single munition:** only the AP kinetic slug.
 
-**Open (before speccing):** confirm it sits as the Advance apex (vs promoting to Experimental); mild erosion vs
-zero (zero would collapse it into EM Lance — prefer mild); whether raw Railgun/Railcannon still get built at all.
+**Open (minor, before coding):** exact stable threshold within **9–12**; whether the flat +2 counts toward the +5
+scrap total or is separate (**default: separate — +5 is the jam stack alone**); **jam-trigger math** — a natural-2 is
+only ~2.78%/shot, so reaching +5 jams is a long-tail event; if scrapping should be a real risk, widen the trigger
+(e.g. natural 2–3, or a wear-scaling jam chance). Barrel-shed ranges (4/6/9 base) still tunable; BV formula; ammo-enum name.
 
 ### Related decisions this session (their own write-ups still pending)
 - **HVAC repurpose (§2 redesign):** stop being the explosive-gamble aero AC; become a **long-barrel precision
@@ -645,7 +667,7 @@ zero (zero would collapse it into EM Lance — prefer mild); whether raw Railgun
 - **Railgun / Railcannon:** a *more violent* future direction (real-rail Lorentz accelerator, not a coilgun).
   Because its defining flaw is **self-erosion of the rails** — the antithesis of OS's maintainability creed —
   it is **Experimental**, or a deliberate rupture of the OS identity. **OS's preferred answer is the
-  Coil-Augmented Railgun hybrid (see §8 successor note), which engineers the erosion away at Advance tier**; the
+  Coil Augmented Railgun hybrid (see §8 successor note), which engineers the erosion away at Advance tier**; the
   raw Railgun/Railcannon may end up narrative-only. Under analysis; not yet specced.
 
 ---
