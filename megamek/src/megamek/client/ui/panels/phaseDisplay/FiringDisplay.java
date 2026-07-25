@@ -89,6 +89,7 @@ import megamek.common.turns.TriggerBPodTurn;
 import megamek.common.units.*;
 import megamek.common.weapons.Weapon;
 import megamek.common.weapons.capitalWeapons.CapitalMissileWeapon;
+import megamek.common.weapons.gaussRifles.outerSphere.OSCoilAugmentedRailgun;
 import megamek.common.weapons.mortars.VehicularGrenadeLauncherWeapon;
 import megamek.logging.MMLogger;
 
@@ -611,6 +612,21 @@ public class FiringDisplay extends AttackPhaseDisplay implements ListSelectionLi
         // Do nothing we have no unit selected or no weapon selected or if the weapon doesn't have modes
         if (currentEntity() == null || weaponMounted == null || !weaponMounted.hasModes()) {
             return;
+        }
+
+        // Coil Augmented Railgun: switching to the one-way "Shed Barrel" mode jettisons the rail barrel — a
+        // destructive, irreversible choice (it commits permanently once the weapon fires in this mode). Warn first.
+        if ((weaponMounted.getType() instanceof OSCoilAugmentedRailgun)
+              && !weaponMounted.isRailgunBarrelShed()
+              && (weaponMounted.curMode() != null)
+              && !OSCoilAugmentedRailgun.MODE_SHED.equals(weaponMounted.curMode().getName())) {
+            int confirm = JOptionPane.showConfirmDialog(clientgui.getFrame(),
+                  Messages.getString("FiringDisplay.shedBarrel.message"),
+                  Messages.getString("FiringDisplay.shedBarrel.title"),
+                  JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            if (confirm != JOptionPane.YES_OPTION) {
+                return;
+            }
         }
 
         // Aeros cannot switch modes under standard rules

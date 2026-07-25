@@ -15,6 +15,8 @@ import megamek.common.ToHitData;
 import megamek.common.actions.WeaponAttackAction;
 import megamek.common.game.Game;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.units.Entity;
+import megamek.common.units.IBuilding;
 import megamek.common.weapons.gaussRifles.outerSphere.OSCoilAugmentedRailgun;
 import megamek.common.weapons.handlers.ac.ACAPHandler;
 import megamek.server.totalWarfare.TWGameManager;
@@ -67,24 +69,61 @@ public class OSCoilAugmentedRailgunHandler extends ACAPHandler {
             return true;
         }
 
+        boolean worn = !shed && (weapon.getRailgunShotsFired() >= OSCoilAugmentedRailgun.STABLE_SHOTS);
+        if (worn) {
+            // Firing on a worn barrel: surface the accumulated to-hit penalty (the modifier itself is added
+            // in ComputeToHit) in the firing-phase report.
+            Report wear = new Report(1273);
+            wear.subject = subjectId;
+            wear.indent();
+            wear.add(2 + weapon.getRailgunDegradation());
+            vPhaseReport.addElement(wear);
+        }
+
         boolean jammed = false;
-        if (!shed && (weapon.getRailgunShotsFired() >= OSCoilAugmentedRailgun.STABLE_SHOTS)
-              && (roll.getIntValue() == 2)) {
+        if (worn && (roll.getIntValue() == 2)) {
             // Barrel worn past its stable life: this shot jams and degrades the rails.
             weapon.setJammed(true);
             weapon.incrementRailgunDegradation();
-            Report r = new Report(3162);
-            r.subject = subjectId;
-            r.choose(false);
-            vPhaseReport.addElement(r);
+
+            Report jam = new Report(1270);
+            jam.subject = subjectId;
+            jam.indent();
+            vPhaseReport.addElement(jam);
+
+            Report degr = new Report(1271);
+            degr.subject = subjectId;
+            degr.indent(2);
+            degr.add(weapon.getRailgunDegradation());
+            degr.add(OSCoilAugmentedRailgun.SCRAP_AT);
+            vPhaseReport.addElement(degr);
+
             if (weapon.getRailgunDegradation() >= OSCoilAugmentedRailgun.SCRAP_AT) {
                 // Barrel scrapped — permanently inoperable for the rest of the battle.
                 weapon.setDestroyed(true);
+                Report scrap = new Report(1272);
+                scrap.subject = subjectId;
+                scrap.indent(2);
+                vPhaseReport.addElement(scrap);
             }
             jammed = true;
         }
 
         weapon.incrementRailgunShotsFired();
         return jammed;
+    }
+
+    @Override
+    protected void handleEntityDamage(Entity entityTarget, Vector<Report> vPhaseReport, IBuilding bldg, int hits,
+          int nCluster, int bldgAbsorbs) {
+        // Long-barrel AP slug: flavor the through-armor penetration (the actual crit is rolled inside
+        // gameManager.damageEntity via the inherited ACAPHandler AP handling). No flavor once the barrel is shed.
+        if (!OSCoilAugmentedRailgun.isBarrelShed(weapon)) {
+            Report ap = new Report(1274);
+            ap.subject = subjectId;
+            ap.indent(2);
+            vPhaseReport.addElement(ap);
+        }
+        super.handleEntityDamage(entityTarget, vPhaseReport, bldg, hits, nCluster, bldgAbsorbs);
     }
 }
