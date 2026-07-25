@@ -213,6 +213,8 @@ public class AmmoType extends EquipmentType {
         GAUSS_AP_OS(126, "AP Gauss Rifle (OS)", AmmoCategory.Ballistic),
         GAUSS_MAGSHOT_OS(127, "Magshot Gauss Rifle (OS)", AmmoCategory.Ballistic),
         GAUSS_LBX_OS(128, "LB-X Gauss Rifle (OS)", AmmoCategory.Ballistic),
+        // Coil Augmented Railgun (Advance apex) - dedicated single-slug AP kinetic ammo.
+        RAILGUN_OS(138, "Coil Augmented Railgun (OS)", AmmoCategory.Ballistic),
         HAG_OS(129, "Hyper-Assault Gauss (OS)", AmmoCategory.Ballistic),
         // OS Machine Gun families - new enums so mixed tech can show "(OS)" suffix.
         // MG_OS / MG_LIGHT_OS / MG_HEAVY_OS are single-shot (no rapid-fire heat coupling like Ultra/Rotary AC).
@@ -3229,6 +3231,7 @@ public class AmmoType extends EquipmentType {
         EquipmentType.addType(AmmoType.createOSHeavyGaussAmmo());
         EquipmentType.addType(AmmoType.createOSImproveHeavyGaussAmmo());
         EquipmentType.addType(AmmoType.createOSSuperHeavyGaussAmmo());
+        EquipmentType.addType(AmmoType.createOSCoilAugmentedRailgunAmmo());
         EquipmentType.addType(AmmoType.createOSAPGaussAmmo());
         EquipmentType.addType(AmmoType.createOSMagshotGaussAmmo());
         EquipmentType.addType(AmmoType.createOSLBXGauss15Ammo());
@@ -12838,6 +12841,11 @@ public class AmmoType extends EquipmentType {
 
     private static AmmoType createOSSuperHeavyGaussAmmo() {
         return makeOSGaussAmmo("Super-Heavy Gauss Rifle", "OSSuperHeavyGaussAmmo", AmmoTypeEnum.GAUSS_HEAVY_OS, 30, 30, 4, 52, 40000);
+    }
+
+    // Coil Augmented Railgun - dedicated single-slug AP ammo (inert; 3 shots/ton).
+    private static AmmoType createOSCoilAugmentedRailgunAmmo() {
+        return makeOSGaussAmmo("Coil Augmented Railgun", "OSCoilAugmentedRailgunAmmo", AmmoTypeEnum.RAILGUN_OS, 30, 30, 3, 55, 45000);
     }
 
     // Specialty

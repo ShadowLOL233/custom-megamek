@@ -908,6 +908,15 @@ public class ComputeToHit {
             toHit.addModifier(2, ammoType.getSubMunitionName() + Messages.getString("WeaponAttackAction.AmmoMod"));
         }
 
+        // Coil Augmented Railgun barrel wear: past its stable shot count the worn barrel adds a flat +2 plus
+        // the accumulated jam-degradation stack. No penalty once the barrel has been shed.
+        if ((weapon.getType() instanceof megamek.common.weapons.gaussRifles.outerSphere.OSCoilAugmentedRailgun)
+              && !megamek.common.weapons.gaussRifles.outerSphere.OSCoilAugmentedRailgun.isBarrelShed(weapon)
+              && (weapon.getRailgunShotsFired()
+                    >= megamek.common.weapons.gaussRifles.outerSphere.OSCoilAugmentedRailgun.STABLE_SHOTS)) {
+            toHit.addModifier(2 + weapon.getRailgunDegradation(), "Coil Augmented Railgun barrel wear");
+        }
+
         // Heat Seeking Missiles
         if (bHeatSeeking) {
             Hex hexTarget = game.getHexOf(target);

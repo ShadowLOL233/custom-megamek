@@ -84,6 +84,10 @@ public class Mounted<T extends EquipmentType> implements Serializable, RoundUpda
     private boolean useless = false;
     private boolean fired = false; // Only true for used OS stuff and TSEMP.
     private int hyperLaserCooldown = 0; // Turns remaining before Hyper Laser can fire again
+    // Coil Augmented Railgun per-battle state (see OSCoilAugmentedRailgunHandler):
+    private int railgunShotsFired = 0; // shots fired this battle; drives barrel wear past the stable count
+    private int railgunDegradation = 0; // stacking +1-per-jam to-hit penalty; weapon scrapped at 5
+    private boolean railgunBarrelShed = false; // one-way: rail barrel jettisoned (short range, 25 dmg, no AP/wear)
     private boolean tsempDowntime = false; // Needed for "every other turn" TSEMP.
     private boolean rapidFire = false; // MGs in rapid-fire mode
     private boolean hotLoaded = false; // Hot loading for ammoType
@@ -660,6 +664,38 @@ public class Mounted<T extends EquipmentType> implements Serializable, RoundUpda
      */
     public void setHyperLaserCooldown(int turns) {
         this.hyperLaserCooldown = turns;
+    }
+
+    // --- Coil Augmented Railgun per-battle barrel state ---
+
+    /** @return shots fired by this Coil Augmented Railgun so far this battle (drives barrel wear). */
+    public int getRailgunShotsFired() {
+        return railgunShotsFired;
+    }
+
+    /** Increments this Coil Augmented Railgun's per-battle shot counter by one. */
+    public void incrementRailgunShotsFired() {
+        railgunShotsFired++;
+    }
+
+    /** @return the stacking barrel-wear to-hit penalty (+1 per jam); at 5 the weapon is scrapped. */
+    public int getRailgunDegradation() {
+        return railgunDegradation;
+    }
+
+    /** Adds one to the barrel-wear degradation stack (called on each jam). */
+    public void incrementRailgunDegradation() {
+        railgunDegradation++;
+    }
+
+    /** @return {@code true} once the rail barrel has been jettisoned (one-way, short-range stable mode). */
+    public boolean isRailgunBarrelShed() {
+        return railgunBarrelShed;
+    }
+
+    /** Jettisons the rail barrel. Irreversible for the battle. */
+    public void setRailgunBarrelShed(boolean shed) {
+        this.railgunBarrelShed = shed;
     }
 
     public boolean isUsedThisRound() {
