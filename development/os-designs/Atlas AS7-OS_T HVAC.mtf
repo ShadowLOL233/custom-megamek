@@ -42,7 +42,7 @@ RTR armor:10
 RTC armor:15
 
 Weapons:8
-Improve HVAC/18, Center Torso
+Improve HVAC/16, Center Torso
 Improve LRM 20, Left Torso
 Improve PPC, Right Arm
 Improve PPC, Right Arm
@@ -96,16 +96,16 @@ OSLRM20Ammo
 Right Torso:
 Fusion Engine
 Fusion Engine
-OSImproveHVAC18
-OSImproveHVAC18
-OSImproveHVAC18
-OSImproveHVAC18
-OSImproveHVAC18
-OSImproveHVAC18
-OSImproveHVAC18
-OS Ammo HVAC/18
-OS Ammo HVAC/18
-OS Ammo HVAC/18
+OSImproveHVAC16
+OSImproveHVAC16
+OSImproveHVAC16
+OSImproveHVAC16
+OSImproveHVAC16
+OSImproveHVAC16
+OSImproveHVAC16
+OS Ammo HVAC/16
+OS Ammo HVAC/16
+OS Ammo HVAC/16
 
 Center Torso:
 Fusion Engine
@@ -118,8 +118,8 @@ Gyro
 Fusion Engine
 Fusion Engine
 Fusion Engine
-OSImproveHVAC18
-OSImproveHVAC18
+OSImproveHVAC16
+OS Ammo HVAC/16
 
 Head:
 Life Support

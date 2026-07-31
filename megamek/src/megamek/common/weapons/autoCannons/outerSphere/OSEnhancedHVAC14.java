@@ -16,9 +16,10 @@ import megamek.common.enums.TechRating;
 import megamek.common.equipment.Mounted;
 
 /**
- * Outer Sphere Enhanced HVAC/14 — Enhanced-tier high-velocity autocannon (heavy calibers only).
- * The compact refinement of the Improve HVAC: same firepower/reach, but lighter, fewer crits and −1 heat
- * (refined electrothermal). Aerospace-capable (AV = damage, maxRange = extreme); electromagnetic-chemical action — no cook-off.
+ * Outer Sphere Enhanced HVAC/14 — Enhanced-tier refinement of the Improve precision HVAC: same firepower,
+ * reach and range-scaling accuracy (medium/long −1, extreme −2), but −2 t, −2 crit and −1 heat. Shares the Improve
+ * BV (damage/range/accuracy are identical; the lighter/cooler build is the mech-level advantage).
+ * Aerospace-capable (AV = damage, maxRange = extreme); electromagnetic-chemical action — no cook-off.
  */
 public class OSEnhancedHVAC14 extends OSHVACWeapon {
     @Serial
@@ -34,13 +35,13 @@ public class OSEnhancedHVAC14 extends OSHVACWeapon {
         heat = 4;
         damage = 14;
         rackSize = 14;
-        shortRange = 6;
+        shortRange = 7;
         mediumRange = 13;
         longRange = 20;
-        extremeRange = 26;
+        extremeRange = 27;
         tonnage = 10.0;
         criticalSlots = 6;
-        bv = 230;
+        bv = 225;
         cost = 600000;
         shortAV = 14;
         medAV = 14;

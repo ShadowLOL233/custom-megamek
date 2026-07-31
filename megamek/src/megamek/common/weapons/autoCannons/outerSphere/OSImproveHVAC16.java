@@ -16,9 +16,10 @@ import megamek.common.enums.TechRating;
 import megamek.common.equipment.Mounted;
 
 /**
- * Outer Sphere Improve HVAC/16 — Improve-tier high-velocity autocannon (heavy calibers only).
- * The heavier, earlier HVAC pattern; the Enhanced tier is the lighter/cooler refinement of this.
- * Aerospace-capable (AV = damage across all brackets, maxRange = extreme); electromagnetic-chemical action — no cook-off.
+ * Outer Sphere Improve HVAC/16 — Improve-tier long-barrel precision anti-armor autocannon. Single-slug,
+ * high-velocity; the to-hit bonus grows with range (medium/long −1, extreme −2, applied in ComputeToHit). Pays a
+ * mech-level tax in heavy tonnage, high crit count and low ammo/ton, and carries a high BV for the accuracy.
+ * Aerospace-capable (AV = damage across all brackets, maxRange = extreme); electromagnetic-chemical — no cook-off.
  */
 public class OSImproveHVAC16 extends OSHVACWeapon {
     @Serial
@@ -37,11 +38,11 @@ public class OSImproveHVAC16 extends OSHVACWeapon {
         shortRange = 6;
         mediumRange = 12;
         longRange = 19;
-        extremeRange = 25;
+        extremeRange = 26;
         tonnage = 13.0;
         criticalSlots = 8;
-        bv = 265;
-        cost = 540000;
+        bv = 255;
+        cost = 560000;
         shortAV = 16;
         medAV = 16;
         longAV = 16;

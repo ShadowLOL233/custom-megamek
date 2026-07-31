@@ -1563,6 +1563,20 @@ public class ComputeToHit {
             }
         }
 
+        // Precision HVAC (OS): a long-barrel high-velocity precision AC whose to-hit bonus grows with range
+        // as the long barrel walks concentrated slugs onto distant targets: -1 at medium and long range, -2
+        // at extreme range (a milder, longer-reaching cousin of the Burst-Fire gradient). Priced into the BV.
+        if (target != null
+              && weaponType instanceof megamek.common.weapons.autoCannons.outerSphere.OSHVACWeapon) {
+            int nRange = ae.getPosition().distance(target.getPosition());
+            int[] nRanges = weaponType.getRanges(weapon, ammo);
+            if (nRange > nRanges[RangeType.RANGE_LONG]) {
+                toHit.addModifier(-2, Messages.getString("WeaponAttackAction.WeaponMod"));
+            } else if (nRange > nRanges[RangeType.RANGE_SHORT]) {
+                toHit.addModifier(-1, Messages.getString("WeaponAttackAction.WeaponMod"));
+            }
+        }
+
         // Rocket-Propelled AC ammo (OS): +1 to-hit at short range, -1 at long range and beyond. A close-in
         // accuracy penalty traded for reach (this ammo's range bands are already extended ~20%).
         if (target != null && (ammoType != null)

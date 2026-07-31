@@ -229,7 +229,16 @@ public class AmmoType extends EquipmentType {
         AC_RF(136, "Rapid-Fire Autocannon", AmmoCategory.Ballistic),
         // OS standard AC - single-shot, so a dedicated enum is safe (no engine multi-shot coupling),
         // matching its AC_IMP_OS Improve-AC sibling. Ultra/Rotary deliberately stay on canon enums above.
-        AC_STD_OS(137, "Standard Autocannon (OS)", AmmoCategory.Ballistic);
+        AC_STD_OS(137, "Standard Autocannon (OS)", AmmoCategory.Ballistic),
+        // OS HVAC repurposed to a long-barrel precision anti-armor AC. Dedicated enum so the new calibers
+        // 10/12/14/16 do not cross-load with the canon HYPER_VELOCITY HVAC 2/5/10 (esp. the shared caliber
+        // 10). Single-slug (uses ACWeaponHandler, no cook-off handler keyed to HYPER_VELOCITY), so a custom
+        // enum is behaviourally safe — matches the AC_STD_OS "behaviour-simple -> dedicated *_OS" rule.
+        HVAC_OS(139, "High-Velocity Autocannon (OS)", AmmoCategory.Ballistic),
+        // Electromagnetic Lance (Advance) — a power-gated coil supergun. Dedicated enum for its full-power
+        // kinetic slug plus throttled-down payload munitions (Flak/Flechette), whose loaded round selects the
+        // range/damage profile. See OSElectromagneticLance and OS_TECHBASE_DEVELOPMENT_PLAN §8.
+        EM_LANCE_OS(140, "Electromagnetic Lance (OS)", AmmoCategory.Ballistic);
 
         private static final Map<Integer, AmmoTypeEnum> INDEX_LOOKUP = new HashMap<>();
 
@@ -2941,11 +2950,11 @@ public class AmmoType extends EquipmentType {
         EquipmentType.addType(AmmoType.createISHVAC10Ammo());
         EquipmentType.addType(AmmoType.createISHVAC5Ammo());
         EquipmentType.addType(AmmoType.createISHVAC2Ammo());
-        // Outer Sphere Enhanced HVAC ammo (heavy calibers 12/14/16/18; HYPER_VELOCITY)
-        EquipmentType.addType(createOSHVACAmmo(12, 8, 24, 24000));
-        EquipmentType.addType(createOSHVACAmmo(14, 7, 28, 28000));
-        EquipmentType.addType(createOSHVACAmmo(16, 6, 32, 32000));
-        EquipmentType.addType(createOSHVACAmmo(18, 5, 36, 36000));
+        // Outer Sphere precision HVAC ammo (calibers 10/12/14/16; dedicated HVAC_OS enum; low shots/ton)
+        EquipmentType.addType(createOSHVACAmmo(10, 7, 20, 20000));
+        EquipmentType.addType(createOSHVACAmmo(12, 6, 24, 24000));
+        EquipmentType.addType(createOSHVACAmmo(14, 5, 28, 28000));
+        EquipmentType.addType(createOSHVACAmmo(16, 4, 32, 32000));
         EquipmentType.addType(AmmoType.createISMekTaserAmmo());
         EquipmentType.addType(AmmoType.createISAC2pAmmo());
         EquipmentType.addType(AmmoType.createISAC5pAmmo());
@@ -3232,6 +3241,12 @@ public class AmmoType extends EquipmentType {
         EquipmentType.addType(AmmoType.createOSImproveHeavyGaussAmmo());
         EquipmentType.addType(AmmoType.createOSSuperHeavyGaussAmmo());
         EquipmentType.addType(AmmoType.createOSCoilAugmentedRailgunAmmo());
+        EquipmentType.addType(AmmoType.createOSEMLanceSlugAmmo());
+        EquipmentType.addType(AmmoType.createOSEMLanceFlakAmmo());
+        EquipmentType.addType(AmmoType.createOSEMLanceFlechetteAmmo());
+        EquipmentType.addType(AmmoType.createOSEMLanceAPDSAmmo());
+        EquipmentType.addType(AmmoType.createOSEMLancePrecisionAmmo());
+        EquipmentType.addType(AmmoType.createOSEMLanceIncendiaryAmmo());
         EquipmentType.addType(AmmoType.createOSAPGaussAmmo());
         EquipmentType.addType(AmmoType.createOSMagshotGaussAmmo());
         EquipmentType.addType(AmmoType.createOSLBXGauss15Ammo());
@@ -5139,9 +5154,9 @@ public class AmmoType extends EquipmentType {
         return ammo;
     }
 
-    // Outer Sphere Enhanced HVAC ammo — HYPER_VELOCITY rounds for the OS-new heavy calibers (12/14/16/18).
-    // Reuses the canon HYPER_VELOCITY enum (the HVAC handler is keyed to it); new calibers isolate it from
-    // the canon HVAC 2/5/10 by rackSize.
+    // Outer Sphere precision HVAC ammo — dedicated HVAC_OS rounds for the repurposed precision AC (calibers
+    // 10/12/14/16). Uses its own enum (not canon HYPER_VELOCITY) so caliber 10 does not cross-load with the
+    // canon HVAC/10; low shots/ton is part of the weapon's mechanical tax. Single-slug (no cook-off).
     private static AmmoType createOSHVACAmmo(int rackSize, int shots, int bv, int cost) {
         AmmoType ammo = new AmmoType();
         ammo.name = "HVAC/" + rackSize + " Ammo";
@@ -5150,12 +5165,12 @@ public class AmmoType extends EquipmentType {
         ammo.addLookupName("OSHVAC" + rackSize + " Ammo");
         ammo.damagePerShot = 1;
         ammo.rackSize = rackSize;
-        ammo.ammoType = AmmoTypeEnum.HYPER_VELOCITY;
+        ammo.ammoType = AmmoTypeEnum.HVAC_OS;
         ammo.shots = shots;
         ammo.bv = bv;
         ammo.cost = cost;
         // Intro 2900 so the Improve-tier OS HVAC (2900) has ammo from the start; the Enhanced tier (3000)
-        // shares the same HYPER_VELOCITY bin (same rackSize), so one ammo line per caliber covers both.
+        // shares the same HVAC_OS bin (same rackSize), so one ammo line per caliber covers both.
         ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
@@ -12846,6 +12861,61 @@ public class AmmoType extends EquipmentType {
     // Coil Augmented Railgun - dedicated single-slug AP ammo (inert; 3 shots/ton).
     private static AmmoType createOSCoilAugmentedRailgunAmmo() {
         return makeOSGaussAmmo("Coil Augmented Railgun", "OSCoilAugmentedRailgunAmmo", AmmoTypeEnum.RAILGUN_OS, 30, 30, 3, 55, 45000);
+    }
+
+    // Electromagnetic Lance (Advance) - power-gated coil supergun. One ammo per munition on the dedicated
+    // EM_LANCE_OS enum; the loaded round selects the range/damage profile (see OSElectromagneticLance). The
+    // full-power kinetic slug's inherent AP is applied by the handler, so no toHitModifier is set here.
+    private static AmmoType makeOSEMLanceAmmo(String variant, String internal, EnumSet<Munitions> munitions,
+          int shots, int bv, long cost) {
+        AmmoType ammo = new AmmoType();
+        ammo.name = "EM Lance " + variant + " Ammo";
+        ammo.shortName = "EM Lance " + variant;
+        ammo.setInternalName(internal);
+        ammo.addLookupName("OS EM Lance " + variant + " Ammo");
+        ammo.damagePerShot = 20;
+        ammo.rackSize = 0;
+        ammo.ammoType = AmmoTypeEnum.EM_LANCE_OS;
+        ammo.munitionType = munitions;
+        ammo.shots = shots;
+        ammo.bv = bv;
+        ammo.cost = cost;
+        ammo.explosive = false;
+        ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setIntroLevel(false)
+              .setUnofficial(false)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
+              .setISAdvancement(3060, 3070, 3080, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        return ammo;
+    }
+
+    private static AmmoType createOSEMLanceSlugAmmo() {
+        return makeOSEMLanceAmmo("Slug", "OSEMLanceSlugAmmo", EnumSet.of(Munitions.M_STANDARD), 4, 30, 40000);
+    }
+
+    private static AmmoType createOSEMLanceFlakAmmo() {
+        return makeOSEMLanceAmmo("Flak", "OSEMLanceFlakAmmo", EnumSet.of(Munitions.M_FLAK), 4, 30, 42000);
+    }
+
+    private static AmmoType createOSEMLanceFlechetteAmmo() {
+        return makeOSEMLanceAmmo("Flechette", "OSEMLanceFlechetteAmmo", EnumSet.of(Munitions.M_FLECHETTE), 4, 24, 42000);
+    }
+
+    private static AmmoType createOSEMLanceAPDSAmmo() {
+        return makeOSEMLanceAmmo("APDS", "OSEMLanceAPDSAmmo", EnumSet.of(Munitions.M_ARMOR_PIERCING), 5, 28, 48000);
+    }
+
+    private static AmmoType createOSEMLancePrecisionAmmo() {
+        return makeOSEMLanceAmmo("Precision", "OSEMLancePrecisionAmmo", EnumSet.of(Munitions.M_PRECISION), 3, 30, 60000);
+    }
+
+    private static AmmoType createOSEMLanceIncendiaryAmmo() {
+        return makeOSEMLanceAmmo("Incendiary", "OSEMLanceIncendiaryAmmo", EnumSet.of(Munitions.M_INCENDIARY_AC), 4, 20, 40000);
     }
 
     // Specialty

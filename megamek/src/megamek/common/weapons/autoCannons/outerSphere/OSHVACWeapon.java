@@ -13,6 +13,7 @@ import java.io.Serial;
 import megamek.common.ToHitData;
 import megamek.common.actions.WeaponAttackAction;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.AmmoType;
 import megamek.common.game.Game;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.weapons.autoCannons.HVACWeapon;
@@ -21,15 +22,18 @@ import megamek.common.weapons.handlers.ac.ACWeaponHandler;
 import megamek.server.totalWarfare.TWGameManager;
 
 /**
- * Base class for the Outer Sphere HVAC line — electromagnetic-chemical autocannons.
+ * Base class for the Outer Sphere HVAC line — a long-barrel precision anti-armor autocannon.
  *
- * <p>The Inner Sphere HVAC cooks off: its volatile, high-pressure chemical breech detonates on a
- * critical hit and can rupture on a bad firing cycle. The OS pattern is a fundamentally different
- * weapon — a stable chemical charge accelerated by an electromagnetic stage — so it has no such
- * catastrophic-detonation failure mode. Accordingly these weapons are NOT treated as explosive on a
- * critical hit ({@code explosive = false}, {@code explosionDamage = 0}) and use the plain autocannon
- * attack handler instead of {@link HVACWeapon}'s cook-off handler, so a natural-2 attack roll no
- * longer jams-and-explodes the weapon.
+ * <p>Unlike the Inner Sphere HVAC (a volatile chemical breech that cooks off on a critical hit), the OS
+ * pattern is a stable chemical charge accelerated by an electromagnetic long barrel. It has no
+ * catastrophic-detonation failure mode ({@code explosive = false}, {@code explosionDamage = 0}) and uses
+ * the plain autocannon attack handler instead of {@link HVACWeapon}'s cook-off handler.
+ *
+ * <p>The OS line is repurposed as a precision piece: the long, high-velocity barrel walks concentrated
+ * single slugs onto distant targets, giving a to-hit bonus that grows with range (medium/long −1, extreme −2,
+ * applied in {@code ComputeToHit}). It is distinct from LB-X (single-slug, not cluster) and pays a
+ * mech-level tax in heavy tonnage, high crit count, low ammo/ton and a high BV. Aerospace-capable
+ * (AV = damage, maxRange = extreme). Ammo lives in the dedicated {@link AmmoType.AmmoTypeEnum#HVAC_OS} bin.
  */
 public abstract class OSHVACWeapon extends HVACWeapon {
     @Serial
@@ -40,6 +44,8 @@ public abstract class OSHVACWeapon extends HVACWeapon {
         // Electromagnetic-chemical design: no sympathetic detonation / cook-off.
         explosive = false;
         explosionDamage = 0;
+        // Dedicated OS precision-HVAC ammo bin (isolates caliber 10 from the canon HYPER_VELOCITY HVAC/10).
+        ammoType = AmmoType.AmmoTypeEnum.HVAC_OS;
     }
 
     @Override

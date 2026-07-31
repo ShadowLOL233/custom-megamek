@@ -1596,15 +1596,15 @@ public class WeaponType extends EquipmentType {
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSUltraLB5XAC());
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSUltraLB10XAC());
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSUltraLB20XAC());
-        // OS Enhanced HVAC (Enhanced-tier high-velocity AC; OS-new heavy calibers 12/14/16/18)
+        // OS precision HVAC (long-barrel precision anti-armor AC; calibers 10/12/14/16)
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSImproveHVAC10());
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSImproveHVAC12());
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSImproveHVAC14());
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSImproveHVAC16());
-        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSImproveHVAC18());
+        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSEnhancedHVAC10());
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSEnhancedHVAC12());
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSEnhancedHVAC14());
         EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSEnhancedHVAC16());
-        EquipmentType.addType(new megamek.common.weapons.autoCannons.outerSphere.OSEnhancedHVAC18());
 
         // Outer Sphere (OS) Gauss Rifles
         EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSGaussRifle());
@@ -1617,6 +1617,7 @@ public class WeaponType extends EquipmentType {
         EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSEnhancedHeavyGauss());
         EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSSuperHeavyGauss());
         EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSCoilAugmentedRailgun());
+        EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSElectromagneticLance());
         EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSAPGauss());
         EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSMagshotGauss());
         EquipmentType.addType(new megamek.common.weapons.gaussRifles.outerSphere.OSHAG20());
