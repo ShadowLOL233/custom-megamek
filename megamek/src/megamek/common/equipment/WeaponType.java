@@ -122,6 +122,8 @@ import megamek.common.weapons.c3.ISC3MBS;
 import megamek.common.weapons.c3.OSC3Node;
 import megamek.common.weapons.c3.OSDemonHackingSystem;
 import megamek.common.weapons.c3.OSImproveC3Node;
+import megamek.common.weapons.c3.OSKestrelDesignator;
+import megamek.common.weapons.c3.OSShrikeDesignator;
 import megamek.common.weapons.c3.ISC3RemoteSensorLauncher;
 import megamek.common.weapons.capitalWeapons.*;
 import megamek.common.weapons.capitalWeapons.naval.*;
@@ -2095,6 +2097,8 @@ public class WeaponType extends EquipmentType {
         EquipmentType.addType(new OSC3Node());
         EquipmentType.addType(new OSImproveC3Node());
         EquipmentType.addType(new OSDemonHackingSystem());
+        EquipmentType.addType(new OSKestrelDesignator());
+        EquipmentType.addType(new OSShrikeDesignator());
         EquipmentType.addType(new CLLightTAG());
         EquipmentType.addType(new CLTAG());
         EquipmentType.addType(new CLBALightTAG());

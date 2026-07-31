@@ -147,5 +147,11 @@ public enum WeaponTypeFlag implements EquipmentFlag {
     HEAVY_LASER,
 
     /** OS Demon Aggressive Hacking System (dev plan §9) — a crit-capable TAG-like offensive-EW designator. */
-    F_OS_DEMON_HACKING
+    F_OS_DEMON_HACKING,
+
+    /** OS Kestrel Network Target Designator (dev plan §9) — a C3-network close-range target-data node. */
+    F_OS_KESTREL_DESIGNATOR,
+
+    /** OS Shrike Combat Designator (dev plan §9) — a crit-capable TAG that grants the C3 network a to-hit bonus. */
+    F_OS_SHRIKE_DESIGNATOR
 }

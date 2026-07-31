@@ -19,7 +19,7 @@ Quick index — jump to a section instead of scanning the whole file.
 - **Section 6 — Naming & tier-reclassification work items** [active]: §6.4 engine/structure/armor Advance→Enhanced rename **✅ DONE 2026-07-06**; subsections 6.3 & 6.5 shelved (see below).
 - **Section 7 — Planned: BF & RF AC variants** [active]: being reclassified to **Inner Sphere** (not OS).
 - **Section 8 — Electromagnetic Lance & kinetic apex**: Coil Augmented Railgun **✅ IMPLEMENTED**; Electromagnetic Lance (power-gated coilgun supergun) **✅ IMPLEMENTED 2026-07-31 — 6 munitions**; also holds the (now ✅ done) HVAC-repurpose & Heavy-missile-Ultra decisions.
-- **Section 9 — OS Modular Electronics: BCS & CCS** [active/DESIGN]: two systems — **BCS** (Battle Computer System: info/command/EW, Tacticon B-2500 lineage, modular track + Advance specialized cores C-X280/Raven/G-X100) and **CCS** (Combat Computer System: single-mech fire control, C-2500 core + weapon-type modules + Composite). Dissolves canon AES⊥TC / AES⊥MASC / standalone-C3 into a modular ecosystem balanced by a two-core tonnage tax.
+- **Section 9 — OS Modular Electronics: BCS & CCS** [active/DESIGN]: two systems — **BCS** (Battle Computer System: info/command/EW, Tacticon B-2500 lineage, modular track + Advance specialized cores C-X280/Raven/G-X100) and **CCS** (Combat Computer System: single-mech fire control, C-2500 core + weapon-type modules + Composite). Dissolves canon AES⊥TC / AES⊥MASC / standalone-C3 into a modular ecosystem balanced by a two-core tonnage tax. **§9.6** adds a C3-network target-designator sub-family (Kestrel / Shrike / Lodestar).
 
 Shelved ideas are parked in **[OS_SHELVED_IDEAS.md](OS_SHELVED_IDEAS.md)**. Splitting this plan into
 per-topic files (weapons / units / equipment) is **deferred** until it grows further.
@@ -769,6 +769,12 @@ coordination roll (`Entity.newRound` → `getBcsCoordinationRoll`) is now surfac
   (`getTCPInitBonus` is gated on `MD_TRIPLE_CORE_PROCESSOR` + VDNI/BVDNI), so a normal-pilot B-2500 gives +0 on non-12
   turns and only the new +2 on a 12. Making the constant +1 grant standalone is a separate follow-up.
 
+**Added — Network Target Designators (Kestrel / Shrike / Lodestar) — DESIGN + stubs (2026-07-31):** a new
+BCS-adjacent C3-network designator sub-family (full design in §9.6). **Kestrel NTD** (Improve) and **Shrike
+Combat Designator** (Enhanced) are defined as TAG-subclass stubs, flagged (`F_OS_KESTREL_DESIGNATOR` /
+`F_OS_SHRIKE_DESIGNATOR`), and registered — compile-clean, same pattern as Demon. **Lodestar Guidance Beacon**
+(a Narc-beacon munition on the OS Narc / Munin launcher) is designed but not yet coded. **All mechanics TODO** (§9.5).
+
 ### 9.0 Architecture & philosophy
 Two systems, each needing its **own core**; a mech may mount both, but two cores is a heavy tonnage/crit tax —
 that tax (NOT a per-attack arbitration rule) is the balancer.
@@ -885,6 +891,73 @@ Mechanics-remaining (best implemented test-driven; all UNTESTED until the unifie
 - Exact per-module BV factors; Enhanced Combat Computer revival + rename. ~~optional Round-Report line for the
   coordination roll~~ ✅ DONE 2026-07-23 (initiative-report line, double-blind aware).
 - **B-2500 constant +1 initiative** currently only applies through the TCP-implant path — make it grant standalone.
+- **Network Target Designators (§9.6) — all mechanics:** Kestrel network −1 direct-fire injection + per-turn
+  designation state; Kestrel/Lodestar LRM-indirect enable; Shrike −1/−3 crit + per-turn network to-hit state;
+  Lodestar beacon pod + target-side "beaconed-by-network" flag. Confirm Lodestar tier/params and the
+  designator-vs-BCS-cap stacking rule.
+
+### 9.6 OS Network Target Designators — Kestrel / Shrike / Lodestar (added 2026-07-31)
+
+A BCS-adjacent sub-family of C3-network target designators. Each is **dead weight unless the mounting / firing
+unit is in an active OS C3/BCS network** — their entire value is network-shared targeting data. Two are
+TAG-derived designator devices carried on a unit; the third is a Narc-beacon munition.
+
+**Status (2026-07-31):** Kestrel + Shrike **defined / flagged / registered / compiling** (TAG-subclass stubs,
+same pattern as Demon — `weapons/c3/OSKestrelDesignator.java`, `OSShrikeDesignator.java`; flags
+`F_OS_KESTREL_DESIGNATOR` / `F_OS_SHRIKE_DESIGNATOR`). **Lodestar not yet coded. All mechanics TODO** (§9.5).
+
+| Item | Tier | t / crit | BV | Cost | Role |
+|---|---|---|---|---|---|
+| Kestrel Network Target Designator | Improve | 4 / 3 | 130 | 200,000 | network −1 direct-fire vs a designated target + Lodestar-enabled LRM indirect fire |
+| Shrike Combat Designator | Enhanced | 3 / 2 | 110 | 320,000 | crit-capable TAG: network −1 (−3 on crit) vs a designated target |
+| Lodestar Guidance Beacon | Improve ⏳ | Narc pod ammo | — | ⏳ | Narc-beacon munition that plants the remote lock a networked Kestrel reads |
+
+**Kestrel Network Target Designator (Improve).** A TAG-mode designator. While its unit is in an active C3/BCS
+network **and** either (a) it holds LOS to the designated target, or (b) a **Lodestar beacon** is attached to the
+target and the target is within the Kestrel's own range, the **whole network gains −1 to-hit against that target
+with all direct-fire weapons**. The Lodestar path additionally grants the network **LRM indirect-fire
+capability** against the beaconed target (the beacon is the remote lock; no spotter LOS needed). Kestrel carries
+no self to-hit modifier — the value is purely the shared network reading.
+> *Design note:* this **supersedes** the earlier "network reads the target's range brackets at close range"
+> sketch. Finalized 2026-07-31 as a flat **−1 direct-fire + Lodestar LRM-indirect enable** (the OSKestrelDesignator
+> Javadoc has been updated to match).
+
+**Shrike Combat Designator (Enhanced).** A crit-capable TAG. On a successful designation, every same-C3-network
+unit attacking that target **this turn** gets **−1 to-hit**, deepened to **−3** when the designation roll is a
+critical (natural 9+). Independent of Kestrel/Lodestar (no beacon needed). Dead weight outside a network.
+
+**Lodestar Guidance Beacon (Narc munition).** A **special beacon pod fired from the OS Narc / Munin launcher**
+— it reuses the existing OS beacon-ammo family (see `AmmoType.makeOSBeaconAmmo`, the `OSNarcPods` / `OSMunin*`
+line, `AmmoType.java`). On a hit it attaches to the target like any Narc pod. It does nothing on its own; it is
+the **remote lock a networked Kestrel consumes**: units in a C3 network **containing a Kestrel NTD** gain LRM
+indirect fire against the beaconed target, and while the beacon is within that Kestrel's range the network gets
+the −1 direct-fire reading even without Kestrel LOS. ⏳ **Draft params to confirm:** tier (proposed Improve, to
+pair with Kestrel); whether it is a new `Munitions` type on the OS Narc launcher vs. its own launcher; pod count /
+cost; and beacon persistence (inherits Narc "until removed" by default).
+
+**Relationships & anti-stack.**
+- Kestrel + Lodestar = the *information / indirect* combo (reach + −1 direct-fire without LOS). Shrike = the
+  *burst direct-fire* combo (−1/−3 this turn, driven by the Shrike unit's own designation). Separate paths; a
+  network could field both.
+- ⏳ **Stacking rule to confirm:** the Kestrel/Lodestar network −1 and the Shrike network −1 are both "network
+  to-hit vs a designated target." Proposed: both fall under the §9.1 **BCS network-coordination −1 cap** (do not
+  stack with each other, nor with the B-2500 coordination −1 / Improve C3 Point focus-fire −1). A direct-fire
+  weapon may still add a CCS module −1 on top (§9.3 cross-system −2 ceiling).
+- **ECM:** as network-coordination effects, all of these are **ECM-suppressible** like the rest of the BCS
+  (§9.1), pending the mechanics pass.
+
+**Implementation hooks (TODO — mechanics pass, all UNTESTED).**
+- **Kestrel −1 direct-fire:** inject into `ComputeTargetToHitMods`, gated on `onSameC3NetworkAs` a Kestrel + the
+  target being (LOS to Kestrel) OR (Lodestar-beaconed & within Kestrel range); per-turn designation state. The
+  range/spotter reading side lives near `ComputeC3Spotter.findC3Spotter`.
+- **Kestrel/Lodestar LRM indirect enable:** relax the indirect-fire spotter requirement for Kestrel-network
+  units firing LRMs at a Lodestar-beaconed target (indirect mode gate around `WeaponAttackAction` `isIndirect` /
+  the spotter lookup).
+- **Shrike −1/−3:** crit detection on the TAG-designation resolution + per-turn network to-hit state on the
+  target + `ComputeTargetToHitMods` injection gated on `onSameC3NetworkAs` the Shrike.
+- **Lodestar pod:** add the beacon as an OS Narc/Munin munition (`makeOSBeaconAmmo` pattern; a new `Munitions`
+  entry if it needs distinct behaviour) + a target-side "Lodestar-beaconed by network N" flag riding the existing
+  `Entity.attachNarcPod` / `isNarcedBy` / `NarcHandler` machinery.
 
 ## 10. OS design saves — cross-device import (added 2026-07-19)
 
