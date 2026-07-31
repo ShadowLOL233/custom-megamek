@@ -475,7 +475,10 @@ public class Engine implements Serializable, ITechnology {
     public boolean isFusion() {
         return (engineType != COMBUSTION_ENGINE) && (engineType != FISSION) && (engineType != FUEL_CELL)
               && (engineType != NONE) && (engineType != BATTERY) && (engineType != SOLAR)
-              && (engineType != STEAM) && (engineType != MAGLEV) && (engineType != EXTERNAL);
+              && (engineType != STEAM) && (engineType != MAGLEV) && (engineType != EXTERNAL)
+              // OS non-fusion power plants: an ICE and an ICE+fuel-cell hybrid. Excluding them here makes
+              // them correctly carry 0 weight-free heat sinks and follow non-fusion rules (power amps, etc.).
+              && (engineType != OS_IMPROVE_ICE_ENGINE) && (engineType != OS_HYBRID_ENGINE);
     }
 
     /** @return True if this engine is a fission engine. */
@@ -488,7 +491,10 @@ public class Engine implements Serializable, ITechnology {
     }
 
     public boolean isICE() {
-        return engineType == COMBUSTION_ENGINE;
+        // The OS Improve ICE is a genuine internal-combustion engine, so it counts as ICE. The OS Hybrid
+        // (ICE + fuel cell) is deliberately NOT counted as ICE: it has its own sealed, oxidizer-fed handling
+        // (built-in environmental sealing, deep-water operation) that pure-ICE rules must not override.
+        return (engineType == COMBUSTION_ENGINE) || (engineType == OS_IMPROVE_ICE_ENGINE);
     }
 
     /**
@@ -1058,7 +1064,7 @@ public class Engine implements Serializable, ITechnology {
             case OS_ENHANCED_COMPACT_ENGINE -> 16000; // OS Advance Compact
             case OS_SH_STANDARD_ENGINE -> 30000; // Superheavy Standard
             case OS_IMPROVE_ICE_ENGINE -> 1800;  // OS Improve ICE
-            case OS_HYBRID_ENGINE -> 2800;       // OS Hybrid
+            case OS_HYBRID_ENGINE -> 2300;       // OS Hybrid (kept close to Improve ICE's 1800)
             default -> 0;
         };
         if (hasFlag(LARGE_ENGINE)) {
