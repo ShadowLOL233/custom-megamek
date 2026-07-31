@@ -5170,15 +5170,19 @@ public class AmmoType extends EquipmentType {
         ammo.bv = bv;
         ammo.cost = cost;
         // Intro 2900 so the Improve-tier OS HVAC (2900) has ammo from the start; the Enhanced tier (3000)
-        // shares the same HVAC_OS bin (same rackSize), so one ammo line per caliber covers both.
+        // shares the same HVAC_OS bin (same rackSize), so one ammo line per caliber covers both. STANDARD
+        // static level — the lower of the two weapon tiers — so the ammo is visible whenever the Standard-tier
+        // Improve HVAC is legal (an ADVANCED-static ammo would vanish from MML at the Standard rules level).
         ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setIntroLevel(false)
+              .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(2900, 2930, 2960, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
-              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
         return ammo;
     }
 
