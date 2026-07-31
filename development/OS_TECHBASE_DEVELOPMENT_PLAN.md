@@ -12,17 +12,33 @@ Quick index — jump to a section instead of scanning the whole file.
 
 - **Section 0 — Design philosophy**: tier ladder, BV methodology, TechRating, implementation mapping (durable reference).
 - **Section 1 — Status snapshot**: what is implemented in code (some lines pending tier-revision).
-- **Section 2 — OS HVAC** [active]: shipped as Improve+Enhanced explosive-gamble AC; **now being REPURPOSED → long-barrel precision anti-armor AC** (see §8 related-decisions).
+- **Section 2 — OS HVAC**: **✅ REPURPOSED 2026-07-31 → long-barrel precision anti-armor AC** (calibers 10/12/14/16, dedicated `HVAC_OS` ammo, range-scaling to-hit bonus, BV 165/195/225/255).
 - **Section 3 — Planned: superheavy unit-cap extensions** [active]: >100t vehicles / VTOL / fighters.
 - **Section 4 — Dev focus: OS versions of canon special equipment** [active]: MiscType catalogue (priority A/B/C/E/G/I).
 - **Section 5 — Open tuning / review items** [active].
 - **Section 6 — Naming & tier-reclassification work items** [active]: §6.4 engine/structure/armor Advance→Enhanced rename **✅ DONE 2026-07-06**; subsections 6.3 & 6.5 shelved (see below).
 - **Section 7 — Planned: BF & RF AC variants** [active]: being reclassified to **Inner Sphere** (not OS).
-- **Section 8 — Planned: Electromagnetic Lance** [active]: Advance-tier Gauss variant — coilgun supergun with power-gated AC munitions. Includes the HVAC-repurpose & Heavy-missile-Ultra decisions.
+- **Section 8 — Electromagnetic Lance & kinetic apex**: Coil Augmented Railgun **✅ IMPLEMENTED**; Electromagnetic Lance (power-gated coilgun supergun) **✅ IMPLEMENTED 2026-07-31 — 6 munitions**; also holds the (now ✅ done) HVAC-repurpose & Heavy-missile-Ultra decisions.
 - **Section 9 — OS Modular Electronics: BCS & CCS** [active/DESIGN]: two systems — **BCS** (Battle Computer System: info/command/EW, Tacticon B-2500 lineage, modular track + Advance specialized cores C-X280/Raven/G-X100) and **CCS** (Combat Computer System: single-mech fire control, C-2500 core + weapon-type modules + Composite). Dissolves canon AES⊥TC / AES⊥MASC / standalone-C3 into a modular ecosystem balanced by a two-core tonnage tax.
 
 Shelved ideas are parked in **[OS_SHELVED_IDEAS.md](OS_SHELVED_IDEAS.md)**. Splitting this plan into
 per-topic files (weapons / units / equipment) is **deferred** until it grows further.
+
+## ⭐ Playtest priority queue (added 2026-07-31)
+
+Nothing in the recent waves has had an in-game playtest yet — every item below compiles and passes the
+equipment-init unit tests **only**. Testing priority order:
+
+1. **P1 — BCS/CCS modular electronics (§9).** The larger prior initiative; §9.5 lists its still-UNTESTED
+   mechanics (Demon debuff, Improve C3 Point focus-fire, the network-cap raise, the Advance cores, …).
+2. **P2 — New weapon equipment (this session) — UNTESTED.** All compile + pass equipment-init tests but have had
+   **no in-game playtest**:
+   - **HVAC precision repurpose (§2)** — check the range-scaling to-hit bonus (0 / −1 / −1 / −2) and the new
+     10/12/14/16 calibers / `HVAC_OS` ammo.
+   - **Ultra Heavy LRM/SRM (§8)** — check Single/Ultra mode switching, the 2-volley resolution + heat doubling,
+     and the natural-2 double-tap jam.
+   - **Electromagnetic Lance (§8)** — check the per-munition power-gate (range + damage switching), inherent AP
+     on the full-power rounds, and Precision's −2 vs target movement.
 
 ---
 
@@ -105,24 +121,27 @@ hot-reloads jars — do a full clean rebuild + restart: `cd megameklab && .\grad
 
 ---
 
-## 2. OS HVAC (High-Velocity Autocannon) — heavy calibers only — IMPLEMENTED as Improve + Enhanced (2026-07-08)
+## 2. OS HVAC (High-Velocity Autocannon) — REPURPOSED to a precision anti-armor AC (2026-07-31)
 
-> **NOW TWO TIERS + rebalanced (2026-07-08).** The original single Enhanced draft was judged too bulky/hot,
-> so it was rebased as the **Improve** tier and a lighter/cooler **Enhanced** tier added on top; then a
-> heat + ammo pass made the whole family fieldable (the canon HVAC profile stacked too many drawbacks).
-> - **Improve HVAC/{12,14,16,18}** (`OSImproveHVAC*`, dates `2900/2930/2960`): heat **4/5/6/7** (capped at
->   the AC/20 ceiling, was 5/6/8/9) · 11/12/13/14 t · 7/8/8/9 crit · BV 195/230/265/300.
-> - **Enhanced HVAC/{12,14,16,18}** (`OSEnhancedHVAC*`, dates `3000/3025/3050`): the compact refinement —
->   same damage/range/AV, **−2 t, −2 crit, −1 heat** (heat **3/4/5/6** · 9/10/11/12 t · 5/6/6/7 crit).
->   **BV = Improve (195/230/265/300)** — per the ratified BV policy the shooter's self-heat and tonnage/
->   crits never enter weapon BV, and damage/range are identical, so the tiers MUST share BV; the Enhanced's
->   lighter/cooler build is the "OS Clan-tax equivalent" (mech-level advantage). Cost +100k (Enhanced
->   manufacturing premium, independent of BV).
-> Both tiers: extend `HVACWeapon`; TechRating F; ADVANCED-static; Faction LEGION; aero AV = damage,
-> maxRange = extreme. **Ammo:** shared — reused the canon `HYPER_VELOCITY` enum (4 entries "HVAC/12-18 Ammo"
-> via `createOSHVACAmmo`, intro **2900**; same rackSize covers both tiers); shots/ton raised to **8/7/6/5**
-> (standard-AC density ≈100/rackSize, was canon 7/6/5/4 — the heavy weapon + explosive ammo warranted more,
-> per OS "better than IS canon"); **no** dedicated `AC_HVAC_OS`. Compiles; pending in-game test.
+> **REPURPOSED 2026-07-31 — was an explosive-gamble aero AC, now a long-barrel precision anti-armor AC.**
+> The single-slug OS HVAC no longer competes with LB-X on an explosive/aero-gamble axis; it is now a high-BV
+> **precision** piece whose long, high-velocity barrel walks concentrated slugs onto distant targets.
+> - **Calibers re-based `12/14/16/18` → `{10,12,14,16}`** (dropped 18, added 10 — cuts family tonnage/crit).
+>   Old `OSImprove/EnhancedHVAC18` deleted; old display names kept as `addLookupName` on the survivors.
+> - **Signature — range-scaling to-hit bonus** (in `ComputeToHit`, gated on `OSHVACWeapon`): short **0**,
+>   medium **−1**, long **−1**, extreme **−2**. A milder, longer-reaching cousin of the Burst-Fire gradient;
+>   priced into a high BV (unlike BF's BV-neutral −1). Tuned down from a first draft of med −2 / long −3.
+> - **Stats (Improve / Enhanced share BV per the ratified policy):** dmg = caliber; ranges /10 8/16/24/32 ·
+>   /12 7/14/21/28 · /14 7/13/20/27 · /16 6/12/19/26; **Improve** t/crit/heat 10/6/3 · 11/7/4 · 12/8/5 · 13/8/6;
+>   **Enhanced** −2t/−2crit/−1heat (8/4/2 · 9/5/3 · 10/6/4 · 11/6/5); **BV 165/195/225/255**; aero AV = dmg,
+>   maxRange = EXT; single-slug, non-explosive (`explosive=false`, plain `ACWeaponHandler`).
+> - **Ammo — dedicated `HVAC_OS` enum (idx 139)**, NOT canon `HYPER_VELOCITY` (avoids the caliber-10 cross-load
+>   with canon HVAC/10). Low ammo/ton **7/6/5/4** (mech-level tax); intro 2900 covers both tiers.
+> - Migrated the tracked design `os-designs/Atlas AS7-OS_T HVAC.mtf` off the deleted HVAC/18 → HVAC/16
+>   (tonnage/crit-neutral swap). Compiles; equipment tests pass; **not yet playtested**. BV is the main tuning knob.
+
+> **NOTE:** the *Design decision / Concept / DRAFT stats / Tech fields / Implementation notes* below are the
+> **pre-repurpose historical record** (the explosive-gamble era) — kept for rationale, superseded by the above.
 
 ### Design decision
 - OS HVAC is rooted in **OS Improve AC + Improve LB-X** (NOT IS HVAC).
@@ -538,7 +557,20 @@ are Standard/Improve/**Enhanced**.
 
 ## 8. Planned: Electromagnetic Lance — Advance-tier Gauss variant (added 2026-07-10)
 
-**Status: DESIGN — not yet coded.** Concept agreed this session; stats not pinned.
+**Status: IMPLEMENTED — 6 munitions (2026-07-31, passes 1 + 2).** One weapon `OSElectromagneticLance` (Advance,
+extends `GaussWeapon`) + dedicated `EM_LANCE_OS` ammo enum (idx 140). The power-gate is a `getRanges` override on
+the weapon (no core-method change): full-power rounds keep the long profile (min3 / 9 / 18 / 26 / 34); low-power
+rounds collapse to 0 / 5 / 10 / 15 / 20 and lose AP.
+- **Full power:** **EM Slug** (default → `ACAPHandler`, inherent AP, full dmg) · **APDS**
+  (`OSEMLanceAPDSHandler`, inherent AP + ×0.8 dmg, more shots/ton — the rugged sabot penetrator).
+- **Low power (no AP, dmg drop):** **Flak** (`ACFlakHandler`, anti-air fragments — range-only penalty so far) ·
+  **Flechette** (`OSEMLanceFlechetteHandler`, ×0.6, anti-infantry) · **Precision** (`OSEMLancePrecisionHandler`,
+  ×0.6, cancels up to −2 of the target movement mod — wired via `M_PRECISION` + `EM_LANCE_OS` in
+  `ComputeTargetToHitMods`) · **Incendiary/HE** (`OSEMLanceIncendiaryHandler`, ×0.6, sets fires).
+- Chassis: dmg 20 · heat 3 · 18 t · 11 crit · BV 480 · 3060/3070/3080 · TechRating F · LEGION. Compiles;
+  equipment tests pass; **not yet playtested**.
+- **Still deferred:** Flak's low-power damage drop (cluster nature), a manual throttle mode, an EM-Lance to-hit
+  gradient, and final stat/BV tuning after playtest.
 
 ### Concept
 An **Advance-tier variant of the OS Gauss family**: a coil-accelerated ferrous-slug supergun that fuses the
@@ -591,7 +623,7 @@ munition→power-tier assignment; heat model (coil discharge → more heat than 
 ammo enum vs dedicated EM Lance ammo.
 
 ### Successor concept — Coil Augmented Railgun (hybrid) — SPECCED (design pinned 2026-07-24)
-**Status: DESIGN FINALIZED — stats pinned, not yet coded.** The hybrid that fuses coilgun + railgun and is
+**Status: IMPLEMENTED — committed as `b64ff86193` + round-report / shed-barrel follow-ups (the doc had simply lagged the code; corrected in the 2026-07-31 sync).** The hybrid that fuses coilgun + railgun and is
 arguably **the single most "OS" weapon in the tech base** — the real-engineering hybrid *is* the
 maintainability-first way to build a railgun. **Base version name = Coil Augmented Railgun.**
 
@@ -655,15 +687,15 @@ only ~2.78%/shot, so reaching +5 jams is a long-tail event; if scrapping should 
 (e.g. natural 2–3, or a wear-scaling jam chance). Barrel-shed ranges (4/6/9 base) still tunable; BV formula; ammo-enum name.
 
 ### Related decisions this session (their own write-ups still pending)
-- **HVAC repurpose (§2 redesign):** stop being the explosive-gamble aero AC; become a **long-barrel precision
-  anti-armor AC distinct from LB-X**. Signature = a to-hit gradient **medium −2 / long −3** (reuse the BF
-  `ComputeToHit` block, stronger values). **Calibers dropped 12/14/16/18 → 10/12/14/16** to cut tonnage/crit.
-  Paid with heavy tonnage + high crit + low ammo/ton (mech-level tax). **NB:** unlike BF's BV-neutral −1, this
-  accuracy bonus **raises weapon BV** — HVAC becomes a high-BV precision piece, not a cheap gun.
-- **Heavy LRM/SRM → Ultra-missile:** player chooses 1 or 2 volleys; **each volley rolls its own to-hit +
-  cluster**; jam on the double-tap. **Do the 2-volley version first** (template = `OSUltraLBXHandler`, which
-  already composes Ultra shot-count × per-shot cluster); the 4-volley (2 outputs × 2 volleys) escalation is
-  **deferred pending playtest**.
+- **HVAC repurpose (§2 redesign) — ✅ DONE 2026-07-31.** Now a long-barrel precision anti-armor AC (see §2 for
+  the full write-up): calibers 10/12/14/16, dedicated `HVAC_OS` ammo, and a range-scaling to-hit bonus
+  (short 0 / med −1 / long −1 / extreme −2 — tuned down from the med −2 / long −3 first draft), priced into a
+  high BV (165/195/225/255).
+- **Heavy LRM/SRM → Ultra-missile — ✅ DONE 2026-07-31.** Heavy LRM (10/20/30) and Heavy SRM (4/6/8/12) gained
+  **Single / Ultra** fire modes: Ultra fires 2 volleys (each its own cluster roll), consumes 2 ammo, doubles heat
+  (via a new `Mounted.getNumShots` clause gated on LRM/SRM ammo + Ultra mode), and **jams on a natural-2 attack
+  roll**; Single is a plain launcher. Weapon `heat` re-based to the single-volley value; BV re-tiered to ≈1.6×
+  single (the Ultra-AC convention). The 4-volley escalation remains deferred pending playtest.
 - **Railgun / Railcannon:** a *more violent* future direction (real-rail Lorentz accelerator, not a coilgun).
   Because its defining flaw is **self-erosion of the rails** — the antithesis of OS's maintainability creed —
   it is **Experimental**, or a deliberate rupture of the OS identity. **OS's preferred answer is the
