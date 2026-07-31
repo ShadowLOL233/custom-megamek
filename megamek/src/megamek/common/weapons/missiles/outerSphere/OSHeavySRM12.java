@@ -22,19 +22,23 @@ import megamek.common.weapons.handlers.srm.OSDoubleFireSRMHandler;
 import megamek.common.weapons.srms.SRMWeapon;
 import megamek.server.totalWarfare.TWGameManager;
 
-/** Outer Sphere Heavy SRM 12 - double-fire launcher (2 volleys, 2x ammo/heat), extended 4/8/12. */
+/**
+ * Outer Sphere Heavy SRM 12 — Single / Ultra fire modes, extended 4/8/12 range. Ultra fires two volleys in
+ * one turn (2x ammo, 2x heat) and can jam on a natural-2 attack roll; Single is a plain SRM 12 (one volley).
+ */
 public class OSHeavySRM12 extends SRMWeapon {
     @Serial
     private static final long serialVersionUID = 1L;
 
     public OSHeavySRM12() {
         super();
+        setModes(new String[] { MODE_AC_SINGLE, MODE_UAC_ULTRA });
         name = "Heavy SRM 12";
         setInternalName("OSHeavySRM12");
         addLookupName("OS Heavy SRM-12");
         addLookupName("OS Heavy SRM 12");
         sortingName = "Missile OS 3 2 1 12";
-        heat = 14;
+        heat = 7;
         rackSize = 12;
         shortRange = 4;
         mediumRange = 8;
@@ -42,7 +46,7 @@ public class OSHeavySRM12 extends SRMWeapon {
         extremeRange = 16;
         tonnage = 9.0;
         criticalSlots = 5;
-        bv = 240;
+        bv = 190;
         cost = 300000;
         shortAV = 16;
         medAV = 16;

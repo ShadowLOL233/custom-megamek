@@ -940,6 +940,15 @@ public class Mounted<T extends EquipmentType> implements Serializable, RoundUpda
             } else if (mode.equals(Weapon.MODE_RAC_FIVE_SHOT)) {
                 return 5;
             }
+        } else if (((weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.LRM)
+              || (weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.SRM))
+              && weaponType.hasModes()
+              && (mode != null) && mode.equals(Weapon.MODE_UAC_ULTRA)) {
+            // OS Heavy LRM/SRM Ultra-fire launchers: fire two volleys (so double heat) in Ultra mode. They
+            // keep the shared LRM/SRM ammo enum for Artemis/Narc compatibility, so the trigger is the Ultra
+            // mode itself (only these OS launchers carry it), not a dedicated ammo type. Deliberately NOT
+            // gated on ignoreMode, so canon LRM/SRM launchers that merely have other modes are never doubled.
+            return 2;
         }
         return 1;
     }

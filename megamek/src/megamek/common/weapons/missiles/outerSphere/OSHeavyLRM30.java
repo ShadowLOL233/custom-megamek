@@ -22,24 +22,28 @@ import megamek.common.weapons.handlers.lrm.OSDoubleFireLRMHandler;
 import megamek.common.weapons.lrms.LRMWeapon;
 import megamek.server.totalWarfare.TWGameManager;
 
-/** Outer Sphere Heavy LRM 30 - double-fire launcher: two volleys per turn (2x ammo, 2x heat). */
+/**
+ * Outer Sphere Heavy LRM 30 — Single / Ultra fire modes. Ultra fires two volleys in one turn (2x ammo,
+ * 2x heat) and can jam on a natural-2 attack roll; Single is a plain LRM 30 (one volley, no jam).
+ */
 public class OSHeavyLRM30 extends LRMWeapon {
     @Serial
     private static final long serialVersionUID = 1L;
 
     public OSHeavyLRM30() {
         super();
+        setModes(new String[] { MODE_AC_SINGLE, MODE_UAC_ULTRA });
         name = "Heavy LRM 30";
         setInternalName("OSHeavyLRM30");
         addLookupName("OS Heavy LRM-30");
         addLookupName("OS Heavy LRM 30");
         sortingName = "Missile OS 1 2 1 30";
-        heat = 18;
+        heat = 9;
         rackSize = 30;
         minimumRange = 6;
         tonnage = 14.0;
         criticalSlots = 7;
-        bv = 510;
+        bv = 410;
         cost = 562500;
         shortAV = 18;
         medAV = 18;
