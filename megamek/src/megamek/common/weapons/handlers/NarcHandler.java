@@ -278,6 +278,15 @@ public class NarcHandler extends MissileWeaponHandler {
                 r.add(entityTarget.getLocationAbbr(hit));
                 r.subject = subjectId;
                 vPhaseReport.addElement(r);
+            } else if (ammoType.getMunitionType().contains(AmmoType.Munitions.M_LODESTAR)) {
+                // OS Lodestar guidance beacon (dev plan §9.6): a passive beacon a networked Kestrel NTD reads.
+                pod = new INarcPod(attackingEntity.getOwner().getTeam(), INarcPod.LODESTAR,
+                      hit.getLocation());
+                Report r = new Report(3254);
+                r.subject = subjectId;
+                r.add(entityTarget.getDisplayName());
+                r.add(entityTarget.getLocationAbbr(hit));
+                vPhaseReport.addElement(r);
             } else {
                 pod = new INarcPod(attackingEntity.getOwner().getTeam(), INarcPod.HOMING,
                       hit.getLocation());

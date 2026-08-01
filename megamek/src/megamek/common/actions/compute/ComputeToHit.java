@@ -1630,6 +1630,23 @@ public class ComputeToHit {
             }
         }
 
+        // OS Kestrel Network Target Designator (dev plan §9.6): a unit on the attacker's active C3 network mounts
+        // an operational Kestrel that paints this target (LOS in range, or a friendly Lodestar beacon on it in
+        // range) → the whole network gets -1 to-hit with direct-fire weapons. Priced into the Kestrel/Lodestar BV.
+        if ((te != null) && !isIndirect && !weaponType.hasFlag(WeaponType.F_ARTILLERY)
+              && megamek.common.weapons.c3.OSNetworkDesignators.hasNetworkKestrelPaint(game, ae, te)) {
+            toHit.addModifier(-1, Messages.getString("WeaponAttackAction.WeaponMod"));
+        }
+
+        // OS Shrike Combat Designator (dev plan §9.6): a target Shrike-designated this turn by a unit on the
+        // attacker's C3 network grants -1 (-3 on a natural-9+ crit designation) to every networked attacker.
+        if (te != null) {
+            int shrikeMod = megamek.common.weapons.c3.OSNetworkDesignators.shrikeToHitBonus(game, ae, te);
+            if (shrikeMod != 0) {
+                toHit.addModifier(shrikeMod, Messages.getString("WeaponAttackAction.WeaponMod"));
+            }
+        }
+
         // Indirect fire (LRMs, mortars and the like) has a +1 mod
         if (isIndirect) {
             toHit.addModifier(1, Messages.getString("WeaponAttackAction.Indirect"));

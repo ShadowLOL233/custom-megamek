@@ -428,6 +428,10 @@ public abstract class Entity extends TurnOrdered
     protected boolean stuckInSwamp = false;
     protected boolean canUnstickByJumping = false;
     protected int taggedBy = -1;
+    // OS Shrike Combat Designator (dev plan §9.6): the attacker id that Shrike-designated this unit this turn
+    // (-1 = none), and whether that designation roll was a natural-9+ critical. Reset each round.
+    protected int shrikeDesignatedBy = -1;
+    protected boolean shrikeDesignationCrit = false;
     protected boolean layingMines = false;
     protected boolean _isEMId = false;
     protected boolean[] hardenedArmorDamaged;
@@ -7274,6 +7278,7 @@ public abstract class Entity extends TurnOrdered
         hitBySwarmsEntity.clear();
         hitBySwarmsWeapon.clear();
         setTaggedBy(-1);
+        clearShrikeDesignation();
         setLayingMines(false);
         setArmsFlipped(false);
         setDisplacementAttack(null);
@@ -11777,6 +11782,27 @@ public abstract class Entity extends TurnOrdered
 
     public int getTaggedBy() {
         return taggedBy;
+    }
+
+    /** OS Shrike (dev plan §9.6): record that {@code taggerId} Shrike-designated this unit this turn (crit = natural 9+). */
+    public void setShrikeDesignatedBy(int taggerId, boolean crit) {
+        shrikeDesignatedBy = taggerId;
+        shrikeDesignationCrit = crit;
+    }
+
+    /** @return the attacker id that Shrike-designated this unit this turn, or -1 if none. */
+    public int getShrikeDesignatedBy() {
+        return shrikeDesignatedBy;
+    }
+
+    /** @return true if this unit's Shrike designation this turn was a natural-9+ critical. */
+    public boolean isShrikeDesignationCrit() {
+        return shrikeDesignationCrit;
+    }
+
+    public void clearShrikeDesignation() {
+        shrikeDesignatedBy = -1;
+        shrikeDesignationCrit = false;
     }
 
     /**

@@ -57,6 +57,8 @@ public record INarcPod(int team, int type, int location) implements Serializable
     public static final int ECM = 2;
     public static final int HAYWIRE = 4;
     public static final int NEMESIS = 8;
+    /** OS Lodestar guidance beacon (dev plan §9.6) — a passive beacon read by a networked Kestrel NTD. */
+    public static final int LODESTAR = 16;
 
     /**
      * Creates a new <code>INarcPod</code>, from the team and of the type specified.
@@ -111,6 +113,9 @@ public record INarcPod(int team, int type, int location) implements Serializable
                 break;
             case NEMESIS:
                 buf.append("Nemesis");
+                break;
+            case LODESTAR:
+                buf.append("Lodestar");
                 break;
         }
         buf.append(" iNarc pod from Team #").append(team);

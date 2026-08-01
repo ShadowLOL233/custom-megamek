@@ -9,22 +9,26 @@ package megamek.common.weapons.c3;
 import java.io.Serial;
 
 import megamek.common.SimpleTechLevel;
+import megamek.common.ToHitData;
+import megamek.common.actions.WeaponAttackAction;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
 import megamek.common.enums.TechRating;
 import megamek.common.equipment.WeaponTypeFlag;
+import megamek.common.game.Game;
+import megamek.common.loaders.EntityLoadingException;
+import megamek.common.weapons.handlers.AttackHandler;
+import megamek.common.weapons.handlers.ShrikeTAGHandler;
 import megamek.common.weapons.tag.TAGWeapon;
+import megamek.server.totalWarfare.TWGameManager;
 
 /**
  * OS Shrike Combat Designator (dev plan §9.6) — an Enhanced-tier crit-capable TAG. On a successful designation it
  * grants every same-C3-network unit attacking that target a to-hit bonus this turn: −1 on a normal hit, and a
  * further −2 (total −3) when the designation roll is a critical (natural 9+). Dead weight if the mounting unit
- * is not in an active C3 network.
- *
- * <p><b>Mechanics-remaining (TODO, mechanics pass):</b> the crit detection + per-turn network-bonus state on the
- * target, and its injection into {@code ComputeTargetToHitMods} gated on {@code onSameC3NetworkAs} the
- * designator. For now the weapon exists and designates like a TAG.
+ * is not in an active C3 network. The crit detection + per-turn target state live in {@link ShrikeTAGHandler};
+ * the network-gated −1/−3 injection is in {@code ComputeToHit}.
  */
 public class OSShrikeDesignator extends TAGWeapon {
     @Serial
@@ -61,5 +65,15 @@ public class OSShrikeDesignator extends TAGWeapon {
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
               .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+    }
+
+    @Override
+    public AttackHandler getCorrectHandler(ToHitData toHit, WeaponAttackAction waa, Game game,
+          TWGameManager manager) {
+        try {
+            return new ShrikeTAGHandler(toHit, waa, game, manager);
+        } catch (EntityLoadingException ignored) {
+            return null;
+        }
     }
 }

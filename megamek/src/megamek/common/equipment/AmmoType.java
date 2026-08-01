@@ -2522,7 +2522,11 @@ public class AmmoType extends EquipmentType {
         // note that 62 is in use above
         // this area is a primary target for the introduction of an enum or some other
         // kind of refactoring
-        M_FAE
+        M_FAE,
+
+        // OS Lodestar guidance beacon (dev plan §9.6) — an iNarc-attach beacon read by a networked Kestrel NTD.
+        // Appended at the end to keep existing ordinals stable.
+        M_LODESTAR
     }
 
     public static final EnumSet<AmmoType.Munitions> SMOKE_MUNITIONS = EnumSet.of(AmmoType.Munitions.M_SMOKE,
@@ -3639,6 +3643,7 @@ public class AmmoType extends EquipmentType {
         EquipmentType.addType(AmmoType.createOSMuninECMAmmo());
         EquipmentType.addType(AmmoType.createOSMuninHaywireAmmo());
         EquipmentType.addType(AmmoType.createOSMuninNemesisAmmo());
+        EquipmentType.addType(AmmoType.createOSLodestarAmmo());
         EquipmentType.addType(AmmoType.createCLAPGaussRifleAmmo());
         EquipmentType.addType(AmmoType.createCLMediumChemicalLaserAmmo());
         EquipmentType.addType(AmmoType.createCLSmallChemicalLaserAmmo());
@@ -13102,6 +13107,10 @@ public class AmmoType extends EquipmentType {
     private static AmmoType createOSMuninECMAmmo()     { return makeOSBeaconAmmo("Munin ECM Pods",     "Munin ECM",     "OSMuninECMPods",     AmmoTypeEnum.INARC, Munitions.M_ECM,     3, 4, 15000); }
     private static AmmoType createOSMuninHaywireAmmo() { return makeOSBeaconAmmo("Munin Haywire Pods", "Munin Haywire", "OSMuninHaywirePods", AmmoTypeEnum.INARC, Munitions.M_HAYWIRE, 3, 4, 20000); }
     private static AmmoType createOSMuninNemesisAmmo() { return makeOSBeaconAmmo("Munin Nemesis Pods", "Munin Nemesis", "OSMuninNemesisPods", AmmoTypeEnum.INARC, Munitions.M_NEMESIS, 3, 4, 10000); }
+    // OS Lodestar guidance beacon (dev plan §9.6): a Munin-launcher (iNarc) special pod. On attach it is a passive
+    // beacon a networked Kestrel NTD reads (grants the network -1 direct-fire vs the beaconed target within Kestrel
+    // range, no LOS needed). Fired from the OS Narc / Munin launcher.
+    private static AmmoType createOSLodestarAmmo()     { return makeOSBeaconAmmo("Lodestar Beacon Pods", "Lodestar", "OSLodestarPods", AmmoTypeEnum.INARC, Munitions.M_LODESTAR, 3, 4, 12000); }
 
     // OS LB-X ammo (shared by standard / Improve / Ultra LB-X tiers); slug + cluster per caliber
     private static AmmoType makeOSLBXClusterAmmo(String weaponName, String internal, int rackSize, int shots,

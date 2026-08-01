@@ -25,10 +25,11 @@ import megamek.common.weapons.tag.TAGWeapon;
  * (the beacon is the remote lock; no spotter LOS needed). Kestrel carries no self to-hit modifier. Dead weight if
  * the mounting unit is not in an active C3 network.
  *
- * <p><b>Mechanics-remaining (TODO, mechanics pass):</b> the network −1 direct-fire injection into
- * {@code ComputeTargetToHitMods} (gated on {@code onSameC3NetworkAs} plus LOS-or-Lodestar-beacon), the
- * Lodestar LRM-indirect enable, and the per-turn designation state. The range/spotter reading side lives near
- * {@code ComputeC3Spotter.findC3Spotter}. For now the weapon exists and designates like a TAG.
+ * <p>The network −1 direct-fire benefit is <b>passive</b> (no TAG action needed): it is computed in
+ * {@code ComputeToHit} via {@code OSNetworkDesignators.hasNetworkKestrelPaint} — a networked Kestrel with LOS to
+ * the target in range, or a friendly Lodestar beacon on the target in range. <b>Mechanics-remaining (TODO):</b>
+ * the Lodestar LRM indirect-fire enable (letting Kestrel-network LRMs fire indirectly at a beaconed target
+ * without a normal spotter) is not yet wired.
  */
 public class OSKestrelDesignator extends TAGWeapon {
     @Serial
