@@ -508,6 +508,176 @@ public class AmmoType extends EquipmentType {
                 .setStaticTechLevel(SimpleTechLevel.STANDARD),
           "AU");
 
+    private static final MunitionMutator OS_INFERNO_MUNITION_MUTATOR = new MunitionMutator("Inferno",
+          1,
+          Munitions.M_INFERNO,
+          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
+                .setUnofficial(false)
+                .setTechRating(TechRating.E)
+                .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+                .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
+                .setISApproximate(true, false, false, false, false)
+                .setPrototypeFactions(Faction.LEGION)
+                .setProductionFactions(Faction.LEGION)
+                .setStaticTechLevel(SimpleTechLevel.STANDARD),
+          "AU");
+
+    // OS missile munition mutators — canon M_* mechanics on the OS tech base, all at the OS Standard tier
+    // (2805/2820/2840, rating E, Faction.LEGION). Weight ratios mirror canon. Shared by the SRM & LRM sets.
+    private static final MunitionMutator OS_FRAGMENTATION_MUNITION_MUTATOR = new MunitionMutator("Fragmentation", "Frag",
+          1,
+          Munitions.M_FRAGMENTATION,
+          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
+                .setUnofficial(false)
+                .setTechRating(TechRating.E)
+                .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+                .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
+                .setISApproximate(true, false, false, false, false)
+                .setPrototypeFactions(Faction.LEGION)
+                .setProductionFactions(Faction.LEGION)
+                .setStaticTechLevel(SimpleTechLevel.STANDARD),
+          "AU");
+
+    private static final MunitionMutator OS_SMOKE_MUNITION_MUTATOR = new MunitionMutator("Smoke",
+          1,
+          Munitions.M_SMOKE_WARHEAD,
+          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
+                .setUnofficial(false)
+                .setTechRating(TechRating.E)
+                .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+                .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
+                .setISApproximate(true, false, false, false, false)
+                .setPrototypeFactions(Faction.LEGION)
+                .setProductionFactions(Faction.LEGION)
+                .setStaticTechLevel(SimpleTechLevel.STANDARD),
+          "AU");
+
+    private static final MunitionMutator OS_TANDEM_CHARGE_MUNITION_MUTATOR = new MunitionMutator("Tandem-Charge", "Tandem",
+          2,
+          Munitions.M_TANDEM_CHARGE,
+          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
+                .setUnofficial(false)
+                .setTechRating(TechRating.E)
+                .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+                .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
+                .setISApproximate(true, false, false, false, false)
+                .setPrototypeFactions(Faction.LEGION)
+                .setProductionFactions(Faction.LEGION)
+                .setStaticTechLevel(SimpleTechLevel.STANDARD),
+          "AU");
+
+    private static final MunitionMutator OS_NARC_CAPABLE_MUNITION_MUTATOR = new MunitionMutator("Narc-capable", "Narc",
+          1,
+          Munitions.M_NARC_CAPABLE,
+          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
+                .setUnofficial(false)
+                .setTechRating(TechRating.E)
+                .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+                .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
+                .setISApproximate(true, false, false, false, false)
+                .setPrototypeFactions(Faction.LEGION)
+                .setProductionFactions(Faction.LEGION)
+                .setStaticTechLevel(SimpleTechLevel.STANDARD),
+          "AU");
+
+    private static final MunitionMutator OS_HEAT_SEEKING_MUNITION_MUTATOR = new MunitionMutator("Heat-Seeking", "HS",
+          2,
+          Munitions.M_HEAT_SEEKING,
+          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
+                .setUnofficial(false)
+                .setTechRating(TechRating.E)
+                .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+                .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
+                .setISApproximate(true, false, false, false, false)
+                .setPrototypeFactions(Faction.LEGION)
+                .setProductionFactions(Faction.LEGION)
+                .setStaticTechLevel(SimpleTechLevel.STANDARD),
+          "AU");
+
+    private static final MunitionMutator OS_LISTEN_KILL_MUNITION_MUTATOR = new MunitionMutator("Listen-Kill",
+          1,
+          Munitions.M_LISTEN_KILL,
+          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
+                .setUnofficial(false)
+                .setTechRating(TechRating.E)
+                .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+                .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
+                .setISApproximate(true, false, false, false, false)
+                .setPrototypeFactions(Faction.LEGION)
+                .setProductionFactions(Faction.LEGION)
+                .setStaticTechLevel(SimpleTechLevel.STANDARD),
+          "AU");
+
+    private static final MunitionMutator OS_MINE_CLEARANCE_MUNITION_MUTATOR = new MunitionMutator("Mine Clearance", "MC",
+          1,
+          Munitions.M_MINE_CLEARANCE,
+          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
+                .setUnofficial(false)
+                .setTechRating(TechRating.E)
+                .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+                .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
+                .setISApproximate(true, false, false, false, false)
+                .setPrototypeFactions(Faction.LEGION)
+                .setProductionFactions(Faction.LEGION)
+                .setStaticTechLevel(SimpleTechLevel.STANDARD),
+          "AU");
+
+    private static final MunitionMutator OS_ANTI_TSM_MUNITION_MUTATOR = new MunitionMutator("Anti-TSM",
+          1,
+          Munitions.M_ANTI_TSM,
+          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
+                .setUnofficial(false)
+                .setTechRating(TechRating.E)
+                .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+                .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
+                .setISApproximate(true, false, false, false, false)
+                .setPrototypeFactions(Faction.LEGION)
+                .setProductionFactions(Faction.LEGION)
+                .setStaticTechLevel(SimpleTechLevel.STANDARD),
+          "AU");
+
+    private static final MunitionMutator OS_DEAD_FIRE_MUNITION_MUTATOR = new MunitionMutator("Dead-Fire",
+          1,
+          Munitions.M_DEAD_FIRE,
+          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
+                .setUnofficial(false)
+                .setTechRating(TechRating.E)
+                .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+                .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
+                .setISApproximate(true, false, false, false, false)
+                .setPrototypeFactions(Faction.LEGION)
+                .setProductionFactions(Faction.LEGION)
+                .setStaticTechLevel(SimpleTechLevel.STANDARD),
+          "AU");
+
+    private static final MunitionMutator OS_ARAD_MUNITION_MUTATOR = new MunitionMutator("Anti-Radiation", "AR",
+          1,
+          Munitions.M_ARAD,
+          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
+                .setUnofficial(false)
+                .setTechRating(TechRating.E)
+                .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+                .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
+                .setISApproximate(true, false, false, false, false)
+                .setPrototypeFactions(Faction.LEGION)
+                .setProductionFactions(Faction.LEGION)
+                .setStaticTechLevel(SimpleTechLevel.STANDARD),
+          "AU");
+
+    private static final MunitionMutator OS_ACID_MUNITION_MUTATOR = new MunitionMutator("Acid",
+          2,
+          Munitions.M_AX_HEAD,
+          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
+                .setUnofficial(false)
+                .setTechRating(TechRating.E)
+                .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+                .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
+                .setISApproximate(true, false, false, false, false)
+                .setPrototypeFactions(Faction.LEGION)
+                .setProductionFactions(Faction.LEGION)
+                .setStaticTechLevel(SimpleTechLevel.STANDARD),
+          "AU");
+
     private static final MunitionMutator DEAD_FIRE_MUNITION_MUTATOR = new MunitionMutator("Dead-Fire",
           1,
           Munitions.M_DEAD_FIRE,
@@ -3913,6 +4083,34 @@ public class AmmoType extends EquipmentType {
         munitions.clear();
         munitions.add(OS_ARTEMIS_CAPABLE_MUNITION_MUTATOR);
         AmmoType.createMunitions(osArtemisMissileAmmos, munitions);
+
+        // OS SRM special munitions — full canon SRM munition set at OS Standard tier (reuses canon M_* mechanics).
+        // Applied to SRM 2/4/6 + MML-SRM racks; Streak / Heavy-SRM excluded. Torpedo (naval) deferred.
+        ArrayList<AmmoType> osSrmMunitionAmmos = new ArrayList<>();
+        osSrmMunitionAmmos.add(AmmoType.createOSSRM2Ammo());
+        osSrmMunitionAmmos.add(AmmoType.createOSSRM4Ammo());
+        osSrmMunitionAmmos.add(AmmoType.createOSSRM6Ammo());
+        osSrmMunitionAmmos.add(AmmoType.createOSMML3SRMAmmo());
+        osSrmMunitionAmmos.add(AmmoType.createOSMML5SRMAmmo());
+        osSrmMunitionAmmos.add(AmmoType.createOSMML7SRMAmmo());
+        osSrmMunitionAmmos.add(AmmoType.createOSMML8SRMAmmo());
+        osSrmMunitionAmmos.add(AmmoType.createOSMML9SRMAmmo());
+        osSrmMunitionAmmos.add(AmmoType.createOSMML11SRMAmmo());
+        osSrmMunitionAmmos.add(AmmoType.createOSMML14SRMAmmo());
+        munitions.clear();
+        munitions.add(OS_INFERNO_MUNITION_MUTATOR);
+        munitions.add(OS_FRAGMENTATION_MUNITION_MUTATOR);
+        munitions.add(OS_SMOKE_MUNITION_MUTATOR);
+        munitions.add(OS_TANDEM_CHARGE_MUNITION_MUTATOR);
+        munitions.add(OS_NARC_CAPABLE_MUNITION_MUTATOR);
+        munitions.add(OS_HEAT_SEEKING_MUNITION_MUTATOR);
+        munitions.add(OS_LISTEN_KILL_MUNITION_MUTATOR);
+        munitions.add(OS_MINE_CLEARANCE_MUNITION_MUTATOR);
+        munitions.add(OS_ANTI_TSM_MUNITION_MUTATOR);
+        munitions.add(OS_DEAD_FIRE_MUNITION_MUTATOR);
+        munitions.add(OS_ARAD_MUNITION_MUTATOR);
+        munitions.add(OS_ACID_MUNITION_MUTATOR);
+        AmmoType.createMunitions(osSrmMunitionAmmos, munitions);
 
         // PLAYTEST create the munition types for RAC rounds.
         munitions.clear();
