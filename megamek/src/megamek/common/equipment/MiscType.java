@@ -2607,7 +2607,8 @@ public class MiscType extends EquipmentType {
         misc.tonnage = 2;
         misc.criticalSlots = 2;
         misc.cost = 500000;
-        misc.flags = misc.flags.or(MiscTypeFlag.F_OS_COMBAT_COMPUTER, F_MEK_EQUIPMENT);
+        misc.flags = misc.flags.or(MiscTypeFlag.F_OS_COMBAT_COMPUTER, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT,
+              F_SUPPORT_TANK_EQUIPMENT, F_FIGHTER_EQUIPMENT);
         misc.setModes(new String[] { "Normal", "Aimed shot" });
         misc.bv = 0;
         misc.rulesRefs = "AU";
@@ -2630,7 +2631,8 @@ public class MiscType extends EquipmentType {
         misc.tonnage = TONNAGE_VARIABLE;
         misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
         misc.cost = 300000;
-        misc.flags = misc.flags.or(MiscTypeFlag.F_OS_CC_BALLISTIC, F_MEK_EQUIPMENT);
+        misc.flags = misc.flags.or(MiscTypeFlag.F_OS_CC_BALLISTIC, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT,
+              F_SUPPORT_TANK_EQUIPMENT, F_FIGHTER_EQUIPMENT);
         misc.bv = 0;
         misc.rulesRefs = "AU";
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
@@ -2652,7 +2654,8 @@ public class MiscType extends EquipmentType {
         misc.tonnage = TONNAGE_VARIABLE;
         misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
         misc.cost = 300000;
-        misc.flags = misc.flags.or(MiscTypeFlag.F_OS_CC_ENERGY, F_MEK_EQUIPMENT);
+        misc.flags = misc.flags.or(MiscTypeFlag.F_OS_CC_ENERGY, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT,
+              F_SUPPORT_TANK_EQUIPMENT, F_FIGHTER_EQUIPMENT);
         misc.bv = 0;
         misc.rulesRefs = "AU";
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
@@ -2674,7 +2677,8 @@ public class MiscType extends EquipmentType {
         misc.tonnage = TONNAGE_VARIABLE;
         misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
         misc.cost = 300000;
-        misc.flags = misc.flags.or(MiscTypeFlag.F_OS_CC_MISSILE, F_MEK_EQUIPMENT);
+        misc.flags = misc.flags.or(MiscTypeFlag.F_OS_CC_MISSILE, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT,
+              F_SUPPORT_TANK_EQUIPMENT, F_FIGHTER_EQUIPMENT);
         misc.bv = 0;
         misc.rulesRefs = "AU";
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
@@ -2696,7 +2700,8 @@ public class MiscType extends EquipmentType {
         misc.tonnage = TONNAGE_VARIABLE;
         misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
         misc.cost = 750000;
-        misc.flags = misc.flags.or(MiscTypeFlag.F_OS_COMPOSITE_TC, F_MEK_EQUIPMENT);
+        misc.flags = misc.flags.or(MiscTypeFlag.F_OS_COMPOSITE_TC, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT,
+              F_SUPPORT_TANK_EQUIPMENT, F_FIGHTER_EQUIPMENT);
         misc.setModes(new String[] { "Normal", "Aimed shot" });
         misc.bv = 0;
         misc.rulesRefs = "AU";

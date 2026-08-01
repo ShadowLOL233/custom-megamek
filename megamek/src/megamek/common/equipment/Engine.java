@@ -1241,7 +1241,7 @@ public class Engine implements Serializable, ITechnology {
           .setISAdvancement(2900, 2915, 2930)
           .setTechRating(TechRating.E)
           .setAvailability(AvailabilityValue.D, AvailabilityValue.D, AvailabilityValue.C, AvailabilityValue.C)
-          .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+          .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     private static final TechAdvancement SUPPORT_STEAM_TA = new TechAdvancement(TechBase.ALL)
           .setAdvancement(DATE_PS, DATE_PS, DATE_PS).setTechRating(TechRating.A)
@@ -1739,11 +1739,16 @@ public class Engine implements Serializable, ITechnology {
             case OS_IMPROVE_COMPACT_ENGINE:
             case OS_ENHANCED_COMPACT_ENGINE:
             case OS_IMPROVE_ICE_ENGINE:
-            case OS_HYBRID_ENGINE:
                 if (year < 2800) {
                     return TechConstants.T_OUTER_SPHERE_UNOFFICIAL;
                 } else {
                     return TechConstants.T_OUTER_SPHERE_ADVANCED;
+                }
+            case OS_HYBRID_ENGINE:
+                if (year < 2800) {
+                    return TechConstants.T_OUTER_SPHERE_UNOFFICIAL;
+                } else {
+                    return TechConstants.T_OUTER_SPHERE_STANDARD;
                 }
             case OS_ENHANCED_XXL_ENGINE:
             case OS_STANDARD_XXL_ENGINE:

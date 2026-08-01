@@ -859,6 +859,13 @@ module).
   <30 t / 3-type <45 t → Composite).
 - **Enhanced Combat Computer** — SHELVED for now (was to be the Advance do-everything apex; the name also collided
   with the §0.2 "Enhanced" tier).
+- **Mountable on all unit types (decided 2026-07-31):** the whole CCS — C-2500 core, all three CC modules, and the
+  Composite TC — carries the same entity flags as the canon Targeting Computer (`F_MEK_EQUIPMENT + F_TANK_EQUIPMENT +
+  F_SUPPORT_TANK_EQUIPMENT + F_FIGHTER_EQUIPMENT`), so it is buildable on Meks, combat & support vehicles, and
+  aerospace fighters. OS rejects Mek-exclusive systems; the "*one mech*" framing in §9.1 is thematic, not a
+  construction restriction. `F_HEAVY_EQUIPMENT` (canon TC's support-vehicle weight-class marker) is the only TC flag
+  not copied — add it if full parity is wanted. ⏳ playtest: the module/Composite −1 to-hit
+  (`ComputeAttackerToHitMods`) and the variable tonnage/crit on non-Mek chassis are UNTESTED on vehicles/fighters.
 
 ### 9.3 Cross-system rules & tiers
 - **Direct-fire stacking:** a direct-fire weapon may take **CCS module −1 + BCS network −1 = −2** total (allowed).
