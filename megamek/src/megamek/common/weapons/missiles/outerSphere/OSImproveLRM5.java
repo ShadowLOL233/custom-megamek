@@ -32,13 +32,15 @@ public class OSImproveLRM5 extends LRMWeapon {
         minimumRange = 6;
         tonnage = 1.5;
         criticalSlots = 1;
-        bv = 45;
+        bv = 52;
+        longRange = 24;
+        extremeRange = 30;
         cost = 30000;
         shortAV = 3;
         medAV = 3;
         longAV = 3;
         maxRange = RANGE_LONG;
-        flags = flags.andNot(F_PROTO_WEAPON);
+        flags = flags.andNot(F_PROTO_WEAPON).or(F_OS_LRM_LONG_SPEC);
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setIntroLevel(false)
               .setUnofficial(false)

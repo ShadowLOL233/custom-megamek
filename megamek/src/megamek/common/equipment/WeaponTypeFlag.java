@@ -153,5 +153,11 @@ public enum WeaponTypeFlag implements EquipmentFlag {
     F_OS_KESTREL_DESIGNATOR,
 
     /** OS Shrike Combat Designator (dev plan §9) — a crit-capable TAG that grants the C3 network a to-hit bonus. */
-    F_OS_SHRIKE_DESIGNATOR
+    F_OS_SHRIKE_DESIGNATOR,
+
+    /** OS core LRM (long-range bombardment specialist): -1 to-hit in the long range bracket and beyond. */
+    F_OS_LRM_LONG_SPEC,
+
+    /** OS core MRM (medium-range specialist): -1 to-hit inside its (huge) medium range bracket. */
+    F_OS_MRM_MEDIUM_SPEC
 }

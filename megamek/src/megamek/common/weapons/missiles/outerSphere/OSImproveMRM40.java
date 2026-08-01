@@ -13,11 +13,13 @@ import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
 import megamek.common.enums.TechRating;
-import megamek.common.equipment.Mounted;
-import megamek.common.weapons.missiles.MRMWeapon;
 
-/** Outer Sphere Improve MRM 40 - precise mid-range LRM: no min range, -1 to-hit, Diana III FCS. */
-public class OSImproveMRM40 extends MRMWeapon {
+/**
+ * Outer Sphere Improve MRM 40 — OS medium-range specialist: a huge medium bracket (short 3 / medium 13 /
+ * long 16, no minimum range), accurate with a -1 to-hit inside the medium bracket (wired in ComputeToHit via
+ * F_OS_MRM_MEDIUM_SPEC; a linked Diana III FCS adds a further -1 there).
+ */
+public class OSImproveMRM40 extends OSMRMWeapon {
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -28,13 +30,12 @@ public class OSImproveMRM40 extends MRMWeapon {
         addLookupName("OS Improve MRM-40");
         addLookupName("OS Improve MRM 40");
         sortingName = "Missile OS 2 1 2 40";
-        toHitModifier = -1;
         heat = 12;
         rackSize = 40;
         minimumRange = 0;
-        shortRange = 5;
-        mediumRange = 10;
-        longRange = 15;
+        shortRange = 3;
+        mediumRange = 13;
+        longRange = 16;
         extremeRange = 20;
         tonnage = 12.0;
         criticalSlots = 7;
@@ -44,6 +45,7 @@ public class OSImproveMRM40 extends MRMWeapon {
         medAV = 24;
         longAV = 24;
         maxRange = RANGE_LONG;
+        flags = flags.or(F_OS_MRM_MEDIUM_SPEC);
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setIntroLevel(false)
               .setUnofficial(false)
@@ -54,19 +56,6 @@ public class OSImproveMRM40 extends MRMWeapon {
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
               .setStaticTechLevel(SimpleTechLevel.STANDARD);
-    }
-
-    @Override
-    public int getToHitModifier(Mounted<?> mounted) {
-        int mod = -1;
-        if ((mounted != null) && (mounted.getLinkedBy() != null)
-              && (mounted.getLinkedBy().getType() instanceof megamek.common.equipment.MiscType fcs)
-              && fcs.hasFlag(megamek.common.equipment.MiscType.F_DIANA_III)
-              && !mounted.getLinkedBy().isDestroyed() && !mounted.getLinkedBy().isMissing()
-              && !mounted.getLinkedBy().isBreached()) {
-            mod -= 1; // Diana III FCS adds another -1
-        }
-        return mod;
     }
 
     @Override

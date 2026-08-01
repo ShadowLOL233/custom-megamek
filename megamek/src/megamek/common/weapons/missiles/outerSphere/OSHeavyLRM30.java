@@ -43,13 +43,15 @@ public class OSHeavyLRM30 extends LRMWeapon {
         minimumRange = 6;
         tonnage = 14.0;
         criticalSlots = 7;
-        bv = 410;
+        bv = 472;
+        longRange = 24;
+        extremeRange = 30;
         cost = 562500;
         shortAV = 18;
         medAV = 18;
         longAV = 18;
         maxRange = RANGE_LONG;
-        flags = flags.andNot(F_PROTO_WEAPON);
+        flags = flags.andNot(F_PROTO_WEAPON).or(F_OS_LRM_LONG_SPEC);
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setIntroLevel(false)
               .setUnofficial(false)

@@ -1603,6 +1603,33 @@ public class ComputeToHit {
             }
         }
 
+        // OS LRM (long-range bombardment specialist): -1 to-hit in the long range bracket and beyond — the
+        // standoff artillery walks salvos onto distant targets. Priced into the BV.
+        if (target != null && weaponType.hasFlag(megamek.common.equipment.WeaponTypeFlag.F_OS_LRM_LONG_SPEC)) {
+            int nRange = ae.getPosition().distance(target.getPosition());
+            int[] nRanges = weaponType.getRanges(weapon, ammo);
+            if (nRange > nRanges[RangeType.RANGE_MEDIUM]) {
+                toHit.addModifier(-1, Messages.getString("WeaponAttackAction.WeaponMod"));
+            }
+        }
+
+        // OS MRM (medium-range specialist): -1 to-hit inside its huge medium range bracket; a linked Diana III
+        // FCS adds a further -1. No bonus at short or long range. Priced into the BV.
+        if (target != null && weaponType.hasFlag(megamek.common.equipment.WeaponTypeFlag.F_OS_MRM_MEDIUM_SPEC)) {
+            int nRange = ae.getPosition().distance(target.getPosition());
+            int[] nRanges = weaponType.getRanges(weapon, ammo);
+            if ((nRange > nRanges[RangeType.RANGE_SHORT]) && (nRange <= nRanges[RangeType.RANGE_MEDIUM])) {
+                toHit.addModifier(-1, Messages.getString("WeaponAttackAction.WeaponMod"));
+                if ((weapon != null) && (weapon.getLinkedBy() != null)
+                      && (weapon.getLinkedBy().getType() instanceof megamek.common.equipment.MiscType fcs)
+                      && fcs.hasFlag(megamek.common.equipment.MiscType.F_DIANA_III)
+                      && !weapon.getLinkedBy().isDestroyed() && !weapon.getLinkedBy().isMissing()
+                      && !weapon.getLinkedBy().isBreached()) {
+                    toHit.addModifier(-1, Messages.getString("WeaponAttackAction.WeaponMod"));
+                }
+            }
+        }
+
         // Indirect fire (LRMs, mortars and the like) has a +1 mod
         if (isIndirect) {
             toHit.addModifier(1, Messages.getString("WeaponAttackAction.Indirect"));

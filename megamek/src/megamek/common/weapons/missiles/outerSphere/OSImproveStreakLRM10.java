@@ -32,11 +32,11 @@ public class OSImproveStreakLRM10 extends StreakLRMWeapon {
         minimumRange = 6;
         shortRange = 7;
         mediumRange = 14;
-        longRange = 21;
-        extremeRange = 28;
+        longRange = 24;
+        extremeRange = 30;
         tonnage = 5.0;
         criticalSlots = 2;
-        bv = 173;
+        bv = 182;
         cost = 156000;
         shortAV = 10;
         medAV = 10;

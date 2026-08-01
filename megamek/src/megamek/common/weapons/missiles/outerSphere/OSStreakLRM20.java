@@ -32,11 +32,11 @@ public class OSStreakLRM20 extends StreakLRMWeapon {
         minimumRange = 6;
         shortRange = 7;
         mediumRange = 14;
-        longRange = 21;
-        extremeRange = 28;
+        longRange = 24;
+        extremeRange = 30;
         tonnage = 11.5;
         criticalSlots = 5;
-        bv = 346;
+        bv = 363;
         cost = 240000;
         shortAV = 20;
         medAV = 20;

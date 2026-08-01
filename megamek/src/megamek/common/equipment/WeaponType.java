@@ -608,6 +608,10 @@ public class WeaponType extends EquipmentType {
     public static final WeaponTypeFlag F_ONE_SHOT = WeaponTypeFlag.F_ONE_SHOT;
     public static final WeaponTypeFlag F_ARTILLERY = WeaponTypeFlag.F_ARTILLERY;
 
+    // OS missile range-specialists (dev plan §8/§missile-redesign): bare aliases so weapon subclasses can set them.
+    public static final WeaponTypeFlag F_OS_LRM_LONG_SPEC = WeaponTypeFlag.F_OS_LRM_LONG_SPEC;
+    public static final WeaponTypeFlag F_OS_MRM_MEDIUM_SPEC = WeaponTypeFlag.F_OS_MRM_MEDIUM_SPEC;
+
     // for Gunnery/Ballistic
     public static final WeaponTypeFlag F_BALLISTIC = WeaponTypeFlag.F_BALLISTIC;
     // for Gunnery/Energy

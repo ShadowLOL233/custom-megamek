@@ -34,13 +34,15 @@ public class OSEnhancedLRM5 extends LRMWeapon {
         minimumRange = 0;
         tonnage = 1.0;
         criticalSlots = 1;
-        bv = 51;
+        bv = 59;
+        longRange = 24;
+        extremeRange = 30;
         cost = 45000;
         shortAV = 3;
         medAV = 3;
         longAV = 3;
         maxRange = RANGE_LONG;
-        flags = flags.andNot(F_PROTO_WEAPON);
+        flags = flags.andNot(F_PROTO_WEAPON).or(F_OS_LRM_LONG_SPEC);
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setIntroLevel(false)
               .setUnofficial(false)

@@ -13,15 +13,14 @@ import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
 import megamek.common.enums.TechRating;
-import megamek.common.equipment.Mounted;
-import megamek.common.weapons.missiles.MRMWeapon;
 
 /**
- * Outer Sphere Improve MRM 10 - OS reinterprets the MRM as a precise mid-range LRM: no minimum
- * range and a -1 to-hit bonus (instead of the canon +1 penalty). Pairs with the Diana III FCS.
- * There is no base OS MRM (plain and Improve MRM were only months apart, so RoOS fielded Improve).
+ * Outer Sphere Improve MRM 10 — OS medium-range specialist: a huge medium bracket (short 3 / medium 13 /
+ * long 16, no minimum range), accurate with a -1 to-hit inside the medium bracket (wired in ComputeToHit via
+ * F_OS_MRM_MEDIUM_SPEC; a linked Diana III FCS adds a further -1 there). There is no base OS MRM (plain and
+ * Improve MRM were only months apart, so RoOS fielded Improve).
  */
-public class OSImproveMRM10 extends MRMWeapon {
+public class OSImproveMRM10 extends OSMRMWeapon {
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -32,13 +31,12 @@ public class OSImproveMRM10 extends MRMWeapon {
         addLookupName("OS Improve MRM-10");
         addLookupName("OS Improve MRM 10");
         sortingName = "Missile OS 2 1 2 10";
-        toHitModifier = -1;
         heat = 4;
         rackSize = 10;
         minimumRange = 0;
-        shortRange = 5;
-        mediumRange = 10;
-        longRange = 15;
+        shortRange = 3;
+        mediumRange = 13;
+        longRange = 16;
         extremeRange = 20;
         tonnage = 3.0;
         criticalSlots = 2;
@@ -48,6 +46,7 @@ public class OSImproveMRM10 extends MRMWeapon {
         medAV = 6;
         longAV = 6;
         maxRange = RANGE_LONG;
+        flags = flags.or(F_OS_MRM_MEDIUM_SPEC);
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setIntroLevel(false)
               .setUnofficial(false)
@@ -58,19 +57,6 @@ public class OSImproveMRM10 extends MRMWeapon {
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
               .setStaticTechLevel(SimpleTechLevel.STANDARD);
-    }
-
-    @Override
-    public int getToHitModifier(Mounted<?> mounted) {
-        int mod = -1;
-        if ((mounted != null) && (mounted.getLinkedBy() != null)
-              && (mounted.getLinkedBy().getType() instanceof megamek.common.equipment.MiscType fcs)
-              && fcs.hasFlag(megamek.common.equipment.MiscType.F_DIANA_III)
-              && !mounted.getLinkedBy().isDestroyed() && !mounted.getLinkedBy().isMissing()
-              && !mounted.getLinkedBy().isBreached()) {
-            mod -= 1; // Diana III FCS adds another -1
-        }
-        return mod;
     }
 
     @Override

@@ -20,7 +20,7 @@ Quick index — jump to a section instead of scanning the whole file.
 - **Section 7 — Planned: BF & RF AC variants** [active]: being reclassified to **Inner Sphere** (not OS).
 - **Section 8 — Electromagnetic Lance & kinetic apex**: Coil Augmented Railgun **✅ IMPLEMENTED**; Electromagnetic Lance (power-gated coilgun supergun) **✅ IMPLEMENTED 2026-07-31 — 6 munitions**; also holds the (now ✅ done) HVAC-repurpose & Heavy-missile-Ultra decisions.
 - **Section 9 — OS Modular Electronics: BCS & CCS** [active/DESIGN]: two systems — **BCS** (Battle Computer System: info/command/EW, Tacticon B-2500 lineage, modular track + Advance specialized cores C-X280/Raven/G-X100) and **CCS** (Combat Computer System: single-mech fire control, C-2500 core + weapon-type modules + Composite). Dissolves canon AES⊥TC / AES⊥MASC / standalone-C3 into a modular ecosystem balanced by a two-core tonnage tax. **§9.6** adds a C3-network target-designator sub-family (Kestrel / Shrike / Lodestar).
-- **⭐ HIGH PRIORITY (2026-07-31) — OS missile special munitions:** Inferno / Smoke / Semi-Guided / Swarm / Thunder (FASCAM) / Fragmentation / Narc- & Artemis-capable, etc. The OS missile line currently ships STANDARD ammo only. Detail under "⭐ Development priority" below.
+- **OS missile special munitions (2026-07-31):** **SRM ✅ + LRM ✅ done** (full canon set at OS Standard on SRM/LRM racks + MML); **MRM ⏳** (OS-original subset, no canon). Detail under "⭐ Development priority" below.
 
 Shelved ideas are parked in **[OS_SHELVED_IDEAS.md](OS_SHELVED_IDEAS.md)**. Splitting this plan into
 per-topic files (weapons / units / equipment) is **deferred** until it grows further.
@@ -45,19 +45,63 @@ equipment-init unit tests **only**. Testing priority order:
 
 ## ⭐ Development priority (added 2026-07-31)
 
-### OS missile special munitions — HIGH PRIORITY
-The OS missile line (LRM / SRM / Streak / ER-LRM / MML / Heavy families — ammo in `AmmoType.java`,
-`createOS*Ammo`) currently ships **STANDARD ammo only** and has **no special munitions**. Bring it up to
-the canon missile-munition catalogue with OS-flavored variants (tier per §0.2 where meaningful):
-- **SRM:** **Inferno** (explicit first target), Fragmentation, Smoke, Tandem-Charge, Narc-capable,
-  Artemis-capable; Listen-Kill / Heat-Seeking optional.
-- **LRM:** Semi-Guided, Swarm / Swarm-I, the **Thunder / FASCAM** minefield family (Thunder, -Augmented,
-  -Inferno, -Active, -Vibrabomb), Fragmentation, Narc- & Artemis-capable, Follow-the-Leader.
-- **MML:** inherits both the LRM and SRM munition sets.
+### OS missile special munitions — SRM ✅ / LRM ✅ / MRM ✅
+The OS missile line (LRM / SRM / MML / Streak / ER-LRM / Heavy families — ammo in `AmmoType.java`,
+`createOS*Ammo`) shipped **STANDARD ammo only**; this initiative brings it up to the canon missile-munition
+catalogue with OS-native variants. Method: define `OS_*_MUNITION_MUTATOR`s (canon `Munitions.M_*` + weight
+ratio, OS Standard tier 2805/2820/2840, rating E, `Faction.LEGION`) and apply them via `createMunitions`.
+Because MegaMek's munition mechanics are driven by the `Munitions` enum + generic handlers (which only check
+`munitionType.contains(M_*)`, tech-base-agnostic), the OS variants reuse canon mechanics with **no handler
+work**.
+- **SRM — ✅ DONE (2026-07-31):** full canon set (Inferno, Fragmentation, Smoke, Tandem-Charge, Narc-capable,
+  Heat-Seeking, Listen-Kill, Mine-Clearance, Anti-TSM, Dead-Fire, ARAD, Acid) on SRM 2/4/6 + MML-SRM. Artemis
+  is applied by the separate OS Artemis block. Streak / Heavy-SRM excluded; Torpedo (naval) deferred.
+- **LRM — ✅ DONE (2026-07-31):** full canon set — Follow-the-Leader, Semi-Guided, Swarm, Swarm-I, the
+  Thunder/FASCAM family (Thunder / -Active / -Augmented / -Vibrabomb / -Inferno), plus the shared Fragmentation,
+  Smoke, Narc, Heat-Seeking, Listen-Kill, Mine-Clearance, Anti-TSM, Dead-Fire, ARAD — on LRM 5/10/15/20/30 +
+  MML-LRM. Artemis applied separately. **Incendiary LRM deferred** (canon builds it as separate ammo via
+  `createIncendiaryVariants`, not a mutator); Tandem-Charge / Acid are SRM-only in canon; ER-LRM / MRM excluded.
+- **MRM — ✅ DONE (2026-07-31):** OS-original subset (canon MRM has none): Fragmentation, Smoke, Narc-capable,
+  Heat-Seeking, Listen-Kill, Anti-TSM, Mine-Clearance, Dead-Fire on Improve MRM 10/20/30/40 (Streak MRM
+  excluded). Because the plain `MRMHandler` doesn't branch on munition, effect dispatch is wired via the new
+  `OSMRMWeapon` base (reuses the LRM cluster-missile handlers). Thunder/FASCAM stays LRM-only.
 
-Implementation: add OS `AmmoType` munition variants — reuse canon `Munitions` types + handler mechanics
-where the behavior is unchanged; author new OS munitions only where the OS design diverges — and wire ammo
-switching in MML. ⏳ scope, tiering, and which munitions get OS-specific twists TBD.
+Tiering: all at OS Standard for now; the user may later promote select munitions to Advance. **UNTESTED
+in-game** — compiles + equipment-init / AmmoType tests pass.
+
+### OS missile range specialization — SRM / MRM / LRM triad (redesign, 2026-07-31)
+Reworks the three cluster-missile families into a short / medium / long specialization triad (OS §0 "reject
+do-everything"): SRM = short brawler, MRM = medium specialist, LRM = long-range bombardment. Range brackets are
+data-only field changes; the bracket-conditional to-hit bonuses are wired in `ComputeToHit` (mirroring the HVAC
+range-scaling block), gated on new flags `F_OS_LRM_LONG_SPEC` / `F_OS_MRM_MEDIUM_SPEC`.
+
+| Family | min | short | medium | long | ext | signature |
+|---|---|---|---|---|---|---|
+| SRM (unchanged) | 0 | 3 | 6 | 9 | 12 | dmg 2/missile, short brawler |
+| MRM (core) | 0 | 3 | 13 | 16 | 20 | **-1 to-hit in the huge medium bracket** (Diana III FCS stacks a further -1); canon +1 penalty removed |
+| LRM (core) | 6 / 0 | 7 | 14 | 24 | 30 | **-1 to-hit in the long bracket**, indirect-fire bombardment |
+
+**Variant positioning (where the LRM sub-families sit in the new triad):**
+- **Core LRM (Heavy / Improve / Enhanced):** the only family with 7/14/24 + long -1 (`F_OS_LRM_LONG_SPEC`). **BV +15%.**
+- **Streak LRM (+ Improve Streak):** precision no-waste long — adopts the new 7/14/24 range, keeps lock-on, **no
+  long -1** (its edge is guaranteed hits, not the accuracy bonus). **BV +5%.**
+- **ER-LRM:** the extreme-reach axis (12/22/38, Artemis) — unchanged; trades the long -1 for raw distance.
+- **Extended Streak LRM:** apex reach + lock-on (12/22/38) — unchanged.
+- **Dragon Piercer:** a Thunderbolt single-warhead AP strike — orthogonal to the cluster triad, unchanged (no
+  bracket -1, no range change).
+- **MML (LRM mode):** the generalist — stays baseline canon 7/14/21, **no** long -1 (flexibility is its tradeoff;
+  specialization is not rewarded). This also sidesteps the dual-mode gating complexity.
+- **Core MRM (Improve 10/20/30/40):** the medium specialist (`F_OS_MRM_MEDIUM_SPEC`); **BV held**. **Streak MRM**
+  adopts the new 3/13/16 ranges, no medium -1, BV held.
+
+**BV scheme applied:** value = damage + range + accuracy (OS methodology). Core LRM +15% (long +3 reach + long
+-1): Improve 5/10/15/20 = 52/104/156/208; Enhanced = 59/117/177/236; Heavy 10/20/30 = 155/316/472. Streak LRM
++5% (range only): 5/10/15/20 = 91/182/273/363. MRM held (medium -1 + huge bracket ≈ the old flat -1).
+
+**Implementation:** `WeaponTypeFlag.F_OS_LRM_LONG_SPEC` / `F_OS_MRM_MEDIUM_SPEC` (+ WeaponType bare aliases);
+`ComputeToHit` bracket blocks; new `OSMRMWeapon` base (medium-spec accuracy baseline + special-munition
+dispatch). Compiles; equipment-init / AmmoType tests pass. **UNTESTED in-game** (to playtest: verify the long/
+medium -1 fire in the right brackets, MRM special-munition effects resolve, and the new BVs feel right).
 
 ---
 

@@ -39,9 +39,9 @@ public class OSStreakMRM10 extends MRMWeapon {
         heat = 4;
         rackSize = 10;
         minimumRange = 0;
-        shortRange = 5;
-        mediumRange = 10;
-        longRange = 15;
+        shortRange = 3;
+        mediumRange = 13;
+        longRange = 16;
         extremeRange = 20;
         tonnage = 6.0;
         criticalSlots = 3;
