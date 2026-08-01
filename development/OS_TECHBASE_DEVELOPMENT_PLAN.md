@@ -20,6 +20,7 @@ Quick index — jump to a section instead of scanning the whole file.
 - **Section 7 — Planned: BF & RF AC variants** [active]: being reclassified to **Inner Sphere** (not OS).
 - **Section 8 — Electromagnetic Lance & kinetic apex**: Coil Augmented Railgun **✅ IMPLEMENTED**; Electromagnetic Lance (power-gated coilgun supergun) **✅ IMPLEMENTED 2026-07-31 — 6 munitions**; also holds the (now ✅ done) HVAC-repurpose & Heavy-missile-Ultra decisions.
 - **Section 9 — OS Modular Electronics: BCS & CCS** [active/DESIGN]: two systems — **BCS** (Battle Computer System: info/command/EW, Tacticon B-2500 lineage, modular track + Advance specialized cores C-X280/Raven/G-X100) and **CCS** (Combat Computer System: single-mech fire control, C-2500 core + weapon-type modules + Composite). Dissolves canon AES⊥TC / AES⊥MASC / standalone-C3 into a modular ecosystem balanced by a two-core tonnage tax. **§9.6** adds a C3-network target-designator sub-family (Kestrel / Shrike / Lodestar).
+- **⭐ HIGH PRIORITY (2026-07-31) — OS missile special munitions:** Inferno / Smoke / Semi-Guided / Swarm / Thunder (FASCAM) / Fragmentation / Narc- & Artemis-capable, etc. The OS missile line currently ships STANDARD ammo only. Detail under "⭐ Development priority" below.
 
 Shelved ideas are parked in **[OS_SHELVED_IDEAS.md](OS_SHELVED_IDEAS.md)**. Splitting this plan into
 per-topic files (weapons / units / equipment) is **deferred** until it grows further.
@@ -39,6 +40,24 @@ equipment-init unit tests **only**. Testing priority order:
      and the natural-2 double-tap jam.
    - **Electromagnetic Lance (§8)** — check the per-munition power-gate (range + damage switching), inherent AP
      on the full-power rounds, and Precision's −2 vs target movement.
+
+---
+
+## ⭐ Development priority (added 2026-07-31)
+
+### OS missile special munitions — HIGH PRIORITY
+The OS missile line (LRM / SRM / Streak / ER-LRM / MML / Heavy families — ammo in `AmmoType.java`,
+`createOS*Ammo`) currently ships **STANDARD ammo only** and has **no special munitions**. Bring it up to
+the canon missile-munition catalogue with OS-flavored variants (tier per §0.2 where meaningful):
+- **SRM:** **Inferno** (explicit first target), Fragmentation, Smoke, Tandem-Charge, Narc-capable,
+  Artemis-capable; Listen-Kill / Heat-Seeking optional.
+- **LRM:** Semi-Guided, Swarm / Swarm-I, the **Thunder / FASCAM** minefield family (Thunder, -Augmented,
+  -Inferno, -Active, -Vibrabomb), Fragmentation, Narc- & Artemis-capable, Follow-the-Leader.
+- **MML:** inherits both the LRM and SRM munition sets.
+
+Implementation: add OS `AmmoType` munition variants — reuse canon `Munitions` types + handler mechanics
+where the behavior is unchanged; author new OS munitions only where the OS design diverges — and wire ammo
+switching in MML. ⏳ scope, tiering, and which munitions get OS-specific twists TBD.
 
 ---
 

@@ -2049,6 +2049,7 @@ public class ArmorType extends MiscType {
               .setAvailability(AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C)
               .setISAdvancement(2820, 2825, 2832).setStaticTechLevel(SimpleTechLevel.STANDARD);
         armor.armorType = T_ARMOR_OS_IMP_FF;
+        armor.flags = armor.flags.or(F_TANK_EQUIPMENT).or(F_VTOL_EQUIPMENT);
         armor.pptMultiplier = 1.12;
         return armor;
     }
@@ -2072,6 +2073,7 @@ public class ArmorType extends MiscType {
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
               .setISAdvancement(3000, 3025, 3050).setStaticTechLevel(SimpleTechLevel.ADVANCED);
         armor.armorType = T_ARMOR_OS_ADV_FF;
+        armor.flags = armor.flags.or(F_TANK_EQUIPMENT).or(F_VTOL_EQUIPMENT);
         armor.pptMultiplier = 1.208;
         return armor;
     }
@@ -2090,6 +2092,7 @@ public class ArmorType extends MiscType {
               .setAvailability(AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C)
               .setISAdvancement(2824, 2830, 2838).setStaticTechLevel(SimpleTechLevel.ADVANCED);
         armor.armorType = T_ARMOR_OS_HEAVY_FF;
+        armor.flags = armor.flags.or(F_TANK_EQUIPMENT).or(F_VTOL_EQUIPMENT);
         armor.pptMultiplier = 1.1875;
         return armor;
     }
@@ -2111,6 +2114,7 @@ public class ArmorType extends MiscType {
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
               .setISAdvancement(2848, 2856, 2866).setStaticTechLevel(SimpleTechLevel.STANDARD);
         armor.armorType = T_ARMOR_OS_IMP_HEAVY_FF;
+        armor.flags = armor.flags.or(F_TANK_EQUIPMENT).or(F_VTOL_EQUIPMENT);
         armor.pptMultiplier = 1.25;
         return armor;
     }
@@ -2132,6 +2136,7 @@ public class ArmorType extends MiscType {
               .setAvailability(AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C)
               .setISAdvancement(2828, 2834, 2842).setStaticTechLevel(SimpleTechLevel.STANDARD);
         armor.armorType = T_ARMOR_OS_IMP_LIGHT_FF;
+        armor.flags = armor.flags.or(F_TANK_EQUIPMENT).or(F_VTOL_EQUIPMENT);
         armor.pptMultiplier = 1.0;
         return armor;
     }
@@ -2173,6 +2178,7 @@ public class ArmorType extends MiscType {
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
               .setISAdvancement(2860, 2870, 2882).setStaticTechLevel(SimpleTechLevel.ADVANCED);
         armor.armorType = T_ARMOR_OS_HARDENED_FF;
+        armor.flags = armor.flags.or(F_TANK_EQUIPMENT);
         armor.pptMultiplier = 0.5625;
         return armor;
     }
@@ -2191,6 +2197,7 @@ public class ArmorType extends MiscType {
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
               .setISAdvancement(2875, 2888, 2900).setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
         armor.armorType = T_ARMOR_OS_HARDENED_HEAVY_FF;
+        armor.flags = armor.flags.or(F_TANK_EQUIPMENT);
         armor.pptMultiplier = 0.9375;
         return armor;
     }
@@ -2214,6 +2221,7 @@ public class ArmorType extends MiscType {
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
               .setISAdvancement(3000, 3025, 3050).setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
         armor.armorType = T_ARMOR_OS_ADV_HARDENED_FF;
+        armor.flags = armor.flags.or(F_TANK_EQUIPMENT);
         armor.pptMultiplier = 0.8125;
         return armor;
     }
@@ -2273,6 +2281,7 @@ public class ArmorType extends MiscType {
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
               .setISAdvancement(2855, 2865, 2878).setStaticTechLevel(SimpleTechLevel.ADVANCED);
         armor.armorType = T_ARMOR_OS_ENERGY_ABSORPTION;
+        armor.flags = armor.flags.or(F_TANK_EQUIPMENT).or(F_VTOL_EQUIPMENT).or(F_FIGHTER_EQUIPMENT);
         armor.pptMultiplier = 1.0;
         return armor;
     }
@@ -2291,6 +2300,7 @@ public class ArmorType extends MiscType {
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
               .setISAdvancement(2848, 2858, 2870).setStaticTechLevel(SimpleTechLevel.ADVANCED);
         armor.armorType = T_ARMOR_OS_LASER_REFLECTIVE;
+        armor.flags = armor.flags.or(F_TANK_EQUIPMENT).or(F_VTOL_EQUIPMENT).or(F_FIGHTER_EQUIPMENT);
         armor.pptMultiplier = 1.0;
         return armor;
     }
@@ -2309,6 +2319,7 @@ public class ArmorType extends MiscType {
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
               .setISAdvancement(2845, 2855, 2868).setStaticTechLevel(SimpleTechLevel.ADVANCED);
         armor.armorType = T_ARMOR_OS_BALLISTIC_REINFORCED;
+        armor.flags = armor.flags.or(F_FIGHTER_EQUIPMENT);
         armor.pptMultiplier = 0.875;
         return armor;
     }
@@ -2328,6 +2339,7 @@ public class ArmorType extends MiscType {
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
               .setISAdvancement(2878, 2892, 2910).setStaticTechLevel(SimpleTechLevel.ADVANCED);
         armor.armorType = T_ARMOR_OS_FERRO_LAMELLOR;
+        armor.flags = armor.flags.or(F_FIGHTER_EQUIPMENT);
         armor.pptMultiplier = 0.75;
         return armor;
     }
@@ -2347,6 +2359,7 @@ public class ArmorType extends MiscType {
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
               .setISAdvancement(2890, 2905, 2922).setStaticTechLevel(SimpleTechLevel.ADVANCED);
         armor.armorType = T_ARMOR_OS_HEAVY_FERRO_LAMELLOR;
+        armor.flags = armor.flags.or(F_FIGHTER_EQUIPMENT);
         armor.pptMultiplier = 0.875;
         return armor;
     }
@@ -2366,6 +2379,7 @@ public class ArmorType extends MiscType {
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
               .setISAdvancement(2905, 2920, 2940).setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
         armor.armorType = T_ARMOR_OS_HARDENED_HEAVY_FERRO_LAMELLOR;
+        armor.flags = armor.flags.or(F_TANK_EQUIPMENT);
         armor.pptMultiplier = 0.75;
         return armor;
     }
@@ -2389,6 +2403,7 @@ public class ArmorType extends MiscType {
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
               .setISAdvancement(2852, 2862, 2875).setStaticTechLevel(SimpleTechLevel.ADVANCED);
         armor.armorType = T_ARMOR_OS_STEALTH;
+        armor.flags = armor.flags.or(F_TANK_EQUIPMENT).or(F_FIGHTER_EQUIPMENT);
         armor.pptMultiplier = 1.0;
         return armor;
     }
@@ -2408,6 +2423,7 @@ public class ArmorType extends MiscType {
               .setAvailability(AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C)
               .setISAdvancement(2830, 2840, 2852).setStaticTechLevel(SimpleTechLevel.ADVANCED);
         armor.armorType = T_ARMOR_OS_APA;
+        armor.flags = armor.flags.or(F_FIGHTER_EQUIPMENT);
         armor.pptMultiplier = 0.9375;
         return armor;
     }
@@ -2434,6 +2450,7 @@ public class ArmorType extends MiscType {
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
               .setISAdvancement(2878, 2892, 2910).setStaticTechLevel(SimpleTechLevel.STANDARD);
         armor.armorType = T_ARMOR_OS_IMP_STEALTH;
+        armor.flags = armor.flags.or(F_TANK_EQUIPMENT).or(F_FIGHTER_EQUIPMENT);
         armor.pptMultiplier = 1.0;
         return armor;
     }
