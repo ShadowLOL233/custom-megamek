@@ -10,6 +10,7 @@ It is a living planning doc — update it as items land.
 
 Quick index — jump to a section instead of scanning the whole file.
 
+- **⭐⭐ TOP PRIORITY (2026-08-01) — Alpha Strike Formation Bonus → Total Warfare:** see the dedicated section directly below the Contents. **#2 priority = playtesting the new OS components** (see the Playtest priority queue). Improve C3 Point focus-fire (§9.6) is queued behind those.
 - **Section 0 — Design philosophy**: tier ladder, BV methodology, TechRating, implementation mapping (durable reference).
 - **Section 1 — Status snapshot**: what is implemented in code (some lines pending tier-revision).
 - **Section 2 — OS HVAC**: **✅ REPURPOSED 2026-07-31 → long-barrel precision anti-armor AC** (calibers 10/12/14/16, dedicated `HVAC_OS` ammo, range-scaling to-hit bonus, BV 165/195/225/255).
@@ -25,20 +26,72 @@ Quick index — jump to a section instead of scanning the whole file.
 Shelved ideas are parked in **[OS_SHELVED_IDEAS.md](OS_SHELVED_IDEAS.md)**. Splitting this plan into
 per-topic files (weapons / units / equipment) is **deferred** until it grows further.
 
-## ⭐ Playtest priority queue (added 2026-07-31)
+## ⭐⭐ TOP PRIORITY — Alpha Strike Formation Bonus → Total Warfare (added 2026-08-01)
 
-Nothing in the recent waves has had an in-game playtest yet — every item below compiles and passes the
-equipment-init unit tests **only**. Testing priority order:
+**Goal:** bring Alpha Strike's *Formation Bonus* into the TW (classic) engine — a **force** whose composition
+matches a formation type (Battle / Assault / Striker-Cavalry / Fire / Recon / Pursuit / Command / …) grants its
+member units a standing bonus for the battle.
 
-1. **P1 — BCS/CCS modular electronics (§9).** The larger prior initiative; §9.5 lists its still-UNTESTED
-   mechanics (Demon debuff, Improve C3 Point focus-fire, the network-cap raise, the Advance cores, …).
-2. **P2 — New weapon equipment (this session) — UNTESTED.** All compile + pass equipment-init tests but have had
-   **no in-game playtest**:
-   - **HVAC precision repurpose (§2)** — check the range-scaling to-hit bonus (0 / −1 / −1 / −2) and the new
+**How AS does it (for reference):** in the AS Companion you organize units into a formation (lance/star), and if
+its composition (unit count + **unit roles**, sometimes size/movement) matches a formation type, the whole
+formation gains a **Formation Bonus** — mostly delivered as free **SPAs** granted to members, plus a few flat
+effects (e.g. Recon/Command → initiative; Fire → long-range/indirect help). *(Exact AS Companion values must be
+transcribed when we spec the table — do not guess them.)*
+
+**Feasibility in this engine: HIGH — most infrastructure already exists; only the formation ruleset is missing.**
+- **Unit roles ✓:** `UnitRole` (`common/units/UnitRole.java`) already carries the AS role set — AMBUSHER, BRAWLER,
+  JUGGERNAUT, MISSILE_BOAT, SCOUT, SKIRMISHER, SNIPER, STRIKER (+ aero). `Entity.getRole()` exposes it. AS
+  formation qualification keys off exactly these roles.
+- **Force grouping ✓:** `common/force/Force` + `Forces`; `Entity.getForceId()`. A "formation" = a **Force**
+  (lance level), NOT a Team. Enumerate members via `Force.getEntities()` → `game.getInGameObjects(...)`.
+- **Bonus hooks ✓:** initiative via `InitiativeBonusBreakdown` (add a `formation` component, mirroring the `bcs`
+  one); to-hit via `ComputeAttackerToHitMods` / `ComputeToHit`; per-round / per-team effects via the phase-prep
+  managers.
+- **Gap ✗:** there is **no** Formation-type / Formation-Bonus logic yet (the repo's Alpha Strike code is
+  stat-conversion + card tooling, not a TW ruleset) — must be built from scratch.
+
+**Conceptual challenge (AS abstract → TW granular):** AS bonuses are balanced for AS's coarse scale; some port
+1:1 (initiative, free SPAs — TW already has the SPA system), but others (range/damage-band effects) need a
+TW-native re-expression. Expect a *curated* subset + re-tuning, not a blind copy.
+
+**Design questions to settle before coding:**
+1. **Which formation types + exact bonuses** to include (transcribe AS Companion; decide SPA-grant vs flat-mod per bonus).
+2. **Detection granularity/timing:** per-Force, evaluated at game start (re-check on unit loss?); composition
+   rules (count, role mix, weight/movement) per type.
+3. **Bonus scope + interaction:** initiative only, or also to-hit / movement / morale? How it stacks with the OS
+   BCS/C3 network bonuses and the §9.3/§9.6 network-coordination cap.
+4. **Canon vs AU:** gate behind a **game option** so vanilla TW is unchanged by default (recommended).
+
+**Proposed phasing:** (P1) `Formation`/`FormationType` model + per-Force detection from `UnitRole`; (P2)
+initiative-bonus formations first (simplest hook — `InitiativeBonusBreakdown`); (P3) to-hit / movement formations;
+(P4) lobby UI showing a Force's detected formation + bonus; (P5) game-option gate + docs.
+
+**Status:** ⏳ **ANALYSIS DONE (2026-08-01)** — awaiting the formation-type/bonus-table decision (design question 1)
+before implementation.
+
+---
+
+## ⭐ Playtest priority queue — #2 DEV PRIORITY (2026-07-31, reprioritized 2026-08-01)
+
+**This entire queue is the #2 development priority, immediately below the Formation Bonus port above** — every OS
+component shipped so far compiles and passes the equipment-init unit tests **only**; none has had an in-game
+playtest. Testing priority order (newest OS components first, per the 2026-08-01 reprioritization):
+
+1. **P1 — OS missile redesign + special munitions (this session) — UNTESTED.** The SRM/MRM/LRM range-
+   specialization triad (MRM medium −1 / LRM long −1) and the full SRM/LRM/MRM special-munition catalogue.
+   Check: the bracket −1s fire in the right range brackets; MRM special-munition effects resolve; the new BVs feel right.
+2. **P2 — Kestrel / Shrike / Lodestar network designators (§9.6) — UNTESTED.** Kestrel network −1 (LOS + Lodestar-
+   beacon paths), Shrike −1/−3 crit, Lodestar beacon attach + LRM indirect-fire enable, and the non-stacking
+   network-coordination cap (only the deepest of Kestrel/Shrike/B-2500 applies; a CCS module −1 still stacks to −2).
+   Verify the effects vanish off-network / off-beacon / under ECM.
+3. **P3 — BCS/CCS modular electronics (§9).** The larger prior initiative; §9.5 lists its still-UNTESTED
+   mechanics (Demon debuff, the network-cap raise, the Advance cores, …).
+4. **P4 — Earlier weapon equipment — UNTESTED.**
+   - **HVAC precision repurpose (§2)** — the range-scaling to-hit bonus (0 / −1 / −1 / −2) and the new
      10/12/14/16 calibers / `HVAC_OS` ammo.
-   - **Ultra Heavy LRM/SRM (§8)** — check Single/Ultra mode switching, the 2-volley resolution + heat doubling,
+   - **Ultra Heavy LRM/SRM (§8)** — Single/Ultra mode switching, the 2-volley resolution + heat doubling,
      and the natural-2 double-tap jam.
-   - **Electromagnetic Lance (§8)** — check the per-munition power-gate (range + damage switching), inherent AP
+   - **Electromagnetic Lance (§8)** — the per-munition power-gate (range + damage switching), inherent AP
      on the full-power rounds, and Precision's −2 vs target movement.
 
 ---
@@ -961,9 +1014,10 @@ Mechanics-remaining (best implemented test-driven; all UNTESTED until the unifie
 - Exact per-module BV factors; Enhanced Combat Computer revival + rename. ~~optional Round-Report line for the
   coordination roll~~ ✅ DONE 2026-07-23 (initiative-report line, double-blind aware).
 - **B-2500 constant +1 initiative** currently only applies through the TCP-implant path — make it grant standalone.
-- ~~**Network Target Designators (§9.6):** Kestrel −1, Shrike −1/−3 crit, Lodestar beacon pod~~ ✅ DONE 2026-08-01
-  (see §9.6). **Still open:** the Lodestar **LRM indirect-fire enable**, and a shared anti-stack cap for the
-  Kestrel/Shrike/B-2500/Improve-C3-Point network −1s (currently each applies independently).
+- ~~**Network Target Designators (§9.6):** Kestrel −1, Shrike −1/−3 crit, Lodestar beacon pod, Lodestar LRM
+  indirect-fire enable, and the non-stacking network-coordination cap (Kestrel/Shrike/B-2500)~~ ✅ DONE 2026-08-01
+  (see §9.6). **Remaining:** Improve C3 Point focus-fire −1 has no class yet — when built it should route through
+  `OSNetworkDesignators.networkCoordinationToHit` to join the cap. All §9.6 mechanics are UNTESTED in-game.
 
 ### 9.6 OS Network Target Designators — Kestrel / Shrike / Lodestar (added 2026-07-31)
 
@@ -974,8 +1028,9 @@ TAG-derived designator devices carried on a unit; the third is a Narc-beacon mun
 **Status (2026-08-01): MECHANICS IMPLEMENTED — UNTESTED in-game.** Kestrel −1 direct-fire and Shrike −1/−3 are
 wired in `ComputeToHit` (via `weapons/c3/OSNetworkDesignators`); Shrike records its designation + natural-9+ crit
 on the target through a custom `ShrikeTAGHandler`; Lodestar is coded as an OS **Munin (iNarc) beacon munition**
-(`M_LODESTAR` → `INarcPod.LODESTAR`) whose beacon-in-range path feeds the Kestrel −1. **One piece remains TODO:**
-the Lodestar **LRM indirect-fire enable** (§9.5).
+(`M_LODESTAR` → `INarcPod.LODESTAR`) whose beacon-in-range path feeds the Kestrel −1. The Lodestar **LRM
+indirect-fire enable** and the non-stacking **network-coordination cap** (Kestrel/Shrike/B-2500 share one −1)
+are also wired (2026-08-01). All mechanics landed; **UNTESTED in-game.**
 
 | Item | Tier | t / crit | BV | Cost | Role |
 |---|---|---|---|---|---|
@@ -1028,11 +1083,16 @@ removed, like any Narc pod); 4 shots / 12,000 C-bills. The Kestrel beacon-in-ran
 - **Lodestar pod ✅:** `Munitions.M_LODESTAR` (appended to keep ordinals stable) → `INarcPod.LODESTAR`, attached
   by `NarcHandler`; ammo `createOSLodestarAmmo` (OS Munin/iNarc, 4 shots, 12,000). Detected by the Kestrel
   beacon-in-range path.
-- **Kestrel/Lodestar LRM indirect enable ⏳ TODO:** letting Kestrel-network LRMs fire indirectly at a
-  Lodestar-beaconed target without a normal spotter — a separate indirect-fire-legality change (around
-  `WeaponAttackAction` `isIndirect` / the spotter lookup). Not yet wired.
-- **⏳ Anti-stack cap** (Kestrel/Shrike vs B-2500 / Improve C3 Point −1) is still nominal: Kestrel and Shrike
-  each add their own −1 independently for now (no shared network-coordination cap enforced yet).
+- **Kestrel/Lodestar LRM indirect enable ✅ (2026-08-01):** in the `ComputeToHit` indirect spotter block, an LRM /
+  LRM-IMP / MML / NLRM attack whose target carries a friendly Lodestar beacon (with a Kestrel on the attacker's
+  network in range) **self-spots** — `spotter = te; narcSpotter = true` (mirrors the Narc self-spot fallback), so
+  indirect fire is legal without a normal spotter. ECM-suppressible (skipped when the target is ECM-affected).
+- **Anti-stack network-coordination cap ✅ (2026-08-01):** the Kestrel −1, Shrike −1/−3 and B-2500 coordination −1
+  are now a single non-stacking bonus — `OSNetworkDesignators.networkCoordinationToHit` returns only the **deepest**
+  of them (applied once in `ComputeToHit`). The B-2500 −1 was moved out of `ComputeAttackerToHitMods` into this
+  consolidated computation. A CCS module −1 (fire control) still stacks on top (§9.3: direct-fire may reach −2).
+  *(Improve C3 Point focus-fire −1 has no class yet, so it is not part of the cap until it is built; when added it
+  should route through `networkCoordinationToHit`.)*
 
 ## 10. OS design saves — cross-device import (added 2026-07-19)
 

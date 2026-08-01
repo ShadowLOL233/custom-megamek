@@ -393,6 +393,18 @@ public class ComputeToHit {
                     }
                 }
             }
+            // OS Lodestar (dev plan §9.6): a friendly Lodestar beacon on the target plus a Kestrel on the
+            // attacker's active C3 network give the network LRM indirect fire — the beacon is the remote lock, so
+            // the target self-spots (mirrors the Narc self-spot fallback above). ECM-suppressible.
+            if ((spotter == null) && (te != null) && (ammoType != null) && !isTargetECMAffected
+                  && ((ammoType.getAmmoType() == AmmoType.AmmoTypeEnum.LRM)
+                        || (ammoType.getAmmoType() == AmmoType.AmmoTypeEnum.LRM_IMP)
+                        || (ammoType.getAmmoType() == AmmoType.AmmoTypeEnum.MML)
+                        || (ammoType.getAmmoType() == AmmoType.AmmoTypeEnum.NLRM))
+                  && megamek.common.weapons.c3.OSNetworkDesignators.enablesLodestarIndirectFire(game, ae, te)) {
+                spotter = te;
+                narcSpotter = true;
+            }
         }
 
         // EI system
@@ -1630,20 +1642,16 @@ public class ComputeToHit {
             }
         }
 
-        // OS Kestrel Network Target Designator (dev plan §9.6): a unit on the attacker's active C3 network mounts
-        // an operational Kestrel that paints this target (LOS in range, or a friendly Lodestar beacon on it in
-        // range) → the whole network gets -1 to-hit with direct-fire weapons. Priced into the Kestrel/Lodestar BV.
-        if ((te != null) && !isIndirect && !weaponType.hasFlag(WeaponType.F_ARTILLERY)
-              && megamek.common.weapons.c3.OSNetworkDesignators.hasNetworkKestrelPaint(game, ae, te)) {
-            toHit.addModifier(-1, Messages.getString("WeaponAttackAction.WeaponMod"));
-        }
-
-        // OS Shrike Combat Designator (dev plan §9.6): a target Shrike-designated this turn by a unit on the
-        // attacker's C3 network grants -1 (-3 on a natural-9+ crit designation) to every networked attacker.
+        // OS network coordination (dev plan §9.3/§9.6): the Kestrel paint -1, the Shrike designation -1/-3, and the
+        // B-2500 coordination -1 are a single NON-stacking "network coordination" bonus — only the deepest applies.
+        // A CCS module -1 (fire control, in ComputeAttackerToHitMods) may still stack on top (§9.3: direct-fire may
+        // reach -2 total).
         if (te != null) {
-            int shrikeMod = megamek.common.weapons.c3.OSNetworkDesignators.shrikeToHitBonus(game, ae, te);
-            if (shrikeMod != 0) {
-                toHit.addModifier(shrikeMod, Messages.getString("WeaponAttackAction.WeaponMod"));
+            boolean directFire = (weaponType != null) && weaponType.hasFlag(WeaponType.F_DIRECT_FIRE);
+            int netCoord = megamek.common.weapons.c3.OSNetworkDesignators.networkCoordinationToHit(game, ae, te,
+                  directFire);
+            if (netCoord != 0) {
+                toHit.addModifier(netCoord, Messages.getString("WeaponAttackAction.WeaponMod"));
             }
         }
 

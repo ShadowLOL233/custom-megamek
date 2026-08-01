@@ -47,7 +47,6 @@ import megamek.common.ToHitData;
 import megamek.common.compute.Compute;
 import megamek.common.enums.AimingMode;
 import megamek.common.equipment.AmmoType;
-import megamek.common.compute.ComputeECM;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponType;
@@ -362,22 +361,10 @@ public class ComputeAttackerToHitMods {
             }
         }
 
-        // OS Battle Computer System coordination (dev plan §9.1): a B-2500 / Crow Nest core on the attacker's C3
-        // network that rolled 10+ this round grants -1 vs direct-fire weapons; suppressed if that core is under
-        // hostile ECM. Stacks with the CC-module -1 (§9.3: direct-fire may reach -2). UNTESTED.
-        if ((weaponType != null) && weaponType.hasFlag(WeaponType.F_DIRECT_FIRE) && (game != null)) {
-            for (Entity core : game.getEntitiesVector()) {
-                boolean isBcsCore = core.hasWorkingMisc(MiscTypeFlag.F_OS_BATTLE_COMPUTER)
-                      || core.hasWorkingMisc(MiscTypeFlag.F_OS_CROW_NEST);
-                if (isBcsCore && (core.getBcsCoordinationRoll() >= 10)
-                      && (core.equals(attacker) || attacker.onSameC3NetworkAs(core))
-                      && ((core.getPosition() == null)
-                            || !ComputeECM.isAffectedByECM(core, core.getPosition(), core.getPosition()))) {
-                    toHit.addModifier(-1, "OS Battle Computer coordination");
-                    break;
-                }
-            }
-        }
+        // OS Battle Computer coordination (-1 vs direct-fire on a 10+ roll, §9.1) is now folded into the single
+        // NON-stacking OS "network coordination" bonus computed in ComputeToHit (OSNetworkDesignators
+        // .networkCoordinationToHit), so it no longer stacks with the Kestrel / Shrike network -1. The CCS
+        // module -1 above (fire control) still stacks with it (§9.3: direct-fire may reach -2 total).
 
         // penalty for an active void signature system
         if (attacker.isVoidSigActive()) {

@@ -9,7 +9,9 @@ package megamek.common.weapons.c3;
 import java.util.Iterator;
 
 import megamek.common.LosEffects;
+import megamek.common.compute.ComputeECM;
 import megamek.common.equipment.INarcPod;
+import megamek.common.equipment.enums.MiscTypeFlag;
 import megamek.common.equipment.WeaponMounted;
 import megamek.common.equipment.WeaponType;
 import megamek.common.equipment.WeaponTypeFlag;
@@ -75,6 +77,74 @@ public final class OSNetworkDesignators {
             return 0;
         }
         return target.isShrikeDesignationCrit() ? -3 : -1;
+    }
+
+    /**
+     * @return true if a BCS / Crow Nest core on the attacker's active C3 network rolled 10+ on its coordination
+     *       roll this round and is not currently jammed by hostile ECM (dev plan §9.1).
+     */
+    public static boolean hasBcsCoordination(Game game, Entity attacker) {
+        if ((game == null) || (attacker == null)) {
+            return false;
+        }
+        for (Entity core : game.getEntitiesVector()) {
+            boolean isBcsCore = core.hasWorkingMisc(MiscTypeFlag.F_OS_BATTLE_COMPUTER)
+                  || core.hasWorkingMisc(MiscTypeFlag.F_OS_CROW_NEST);
+            if (isBcsCore && (core.getBcsCoordinationRoll() >= 10)
+                  && (core.equals(attacker) || attacker.onSameC3NetworkAs(core))
+                  && ((core.getPosition() == null)
+                        || !ComputeECM.isAffectedByECM(core, core.getPosition(), core.getPosition()))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * The single, non-stacking OS "network coordination" to-hit bonus (dev plan §9.3 / §9.6). The Shrike
+     * designation (−1, or −3 on a crit), the Kestrel network paint (−1, direct-fire only) and the B-2500
+     * coordination roll (−1, direct-fire only) are all "network coordination" — they do <b>not</b> stack with each
+     * other; only the deepest applies. A CCS module −1 (fire control, handled elsewhere) may still stack on top,
+     * so a direct-fire weapon can still reach −2 total (§9.3).
+     *
+     * @return the (≤ 0) to-hit modifier to apply, or 0 if none applies.
+     */
+    public static int networkCoordinationToHit(Game game, Entity attacker, Entity target, boolean directFire) {
+        if ((attacker == null) || (target == null)) {
+            return 0;
+        }
+        int best = Math.min(0, shrikeToHitBonus(game, attacker, target));
+        if (directFire) {
+            if (hasNetworkKestrelPaint(game, attacker, target)) {
+                best = Math.min(best, -1);
+            }
+            if (hasBcsCoordination(game, attacker)) {
+                best = Math.min(best, -1);
+            }
+        }
+        return best;
+    }
+
+    /**
+     * @return true if the target carries a friendly Lodestar beacon and a unit on the attacker's active C3 network
+     *       (incl. the attacker) mounts an operational Kestrel NTD with the target in range — i.e. the network may
+     *       fire LRMs indirectly at the beaconed target without a normal spotter (dev plan §9.6).
+     */
+    public static boolean enablesLodestarIndirectFire(Game game, Entity attacker, Entity target) {
+        if ((attacker == null) || (target == null) || (target.getPosition() == null)
+              || !hasFriendlyLodestar(target, attacker.getOwner().getTeam())) {
+            return false;
+        }
+        for (Entity e : game.getEntitiesVector()) {
+            if (e.isDestroyed() || (e.getPosition() == null) || !networkedWith(game, attacker, e)) {
+                continue;
+            }
+            int kestrelRange = kestrelRange(e);
+            if ((kestrelRange > 0) && (e.getPosition().distance(target.getPosition()) <= kestrelRange)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** @return the long range of an operational Kestrel NTD mounted on {@code e}, or 0 if it has none. */
