@@ -152,6 +152,7 @@ public class GameOptions extends BasicGameOptions {
         addOption(advancedRules, OptionsConstants.RPG_CONDITIONAL_EJECTION, false);
         addOption(advancedRules, OptionsConstants.ADVANCED_STRATOPS_QUIRKS, false);
         addOption(advancedRules, OptionsConstants.ADVANCED_STRATOPS_PARTIAL_REPAIRS, false);
+        addOption(advancedRules, OptionsConstants.ADVANCED_FORMATION_BONUSES, false);
         addOption(advancedRules, OptionsConstants.ADVANCED_ASSAULT_DROP, false);
         addOption(advancedRules, OptionsConstants.ADVANCED_PARATROOPERS, false);
         addOption(advancedRules, OptionsConstants.ADVANCED_INCLUSIVE_SENSOR_RANGE, false);

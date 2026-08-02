@@ -385,6 +385,7 @@ public class OptionsConstants {
     public static final String ADVANCED_MAX_TECH_MOVEMENT_MODS = "maxtech_movement_mods";
     public static final String ADVANCED_ALTERNATE_MASC = "alternate_masc";
     public static final String ADVANCED_ALTERNATE_MASC_ENHANCED = "alternate_masc_enhanced";
+    public static final String ADVANCED_FORMATION_BONUSES = "formation_bonuses";
     public static final String ADVANCED_COMBAT_TAC_OPS_AMS = "tacops_ams";
     public static final String ADVANCED_COMBAT_TAC_OPS_MANUAL_AMS = "tacops_manual_ams";
     public static final String ADVANCED_COMBAT_FLOATING_CRITS = "floating_crits";

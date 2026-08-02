@@ -961,6 +961,26 @@ class LobbyMekCellFormatter {
         }
         result.append("</FONT>");
 
+        // Formation Bonus (Campaign Ops / Alpha Strike port): annotate a lance with its detected formation type
+        // + bonus. Uses only the force's DIRECT units, so grouping nodes (holding sub-forces) are skipped.
+        java.util.List<Entity> directUnits = new java.util.ArrayList<>();
+        for (int memberId : force.getEntities()) {
+            Entity member = game.getEntity(memberId);
+            if (member != null) {
+                directUnits.add(member);
+            }
+        }
+        megamek.common.force.FormationBonusType formation = megamek.common.force.FormationBonusType.detect(directUnits);
+        if (formation != null) {
+            result.append(fontHTML(color));
+            result.append(MekTableModel.DOT_SPACER);
+            result.append(" ").append(formation.getDisplayName());
+            if (!formation.getBonusDescription().isEmpty()) {
+                result.append(" (").append(formation.getBonusDescription()).append(")");
+            }
+            result.append("</FONT>");
+        }
+
         return result.toString();
     }
 

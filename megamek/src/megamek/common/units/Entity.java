@@ -7247,6 +7247,19 @@ public abstract class Entity extends TurnOrdered
         bcsCoordinationRoll = roll;
     }
 
+    // Formation Bonus (Campaign Ops / Alpha Strike port): ability names granted to this unit's crew by its
+    // force's formation for the current round. Tracked so they can be revoked without clobbering pilot-native
+    // SPAs. Transient server-side state; see megamek.common.force.FormationBonusType.
+    private transient java.util.Set<String> formationGrantedAbilities;
+
+    /** @return the mutable set of ability names currently granted to this unit's crew by a Formation Bonus. */
+    public java.util.Set<String> getFormationGrantedAbilities() {
+        if (formationGrantedAbilities == null) {
+            formationGrantedAbilities = new java.util.HashSet<>();
+        }
+        return formationGrantedAbilities;
+    }
+
     @Override
     public void newRound(int roundNumber) {
         // UNTESTED (dev plan §9.1): roll the Tactical Coordination die each round for a BCS core bearer.

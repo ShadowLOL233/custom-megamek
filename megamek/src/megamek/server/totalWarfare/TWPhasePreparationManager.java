@@ -78,6 +78,9 @@ public record TWPhasePreparationManager(TWGameManager gameManager) {
                 gameManager.sendTagInfoReset();
                 gameManager.clearReports();
                 gameManager.resetEntityRound();
+                // Formation Bonuses (Campaign Ops / Alpha Strike port): re-evaluate each force's formation and
+                // grant/revoke the corresponding free SPAs to member crews for this round.
+                megamek.common.force.FormationBonusType.refresh(gameManager.getGame());
                 gameManager.resetEntityPhase(phase);
                 gameManager.checkForObservers();
                 gameManager.transmitAllPlayerUpdates();
