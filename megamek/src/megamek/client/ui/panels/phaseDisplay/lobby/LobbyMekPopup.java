@@ -131,6 +131,7 @@ class LobbyMekPopup {
     static final String LMP_F_REMOVE = "FREMOVE";
     static final String LMP_F_PROMOTE = "FPROMOTE";
     static final String LMP_F_RENAME = "FRENAME";
+    static final String LMP_F_GEN_NAME = "FGENNAME";
     static final String LMP_F_CREATE_SUB = "FCREATESUB";
     static final String LMP_F_CREATE_TOP = "FCREATETOP";
     static final String LMP_F_CREATE_FROM = "FCREATEFROM";
@@ -333,6 +334,7 @@ class LobbyMekPopup {
             String fId = "|" + force.getId();
             menu.add(menuItem("Add Sub force...", LMP_F_CREATE_SUB + fId + NO_INFO, editable, listener));
             menu.add(menuItem("Rename", LMP_F_RENAME + fId + NO_INFO, editable, listener));
+            menu.add(menuItem("Generate Name", LMP_F_GEN_NAME + fId + NO_INFO, editable, listener));
             menu.add(menuItem("Promote to Top-Level Force", LMP_F_PROMOTE + fId + NO_INFO,
                   editable && !force.isTopLevel(), listener));
         }

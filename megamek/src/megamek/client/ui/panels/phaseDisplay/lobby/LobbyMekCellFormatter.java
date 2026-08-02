@@ -972,12 +972,11 @@ class LobbyMekCellFormatter {
         }
         megamek.common.force.FormationBonusType formation = megamek.common.force.FormationBonusType.detect(directUnits);
         if (formation != null) {
+            // Show only the formation name inline; the full bonus description is offered as a node tooltip
+            // (see MekForceTreeRenderer) and in the selected-force info panel.
             result.append(fontHTML(color));
             result.append(MekTableModel.DOT_SPACER);
             result.append(" ").append(formation.getDisplayName());
-            if (!formation.getBonusDescription().isEmpty()) {
-                result.append(" (").append(formation.getBonusDescription()).append(")");
-            }
             result.append("</FONT>");
         }
 

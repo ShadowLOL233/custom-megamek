@@ -150,6 +150,7 @@ public record LobbyMekPopupActions(ChatLounge lobby) implements ActionListener {
             case LMP_F_CREATE_SUB:
             case LMP_F_ADD_TO:
             case LMP_F_RENAME:
+            case LMP_F_GEN_NAME:
             case LMP_F_CREATE_TOP:
             case LMP_F_REMOVE:
             case LMP_F_PROMOTE:
@@ -183,6 +184,11 @@ public record LobbyMekPopupActions(ChatLounge lobby) implements ActionListener {
             case LMP_F_RENAME:
                 forceId = StringUtil.toInt(info, Force.NO_FORCE);
                 lobby.lobbyActions.forceRename(forceId);
+                break;
+
+            case LMP_F_GEN_NAME:
+                forceId = StringUtil.toInt(info, Force.NO_FORCE);
+                lobby.lobbyActions.forceGenerateName(forceId);
                 break;
 
             case LMP_F_CREATE_TOP:

@@ -150,6 +150,12 @@ import megamek.common.event.GameSettingsChangeEvent;
 import megamek.common.event.entity.GameEntityNewEvent;
 import megamek.common.event.player.GamePlayerChangeEvent;
 import megamek.common.force.Force;
+import megamek.common.force.FormationBonusType;
+import megamek.client.ui.tileset.EntityImage;
+import megamek.client.ui.tileset.MMStaticDirectoryManager;
+import megamek.common.icons.Camouflage;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.util.ImageUtil;
 import megamek.common.force.Forces;
 import megamek.common.game.Game;
 import megamek.common.game.InGameObject;
@@ -227,10 +233,16 @@ public class ChatLounge extends AbstractPhaseDisplay
     private final MMToggleButton butCompact = new MMToggleButton(Messages.getString("ChatLounge.butCompact"));
     private final MMToggleButton butShowUnitID = new MMToggleButton(Messages.getString("ChatLounge.butShowUnitID"));
     private final JToggleButton butListView = new JToggleButton(Messages.getString("ChatLounge.butSortableView"));
+    private final JToggleButton butCardView = new JToggleButton(Messages.getString("ChatLounge.butCardView"));
     private final JToggleButton butForceView = new JToggleButton(Messages.getString("ChatLounge.butForceView"));
     private final JButton butCollapse = new JButton(Messages.getString("ChatLounge.butCollapse"));
     private final JButton butExpand = new JButton(Messages.getString("ChatLounge.butExpand"));
     private MekTableModel mekModel;
+    private MekCardView mekCardView;
+    private final LanceRadarChart lanceRadar = new LanceRadarChart();
+    private final JComboBox<String> radarAxisCombo = new JComboBox<>(LanceRadarChart.AXIS_LABELS);
+    private final DefaultListModel<Entity> radarRankModel = new DefaultListModel<>();
+    private java.util.List<Entity> currentRadarUnits = new ArrayList<>();
 
     /* Force Tree */
     private MekTreeForceModel mekForceTreeModel;
@@ -462,6 +474,7 @@ public class ChatLounge extends AbstractPhaseDisplay
         butHelp.addActionListener(lobbyListener);
         butAdvancedSearchMap.addActionListener(lobbyListener);
         butListView.addActionListener(lobbyListener);
+        butCardView.addActionListener(lobbyListener);
         butForceView.addActionListener(lobbyListener);
         butCollapse.addActionListener(lobbyListener);
         butExpand.addActionListener(lobbyListener);
@@ -596,6 +609,11 @@ public class ChatLounge extends AbstractPhaseDisplay
         mekTable.getTableHeader().setReorderingAllowed(false);
         mekTable.setIntercellSpacing(new Dimension(0, 0));
         mekTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        mekTable.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                updateFocusedUnit();
+            }
+        });
         for (int i = 0; i < MekTableModel.N_COL; i++) {
             TableColumn column = mekTable.getColumnModel().getColumn(i);
             column.setCellRenderer(mekModel.getRenderer());
@@ -610,7 +628,13 @@ public class ChatLounge extends AbstractPhaseDisplay
         mekForceTree.setCellRenderer(new MekForceTreeRenderer(this));
         mekForceTree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         mekForceTree.setExpandsSelectedPaths(true);
+        mekForceTree.addTreeSelectionListener(e -> {
+            updateLanceRadar();
+            updateFocusedUnit();
+        });
         ToolTipManager.sharedInstance().registerComponent(mekForceTree);
+
+        mekCardView = new MekCardView(this, mekModel, mekTable);
 
         scrMekTable = new JScrollPane(mekTable);
         scrMekTable.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -742,6 +766,7 @@ public class ChatLounge extends AbstractPhaseDisplay
     private void setupUnitsPanel() {
         ButtonGroup viewGroup = new ButtonGroup();
         viewGroup.add(butListView);
+        viewGroup.add(butCardView);
         viewGroup.add(butForceView);
         butListView.setSelected(true);
 
@@ -765,10 +790,31 @@ public class ChatLounge extends AbstractPhaseDisplay
         leftSide.add(Box.createVerticalStrut(scaleForGUI(5)));
         leftSide.add(panAutoResolveInfo);
         leftSide.add(Box.createVerticalStrut(scaleForGUI(5)));
+
+        FixedYPanel panLanceRadar = new FixedYPanel(new BorderLayout());
+        panLanceRadar.setBorder(BorderFactory.createTitledBorder(Messages.getString("ChatLounge.name.lanceRadar")));
+        panLanceRadar.add(lanceRadar, BorderLayout.CENTER);
+
+        radarAxisCombo.addActionListener(e -> refreshRadarRanking());
+        JList<Entity> radarRankList = new JList<>(radarRankModel);
+        radarRankList.setCellRenderer(new RadarRankRenderer());
+        JScrollPane radarRankScroll = new JScrollPane(radarRankList);
+        radarRankScroll.setPreferredSize(new Dimension(scaleForGUI(220), scaleForGUI(110)));
+        JPanel radarRankRow = new JPanel(new FlowLayout(FlowLayout.LEFT, scaleForGUI(4), 0));
+        radarRankRow.add(new JLabel(Messages.getString("ChatLounge.lanceRadar.rankBy")));
+        radarRankRow.add(radarAxisCombo);
+        JPanel radarSouth = new JPanel(new BorderLayout(0, scaleForGUI(2)));
+        radarSouth.add(radarRankRow, BorderLayout.NORTH);
+        radarSouth.add(radarRankScroll, BorderLayout.CENTER);
+        panLanceRadar.add(radarSouth, BorderLayout.SOUTH);
+
+        leftSide.add(panLanceRadar);
+        leftSide.add(Box.createVerticalStrut(scaleForGUI(5)));
         leftSide.add(scrPlayers);
 
         JPanel topRight = new FixedYPanel();
         topRight.add(butListView);
+        topRight.add(butCardView);
         topRight.add(butForceView);
         topRight.add(Box.createHorizontalStrut(30));
         topRight.add(butCompact);
@@ -1404,6 +1450,111 @@ public class ChatLounge extends AbstractPhaseDisplay
     public void refreshEntities() {
         refreshTree();
         refreshMekTable();
+        refreshCardView();
+        updateLanceRadar();
+    }
+
+    /** Rebuilds the Card View cards from the (already refreshed) unit table model. */
+    private void refreshCardView() {
+        if (mekCardView != null) {
+            mekCardView.refresh();
+        }
+    }
+
+    /** Updates the Lance radar chart from the currently selected force; clears it unless exactly one is selected. */
+    private void updateLanceRadar() {
+        java.util.List<Force> selForces = getTreeSelectedForces();
+        if (selForces.size() != 1) {
+            lanceRadar.setForce(java.util.List.of(), "", "");
+            currentRadarUnits = new ArrayList<>();
+            refreshRadarRanking();
+            return;
+        }
+        Force force = selForces.get(0);
+        java.util.List<Entity> units = new ArrayList<>();
+        for (var assignable : game().getForces().getFullEntities(force)) {
+            if (assignable instanceof Entity entity) {
+                units.add(entity);
+            }
+        }
+        // Formation is detected from the force's DIRECT units (matches the tree label / name generator).
+        java.util.List<Entity> directUnits = new ArrayList<>();
+        for (int memberId : force.getEntities()) {
+            Entity member = game().getEntity(memberId);
+            if (member != null) {
+                directUnits.add(member);
+            }
+        }
+        FormationBonusType formation = FormationBonusType.detect(directUnits);
+        String designation = (formation == null) ? ""
+              : (formation.getDisplayName() + " " + MekCardView.echelonName(units.size()));
+        lanceRadar.setForce(units, force.getName(), designation);
+        currentRadarUnits = units;
+        refreshRadarRanking();
+    }
+
+    /** Overlays the single currently-focused unit (from the active view's selection) on the radar + card detail. */
+    private void updateFocusedUnit() {
+        java.util.List<Entity> selected = isForceView() ? getTreeSelectedEntities() : getSelectedEntities();
+        Entity focused = (selected.size() == 1) ? selected.get(0) : null;
+        lanceRadar.setHighlightedUnit(focused);
+        if (mekCardView != null) {
+            mekCardView.setFocusedUnit(focused);
+        }
+    }
+
+    /** Rebuilds the radar's axis-contribution ranking: the current force's units sorted (desc) by the chosen axis. */
+    private void refreshRadarRanking() {
+        if (radarRankModel == null) {
+            return;
+        }
+        radarRankModel.clear();
+        int axis = radarAxisCombo.getSelectedIndex();
+        if ((axis < 0) || currentRadarUnits.isEmpty()) {
+            return;
+        }
+        java.util.List<Entity> sorted = new ArrayList<>(currentRadarUnits);
+        sorted.sort((a, b) -> Double.compare(LanceRadarChart.axisValue(b, axis), LanceRadarChart.axisValue(a, axis)));
+        for (Entity entity : sorted) {
+            radarRankModel.addElement(entity);
+        }
+    }
+
+    /** Renders each ranking row as: axis value + unit designation + weight class + a small unit icon. */
+    private class RadarRankRenderer extends DefaultListCellRenderer {
+        @Override
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+              boolean cellHasFocus) {
+            super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            if (value instanceof Entity entity) {
+                int axis = Math.max(0, radarAxisCombo.getSelectedIndex());
+                double raw = LanceRadarChart.axisValue(entity, axis);
+                String formatted = ((axis == 3) || (axis == 4)) ? String.format("%.1f", raw)
+                      : String.valueOf(Math.round(raw));
+                String weightClass = EntityWeightClass.getClassName(entity.getWeightClass());
+                setText("<HTML><B>" + formatted + "</B>&nbsp;&nbsp;" + entity.getShortName()
+                      + "&nbsp;&nbsp;<FONT color=\"gray\">" + weightClass + "</FONT></HTML>");
+                setIcon(smallUnitIcon(entity, scaleForGUI(28)));
+                setIconTextGap(scaleForGUI(6));
+            }
+            return this;
+        }
+    }
+
+    /** Builds a small scaled mek icon (with camo) for the ranking list, or null on failure. */
+    private Icon smallUnitIcon(Entity entity, int height) {
+        try {
+            Camouflage camouflage = entity.getCamouflageOrElseOwners();
+            Image base = MMStaticDirectoryManager.getMekTileset().imageFor(entity);
+            Image image = new EntityImage(base, camouflage, this, entity).loadPreviewImage(true);
+            if ((image == null) || (image.getWidth(null) <= 0) || (image.getHeight(null) <= 0)) {
+                return null;
+            }
+            int width = height * image.getWidth(null) / image.getHeight(null);
+            return new ImageIcon(ImageUtil.getScaledImage(image, width, height));
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     private void refreshMekTable() {
@@ -2172,6 +2323,12 @@ public class ChatLounge extends AbstractPhaseDisplay
                 butCollapse.setEnabled(false);
                 butExpand.setEnabled(false);
 
+            } else if (ev.getSource() == butCardView) {
+                refreshCardView();
+                scrMekTable.setViewportView(mekCardView);
+                butCollapse.setEnabled(false);
+                butExpand.setEnabled(false);
+
             } else if (ev.getSource() == butForceView) {
                 scrMekTable.setViewportView(mekForceTree);
                 butCollapse.setEnabled(true);
@@ -2599,6 +2756,7 @@ public class ChatLounge extends AbstractPhaseDisplay
         butCancelSearch.removeActionListener(lobbyListener);
         butHelp.removeActionListener(lobbyListener);
         butListView.removeActionListener(lobbyListener);
+        butCardView.removeActionListener(lobbyListener);
         butForceView.removeActionListener(lobbyListener);
         butCollapse.removeActionListener(lobbyListener);
         butExpand.removeActionListener(lobbyListener);

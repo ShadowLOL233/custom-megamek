@@ -40,11 +40,17 @@ import static megamek.client.ui.panels.phaseDisplay.lobby.LobbyUtility.haveSingl
 import static megamek.client.ui.panels.phaseDisplay.lobby.LobbyUtility.isBlindDrop;
 import static megamek.client.ui.panels.phaseDisplay.lobby.LobbyUtility.isRealBlindDrop;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.function.Supplier;
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import megamek.client.AbstractClient;
 import megamek.client.Client;
@@ -70,6 +76,7 @@ import megamek.common.equipment.Transporter;
 import megamek.common.equipment.WeaponType;
 import megamek.common.force.Force;
 import megamek.common.force.Forces;
+import megamek.common.force.FormationBonusType;
 import megamek.common.game.Game;
 import megamek.common.icons.Camouflage;
 import megamek.common.interfaces.ForceAssignable;
@@ -501,9 +508,10 @@ public class LobbyActions {
      * Asks for a name and creates a new top-level force of that name.
      */
     void forceCreateEmpty() {
-        // Ask for a name
-        String name = JOptionPane.showInputDialog(frame(), "Choose a force designation");
-        if ((name == null) || name.isBlank()) {
+        Forces forces = game().getForces();
+        int ownerId = localPlayer().getId();
+        String name = promptForceName(() -> generateNewForceName(forces, ownerId, true, new ArrayList<>()));
+        if (name == null) {
             return;
         }
         client().sendAddForce(Force.createToplevelForce(name, localPlayer()), new ArrayList<>());
@@ -539,13 +547,14 @@ public class LobbyActions {
             LobbyErrors.showOnlyTeam(frame());
             return;
         }
-        // Ask for a name
-        String name = JOptionPane.showInputDialog(frame(), "Choose a force designation");
-        if ((name == null) || name.isBlank()) {
+        Player owner = CollectionUtil.anyOneElement(entities).getOwner();
+        Forces forces = game().getForces();
+        List<Entity> unitList = new ArrayList<>(entities);
+        String name = promptForceName(() -> generateNewForceName(forces, owner.getId(), true, unitList));
+        if (name == null) {
             return;
         }
-        client().sendAddForce(Force.createToplevelForce(name, CollectionUtil.anyOneElement(entities).getOwner()),
-              entities);
+        client().sendAddForce(Force.createToplevelForce(name, owner), entities);
     }
 
     /**
@@ -555,12 +564,14 @@ public class LobbyActions {
         if (parentId == Force.NO_FORCE) {
             return;
         }
-        // Ask for a name
-        String name = JOptionPane.showInputDialog(frame(), "Choose a force designation");
-        if ((name == null) || name.isBlank()) {
+        Forces forces = game().getForces();
+        Force parent = forces.getForce(parentId);
+        int ownerId = parent.getOwnerId();
+        String name = promptForceName(() -> generateNewForceName(forces, ownerId, false, new ArrayList<>()));
+        if (name == null) {
             return;
         }
-        client().sendAddForce(Force.createSubforce(name, game().getForces().getForce(parentId)), new ArrayList<>());
+        client().sendAddForce(Force.createSubforce(name, parent), new ArrayList<>());
     }
 
     /**
@@ -766,6 +777,122 @@ public class LobbyActions {
         forces.renameForce(name, forceId);
         var forceList = new ArrayList<>(List.of(force)); // must be mutable
         client().sendUpdateForce(forceList);
+    }
+
+    /**
+     * Auto-generates a designation for the given force from its composition: an ordinal (by the owner's forces of
+     * the same echelon level), the detected {@link FormationBonusType} function, and an echelon derived from the
+     * unit count, e.g. "1st Battle Lance" or "2nd Fire Support Company".
+     */
+    void forceGenerateName(int forceId) {
+        if (forceId == Force.NO_FORCE) {
+            return;
+        }
+        Forces forces = game().getForces();
+        if (!forces.contains(forceId)) {
+            return;
+        }
+        Force force = forces.getForce(forceId);
+        if (!isEditable(force)) {
+            LobbyErrors.showCannotConfigEnemies(frame());
+            return;
+        }
+        forces.renameForce(generateForceName(forces, force), forceId);
+        var forceList = new ArrayList<>(List.of(force)); // must be mutable
+        client().sendUpdateForce(forceList);
+    }
+
+    /** Builds the "<ordinal> <formation> <echelon>" designation for an existing force. */
+    private String generateForceName(Forces forces, Force force) {
+        // Ordinal: position (1-based, by id) among this owner's forces at the same top-level/sub level.
+        int ordinal = 1;
+        for (Force other : forces.getAllForces()) {
+            if ((other.getId() != force.getId())
+                  && (other.getOwnerId() == force.getOwnerId())
+                  && (other.isTopLevel() == force.isTopLevel())
+                  && (other.getId() < force.getId())) {
+                ordinal++;
+            }
+        }
+        // Function from the force's direct units; echelon from the full (recursive) unit count.
+        List<Entity> directUnits = new ArrayList<>();
+        for (int memberId : force.getEntities()) {
+            Entity member = game().getEntity(memberId);
+            if (member != null) {
+                directUnits.add(member);
+            }
+        }
+        return composeForceName(ordinal, directUnits, forces.getFullEntities(force).size());
+    }
+
+    /**
+     * Builds the "<ordinal> <formation> <echelon>" designation for a <i>new</i> force about to be created, from the
+     * units it will contain (may be empty).
+     */
+    private String generateNewForceName(Forces forces, int ownerId, boolean topLevel, List<Entity> units) {
+        int ordinal = 1;
+        for (Force other : forces.getAllForces()) {
+            if ((other.getOwnerId() == ownerId) && (other.isTopLevel() == topLevel)) {
+                ordinal++;
+            }
+        }
+        return composeForceName(ordinal, units, units.size());
+    }
+
+    /** Assembles ordinal + detected-formation function + echelon (from unit count) into a force designation. */
+    private String composeForceName(int ordinal, List<Entity> formationUnits, int echelonCount) {
+        FormationBonusType formation = FormationBonusType.detect(formationUnits);
+        String function = (formation != null) ? formation.getDisplayName() + " " : "";
+        String echelon;
+        if (echelonCount <= 6) {
+            echelon = "Lance";
+        } else if (echelonCount <= 18) {
+            echelon = "Company";
+        } else if (echelonCount <= 54) {
+            echelon = "Battalion";
+        } else {
+            echelon = "Regiment";
+        }
+        return ordinalOf(ordinal) + " " + function + echelon;
+    }
+
+    /**
+     * Shows the "Create Force" naming dialog pre-filled with a generated designation, with a Generate button that
+     * re-fills it, while still allowing the user to type a name manually. Returns the chosen name, or null if the
+     * dialog was cancelled or the field left blank.
+     */
+    private String promptForceName(Supplier<String> nameGenerator) {
+        JTextField nameField = new JTextField(nameGenerator.get(), 22);
+        JButton generateButton = new JButton(Messages.getString("ChatLounge.butGenerateName"));
+        generateButton.addActionListener(e -> nameField.setText(nameGenerator.get()));
+
+        JPanel panel = new JPanel(new BorderLayout(5, 5));
+        panel.add(new JLabel(Messages.getString("ChatLounge.forceName.prompt")), BorderLayout.NORTH);
+        panel.add(nameField, BorderLayout.CENTER);
+        panel.add(generateButton, BorderLayout.EAST);
+
+        int result = JOptionPane.showConfirmDialog(frame(), panel,
+              Messages.getString("ChatLounge.forceName.title"),
+              JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (result != JOptionPane.OK_OPTION) {
+            return null;
+        }
+        String name = nameField.getText();
+        return ((name == null) || name.isBlank()) ? null : name.trim();
+    }
+
+    /** @return the English ordinal for n (1 -> "1st", 2 -> "2nd", 11 -> "11th", 22 -> "22nd", ...). */
+    private static String ordinalOf(int n) {
+        int mod100 = n % 100;
+        if ((mod100 >= 11) && (mod100 <= 13)) {
+            return n + "th";
+        }
+        return switch (n % 10) {
+            case 1 -> n + "st";
+            case 2 -> n + "nd";
+            case 3 -> n + "rd";
+            default -> n + "th";
+        };
     }
 
     /**

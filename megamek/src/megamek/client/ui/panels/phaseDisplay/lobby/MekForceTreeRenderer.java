@@ -54,6 +54,7 @@ import megamek.common.units.Entity;
 import megamek.common.game.Game;
 import megamek.common.Player;
 import megamek.common.force.Force;
+import megamek.common.force.FormationBonusType;
 import megamek.common.icons.Camouflage;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.ImageUtil;
@@ -74,6 +75,8 @@ public class MekForceTreeRenderer extends DefaultTreeCellRenderer {
     private Player localPlayer;
     private final JTree tree;
     private int row;
+    /** Tooltip (formation name + bonus description) for the force node currently being rendered; null if none. */
+    private String forceFormationTip;
 
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded,
@@ -83,6 +86,7 @@ public class MekForceTreeRenderer extends DefaultTreeCellRenderer {
         localPlayer = lobby.getClientGUI().getClient().getLocalPlayer();
         Color selectionColor = UIManager.getColor("Tree.selectionBackground");
         setOpaque(true);
+        forceFormationTip = null;
 
         if (sel) {
             setBackground(new Color(selectionColor.getRGB()));
@@ -119,6 +123,8 @@ public class MekForceTreeRenderer extends DefaultTreeCellRenderer {
             }
         } else if (value instanceof Force force) {
             entity = null;
+            this.row = row;
+            forceFormationTip = buildFormationTip(game, force);
             Font scaledFont = new Font(MMConstants.FONT_DIALOG, Font.PLAIN, UIUtil.scaleForGUI(UIUtil.FONT_SCALE1 + 3));
             setFont(scaledFont);
             if (lobby.isCompact()) {
@@ -134,13 +140,32 @@ public class MekForceTreeRenderer extends DefaultTreeCellRenderer {
     @Override
     public String getToolTipText(MouseEvent event) {
         if (entity == null) {
-            return null;
+            // Force node: show the detected formation + its bonus description, if any.
+            return forceFormationTip;
         }
         Rectangle r = tree.getRowBounds(row);
         if (r != null && event.getPoint().x > r.getWidth() - UIUtil.scaleForGUI(50)) {
             return "<HTML>" + UnitToolTip.getEntityTipLobby(entity, localPlayer, lobby.mapSettings);
         }
         return null;
+    }
+
+    /** @return an HTML tooltip naming the force's detected formation and describing its bonus, or null if none. */
+    private String buildFormationTip(Game game, Force force) {
+        java.util.List<Entity> directUnits = new java.util.ArrayList<>();
+        for (int memberId : force.getEntities()) {
+            Entity member = game.getEntity(memberId);
+            if (member != null) {
+                directUnits.add(member);
+            }
+        }
+        FormationBonusType formation = FormationBonusType.detect(directUnits);
+        if (formation == null) {
+            return null;
+        }
+        String description = formation.getBonusDescription();
+        return "<HTML><B>" + formation.getDisplayName() + " Formation</B>"
+              + (description.isEmpty() ? "" : "<BR>" + description);
     }
 
     private void setIcon(Image image, int height) {
