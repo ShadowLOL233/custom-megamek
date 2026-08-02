@@ -66,8 +66,17 @@ TW-native re-expression. Expect a *curated* subset + re-tuning, not a blind copy
 initiative-bonus formations first (simplest hook — `InitiativeBonusBreakdown`); (P3) to-hit / movement formations;
 (P4) lobby UI showing a Force's detected formation + bonus; (P5) game-option gate + docs.
 
-**Status:** ⏳ **ANALYSIS DONE (2026-08-01)** — awaiting the formation-type/bonus-table decision (design question 1)
-before implementation.
+**Status:** ⏳ **ANALYSIS DONE (2026-08-01); SOURCE DATA TRANSCRIBED (2026-08-01)** — the full AS Commander's
+Edition formation list + Formation Bonuses (pp. 116–123) and every referenced SPA/SCA effect (pp. 92–103) are now
+transcribed in `development/FORMATION_BONUS_REFERENCE.md`. That doc also records: (a) the extra MekBay formations
+(Berserker/Close, Rifle, Hunter, …) are canon from **Campaign Operations**, already implemented (composition only,
+no bonus) in `megamek/client/ratgenerator/FormationType.java`, reusable for the eligibility layer; (b) which
+formations have CE bonuses vs which need AS Companion. **Scope decided (2026-08-01, two tiers):** Tier 1 (coding
+started) = the non-CamOps AS CE Formation Bonuses; Tier 2 (next) = the CamOps-only formations (Berserker/Close, …),
+whose bonuses need AS Companion or custom design. **Implementation approach (reference doc §6):** grant the
+equivalent *existing* TW pilot option (`Crew.getOptions()`) to a qualifying Force's members, gated by a new game
+option — most AS SPAs (Sniper, Oblique Attacker, Weapon Specialist, Blood Stalker, Multi-Tasker, Tactical Genius,
+Forward Observer, Maneuvering Ace, Edge) already exist and are honored by the TW rules engine.
 
 ---
 
