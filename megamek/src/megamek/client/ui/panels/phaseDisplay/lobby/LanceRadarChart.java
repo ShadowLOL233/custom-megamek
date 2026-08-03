@@ -62,6 +62,11 @@ public class LanceRadarChart extends JPanel {
     public static final String[] AXIS_LABELS = { "Damage", "Armor", "Structure", "Mobility", "Range", "Heat" };
     public static final int AXES = AXIS_LABELS.length;
 
+    // Fixed logical canvas: the whole chart is laid out once in these units, then uniformly scaled to fill the
+    // panel, so the layout/style is identical at any panel size or GUI Scale (only the overall size changes).
+    private static final int LOGICAL_W = 380;
+    private static final int LOGICAL_H = 480;
+
     // Reference maxima used only to scale values to [0,1] for the polygons; labels always show the real value.
     private static final double[] FORCE_MAX = { 160, 1200, 600, 8, 24, 120 };
     private static final double[] UNIT_MAX = { 50, 400, 200, 8, 24, 30 };
@@ -84,8 +89,15 @@ public class LanceRadarChart extends JPanel {
     private String formationName = "";
 
     public LanceRadarChart() {
-        setPreferredSize(new Dimension(scaleForGUI(380), scaleForGUI(480)));
         setOpaque(false);
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        // Recomputed on every call so it tracks the CURRENT GUI Scale. A size set once in the constructor would
+        // stay fixed, so raising GUI Scale would grow the neighbouring panels and squeeze this one smaller
+        // ("increase GUI Scale -> radar shrinks"); requesting a GUI-Scale-sized area makes it grow instead.
+        return new Dimension(scaleForGUI(380), scaleForGUI(480));
     }
 
     /** Sets the force to display (units may be empty/null to clear) plus the header names. */
@@ -180,30 +192,35 @@ public class LanceRadarChart extends JPanel {
         Graphics2D g2 = (Graphics2D) g.create();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        int w = getWidth();
-        int h = getHeight();
+        // Uniformly scale the fixed LOGICAL_W x LOGICAL_H layout to fill the panel (aspect-preserving, centered),
+        // then draw everything in logical units so the whole chart scales as one rigid unit: its layout and
+        // style stay identical at any panel size / GUI Scale, only the overall size follows the panel.
+        double k = Math.min(getWidth() / (double) LOGICAL_W, getHeight() / (double) LOGICAL_H);
+        g2.translate((getWidth() - LOGICAL_W * k) / 2.0, (getHeight() - LOGICAL_H * k) / 2.0);
+        g2.scale(k, k);
+        int w = LOGICAL_W;
+        int h = LOGICAL_H;
 
         // No background fill: let MegaMek's standard dark gray show through; the grid/text are white.
         Font baseFont = getFont();
         g2.setColor(TEXT);
 
         // Header: Force name (bold) + Formation name — enlarged, with a clear gap before the chart.
-        int headerBottom = scaleForGUI(8);
-        Font nameFont = baseFont.deriveFont(Font.BOLD, (float) scaleForGUI(16));
-        Font formFont = baseFont.deriveFont(Font.ITALIC, (float) scaleForGUI(13));
+        int headerBottom = 8;
+        Font nameFont = baseFont.deriveFont(Font.BOLD, 16f);
+        Font formFont = baseFont.deriveFont(Font.ITALIC, 13f);
         headerBottom = drawCentered(g2, forceName.isEmpty() ? "" : forceName, nameFont, w, headerBottom);
         headerBottom = drawCentered(g2, formationName, formFont, w, headerBottom);
-        headerBottom += scaleForGUI(14);
+        headerBottom += 14;
 
-        Font labelFont = baseFont.deriveFont((float) scaleForGUI(11));
+        Font labelFont = baseFont.deriveFont(11f);
         g2.setFont(labelFont);
-        FontMetrics fm = g2.getFontMetrics();
+        FontMetrics fm = getFontMetrics(labelFont);
 
         int chartTop = headerBottom;
         int cx = w / 2;
         int cy = chartTop + (h - chartTop) / 2;
-        // Shrunk ~25% from before so the enlarged header no longer overlaps the hexagon / axis labels.
-        int radius = (int) (Math.min(w, h - chartTop) * 0.28);
+        int radius = (int) (Math.min(w, h - chartTop) * 0.30);
 
         // Grid rings + spokes.
         g2.setStroke(new BasicStroke(1f));
@@ -230,15 +247,15 @@ public class LanceRadarChart extends JPanel {
         g2.setColor(alpha(FORCE_COLOR, 70));
         g2.fill(forcePath);
         g2.setColor(FORCE_COLOR);
-        g2.setStroke(new BasicStroke((float) scaleForGUI(2)));
+        g2.setStroke(new BasicStroke(2f));
         g2.draw(forcePath);
 
         // Focused unit overlay (blue dashed).
         if (hasUnit) {
             Path2D unitPath = dataPolygon(cx, cy, radius, unitValues);
             g2.setColor(UNIT_COLOR);
-            g2.setStroke(new BasicStroke((float) scaleForGUI(2), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 1f,
-                  new float[] { scaleForGUI(4), scaleForGUI(4) }, 0f));
+            g2.setStroke(new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 1f,
+                  new float[] { 4f, 4f }, 0f));
             g2.draw(unitPath);
         }
 
@@ -247,7 +264,7 @@ public class LanceRadarChart extends JPanel {
     }
 
     private void drawAxisLabels(Graphics2D g2, int cx, int cy, int radius, FontMetrics fm) {
-        int labelRadius = radius + scaleForGUI(30);
+        int labelRadius = radius + 30;
         for (int i = 0; i < AXES; i++) {
             double angle = angleFor(i);
             int x = cx + (int) (Math.cos(angle) * labelRadius);
@@ -261,12 +278,12 @@ public class LanceRadarChart extends JPanel {
     /** Draws an axis label centered at (x,y) inside a bordered, semi-transparent box for readability. */
     private void drawLabelBox(Graphics2D g2, int x, int y, String line1, String line2, FontMetrics fm) {
         int lineHeight = fm.getHeight();
-        int width = Math.max(fm.stringWidth(line1), (line2 != null) ? fm.stringWidth(line2) : 0) + scaleForGUI(8);
+        int width = Math.max(fm.stringWidth(line1), (line2 != null) ? fm.stringWidth(line2) : 0) + 8;
         int lines = (line2 != null) ? 2 : 1;
-        int height = lineHeight * lines + scaleForGUI(4);
+        int height = lineHeight * lines + 4;
         int boxX = x - width / 2;
         int boxY = y - height / 2;
-        int arc = scaleForGUI(6);
+        int arc = 6;
 
         g2.setColor(new Color(0, 0, 0, 155));
         g2.fillRoundRect(boxX, boxY, width, height, arc, arc);
@@ -274,7 +291,7 @@ public class LanceRadarChart extends JPanel {
         g2.setStroke(new BasicStroke(1f));
         g2.drawRoundRect(boxX, boxY, width, height, arc, arc);
 
-        int textY = boxY + fm.getAscent() + scaleForGUI(2);
+        int textY = boxY + fm.getAscent() + 2;
         g2.setColor(TEXT);
         g2.drawString(line1, x - fm.stringWidth(line1) / 2, textY);
         if (line2 != null) {
@@ -294,7 +311,7 @@ public class LanceRadarChart extends JPanel {
             return top;
         }
         g2.setFont(font);
-        FontMetrics fm = g2.getFontMetrics();
+        FontMetrics fm = getFontMetrics(font);
         g2.setColor(TEXT);
         g2.drawString(text, (width - fm.stringWidth(text)) / 2, top + fm.getAscent());
         return top + fm.getHeight();

@@ -243,6 +243,7 @@ public class ChatLounge extends AbstractPhaseDisplay
     private final JComboBox<String> radarAxisCombo = new JComboBox<>(LanceRadarChart.AXIS_LABELS);
     private final DefaultListModel<Entity> radarRankModel = new DefaultListModel<>();
     private java.util.List<Entity> currentRadarUnits = new ArrayList<>();
+    private JSplitPane unitsSplitPane;
 
     /* Force Tree */
     private MekTreeForceModel mekForceTreeModel;
@@ -829,12 +830,19 @@ public class ChatLounge extends AbstractPhaseDisplay
         rightSide.add(scrMekTable);
 
         panUnits.setLayout(new BoxLayout(panUnits, BoxLayout.LINE_AXIS));
-        JSplitPane sp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        sp.setDividerLocation(400);
-        sp.setDividerSize(10);
-        sp.setLeftComponent(leftSide);
-        sp.setRightComponent(rightSide);
-        panUnits.add(sp);
+        // Wrap the left column in a scroll pane so it can take its full (GUI-Scale-sized) height instead of being
+        // squeezed by the fixed window; this lets the lance radar keep its height and grow with GUI Scale.
+        JScrollPane leftScroll = new JScrollPane(leftSide, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+              JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        leftScroll.setBorder(null);
+        leftScroll.getVerticalScrollBar().setUnitIncrement(scaleForGUI(16));
+
+        unitsSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        unitsSplitPane.setDividerLocation(scaleForGUI(400));
+        unitsSplitPane.setDividerSize(10);
+        unitsSplitPane.setLeftComponent(leftScroll);
+        unitsSplitPane.setRightComponent(rightSide);
+        panUnits.add(unitsSplitPane);
     }
 
     private void setupMapPanel() {
@@ -3469,6 +3477,14 @@ public class ChatLounge extends AbstractPhaseDisplay
                 clientgui.getTilesetManager().reloadUnitIcons();
                 mekModel.refreshCells();
                 refreshTree();
+                break;
+            case GUIPreferences.GUI_SCALE:
+                // GUI Scale changed live: re-scale the left column width so the lance radar (and the rest of the
+                // left panel) grow/shrink with it. The vertical scroll pane already lets it take its full height.
+                if (unitsSplitPane != null) {
+                    unitsSplitPane.setDividerLocation(scaleForGUI(400));
+                    unitsSplitPane.revalidate();
+                }
                 break;
             case ClientPreferences.SHOW_AUTO_RESOLVE_PANEL:
                 refreshAcar();
