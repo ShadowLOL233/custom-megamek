@@ -525,7 +525,10 @@ public class MekSummaryCache {
         if (ms.isSupport()) {
             ms.setWeightClass(EntityWeightClass.getSupportWeightClass(ms.getTons(), ms.getUnitSubType()));
         } else {
-            double weightClassWeight = ms.isBattleArmor() ? ms.getSuitWeight() : ms.getTons();
+            // Use the entity type directly: ms.isBattleArmor() relies on asUnitType, which is not set until later in
+            // this method, so at this point it would be false for BA and fall back to total squad tonnage (mapping
+            // nearly every BA to Assault).
+            double weightClassWeight = (e instanceof BattleArmor) ? ms.getSuitWeight() : ms.getTons();
             ms.setWeightClass(EntityWeightClass.getWeightClass(weightClassWeight, ms.getUnitType()));
         }
 
