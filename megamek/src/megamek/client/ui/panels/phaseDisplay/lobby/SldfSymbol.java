@@ -249,6 +249,63 @@ public final class SldfSymbol {
         paint(g, x, y, w, h, dominantBranch, avgWeightClass, playerColor, RING_NEUTRAL, null, echelon);
     }
 
+    /**
+     * Paints just the SLDF unit frame chrome — the fill, the experience-colour border ring, the weight-class letter in
+     * the top-right corner and the experience letter at the bottom-left — but no branch glyph, leaving the interior for
+     * the caller to draw a custom icon (e.g. the real unit image at close zoom). The corner letters sit in the top and
+     * bottom margins; the returned rectangle is the central band the caller should fit its icon into so it never
+     * overlaps them.
+     *
+     * @return the interior rectangle reserved for the caller's icon.
+     */
+    public static Rectangle2D paintUnitFrame(Graphics2D g, int x, int y, int w, int h, Entity entity, Color fill) {
+        Object oldAA = g.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
+        Stroke oldStroke = g.getStroke();
+        Font oldFont = g.getFont();
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        Rectangle2D bounds = unitFrameBounds(x, y, w, h);
+        double fx = bounds.getX();
+        double fy = bounds.getY();
+        double fw = bounds.getWidth();
+        double fh = bounds.getHeight();
+        double corner = Math.min(fw, fh) * 0.16;
+        double cut = Math.min(fw, fh) * 0.34;
+
+        Color fillColor = (fill != null) ? fill : new Color(90, 90, 100);
+        Color ink = contrastInk(fillColor);
+        Color ring = skillColor(skillOf(entity));
+        float border = (float) Math.max(1.5, fh * 0.055);
+
+        Shape frame = frameShape(fx, fy, fw, fh, corner);
+        g.setColor(fillColor);
+        g.fill(frame);
+        g.setColor(ring);
+        g.setStroke(new BasicStroke(border, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g.draw(frame);
+
+        drawWeightCorner(g, weightClassOf(entity), fx, fy, fw, fh, cut, ink);
+        drawExpLetter(g, skillLetter(skillOf(entity)), fx + fw * 0.05, fy + fh - fh * 0.05, fh * 0.22, ink);
+
+        g.setStroke(oldStroke);
+        g.setFont(oldFont);
+        if (oldAA != null) {
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, oldAA);
+        }
+
+        double letterBand = fh * 0.24;
+        return new Rectangle2D.Double(fx + fw * 0.04, fy + letterBand, fw * 0.92, fh - 2 * letterBand);
+    }
+
+    /**
+     * @return the outer frame rectangle a unit symbol fills within the given bounds (a uniform margin, no echelon
+     *       band). Callers use it to align connectors and selection highlights to the visible frame.
+     */
+    public static Rectangle2D unitFrameBounds(int x, int y, int w, int h) {
+        double margin = Math.max(2.0, Math.min(w, h) * 0.08);
+        return new Rectangle2D.Double(x + margin, y + margin, w - 2 * margin, h - 2 * margin);
+    }
+
     // ------------------------------------------------------------------------------------------------------------
     // Core painter
     // ------------------------------------------------------------------------------------------------------------
@@ -260,9 +317,9 @@ public final class SldfSymbol {
         Font oldFont = g.getFont();
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // Layout: reserve a top band for echelon marks; the frame is a landscape rectangle below it.
+        // Units fill their whole box; only formations reserve a top band for the echelon marks above the frame.
         double margin = Math.max(2.0, Math.min(w, h) * 0.08);
-        double topBand = h * 0.20;
+        double topBand = (echelon == null) ? margin : h * 0.20;
         double fx = x + margin;
         double fy = y + topBand;
         double fw = w - 2 * margin;

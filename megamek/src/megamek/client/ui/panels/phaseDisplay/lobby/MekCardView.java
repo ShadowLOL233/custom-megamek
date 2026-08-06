@@ -66,7 +66,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.Scrollable;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
@@ -78,20 +77,14 @@ import megamek.client.ui.tileset.MMStaticDirectoryManager;
 import megamek.client.ui.util.ScalingPopup;
 import megamek.common.Configuration;
 import megamek.common.Player;
-import megamek.common.equipment.EquipmentType;
-import megamek.common.equipment.WeaponType;
 import megamek.common.force.Force;
 import megamek.common.force.FormationBonusType;
 import megamek.common.game.InGameObject;
 import megamek.common.icons.Camouflage;
 import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;
-import megamek.common.units.EntityWeightClass;
-import megamek.common.units.Mek;
-import megamek.common.units.UnitType;
 import megamek.common.util.ImageUtil;
 import megamek.common.util.fileUtils.MegaMekFile;
-import megamek.common.verifier.TestEntity;
 
 /**
  * A MekBay-style "Card View" for the lobby: unit cards (icon, name, tonnage, BV, pilot skill) grouped by their
@@ -117,10 +110,7 @@ public class MekCardView extends JPanel implements Scrollable {
     private final ClientGUI clientGui;
 
     private final JPanel cardsContainer = new JPanel();
-    private final JLabel detailIconLabel = new JLabel();
-    private final JLabel detailNameLabel = new JLabel();
-    private final JLabel detailBodyLabel = new JLabel();
-    private final JScrollPane detailBodyScroll;
+    private final UnitDetailPanel detailPanel = new UnitDetailPanel();
     private final List<UnitCard> allCards = new ArrayList<>();
 
     public MekCardView(ChatLounge lobby, MekTableModel model, JTable table) {
@@ -137,29 +127,6 @@ public class MekCardView extends JPanel implements Scrollable {
         cardsScroll.getVerticalScrollBar().setUnitIncrement(scaleForGUI(16));
         add(cardsScroll, BorderLayout.CENTER);
 
-        // Unit detail panel on the right: mek icon + name header on top, scrollable stats body below.
-        detailIconLabel.setVerticalAlignment(SwingConstants.TOP);
-        detailIconLabel.setBorder(new EmptyBorder(scaleForGUI(6), scaleForGUI(6), scaleForGUI(6), scaleForGUI(4)));
-        detailNameLabel.setVerticalAlignment(SwingConstants.TOP);
-        detailNameLabel.setBorder(new EmptyBorder(scaleForGUI(6), 0, scaleForGUI(4), scaleForGUI(6)));
-        detailNameLabel.setFont(detailNameLabel.getFont().deriveFont(detailNameLabel.getFont().getSize2D() * 1.15f));
-        JPanel detailHeader = new JPanel(new BorderLayout(scaleForGUI(4), 0));
-        detailHeader.add(detailIconLabel, BorderLayout.WEST);
-        detailHeader.add(detailNameLabel, BorderLayout.CENTER);
-
-        detailBodyLabel.setVerticalAlignment(SwingConstants.TOP);
-        detailBodyLabel.setBorder(new EmptyBorder(scaleForGUI(2), scaleForGUI(8), scaleForGUI(6), scaleForGUI(8)));
-        detailBodyLabel.setFont(detailBodyLabel.getFont().deriveFont(detailBodyLabel.getFont().getSize2D() * 1.15f));
-        detailBodyScroll = new JScrollPane(detailBodyLabel);
-        detailBodyScroll.setBorder(null);
-        detailBodyScroll.getVerticalScrollBar().setUnitIncrement(scaleForGUI(16));
-
-        JPanel detailPanel = new JPanel(new BorderLayout());
-        detailPanel.setBorder(BorderFactory.createTitledBorder(
-              megamek.client.ui.Messages.getString("ChatLounge.cardView.unitDetails")));
-        detailPanel.add(detailHeader, BorderLayout.NORTH);
-        detailPanel.add(detailBodyScroll, BorderLayout.CENTER);
-        detailPanel.setPreferredSize(new Dimension(scaleForGUI(370), scaleForGUI(100)));
         add(detailPanel, BorderLayout.EAST);
 
         // Keep card highlighting in sync when the selection is changed from either view.
@@ -385,233 +352,7 @@ public class MekCardView extends JPanel implements Scrollable {
 
     /** Updates the detail panel to show the given focused unit (null clears it). */
     public void setFocusedUnit(Entity unit) {
-        if ((unit == null) || isObscured(unit)) {
-            detailIconLabel.setIcon(null);
-            detailNameLabel.setText("");
-            detailBodyLabel.setText((unit == null)
-                  ? "<HTML><I>" + megamek.client.ui.Messages.getString("ChatLounge.cardView.selectUnit") + "</I>"
-                  : "<HTML><B>?</B>");
-        } else {
-            detailIconLabel.setIcon(buildIcon(unit, false, scaleForGUI(96)));
-            detailNameLabel.setText(buildDetailHeaderHtml(unit));
-            detailBodyLabel.setText(buildDetailBodyHtml(unit));
-        }
-        detailBodyScroll.getVerticalScrollBar().setValue(0);
-    }
-
-    /**
-     * @return the header HTML: left column = model then chassis; right column = weight class, role, super-category
-     *       (Mek/Vehicle/Aerospace/…) then sub-category (BattleMek/IndustrialMek/ProtoMek/…).
-     */
-    private String buildDetailHeaderHtml(Entity entity) {
-        String role = (entity.getRole() != null) && entity.getRole().hasRole() ? entity.getRole().toString() : "";
-        return "<HTML><TABLE WIDTH=\"100%\"><TR>"
-              + "<TD VALIGN=\"TOP\"><FONT SIZE=\"-2\">" + entity.getModel() + "</FONT><BR><B><FONT SIZE=\"+1\">"
-              + entity.getChassis() + "</FONT></B></TD>"
-              + "<TD VALIGN=\"TOP\" ALIGN=\"RIGHT\">" + EntityWeightClass.getClassName(entity.getWeightClass())
-              + "<BR><I>" + role + "</I><BR>" + superCategory(entity) + "<BR><FONT SIZE=\"-2\">"
-              + subCategory(entity) + "</FONT></TD>"
-              + "</TR></TABLE></HTML>";
-    }
-
-    /** @return the broad unit category: Mek / Vehicle / Aerospace / Infantry, else the readable unit-type name. */
-    private static String superCategory(Entity entity) {
-        int type = entity.getUnitType();
-        if ((type == UnitType.MEK) || (type == UnitType.PROTOMEK)) {
-            return "Mek";
-        } else if ((type == UnitType.TANK) || (type == UnitType.VTOL) || (type == UnitType.NAVAL)) {
-            return "Vehicle";
-        } else if ((type == UnitType.AEROSPACE_FIGHTER) || (type == UnitType.CONV_FIGHTER)
-              || (type == UnitType.SMALL_CRAFT) || (type == UnitType.DROPSHIP)) {
-            return "Aerospace";
-        } else if ((type == UnitType.INFANTRY) || (type == UnitType.BATTLE_ARMOR)) {
-            return "Infantry";
-        }
-        return UnitType.getTypeDisplayableName(type);
-    }
-
-    /** @return the specific unit sub-category, e.g. BattleMek / IndustrialMek / ProtoMek / Tank / Aerospace Fighter. */
-    private static String subCategory(Entity entity) {
-        if ((entity.getUnitType() == UnitType.MEK) && (entity instanceof Mek)) {
-            return ((Mek) entity).isIndustrial() ? "IndustrialMek" : "BattleMek";
-        }
-        return UnitType.getTypeDisplayableName(entity.getUnitType());
-    }
-
-    private String buildDetailBodyHtml(Entity entity) {
-        NumberFormat integers = NumberFormat.getIntegerInstance();
-
-        StringBuilder sb = new StringBuilder("<HTML>");
-
-        // Two-column property grid.
-        List<String[]> left = new ArrayList<>();
-        left.add(new String[] { "BV", integers.format(entity.getStrength()) });
-        left.add(new String[] { "Tons", NumberFormat.getInstance().format(entity.getWeight()) });
-        left.add(new String[] { "Intro", String.valueOf(entity.getIntroductionDate()) });
-        left.add(new String[] { "C-Bill", integers.format(entity.getCost(false)) });
-        left.add(new String[] { "Structure", EquipmentType.getStructureTypeName(entity.getStructureType()) });
-        left.add(new String[] { "Engine", (entity.getEngine() != null) ? entity.getEngine().getEngineName() : "—" });
-        left.add(new String[] { "Move", entity.getWalkMP() + "/" + entity.getRunMP() + "/" + entity.getJumpMP() });
-
-        List<String[]> right = new ArrayList<>();
-        right.add(new String[] { "Pilot", entity.getCrew().getSkillsAsString(false) });
-        right.add(new String[] { "Rules", titleCase(entity.getStaticTechLevel().toString()) });
-        right.add(new String[] { "Tech", techBaseName(entity) });
-        right.add(new String[] { "Armor", EquipmentType.getArmorTypeName(entity.getArmorType(0)) });
-        right.add(new String[] { "Motive", entity.getMovementModeAsString() });
-        right.add(new String[] { "Network", networkName(entity) });
-
-        sb.append("<TABLE>");
-        int gridRows = Math.max(left.size(), right.size());
-        for (int i = 0; i < gridRows; i++) {
-            sb.append("<TR>");
-            appendPair(sb, (i < left.size()) ? left.get(i) : null);
-            sb.append("<TD>&nbsp;&nbsp;</TD>");
-            appendPair(sb, (i < right.size()) ? right.get(i) : null);
-            sb.append("</TR>");
-        }
-        sb.append("</TABLE><HR>");
-
-        // Combat stat block with proportional bars.
-        double firepower = LanceRadarChart.axisValue(entity, 0);
-        int dissipation = (int) LanceRadarChart.axisValue(entity, 5);
-        int weaponHeat = totalWeaponHeat(entity);
-        double damagePerTurn = (weaponHeat <= dissipation) || (weaponHeat == 0) ? firepower
-              : firepower * dissipation / weaponHeat;
-        int armor = entity.getTotalOArmor();
-        int maxArmor = Math.max(armor, TestEntity.getMaximumArmorPoints(entity));
-        int armorPct = (maxArmor > 0) ? (int) Math.round(100.0 * armor / maxArmor) : 100;
-
-        statBar(sb, "Armor", armor + " (" + armorPct + "%)", (maxArmor > 0) ? (double) armor / maxArmor : 0);
-        statBar(sb, "Structure", String.valueOf(entity.getTotalOInternal()), entity.getTotalOInternal() / 200.0);
-        statBar(sb, "Firepower", String.valueOf(Math.round(firepower)), firepower / 60.0);
-        statBar(sb, "Damage/Turn", String.format("%.1f", damagePerTurn), damagePerTurn / 40.0);
-        double range = LanceRadarChart.axisValue(entity, 4);
-        statBar(sb, "Range", String.valueOf(Math.round(range)), range / 30.0);
-        statBar(sb, "Heat", String.valueOf(weaponHeat), weaponHeat / 40.0);
-        statBar(sb, "Dissipation", String.valueOf(dissipation), dissipation / 30.0);
-        statBar(sb, "Top Speed", String.valueOf(entity.getRunMP()), entity.getRunMP() / 12.0);
-        statBar(sb, "Jump", String.valueOf(entity.getJumpMP()), entity.getJumpMP() / 8.0);
-
-        // Equipment (weapons) as color-coded bars by type.
-        Map<String, Integer> weaponCounts = new LinkedHashMap<>();
-        Map<String, Integer> weaponCategories = new LinkedHashMap<>();
-        for (var mounted : entity.getWeaponList()) {
-            String name = mounted.getType().getName();
-            weaponCounts.merge(name, 1, Integer::sum);
-            weaponCategories.putIfAbsent(name, weaponCategory(mounted.getType()));
-        }
-        if (!weaponCounts.isEmpty()) {
-            sb.append("<BR><B>Equipment</B>");
-            for (Map.Entry<String, Integer> weapon : weaponCounts.entrySet()) {
-                colorTag(sb, weaponCategories.get(weapon.getKey()), weapon.getValue() + "× " + weapon.getKey());
-            }
-        }
-
-        // Ammo as color-coded bars with shots per ton.
-        Map<String, Integer> ammoShots = new LinkedHashMap<>();
-        for (var mounted : entity.getAmmo()) {
-            ammoShots.putIfAbsent(mounted.getType().getName(), mounted.getType().getShots());
-        }
-        if (!ammoShots.isEmpty()) {
-            sb.append("<BR><B>Ammo</B>");
-            for (Map.Entry<String, Integer> bin : ammoShots.entrySet()) {
-                colorTag(sb, ammoCategory(bin.getKey()), bin.getKey() + " (" + bin.getValue() + "/ton)");
-            }
-        }
-        return sb.append("</HTML>").toString();
-    }
-
-    private static void appendPair(StringBuilder sb, String[] pair) {
-        if (pair == null) {
-            sb.append("<TD></TD><TD></TD>");
-        } else {
-            sb.append("<TD>").append(pair[0]).append("</TD><TD><B>").append(pair[1]).append("</B></TD>");
-        }
-    }
-
-    private static final int STAT_TABLE_PX = 288;
-    private static final int STAT_BAR_PX = 196;
-    private static final String STAT_BAR_COLOR = "#5f6066";
-    // Per weapon/ammo category [energy, missile, ballistic, other]: dark body + a brightened left stripe.
-    private static final String[] TAG_BODY = { "#283a5a", "#284c2d", "#43315a", "#5e4828" };
-    private static final String[] TAG_STRIPE = { "#5a9be0", "#6ac47a", "#a97fd6", "#e0a860" };
-    private static final int CAT_ENERGY = 0;
-    private static final int CAT_MISSILE = 1;
-    private static final int CAT_BALLISTIC = 2;
-    private static final int CAT_OTHER = 3;
-
-    /** Renders one stat as its own fixed-width mini-table: a gray bar (label on it) sized to {@code proportion}. */
-    private static void statBar(StringBuilder sb, String label, String value, double proportion) {
-        int fill = (int) Math.round(Math.max(0, Math.min(1, proportion)) * STAT_BAR_PX);
-        sb.append("<TABLE WIDTH=\"").append(STAT_TABLE_PX).append("\" CELLPADDING=\"1\"><TR>")
-              .append("<TD BGCOLOR=\"").append(STAT_BAR_COLOR).append("\" WIDTH=\"").append(fill)
-              .append("\"><FONT COLOR=\"#ffffff\"><B>&nbsp;").append(label).append("&nbsp;</B></FONT></TD>")
-              .append("<TD></TD><TD ALIGN=\"RIGHT\"><B>").append(value).append("</B></TD></TR></TABLE>");
-    }
-
-    /**
-     * Renders a color-coded tag: a brightened left stripe + a thin bright outline (both the stripe color) around a
-     * dark tinted body with white text. The outline is faked with a 1px stripe-colored outer cell (Swing HTML does
-     * not honor table BORDERCOLOR).
-     */
-    private static void colorTag(StringBuilder sb, int category, String text) {
-        String stripe = TAG_STRIPE[category];
-        sb.append("<TABLE CELLSPACING=\"0\" CELLPADDING=\"1\" BGCOLOR=\"").append(stripe).append("\"><TR><TD>")
-              .append("<TABLE CELLSPACING=\"0\" CELLPADDING=\"0\"><TR>")
-              .append("<TD BGCOLOR=\"").append(stripe).append("\" WIDTH=\"5\">&nbsp;</TD>")
-              .append("<TD BGCOLOR=\"").append(TAG_BODY[category]).append("\"><FONT COLOR=\"#ffffff\">&nbsp;")
-              .append(text).append("&nbsp;</FONT></TD>")
-              .append("</TR></TABLE></TD></TR></TABLE>");
-    }
-
-    /** @return the category index for a weapon: energy / missile / ballistic / other. */
-    private static int weaponCategory(WeaponType weaponType) {
-        if (weaponType.hasFlag(WeaponType.F_ENERGY)) {
-            return CAT_ENERGY;
-        } else if (weaponType.hasFlag(WeaponType.F_MISSILE)) {
-            return CAT_MISSILE;
-        } else if (weaponType.hasFlag(WeaponType.F_BALLISTIC)) {
-            return CAT_BALLISTIC;
-        }
-        return CAT_OTHER;
-    }
-
-    /** @return the category index for an ammo bin, classified by name (missile / ballistic / other). */
-    private static int ammoCategory(String name) {
-        String upper = name.toUpperCase();
-        if (upper.contains("LRM") || upper.contains("SRM") || upper.contains("MRM") || upper.contains("MML")
-              || upper.contains("ATM") || upper.contains("ROCKET") || upper.contains("THUNDERBOLT")
-              || upper.contains("NARC") || upper.contains("STREAK") || upper.contains("ARROW")) {
-            return CAT_MISSILE;
-        }
-        if (upper.contains("AC/") || upper.contains("AUTOCANNON") || upper.contains("GAUSS") || upper.contains("MG")
-              || upper.contains("MACHINE GUN") || upper.contains("LB ") || upper.contains("ULTRA")
-              || upper.contains("ROTARY") || upper.contains("HAG") || upper.contains("RIFLE")
-              || upper.contains("LONG TOM") || upper.contains("SNIPER") || upper.contains("THUMPER")) {
-            return CAT_BALLISTIC;
-        }
-        return CAT_OTHER;
-    }
-
-    private static String titleCase(String text) {
-        return text.isEmpty() ? text : text.charAt(0) + text.substring(1).toLowerCase();
-    }
-
-    private static String techBaseName(Entity entity) {
-        return entity.isMixedTech() ? "Mixed" : entity.isClan() ? "Clan" : "Inner Sphere";
-    }
-
-    private static String networkName(Entity entity) {
-        return (entity.hasC3() || entity.hasC3i()) ? "C3" : "None";
-    }
-
-    private static int totalWeaponHeat(Entity entity) {
-        int heat = 0;
-        for (var mounted : entity.getWeaponList()) {
-            heat += Math.max(0, mounted.getType().getHeat());
-        }
-        return heat;
+        detailPanel.setUnit(unit, (unit != null) && isObscured(unit));
     }
 
     private void syncSelectionVisuals() {

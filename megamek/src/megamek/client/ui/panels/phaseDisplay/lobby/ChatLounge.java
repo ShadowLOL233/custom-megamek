@@ -235,10 +235,12 @@ public class ChatLounge extends AbstractPhaseDisplay
     private final JToggleButton butListView = new JToggleButton(Messages.getString("ChatLounge.butSortableView"));
     private final JToggleButton butCardView = new JToggleButton(Messages.getString("ChatLounge.butCardView"));
     private final JToggleButton butForceView = new JToggleButton(Messages.getString("ChatLounge.butForceView"));
+    private final JToggleButton butToeView = new JToggleButton(Messages.getString("ChatLounge.butToeView"));
     private final JButton butCollapse = new JButton(Messages.getString("ChatLounge.butCollapse"));
     private final JButton butExpand = new JButton(Messages.getString("ChatLounge.butExpand"));
     private MekTableModel mekModel;
     private MekCardView mekCardView;
+    private ForceToeView mekToeView;
     private final LanceRadarChart lanceRadar = new LanceRadarChart();
     private final JComboBox<String> radarAxisCombo = new JComboBox<>(LanceRadarChart.AXIS_LABELS);
     private final DefaultListModel<Entity> radarRankModel = new DefaultListModel<>();
@@ -477,6 +479,7 @@ public class ChatLounge extends AbstractPhaseDisplay
         butListView.addActionListener(lobbyListener);
         butCardView.addActionListener(lobbyListener);
         butForceView.addActionListener(lobbyListener);
+        butToeView.addActionListener(lobbyListener);
         butCollapse.addActionListener(lobbyListener);
         butExpand.addActionListener(lobbyListener);
         butRunAutoResolve.addActionListener(lobbyListener);
@@ -636,6 +639,7 @@ public class ChatLounge extends AbstractPhaseDisplay
         ToolTipManager.sharedInstance().registerComponent(mekForceTree);
 
         mekCardView = new MekCardView(this, mekModel, mekTable);
+        mekToeView = new ForceToeView(this, mekModel, mekTable);
 
         scrMekTable = new JScrollPane(mekTable);
         scrMekTable.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -769,6 +773,7 @@ public class ChatLounge extends AbstractPhaseDisplay
         viewGroup.add(butListView);
         viewGroup.add(butCardView);
         viewGroup.add(butForceView);
+        viewGroup.add(butToeView);
         butListView.setSelected(true);
 
         butCollapse.setEnabled(false);
@@ -817,6 +822,7 @@ public class ChatLounge extends AbstractPhaseDisplay
         topRight.add(butListView);
         topRight.add(butCardView);
         topRight.add(butForceView);
+        topRight.add(butToeView);
         topRight.add(Box.createHorizontalStrut(30));
         topRight.add(butCompact);
         topRight.add(butShowUnitID);
@@ -1459,6 +1465,7 @@ public class ChatLounge extends AbstractPhaseDisplay
         refreshTree();
         refreshMekTable();
         refreshCardView();
+        refreshToeView();
         updateLanceRadar();
     }
 
@@ -1466,6 +1473,13 @@ public class ChatLounge extends AbstractPhaseDisplay
     private void refreshCardView() {
         if (mekCardView != null) {
             mekCardView.refresh();
+        }
+    }
+
+    /** Rebuilds the TO&E chart from the (already refreshed) forces and unit table model. */
+    private void refreshToeView() {
+        if (mekToeView != null) {
+            mekToeView.refresh();
         }
     }
 
@@ -2342,6 +2356,12 @@ public class ChatLounge extends AbstractPhaseDisplay
                 butCollapse.setEnabled(true);
                 butExpand.setEnabled(true);
 
+            } else if (ev.getSource() == butToeView) {
+                refreshToeView();
+                scrMekTable.setViewportView(mekToeView);
+                butCollapse.setEnabled(false);
+                butExpand.setEnabled(false);
+
             } else if (ev.getSource() == butCollapse) {
                 collapseTree();
 
@@ -2765,6 +2785,7 @@ public class ChatLounge extends AbstractPhaseDisplay
         butHelp.removeActionListener(lobbyListener);
         butListView.removeActionListener(lobbyListener);
         butCardView.removeActionListener(lobbyListener);
+        butToeView.removeActionListener(lobbyListener);
         butForceView.removeActionListener(lobbyListener);
         butCollapse.removeActionListener(lobbyListener);
         butExpand.removeActionListener(lobbyListener);
