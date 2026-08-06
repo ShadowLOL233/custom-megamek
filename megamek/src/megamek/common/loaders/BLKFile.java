@@ -388,6 +388,33 @@ public class BLKFile {
             }
             String equipName = s.trim();
 
+            // Strip the ":Shots<n>#" ammo-shots suffix (and ":SIZE:<d>") the same way loadEquipment does; it is not
+            // part of the equipment name, so one-shot ammo entries like "BA-SRM3 Ammo:Shots1#" must be stripped
+            // before the lookup or they fail to resolve and mark the whole design invalid.
+            int numShots = 0;
+            int shotsIdx = equipName.indexOf(":Shots");
+            if (shotsIdx >= 0) {
+                int hashIdx = equipName.indexOf('#', shotsIdx);
+                if (hashIdx > shotsIdx) {
+                    try {
+                        numShots = Integer.parseInt(equipName.substring(shotsIdx + ":Shots".length(), hashIdx).trim());
+                    } catch (NumberFormatException ignored) {
+                        // leave numShots = 0
+                    }
+                    equipName = (equipName.substring(0, shotsIdx) + equipName.substring(hashIdx + 1)).trim();
+                }
+            }
+            double size = 0.0;
+            int sizeIdx = equipName.toUpperCase().indexOf(":SIZE:");
+            if (sizeIdx > 0) {
+                try {
+                    size = Double.parseDouble(equipName.substring(sizeIdx + ":SIZE:".length()).trim());
+                } catch (NumberFormatException ignored) {
+                    // leave size = 0
+                }
+                equipName = equipName.substring(0, sizeIdx).trim();
+            }
+
             EquipmentType etype = EquipmentType.get(equipName);
             if (etype == null) {
                 etype = EquipmentType.get(prefix + equipName);
@@ -404,7 +431,14 @@ public class BLKFile {
                     }
                 }
                 try {
-                    t.addEquipment(etype, Entity.LOC_NONE);
+                    Mounted<?> m = t.addEquipment(etype, Entity.LOC_NONE);
+                    if ((numShots != 0) && (m.getType() instanceof AmmoType ammo)) {
+                        m.setShotsLeft(numShots);
+                        m.setOriginalShots(numShots);
+                        m.setSize(numShots * ammo.getKgPerShot() / 1000.0);
+                    } else if (etype.isVariableSize() && (size != 0)) {
+                        m.setSize(size);
+                    }
                 } catch (LocationFullException ex) {
                     throw new EntityLoadingException(ex.getMessage());
                 }
