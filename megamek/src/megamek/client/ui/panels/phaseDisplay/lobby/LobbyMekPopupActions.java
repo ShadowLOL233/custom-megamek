@@ -154,6 +154,7 @@ public record LobbyMekPopupActions(ChatLounge lobby) implements ActionListener {
             case LMP_F_CREATE_TOP:
             case LMP_F_REMOVE:
             case LMP_F_PROMOTE:
+            case LMP_F_ATTACH:
             case LMP_F_ASSIGN:
             case LMP_F_ASSIGN_ONLY:
             case LMP_F_CREATE_FROM:
@@ -215,6 +216,17 @@ public record LobbyMekPopupActions(ChatLounge lobby) implements ActionListener {
                     forceIds.add(StringUtil.toInt(fst.nextToken(), Force.NO_FORCE));
                 }
                 lobby.lobbyActions.forcePromote(forceIds);
+                break;
+
+            case LMP_F_ATTACH:
+                StringTokenizer attachTok = new StringTokenizer(info, ":");
+                Set<Integer> attachChildIds = new HashSet<>();
+                StringTokenizer attachChildTok = new StringTokenizer(attachTok.nextToken(), ",");
+                while (attachChildTok.hasMoreTokens()) {
+                    attachChildIds.add(StringUtil.toInt(attachChildTok.nextToken(), Force.NO_FORCE));
+                }
+                int attachParentId = StringUtil.toInt(attachTok.nextToken(), Force.NO_FORCE);
+                lobby.lobbyActions.forceAttach(attachChildIds, attachParentId);
                 break;
 
             case LMP_F_ASSIGN:

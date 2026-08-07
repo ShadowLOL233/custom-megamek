@@ -585,6 +585,13 @@ public class Client extends AbstractClient {
         for (Entity entity : entities) {
             getGame().setEntity(entity.getId(), entity);
         }
+
+        // setEntity() above fires a GameEntityChangeEvent per entity, which refreshes listeners (e.g. the lobby). A
+        // force-only update — reparenting via attach/promote — carries no entities, so without this nothing repaints
+        // and the structural change appears to do nothing. Signal a refresh for that case.
+        if (!forces.isEmpty() && entities.isEmpty()) {
+            getGame().processGameEvent(new GameSettingsChangeEvent(this));
+        }
     }
 
     /**

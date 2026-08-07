@@ -223,6 +223,33 @@ public class LobbyActions {
     }
 
     /**
+     * Attaches all the given forces as sub forces of the given new parent (the batch form of
+     * {@link #forceAttach(int, int)}, for reparenting several selected forces at once). Members that cannot be attached
+     * (enemy-owned, non-editable, or would become their own ancestor) are skipped silently.
+     */
+    void forceAttach(Collection<Integer> forceIds, int newParentId) {
+        Forces forces = game().getForces();
+        if (!forces.contains(newParentId)) {
+            return;
+        }
+        Force newParent = forces.getForce(newParentId);
+        Player newParentOwner = forces.getOwner(newParent);
+        Set<Force> validForces = forceIds.stream()
+              .filter(forces::contains)
+              .filter(id -> id != newParentId)
+              .map(forces::getForce)
+              .filter(force -> {
+                  Player owner = forces.getOwner(force);
+                  return (owner != null) && !owner.isEnemyOf(newParentOwner)
+                        && !forces.getFullSubForces(force).contains(newParent) && isEditable(force);
+              })
+              .collect(toSet());
+        if (!validForces.isEmpty()) {
+            client().sendForceParent(validForces, newParentId);
+        }
+    }
+
+    /**
      * Makes the given forces top-level, detaching them from any former parents.
      */
     void forcePromote(Collection<Integer> forceIds) {

@@ -130,6 +130,7 @@ class LobbyMekPopup {
     static final String LMP_F_ADD_TO = "FADDTO";
     static final String LMP_F_REMOVE = "FREMOVE";
     static final String LMP_F_PROMOTE = "FPROMOTE";
+    static final String LMP_F_ATTACH = "FATTACH";
     static final String LMP_F_RENAME = "FRENAME";
     static final String LMP_F_GEN_NAME = "FGENNAME";
     static final String LMP_F_CREATE_SUB = "FCREATESUB";
@@ -339,6 +340,27 @@ class LobbyMekPopup {
                   editable && !force.isTopLevel(), listener));
         }
 
+        // Attach the selected force(s) as sub forces of another of the owner's forces (menu counterpart to DnD
+        // reparenting, e.g. nest a Lance under a Company; works for several selected forces at once). The owner's whole
+        // force forest is offered as targets, minus the selected forces' own subtrees.
+        if (!forces.isEmpty() && entities.isEmpty()) {
+            Forces gameForces = lobby.game().getForces();
+            int ownerId = gameForces.getOwnerId(forces.get(0));
+            boolean sameOwner = forces.stream().allMatch(f -> gameForces.getOwnerId(f) == ownerId);
+            boolean allEditable = forces.stream().allMatch(lobby.lobbyActions::isEditable);
+            Set<Integer> childIds = forces.stream().map(Force::getId).collect(Collectors.toSet());
+            String childToken = childIds.stream().map(String::valueOf).collect(Collectors.joining(","));
+
+            JMenu attachMenu = new JMenu(forces.size() == 1 ? "Attach to Force..." : "Attach selected Forces to...");
+            for (Force top : gameForces.getTopLevelForces()) {
+                if (!childIds.contains(top.getId()) && (gameForces.getOwnerId(top) == ownerId)) {
+                    attachMenu.add(forceAttachMenu(childIds, childToken, top, lobby.game(), listener));
+                }
+            }
+            attachMenu.setEnabled(sameOwner && allEditable && (attachMenu.getItemCount() > 0));
+            menu.add(attachMenu);
+        }
+
         // If entities are selected but no forces, offer entity options
         if (forces.isEmpty() && !entities.isEmpty() && LobbyUtility.haveSingleOwner(entities)) {
             // Add to force menu tree
@@ -374,6 +396,39 @@ class LobbyMekPopup {
             }
         }
         return result;
+    }
+
+    /**
+     * Returns a menu node for choosing {@code candidate} (or one of its sub forces) as the new parent of the moved
+     * forces {@code childIds}. Every eligible force is a clickable attach target; the moved forces' own subtrees are
+     * pruned (a force cannot nest under itself or a descendant), and a target already the parent of every moved force is
+     * shown disabled (a no-op). {@code childToken} is the comma-separated moved-force id list carried in the command.
+     */
+    private static JMenuItem forceAttachMenu(Set<Integer> childIds, String childToken, Force candidate, Game game,
+          ActionListener listener) {
+        String label = "<HTML>" + candidate.getName() + idString(game, candidate.getId());
+        String command = LMP_F_ATTACH + "|" + childToken + ":" + candidate.getId() + NO_INFO;
+        boolean noop = childIds.stream().allMatch(id -> {
+            Force moved = game.getForces().getForce(id);
+            return (moved != null) && (moved.getParentId() == candidate.getId());
+        });
+        boolean valid = !noop;
+
+        JMenu sub = new JMenu(label);
+        for (Integer subForceId : candidate.getSubForces()) {
+            if (childIds.contains(subForceId)) {
+                continue; // prune the moved forces and their whole subtrees
+            }
+            Force subForce = game.getForces().getForce(subForceId);
+            if (subForce != null) {
+                sub.add(forceAttachMenu(childIds, childToken, subForce, game, listener));
+            }
+        }
+        if (sub.getItemCount() == 0) {
+            return menuItem(label, command, valid, listener);
+        }
+        sub.insert(menuItem("Attach here", command, valid, listener), 0);
+        return sub;
     }
 
     static String idString(Game game, int id) {
