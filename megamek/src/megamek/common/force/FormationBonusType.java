@@ -227,6 +227,34 @@ public enum FormationBonusType {
         this.composition = composition;
     }
 
+    /**
+     * @return a display/ordering priority for this formation: higher = more forward (command &gt; assault &gt; battle
+     *       &gt; striker &gt; fire &gt; pursuit &gt; recon). Used e.g. to order a company's lances in the TO&amp;E chart.
+     */
+    public int sortWeight() {
+        return switch (this) {
+            case COMMAND, VEHICLE_COMMAND -> 100;
+            case FAST_ASSAULT, ASSAULT -> 90;
+            case HEAVY_BATTLE -> 82;
+            case BATTLE -> 80;
+            case MEDIUM_BATTLE -> 76;
+            case LIGHT_BATTLE -> 72;
+            case HEAVY_STRIKER_CAVALRY -> 66;
+            case STRIKER_CAVALRY -> 64;
+            case DIRECT_FIRE -> 55;
+            case FIRE_SUPPORT -> 50;
+            case FIRE -> 48;
+            case ANTI_AIR -> 46;
+            case ARTILLERY_FIRE -> 44;
+            case PROBE -> 36;
+            case PURSUIT -> 35;
+            case SWEEP -> 34;
+            case HEAVY_RECON -> 28;
+            case RECON -> 26;
+            case LIGHT_RECON -> 24;
+        };
+    }
+
     public String getDisplayName() {
         return displayName;
     }

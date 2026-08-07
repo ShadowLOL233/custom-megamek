@@ -72,6 +72,7 @@ import megamek.client.ui.tileset.MMStaticDirectoryManager;
 import megamek.client.ui.util.ScalingPopup;
 import megamek.common.Player;
 import megamek.common.force.Force;
+import megamek.common.force.FormationBonusType;
 import megamek.common.game.Game;
 import megamek.common.game.InGameObject;
 import megamek.common.icons.Camouflage;
@@ -185,14 +186,15 @@ public class ForceToeView extends JPanel implements Scrollable {
     /** The pan/zoom drawing surface. */
     private class Canvas extends JPanel {
 
-        private static final int UNIT_W = 58;
-        private static final int UNIT_H = 58;
-        private static final int FORCE_W = 156;
-        private static final int FORCE_H = 40;
-        private static final int H_GAP = 18;
-        private static final int V_GAP = 46;
-        private static final int FOREST_GAP = 44;
+        private static final int UNIT_W = 50;
+        private static final int UNIT_H = 50;
+        private static final int FORCE_W = 140;
+        private static final int FORCE_H = 34;
+        private static final int H_GAP = 12;
+        private static final int V_GAP = 30;
+        private static final int FOREST_GAP = 40;
         private static final int MARGIN = 40;
+        private static final int COMMAND_SORT = 1000;  // command lances sort above any detected formation
 
         private static final double MIN_SCALE = 0.15;
         private static final double MAX_SCALE = 3.0;
@@ -209,6 +211,7 @@ public class ForceToeView extends JPanel implements Scrollable {
         private final Color edge = new Color(150, 155, 165);
         private final Color forceFill = new Color(58, 62, 72);
         private final Color forceBorder = new Color(120, 126, 140);
+        private final Color commandBorder = new Color(214, 176, 74);
         private final Color forceText = new Color(232, 234, 240);
         private final Color forceSubText = new Color(176, 182, 196);
         private final Color obscuredFill = new Color(58, 60, 68);
@@ -282,8 +285,8 @@ public class ForceToeView extends JPanel implements Scrollable {
             // Lay out each root tree as a forest, packed left to right.
             double cursor = MARGIN;
             for (Node root : roots) {
-                layout(root);
-                assign(root, cursor, MARGIN);
+                measure(root);
+                place(root, cursor, MARGIN);
                 cursor += root.subtreeWidth + FOREST_GAP;
             }
 
@@ -309,61 +312,166 @@ public class ForceToeView extends JPanel implements Scrollable {
             }
             node.echelon = SldfSymbol.echelonForCount(count);
             node.symbolColor = forceColor(force);
+            node.isCommand = force.isCommandLance();
             computeFormationGlyph(node);
+            node.sortWeight = sortWeightFor(force, node);
+            reparentCommandLance(node);
             return node;
         }
 
-        private void layout(Node node) {
+        /** Ordering priority: a user-set command lance ranks top, else its detected AS formation, else its tonnage. */
+        private int sortWeightFor(Force force, ForceNode node) {
+            if (force.isCommandLance()) {
+                return COMMAND_SORT;
+            }
+            FormationBonusType formation = detectFormation(force);
+            if (formation != null) {
+                return formation.sortWeight();
+            }
+            return 20 + node.avgWeightClass * 12;   // no detected formation: fall back to average tonnage class
+        }
+
+        private FormationBonusType detectFormation(Force force) {
+            List<Entity> units = new ArrayList<>();
+            for (int id : force.getEntities()) {
+                Entity entity = game().getEntity(id);
+                if (entity != null) {
+                    units.add(entity);
+                }
+            }
+            return FormationBonusType.detect(units);
+        }
+
+        /**
+         * Display-only: if one of this force's sub-forces is a designated command lance, make it the "mother root" of
+         * this formation — the command lance keeps its own units and the force's OTHER sub-forces are re-hung beneath
+         * it, while the force's loose direct units stay put. Mirrors the SLDF/IS convention (a battalion's or company's
+         * command element leads its subordinate formations). Actual force data is untouched.
+         */
+        private void reparentCommandLance(ForceNode node) {
+            ForceNode command = null;
+            for (Node child : node.children) {
+                if ((child instanceof ForceNode fc) && fc.isCommand) {
+                    command = fc;
+                    break;
+                }
+            }
+            if (command == null) {
+                return;
+            }
+            List<Node> siblingForces = new ArrayList<>();
+            for (Node child : node.children) {
+                if ((child != command) && (child instanceof ForceNode)) {
+                    siblingForces.add(child);
+                }
+            }
+            node.children.removeAll(siblingForces);
+            command.children.addAll(siblingForces);
+        }
+
+        private List<Node> unitChildren(ForceNode f) {
+            List<Node> units = new ArrayList<>();
+            for (Node c : f.children) {
+                if (c instanceof UnitNode) {
+                    units.add(c);
+                }
+            }
+            return units;
+        }
+
+        /** @return this force's sub-force children ordered by descending sort weight (highest = leftmost). */
+        private List<Node> forceChildren(ForceNode f) {
+            List<Node> forceKids = new ArrayList<>();
+            for (Node c : f.children) {
+                if (c instanceof ForceNode) {
+                    forceKids.add(c);
+                }
+            }
+            forceKids.sort((a, b) -> Integer.compare(((ForceNode) b).sortWeight, ((ForceNode) a).sortWeight));
+            return forceKids;
+        }
+
+        private double rowWidth(List<Node> kids) {
+            double w = 0;
+            for (Node c : kids) {
+                w += c.subtreeWidth;
+            }
+            return w + Math.max(0, kids.size() - 1) * scaleForGUI(H_GAP);
+        }
+
+        /**
+         * Computes each node's footprint width and box x-offset (boxDX), bottom-up. A force's own units are a
+         * horizontal row centred under its box; its sub-forces are a second horizontal row below that. Sets no
+         * absolute position.
+         */
+        private void measure(Node node) {
             if (node instanceof UnitNode) {
                 node.w = scaleForGUI(UNIT_W);
                 node.h = scaleForGUI(UNIT_H);
                 node.subtreeWidth = node.w;
+                node.boxDX = 0;
                 return;
             }
             ForceNode force = (ForceNode) node;
             node.w = scaleForGUI(FORCE_W);
             node.h = scaleForGUI(FORCE_H);
-            if (force.children.isEmpty()) {
-                node.subtreeWidth = node.w;
-                return;
-            }
-            double total = 0;
+            List<Node> units = unitChildren(force);
+            List<Node> forceKids = forceChildren(force);
             for (Node child : force.children) {
-                layout(child);
-                total += child.subtreeWidth;
+                measure(child);
             }
-            total += (force.children.size() - 1) * scaleForGUI(H_GAP);
-            node.subtreeWidth = Math.max(node.w, total);
+
+            double unitsRowW = units.isEmpty() ? 0 : rowWidth(units);
+            double forcesRowW = forceKids.isEmpty() ? 0 : rowWidth(forceKids);
+
+            // Both rows are centred under the box; extents relative to the box's left edge = 0.
+            double minX = 0;
+            double maxX = node.w;
+            if (unitsRowW > 0) {
+                minX = Math.min(minX, node.w / 2 - unitsRowW / 2);
+                maxX = Math.max(maxX, node.w / 2 + unitsRowW / 2);
+            }
+            if (forcesRowW > 0) {
+                minX = Math.min(minX, node.w / 2 - forcesRowW / 2);
+                maxX = Math.max(maxX, node.w / 2 + forcesRowW / 2);
+            }
+            node.boxDX = -minX;
+            node.subtreeWidth = maxX - minX;
         }
 
-        private void assign(Node node, double left, double top) {
-            node.y = top;
-            node.x = left + (node.subtreeWidth - node.w) / 2.0;
+        /** Places a subtree at absolute coordinates given its footprint top-left, recording connectors. */
+        private void place(Node node, double footprintX, double footprintY) {
+            node.x = footprintX + node.boxDX;
+            node.y = footprintY;
             drawNodes.add(node);
+            if (!(node instanceof ForceNode force)) {
+                return;
+            }
 
-            if (node instanceof ForceNode force && !force.children.isEmpty()) {
-                double childrenTotal = -scaleForGUI(H_GAP);
-                for (Node child : force.children) {
-                    childrenTotal += child.subtreeWidth + scaleForGUI(H_GAP);
+            List<Node> units = unitChildren(force);
+            List<Node> forceKids = forceChildren(force);
+            double boxCenterX = node.x + node.w / 2;
+            double parentBottomY = node.y + node.h;
+            double y = parentBottomY + scaleForGUI(V_GAP);
+
+            if (!units.isEmpty()) {
+                double cursor = boxCenterX - rowWidth(units) / 2;
+                for (Node u : units) {
+                    place(u, cursor, y);
+                    Rectangle2D fb = SldfSymbol.unitFrameBounds((int) Math.round(u.x), (int) Math.round(u.y),
+                          (int) Math.round(u.w), (int) Math.round(u.h));
+                    edges.add(new Edge(boxCenterX, parentBottomY, fb.getCenterX(), fb.getMinY(), u));
+                    cursor += u.subtreeWidth + scaleForGUI(H_GAP);
                 }
-                double cursor = left + (node.subtreeWidth - childrenTotal) / 2.0;
-                double childTop = top + node.h + scaleForGUI(V_GAP);
-                double px = node.x + node.w / 2.0;
-                double py = node.y + node.h;
-                for (Node child : force.children) {
-                    assign(child, cursor, childTop);
-                    // Connect to the child's visible top: the unit frame top (units inset a small margin) or the
-                    // force box top.
-                    double cx = child.x + child.w / 2.0;
-                    double cy = child.y;
-                    if (child instanceof UnitNode) {
-                        Rectangle2D fb = SldfSymbol.unitFrameBounds((int) Math.round(child.x),
-                              (int) Math.round(child.y), (int) Math.round(child.w), (int) Math.round(child.h));
-                        cx = fb.getCenterX();
-                        cy = fb.getMinY();
-                    }
-                    edges.add(new Edge(px, py, cx, cy, child));
-                    cursor += child.subtreeWidth + scaleForGUI(H_GAP);
+                y += scaleForGUI(UNIT_H) + scaleForGUI(V_GAP);
+            }
+
+            if (!forceKids.isEmpty()) {
+                double cursor = boxCenterX - rowWidth(forceKids) / 2;
+                for (Node c : forceKids) {
+                    place(c, cursor, y);
+                    edges.add(new Edge(boxCenterX, parentBottomY, c.x + c.w / 2, c.y, c));
+                    cursor += c.subtreeWidth + scaleForGUI(H_GAP);
                 }
             }
         }
@@ -466,18 +574,18 @@ public class ForceToeView extends JPanel implements Scrollable {
                   scaleForGUI(10), scaleForGUI(10));
             g2.setColor(forceFill);
             g2.fill(box);
-            g2.setColor(forceBorder);
-            g2.setStroke(new BasicStroke((float) Math.max(1.0, scaleForGUI(1))));
+            g2.setColor(node.isCommand ? commandBorder : forceBorder);
+            g2.setStroke(new BasicStroke((float) Math.max(1.0, scaleForGUI(node.isCommand ? 2 : 1))));
             g2.draw(box);
 
             String[] parts = node.label.split(SPACER, 2);
             Font base = g2.getFont();
-            g2.setFont(base.deriveFont(Font.BOLD, (float) scaleForGUI(12)));
-            drawCentered(g2, parts[0], node.x + node.w / 2.0, node.y + node.h * 0.42, forceText, node.w - scaleForGUI(10));
+            g2.setFont(base.deriveFont(Font.BOLD, (float) scaleForGUI(10)));
+            drawCentered(g2, parts[0], node.x + node.w / 2.0, node.y + node.h * 0.44, forceText, node.w - scaleForGUI(6));
             if (parts.length > 1) {
-                g2.setFont(base.deriveFont(Font.PLAIN, (float) scaleForGUI(10)));
-                drawCentered(g2, parts[1], node.x + node.w / 2.0, node.y + node.h * 0.78, forceSubText,
-                      node.w - scaleForGUI(10));
+                g2.setFont(base.deriveFont(Font.PLAIN, (float) scaleForGUI(8)));
+                drawCentered(g2, parts[1], node.x + node.w / 2.0, node.y + node.h * 0.80, forceSubText,
+                      node.w - scaleForGUI(6));
             }
         }
 
@@ -862,6 +970,7 @@ public class ForceToeView extends JPanel implements Scrollable {
         double w;
         double h;
         double subtreeWidth;
+        double boxDX;       // x offset of this node's box within its subtree footprint (footprint left = 0)
         boolean hidden;     // inside a collapsed ancestor this frame -> not drawn or hit-tested
         boolean collapsed;  // (ForceNode only) drawn as a single echelon formation symbol
     }
@@ -874,6 +983,8 @@ public class ForceToeView extends JPanel implements Scrollable {
         SldfSymbol.Branch dominantBranch = SldfSymbol.Branch.OTHER;
         int avgWeightClass;
         Color symbolColor;
+        boolean isCommand;  // designated command lance: re-parented as its formation's "mother root"
+        int sortWeight;     // ordering priority among siblings (command > detected formation > tonnage)
 
         ForceNode(String label) {
             this.label = label;
