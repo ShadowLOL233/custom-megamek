@@ -67,6 +67,8 @@ public final class Force implements Serializable {
     private int parent = NO_FORCE;
     private ArrayList<Integer> entities = new ArrayList<>();
     private ArrayList<Integer> subForces = new ArrayList<>();
+    /** When true, this force is the command element of its parent formation (used e.g. by the TO&E chart). */
+    private boolean commandLance = false;
 
     /**
      * Creates a top-level (no parent) force
@@ -118,6 +120,15 @@ public final class Force implements Serializable {
 
     public void setName(String n) {
         name = n;
+    }
+
+    /** @return true if this force is designated as the command element (command lance) of its parent formation. */
+    public boolean isCommandLance() {
+        return commandLance;
+    }
+
+    public void setCommandLance(boolean commandLance) {
+        this.commandLance = commandLance;
     }
 
     public int getId() {
@@ -282,6 +293,7 @@ public final class Force implements Serializable {
         clone.ownerId = ownerId;
         clone.subForces = new ArrayList<>(subForces);
         clone.entities = new ArrayList<>(entities);
+        clone.commandLance = commandLance;
         return clone;
     }
 

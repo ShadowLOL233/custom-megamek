@@ -70,6 +70,9 @@ public final class Forces implements Serializable {
     @Serial
     private static final long serialVersionUID = -1382468145554363945L;
 
+    /** Trailing forceString marker flagging a force as a command lance (see {@link #forceStringFor}). */
+    private static final String COMMAND_MARKER = "C";
+
     private final HashMap<Integer, Force> forces = new HashMap<>();
     private transient IGame game;
 
@@ -87,7 +90,9 @@ public final class Forces implements Serializable {
         }
 
         final int newId = newId();
-        forces.put(newId, new Force(force.getName(), newId, force.getCamouflage().clone(), owner));
+        final Force newForce = new Force(force.getName(), newId, force.getCamouflage().clone(), owner);
+        newForce.setCommandLance(force.isCommandLance());
+        forces.put(newId, newForce);
         return newId;
     }
 
@@ -104,6 +109,7 @@ public final class Forces implements Serializable {
         // Create and add the new force
         final int newId = newId();
         final Force newForce = new Force(force.getName(), newId, force.getCamouflage().clone(), parent);
+        newForce.setCommandLance(force.isCommandLance());
         forces.put(newId, newForce);
         parent.addSubForce(newForce);
         return newId;
@@ -325,15 +331,22 @@ public final class Forces implements Serializable {
         final String[] b = a.split("\\|\\|");
         for (final String forceText : b) {
             final String[] force = forceText.split("\\|");
-            if ((force.length != 2) && (force.length != 4)) {
+            // Accepted formats: name|id (2), name|id|C (3), name|id|cat|file (4), name|id|cat|file|C (5),
+            // where the trailing C marks a command lance.
+            final boolean ok = (force.length == 2) || (force.length == 4)
+                  || ((force.length == 3) && COMMAND_MARKER.equals(force[2]))
+                  || ((force.length == 5) && COMMAND_MARKER.equals(force[4]));
+            if (!ok) {
                 LOGGER.error("Cannot parse {} into a force! Ending parsing forces for {}", forceText, entity);
                 break;
             }
 
-            final Camouflage camouflage = (force.length == 4) ? new Camouflage(force[2], force[3]) : new Camouflage();
+            final Camouflage camouflage = (force.length >= 4) ? new Camouflage(force[2], force[3]) : new Camouflage();
+            final boolean commandLance = (force.length == 3) || (force.length == 5);
 
             try {
                 final Force f = new Force(force[0], Integer.parseInt(force[1]), camouflage);
+                f.setCommandLance(commandLance);
                 forces.add(f);
             } catch (Exception e) {
                 LOGGER.error(e, "Cannot parse {} into a force! Ending parsing forces for {}", forceText, entity);
@@ -383,6 +396,9 @@ public final class Forces implements Serializable {
             if (!ancestor.getCamouflage().isDefault()) {
                 result.append("|").append(ancestor.getCamouflage().getCategory()).append("|")
                       .append(ancestor.getCamouflage().getFilename());
+            }
+            if (ancestor.isCommandLance()) {
+                result.append("|").append(COMMAND_MARKER);
             }
             result.append("||");
         }

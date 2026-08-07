@@ -829,6 +829,25 @@ public class LobbyActions {
         client().sendUpdateForce(forceList);
     }
 
+    /** Toggles whether the given force is designated as a command lance (persisted on the force and synced). */
+    void forceToggleCommand(int forceId) {
+        if (forceId == Force.NO_FORCE) {
+            return;
+        }
+        Forces forces = game().getForces();
+        if (!forces.contains(forceId)) {
+            return;
+        }
+        Force force = forces.getForce(forceId);
+        if (!isEditable(force)) {
+            LobbyErrors.showCannotConfigEnemies(frame());
+            return;
+        }
+        force.setCommandLance(!force.isCommandLance());
+        var forceList = new ArrayList<>(List.of(force)); // must be mutable
+        client().sendUpdateForce(forceList);
+    }
+
     /** Builds the "<ordinal> <formation> <echelon>" designation for an existing force. */
     private String generateForceName(Forces forces, Force force) {
         // Ordinal: position (1-based, by id) among this owner's forces at the same top-level/sub level.

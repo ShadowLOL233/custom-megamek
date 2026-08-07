@@ -131,6 +131,7 @@ class LobbyMekPopup {
     static final String LMP_F_REMOVE = "FREMOVE";
     static final String LMP_F_PROMOTE = "FPROMOTE";
     static final String LMP_F_ATTACH = "FATTACH";
+    static final String LMP_F_COMMAND = "FCOMMAND";
     static final String LMP_F_RENAME = "FRENAME";
     static final String LMP_F_GEN_NAME = "FGENNAME";
     static final String LMP_F_CREATE_SUB = "FCREATESUB";
@@ -338,6 +339,8 @@ class LobbyMekPopup {
             menu.add(menuItem("Generate Name", LMP_F_GEN_NAME + fId + NO_INFO, editable, listener));
             menu.add(menuItem("Promote to Top-Level Force", LMP_F_PROMOTE + fId + NO_INFO,
                   editable && !force.isTopLevel(), listener));
+            menu.add(menuItem(force.isCommandLance() ? "Unset Command Lance" : "Set as Command Lance",
+                  LMP_F_COMMAND + fId + NO_INFO, editable, listener));
         }
 
         // Attach the selected force(s) as sub forces of another of the owner's forces (menu counterpart to DnD
