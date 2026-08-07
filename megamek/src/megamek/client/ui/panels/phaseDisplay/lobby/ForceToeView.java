@@ -55,6 +55,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -86,8 +87,10 @@ import megamek.common.units.Entity;
  * shared {@link UnitDetailPanel} on the right shows the currently selected unit's stats (as in the Card View).
  *
  * <p>It renders the same units as the sortable {@link MekTableModel} table and drives that table's selection model on
- * click, so every selection-dependent lobby action keeps working. It deliberately does not (yet) collapse subtrees by
- * zoom level (LOD) or support drag-and-drop editing — the existing JTree Force View remains the editing surface.
+ * click, so every selection-dependent lobby action keeps working. It applies semantic-zoom level-of-detail: zoomed in,
+ * units show their real icons; zoomed out, units become compact {@link SldfSymbol} glyphs; zoomed out further, a whole
+ * sub-force collapses to a single {@link SldfSymbol#paintFormation echelon formation symbol}. It does not (yet) support
+ * drag-and-drop editing — the existing JTree Force View remains the editing surface.
  */
 public class ForceToeView extends JPanel implements Scrollable {
 
@@ -197,6 +200,11 @@ public class ForceToeView extends JPanel implements Scrollable {
         // Below this on-screen unit width (px) draw the compact SLDF glyph; at or above it draw the real unit icon.
         private static final int LOD_ICON_MIN_PX = 44;
 
+        // Below this on-screen subtree width (px) a whole sub-force collapses to one echelon formation symbol — but
+        // only once its units are already compact glyphs (never collapse while unit icons are still legible).
+        private static final int COLLAPSE_MAX_PX = 140;
+        private static final int FORMATION_SYM = 60;
+
         private final Color bg = new Color(40, 42, 48);
         private final Color edge = new Color(150, 155, 165);
         private final Color forceFill = new Color(58, 62, 72);
@@ -208,14 +216,17 @@ public class ForceToeView extends JPanel implements Scrollable {
         private final Color unitBg = new Color(78, 82, 92);
         private final Color hint = new Color(150, 155, 165);
 
+        private final List<Node> roots = new ArrayList<>();
         private final List<Node> drawNodes = new ArrayList<>();
-        private final List<double[]> edges = new ArrayList<>();
+        private final List<Edge> edges = new ArrayList<>();
         private final Map<Integer, Image> iconCache = new HashMap<>();
 
         private double scale = 1.0;
         private double offsetX = 0;
         private double offsetY = 0;
         private boolean needsFit = true;
+        // The zoom at which the collapse partition was last computed; NaN forces a recompute after a rebuild.
+        private double lastVisibilityScale = Double.NaN;
 
         private int lastDragX;
         private int lastDragY;
@@ -231,9 +242,11 @@ public class ForceToeView extends JPanel implements Scrollable {
         }
 
         void refresh() {
+            roots.clear();
             drawNodes.clear();
             edges.clear();
             iconCache.clear();
+            lastVisibilityScale = Double.NaN;
 
             // Map entity id -> table/model row (the lobby table uses no row sorter, so row == model row).
             Map<Integer, Integer> rowByEntityId = new LinkedHashMap<>();
@@ -244,7 +257,6 @@ public class ForceToeView extends JPanel implements Scrollable {
                 }
             }
 
-            List<Node> roots = new ArrayList<>();
             for (Force force : game().getForces().getTopLevelForces()) {
                 roots.add(buildForceNode(force, rowByEntityId));
             }
@@ -261,6 +273,9 @@ public class ForceToeView extends JPanel implements Scrollable {
                 ForceNode unassigned = new ForceNode(
                       megamek.client.ui.Messages.getString("ChatLounge.cardView.unassigned"));
                 unassigned.children.addAll(orphans);
+                unassigned.echelon = SldfSymbol.echelonForCount(orphans.size());
+                unassigned.symbolColor = null;
+                computeFormationGlyph(unassigned);
                 roots.add(unassigned);
             }
 
@@ -292,6 +307,9 @@ public class ForceToeView extends JPanel implements Scrollable {
                     node.children.add(new UnitNode(entity, row, isObscured(entity)));
                 }
             }
+            node.echelon = SldfSymbol.echelonForCount(count);
+            node.symbolColor = forceColor(force);
+            computeFormationGlyph(node);
             return node;
         }
 
@@ -344,7 +362,7 @@ public class ForceToeView extends JPanel implements Scrollable {
                         cx = fb.getCenterX();
                         cy = fb.getMinY();
                     }
-                    edges.add(new double[] { px, py, cx, cy });
+                    edges.add(new Edge(px, py, cx, cy, child));
                     cursor += child.subtreeWidth + scaleForGUI(H_GAP);
                 }
             }
@@ -368,6 +386,7 @@ public class ForceToeView extends JPanel implements Scrollable {
             if (needsFit) {
                 fitToView();
             }
+            ensureVisibility();
 
             AffineTransform view = new AffineTransform();
             view.translate(offsetX, offsetY);
@@ -378,12 +397,20 @@ public class ForceToeView extends JPanel implements Scrollable {
             g2.setColor(edge);
             g2.setStroke(new BasicStroke((float) Math.max(1.0, scaleForGUI(1)), BasicStroke.CAP_ROUND,
                   BasicStroke.JOIN_ROUND));
-            for (double[] e : edges) {
-                drawElbow(g2, e[0], e[1], e[2], e[3]);
+            for (Edge e : edges) {
+                if (e.child.hidden) {
+                    continue;
+                }
+                drawElbow(g2, e.px, e.py, e.cx, e.cy);
             }
             for (Node node : drawNodes) {
+                if (node.hidden) {
+                    continue;
+                }
                 if (node instanceof UnitNode unit) {
                     paintUnitNode(g2, unit);
+                } else if (((ForceNode) node).collapsed) {
+                    paintCollapsedForce(g2, (ForceNode) node);
                 } else {
                     paintForceNode(g2, (ForceNode) node);
                 }
@@ -394,7 +421,36 @@ public class ForceToeView extends JPanel implements Scrollable {
             g2.setFont(g2.getFont().deriveFont(Font.PLAIN, (float) scaleForGUI(11)));
             g2.drawString(megamek.client.ui.Messages.getString("ChatLounge.toeView.hint"),
                   scaleForGUI(8), getHeight() - scaleForGUI(8));
+
+            paintZoomReadout(g2);
             g2.dispose();
+        }
+
+        /**
+         * Draws a live zoom indicator in the top-right (screen space): the zoom %, the on-screen unit width in px (the
+         * icon⇄glyph LOD flips at {@link #LOD_ICON_MIN_PX}) and the current unit LOD band. A tuning aid so the zoom
+         * thresholds can be adjusted and described precisely.
+         */
+        private void paintZoomReadout(Graphics2D g2) {
+            double unitPx = scaleForGUI(UNIT_W) * scale;
+            String lod = (unitPx >= LOD_ICON_MIN_PX) ? "icons" : "symbols";
+            String text = "Zoom " + Math.round(scale * 100) + "%    " + Math.round(unitPx) + "px/unit    " + lod;
+
+            g2.setFont(g2.getFont().deriveFont(Font.PLAIN, (float) scaleForGUI(11)));
+            FontMetrics fm = g2.getFontMetrics();
+            int padX = scaleForGUI(8);
+            int padY = scaleForGUI(4);
+            int boxW = fm.stringWidth(text) + 2 * padX;
+            int boxH = fm.getAscent() + fm.getDescent() + 2 * padY;
+            int bx = getWidth() - boxW - scaleForGUI(8);
+            int by = scaleForGUI(8);
+
+            g2.setColor(new Color(28, 30, 36, 215));
+            g2.fillRoundRect(bx, by, boxW, boxH, scaleForGUI(8), scaleForGUI(8));
+            g2.setColor(forceBorder);
+            g2.drawRoundRect(bx, by, boxW, boxH, scaleForGUI(8), scaleForGUI(8));
+            g2.setColor(forceText);
+            g2.drawString(text, bx + padX, by + padY + fm.getAscent());
         }
 
         /** Draws a parent→child connector as an orthogonal elbow (down, across, down). */
@@ -422,6 +478,32 @@ public class ForceToeView extends JPanel implements Scrollable {
                 g2.setFont(base.deriveFont(Font.PLAIN, (float) scaleForGUI(10)));
                 drawCentered(g2, parts[1], node.x + node.w / 2.0, node.y + node.h * 0.78, forceSubText,
                       node.w - scaleForGUI(10));
+            }
+        }
+
+        /** Draws a collapsed sub-force as a single centred SLDF echelon symbol with its name beneath it. */
+        private void paintCollapsedForce(Graphics2D g2, ForceNode node) {
+            double symW = scaleForGUI(FORMATION_SYM);
+            double symH = scaleForGUI(FORMATION_SYM);
+            double centerX = node.x + node.w / 2.0;
+            double sx = centerX - symW / 2.0;
+            double sy = node.y;
+            SldfSymbol.paintFormation(g2, (int) Math.round(sx), (int) Math.round(sy),
+                  (int) Math.round(symW), (int) Math.round(symH),
+                  node.echelon, node.dominantBranch, node.avgWeightClass, node.symbolColor);
+
+            String name = node.label.split(SPACER, 2)[0];
+            g2.setFont(g2.getFont().deriveFont(Font.PLAIN, (float) scaleForGUI(10)));
+            drawCentered(g2, name, centerX, sy + symH + scaleForGUI(11), forceText,
+                  Math.min(node.subtreeWidth, scaleForGUI(170)));
+
+            // Selection ring when any member unit of the collapsed formation is selected in the shared table.
+            if (anyMemberSelected(node)) {
+                double pad = scaleForGUI(3);
+                g2.setColor(table.getSelectionBackground());
+                g2.setStroke(new BasicStroke((float) Math.max(2.0, scaleForGUI(2))));
+                g2.draw(new RoundRectangle2D.Double(sx - pad, sy - pad, symW + 2 * pad, symH + 2 * pad,
+                      scaleForGUI(10), scaleForGUI(10)));
             }
         }
 
@@ -534,20 +616,114 @@ public class ForceToeView extends JPanel implements Scrollable {
             } catch (NoninvertibleTransformException ex) {
                 return null;
             }
-            // Prefer unit nodes (drawn on top) then force nodes.
+            ensureVisibility();
+            // Prefer unit nodes (drawn on top) then force nodes; never hit nodes hidden inside a collapsed force.
             for (int pass = 0; pass < 2; pass++) {
                 for (Node node : drawNodes) {
+                    if (node.hidden) {
+                        continue;
+                    }
                     boolean isUnit = node instanceof UnitNode;
                     if ((pass == 0) != isUnit) {
                         continue;
                     }
+                    // A collapsed force's symbol (+ its name label) is taller than the force box; widen its hit area.
+                    double bottom = node.collapsed ? node.y + scaleForGUI(FORMATION_SYM + 14) : node.y + node.h;
                     if ((world.getX() >= node.x) && (world.getX() <= node.x + node.w)
-                          && (world.getY() >= node.y) && (world.getY() <= node.y + node.h)) {
+                          && (world.getY() >= node.y) && (world.getY() <= bottom)) {
                         return node;
                     }
                 }
             }
             return null;
+        }
+
+        /** Recomputes the collapse partition (which forces render as symbols) whenever the zoom changed. */
+        private void ensureVisibility() {
+            if (scale == lastVisibilityScale) {
+                return;
+            }
+            for (Node node : drawNodes) {
+                node.hidden = false;
+                node.collapsed = false;
+            }
+            for (Node root : roots) {
+                walkVisibility(root, false);
+            }
+            lastVisibilityScale = scale;
+        }
+
+        private void walkVisibility(Node node, boolean ancestorCollapsed) {
+            node.hidden = ancestorCollapsed;
+            boolean collapseHere = false;
+            if (!ancestorCollapsed && (node instanceof ForceNode force) && shouldCollapse(force)) {
+                node.collapsed = true;
+                collapseHere = true;
+            }
+            if (node instanceof ForceNode force) {
+                for (Node child : force.children) {
+                    walkVisibility(child, ancestorCollapsed || collapseHere);
+                }
+            }
+        }
+
+        /**
+         * @return whether a force should render as one collapsed echelon symbol: only once its units are already
+         *       compact glyphs (never while unit icons are legible), and its whole subtree is small on screen.
+         */
+        private boolean shouldCollapse(ForceNode force) {
+            if (force.children.isEmpty()) {
+                return false;
+            }
+            if (scaleForGUI(UNIT_W) * scale >= LOD_ICON_MIN_PX) {
+                return false;
+            }
+            return force.subtreeWidth * scale < COLLAPSE_MAX_PX;
+        }
+
+        /** Tallies the subtree's dominant branch and average weight class for the collapsed formation symbol. */
+        private void computeFormationGlyph(ForceNode force) {
+            List<Entity> units = new ArrayList<>();
+            collectUnitEntities(force, units);
+            if (units.isEmpty()) {
+                return;
+            }
+            Map<SldfSymbol.Branch, Integer> branchTally = new EnumMap<>(SldfSymbol.Branch.class);
+            int weightSum = 0;
+            for (Entity entity : units) {
+                branchTally.merge(SldfSymbol.branchOf(entity), 1, Integer::sum);
+                weightSum += SldfSymbol.weightClassOf(entity);
+            }
+            force.dominantBranch = branchTally.entrySet().stream()
+                  .max(Map.Entry.comparingByValue()).map(Map.Entry::getKey).orElse(SldfSymbol.Branch.OTHER);
+            force.avgWeightClass = Math.round((float) weightSum / units.size());
+        }
+
+        private void collectUnitEntities(Node node, List<Entity> out) {
+            if (node instanceof UnitNode unit) {
+                out.add(unit.entity);
+            } else {
+                for (Node child : ((ForceNode) node).children) {
+                    collectUnitEntities(child, out);
+                }
+            }
+        }
+
+        /** @return the owning player's colour for a force's formation symbol, or null (neutral) if unavailable. */
+        private Color forceColor(Force force) {
+            Player owner = game().getForces().getOwner(force);
+            return (owner != null) ? owner.getColour().getColour() : null;
+        }
+
+        private boolean anyMemberSelected(Node node) {
+            List<Integer> rows = new ArrayList<>();
+            collectUnitRows(node, rows);
+            for (int row : rows) {
+                if (table.isRowSelected(row)) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void collectUnitRows(Node node, List<Integer> rows) {
@@ -686,14 +862,38 @@ public class ForceToeView extends JPanel implements Scrollable {
         double w;
         double h;
         double subtreeWidth;
+        boolean hidden;     // inside a collapsed ancestor this frame -> not drawn or hit-tested
+        boolean collapsed;  // (ForceNode only) drawn as a single echelon formation symbol
     }
 
     private static final class ForceNode extends Node {
         final String label;
         final List<Node> children = new ArrayList<>();
+        // Far-zoom collapse attributes: the whole subtree drawn as one SldfSymbol echelon formation symbol.
+        SldfSymbol.Echelon echelon = SldfSymbol.Echelon.LANCE;
+        SldfSymbol.Branch dominantBranch = SldfSymbol.Branch.OTHER;
+        int avgWeightClass;
+        Color symbolColor;
 
         ForceNode(String label) {
             this.label = label;
+        }
+    }
+
+    /** A parent→child connector; keeps the child node so connectors into collapsed-away nodes are skipped. */
+    private static final class Edge {
+        final double px;
+        final double py;
+        final double cx;
+        final double cy;
+        final Node child;
+
+        Edge(double px, double py, double cx, double cy, Node child) {
+            this.px = px;
+            this.py = py;
+            this.cx = cx;
+            this.cy = cy;
+            this.child = child;
         }
     }
 
