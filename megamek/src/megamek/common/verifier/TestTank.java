@@ -246,23 +246,23 @@ public class TestTank extends TestEntity {
 
     @Override
     public boolean hasDoubleHeatSinks() {
-        // tanks can't have DHS
-        return false;
+        return tank.getHeatSinkDissipation() >= 2;
     }
 
     @Override
     public int getCountHeatSinks() {
-        return heatNeutralHSRequirement();
+        // Heat-neutral count, scaled by per-sink dissipation (a single dissipates 1, a double-type sink 2).
+        return (int) Math.ceil((double) heatNeutralHSRequirement() / tank.getHeatSinkDissipation());
     }
 
     @Override
     public double getWeightHeatSinks() {
-        int heat = getCountHeatSinks();
-        heat -= engine.getWeightFreeEngineHeatSinks();
-        if (heat < 0) {
-            heat = 0;
+        int count = getCountHeatSinks();
+        count -= engine.getWeightFreeEngineHeatSinks();
+        if (count < 0) {
+            count = 0;
         }
-        return heat;
+        return count * tank.getHeatSinkTonnage();
     }
 
     @Override

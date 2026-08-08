@@ -266,6 +266,10 @@ public class BLKTankFile extends BLKFile implements IMekLoader {
             t.setHasNoControlSystems(true);
         }
 
+        if (dataFile.exists("sink_type_name")) {
+            t.setHeatSinkTypeName(dataFile.getDataAsString("sink_type_name")[0]);
+        }
+
         if (dataFile.exists("trailer")) {
             t.setTrailer(true);
         }

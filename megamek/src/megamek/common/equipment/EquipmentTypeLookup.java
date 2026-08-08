@@ -136,6 +136,8 @@ public class EquipmentTypeLookup {
     public static final String OS_TRIPLE_HS = "OSTripleHeatSink";
     @EquipmentName
     public static final String OS_QUAD_HS = "OSQuadrupleHeatSink";
+    @EquipmentName
+    public static final String COMPACT_DOUBLE_HS = "CompactDoubleHeatSink";
 
     @EquipmentName
     public static final String HITCH = "Hitch";

@@ -1736,6 +1736,7 @@ public class MiscType extends EquipmentType {
         EquipmentType.addType(MiscType.createOSImprovedDoubleHeatSink());
         EquipmentType.addType(MiscType.createOSTripleHeatSink());
         EquipmentType.addType(MiscType.createOSQuadrupleHeatSink());
+        EquipmentType.addType(MiscType.createCompactDoubleHeatSink());
         EquipmentType.addType(MiscType.createISCASE());
         EquipmentType.addType(MiscType.createCLCASE());
         EquipmentType.addType(MiscType.createOSCASE());
@@ -7712,6 +7713,31 @@ public class MiscType extends EquipmentType {
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
               .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+        return misc;
+    }
+
+    /**
+     * A compact double heat sink light enough to fit combat vehicles (standard and OS double heat sinks are too bulky
+     * for them). Outer Sphere Enhanced-tier tech. Dissipates 2 heat; 1.5 tons; a single critical slot on Meks.
+     */
+    public static MiscType createCompactDoubleHeatSink() {
+        MiscType misc = new MiscType();
+        misc.name = "Compact Double Heat Sink";
+        misc.setInternalName(EquipmentTypeLookup.COMPACT_DOUBLE_HS);
+        misc.addLookupName("Compact Double Heatsink");
+        misc.addLookupName("LegionCompactDoubleHeatSink");
+        misc.tonnage = 1.5;
+        misc.criticalSlots = 1;
+        misc.tankSlots = 0;
+        misc.flags = misc.flags.or(F_DOUBLE_HEAT_SINK, F_COMPACT_HEAT_SINK);
+        misc.bv = 0;
+        misc.cost = 6000;
+        misc.rulesRefs = "OS Custom";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setISAdvancement(3000, 3025, 3050)
+              .setTechRating(TechRating.F)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
         return misc;
     }
 

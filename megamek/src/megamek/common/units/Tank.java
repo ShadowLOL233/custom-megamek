@@ -168,6 +168,37 @@ public class Tank extends Entity {
     protected boolean hasSponsons = false;
     protected boolean hasPintle = false;
 
+    // Combat-vehicle heat sink type. Vehicles are heat-neutral (the count is auto-derived to dissipate all energy
+    // weapon heat), but the type sets how much each sink dissipates and weighs. Default: single heat sinks.
+    private String heatSinkType = EquipmentTypeLookup.SINGLE_HS;
+
+    /** @return the internal name of this vehicle's heat sink type (an {@link EquipmentTypeLookup} heat sink). */
+    public String getHeatSinkTypeName() {
+        return heatSinkType;
+    }
+
+    public void setHeatSinkTypeName(String internalName) {
+        heatSinkType = (internalName == null) ? EquipmentTypeLookup.SINGLE_HS : internalName;
+    }
+
+    /** @return the {@link EquipmentType} for this vehicle's heat sink type, defaulting to single if unknown. */
+    public EquipmentType getHeatSinkTypeEquipment() {
+        EquipmentType hs = EquipmentType.get(heatSinkType);
+        return (hs != null) ? hs : EquipmentType.get(EquipmentTypeLookup.SINGLE_HS);
+    }
+
+    /** @return heat dissipated per heat sink of this vehicle's type (1 for single, 2 for any double-type sink). */
+    public int getHeatSinkDissipation() {
+        EquipmentType hs = getHeatSinkTypeEquipment();
+        return ((hs instanceof MiscType) && hs.hasFlag(MiscType.F_DOUBLE_HEAT_SINK)) ? 2 : 1;
+    }
+
+    /** @return the tonnage of a single heat sink of this vehicle's type. */
+    public double getHeatSinkTonnage() {
+        EquipmentType hs = getHeatSinkTypeEquipment();
+        return (hs != null) ? hs.getTonnage(this) : 1.0;
+    }
+
     @Override
     public int getUnitType() {
         EntityMovementMode mm = getMovementMode();

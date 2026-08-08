@@ -852,6 +852,10 @@ public class BLKFile {
                 }
                 blk.writeBlockData("fuel", ((Aero) t).getFuel());
             }
+            // Combat-vehicle heat sink type (only non-default types are written, so single-sink tanks stay unchanged).
+            if ((t instanceof Tank tank) && !tank.getHeatSinkTypeName().equals(EquipmentTypeLookup.SINGLE_HS)) {
+                blk.writeBlockData("sink_type_name", tank.getHeatSinkTypeName());
+            }
             if (t.hasEngine()) {
                 int engineCode = getEngineCode(t);
                 blk.writeBlockData("engine_type", engineCode);
