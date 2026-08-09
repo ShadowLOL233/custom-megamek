@@ -22,6 +22,7 @@ Quick index — jump to a section instead of scanning the whole file.
 - **Section 8 — Electromagnetic Lance & kinetic apex**: Coil Augmented Railgun **✅ IMPLEMENTED**; Electromagnetic Lance (power-gated coilgun supergun) **✅ IMPLEMENTED 2026-07-31 — 6 munitions**; also holds the (now ✅ done) HVAC-repurpose & Heavy-missile-Ultra decisions.
 - **Section 9 — OS Modular Electronics: BCS & CCS** [active/DESIGN]: two systems — **BCS** (Battle Computer System: info/command/EW, Tacticon B-2500 lineage, modular track + Advance specialized cores C-X280/Raven/G-X100) and **CCS** (Combat Computer System: single-mech fire control, C-2500 core + weapon-type modules + Composite). Dissolves canon AES⊥TC / AES⊥MASC / standalone-C3 into a modular ecosystem balanced by a two-core tonnage tax. **§9.6** adds a C3-network target-designator sub-family (Kestrel / Shrike / Lodestar).
 - **OS missile munitions + range redesign (2026-07-31):** SRM/LRM/MRM special munitions **✅ done**; the SRM/MRM/LRM range-specialization triad (MRM medium -1 / LRM long -1) **✅ done**. Detail under "⭐ Development priority" below.
+- **Section 11 — OS Actuator & Motive Systems (AES-I & AMS-I)** [design, not coded]: Improve-tier AMS-I (vehicle, −2 motive-crit, lighter) + a reconceived Mek-only AES-I (mobility/handling: −1 to-hit when run/jump, offsets Hardened/Modular Armor MP penalties; no TC/BCS/CCS/MASC exclusion).
 
 Shelved ideas are parked in **[OS_SHELVED_IDEAS.md](OS_SHELVED_IDEAS.md)**. Splitting this plan into
 per-topic files (weapons / units / equipment) is **deferred** until it grows further.
@@ -1133,3 +1134,60 @@ megamek/userdata/data/mekfiles/`.
 `Copy-Item "megamek\userdata\data\mekfiles\*.mtf" "development\os-designs\" -Force`, then
 `git add development/os-designs && git commit`. (The tracked `development/os-designs/` copy is what's shared; the
 `userdata/` copy stays local and git-ignored.)
+
+## 11. OS Actuator & Motive Systems — AES-I & AMS-I (design, added 2026-08-06; NOT yet coded)
+
+OS Improve-tier takes on two canon "system enhancement" devices. Both are **Improve tier**: `TechBase.OUTER_SPHERE`,
+rating **E**, `ISAdvancement 2900/2930/2960`, static **STANDARD**, `omniFixedOnly`. Neither is a plain stat-reskin —
+the AES is **reconceived as a mobility/handling system** (see below). **Design only; no code yet.**
+
+### 11.1 Improved Armored Motive System (AMS-I) — combat/support VEHICLE, defensive
+
+> ⚠️ This is the **Armored Motive System** (anti-motive-crit), NOT the Anti-Missile System.
+
+| Field | Value | vs canon |
+|---|---|---|
+| Internal name | `OSImprovedArmoredMotiveSystem` (+ alias `Legion Improved Armored Motive System`) | — |
+| Flags | `F_ARMORED_MOTIVE_SYSTEM` + `F_TANK_EQUIPMENT` + `F_SUPPORT_TANK_EQUIPMENT` | same (not Mek-ised, per OS-not-Mek-exclusive) |
+| Weight | vehicle tonnage × **0.10** | canon IS 0.15 / Clan 0.10 → Improve −weight (matches Clan) |
+| Crit / tank slots | **0** (chassis mod) | same |
+| Effect | **−2 to the motive-system damage roll** (`TWGameManager` `hasWorkingMisc(F_ARMORED_MOTIVE_SYSTEM)`) | same (Improve keeps performance) |
+| Cost / BV | AMS-tonnage × **120,000** C-bill / BV **0** | canon ×100k (slight OS premium) |
+| Tech | OUTER_SPHERE / E / 2900·2930·2960 / STANDARD / avail F·E·D·D | canon E / ADVANCED / 3071 |
+
+### 11.2 Improved Actuator Enhancement System (AES-I) — MEK ONLY, mobility/handling
+
+**Reconception:** canon AES gives a static per-limb −1 to weapon + physical attacks. The OS AES-I is instead a
+**whole-Mek actuator/handling system** — it steadies gunnery at speed and muscles through the movement penalties of
+heavy gear. **Mek only** (no vehicles/aero — decision 1).
+
+| Field | Value | Note |
+|---|---|---|
+| Internal name | `OSImprovedAES` (+ alias `Legion Improved Actuator Enhancement System`), short **AES-I** | — |
+| Flag | **NEW `F_OS_AES`** + `F_MEK_EQUIPMENT` | distinct from canon `F_ACTUATOR_ENHANCEMENT_SYSTEM` so it triggers NONE of the canon per-limb/physical logic, the AES⊥TC/⊥MASC validator, or `hasFunctionalArmAES` |
+| **Install model** | **ONE chassis-wide install per Mek**, no arm/leg requirement | ⚠️ CHANGED from canon per-limb — a consequence of the whole-unit effect |
+| Weight | mek tonnage × **0.05** (round half-ton); 50t → 2.5t | proposal |
+| Crit | weight-class total: Light 1 / Med 2 / Heavy 3 / Assault 4, placed freely | much cheaper than canon (canon was per-limb) |
+| Cost / BV | mek tonnage × **4,000** C-bill / BV **TBD** (modest) | tunable |
+| Tech | OUTER_SPHERE / E / 2900·2930·2960 / STANDARD / avail F·E·D·D | Improve tier |
+
+**Effects:**
+- **(A) To-hit:** **−1 to the attacker's movement-based to-hit modifier when the Mek RAN or JUMPED** (offsets the
+  high-speed firing penalty; deliberately small). Walking unaffected. Hook: `ComputeAttackerToHitMods` (add near the
+  canon-AES block), gated on `F_OS_AES` + movement type RUN/JUMP.
+- **(B) MP offset:** **negates the MP penalty from bulky armour/equipment** — **Hardened Armor** (−1 walk/run) and
+  **Modular Armor** (−1 jump). Hooks: suppress `Mek.hardenedArmorMPReduction()` and the modular-armor jump penalty
+  when `F_OS_AES` is present. *(Optional future extension: Medium Shield −1 jump — NOT committed.)*
+- **Rationale:** enhanced actuators = "a heavy/fast Mek still runs and shoots well." Only offsets **physical-load**
+  penalties from equipment — deliberately NOT heat, combat damage (leg crits), or environmental penalties.
+
+**Exclusions: NONE** — compatible with Targeting Computer, BCS (B-series), CCS (C-series), MASC, TSM. Rationale: as a
+mobility/handling system (not fire control), the canon "AES⊥TC / AES⊥MASC" aiming-conflict rationale no longer
+applies; decision 3 also requires no BCS/CCS conflict. *(MASC compatibility = confirm.)*
+
+**Balance note:** AES-I −1 (run/jump) + a Targeting Computer −1 (always) = −2 to-hit when running — conditional, accepted.
+
+**Coding TODO (when we build it):** new `F_OS_AES` flag in `MiscTypeFlag`; `createOSImprovedAES()` in `MiscType`;
+`EquipmentTypeLookup.OS_IMPROVED_AES`; to-hit hook in `ComputeAttackerToHitMods`; MP-offset hooks in the Mek MP path;
+`createOSImprovedArmoredMotiveSystem()` for AMS-I (pure stat item, reuses the existing `F_ARMORED_MOTIVE_SYSTEM`
+mechanic — no engine work).
