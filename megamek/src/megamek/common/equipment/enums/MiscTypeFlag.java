@@ -488,4 +488,8 @@ public enum MiscTypeFlag implements EquipmentFlag {
     F_OS_RAVEN_CEWS,
     F_OS_GHOST_CORE,
 
+    // OS Actuator & Motive Systems (dev plan §11) — the Mek-only reconceived AES; distinct from the canon
+    // F_ACTUATOR_ENHANCEMENT_SYSTEM so it triggers none of the canon per-limb/physical/⊥TC/⊥MASC logic.
+    F_OS_AES,
+
 }

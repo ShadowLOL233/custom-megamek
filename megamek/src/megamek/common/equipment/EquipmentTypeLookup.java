@@ -223,6 +223,11 @@ public class EquipmentTypeLookup {
     public static final String OS_RAVEN_CEWS = "OSRavenCEWS";
     @EquipmentName
     public static final String OS_GHOST_CORE = "OSGhostCore";
+    // OS Actuator & Motive Systems (dev plan §11)
+    @EquipmentName
+    public static final String OS_IMPROVED_AES = "OSImprovedAES";
+    @EquipmentName
+    public static final String OS_IMPROVED_ARMORED_MOTIVE_SYSTEM = "OSImprovedArmoredMotiveSystem";
     @EquipmentName
     public static final String SPONSON_TURRET = "SponsonTurret";
     @EquipmentName

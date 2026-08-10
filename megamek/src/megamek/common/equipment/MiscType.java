@@ -691,11 +691,14 @@ public class MiscType extends EquipmentType {
             }
             return defaultRounding.round(weaponWeight / 20.0, entity);
         } else if (hasFlag(F_ARMORED_MOTIVE_SYSTEM)) {
-            if (isClan()) {
+            if (is(EquipmentTypeLookup.OS_IMPROVED_ARMORED_MOTIVE_SYSTEM) || isClan()) {
                 return defaultRounding.round(entity.getWeight() * 0.1, entity);
             } else {
                 return defaultRounding.round(entity.getWeight() * 0.15, entity);
             }
+        } else if (hasFlag(MiscTypeFlag.F_OS_AES)) {
+            // OS Improved AES (dev plan §11): whole-Mek install at 5% of chassis tonnage.
+            return defaultRounding.round(entity.getWeight() * 0.05, entity);
         } else if (hasFlag(F_TARGETING_COMPUTER)) {
             // based on tonnage of direct_fire weaponry
             double fTons = 0.0;
@@ -1072,7 +1075,10 @@ public class MiscType extends EquipmentType {
             } else if (hasFlag(F_PINTLE_TURRET)) {
                 costValue = getTonnage(entity, loc) * 1000;
             } else if (hasFlag(F_ARMORED_MOTIVE_SYSTEM)) {
-                costValue = getTonnage(entity, loc) * 100000;
+                costValue = getTonnage(entity, loc)
+                      * (is(EquipmentTypeLookup.OS_IMPROVED_ARMORED_MOTIVE_SYSTEM) ? 120000 : 100000);
+            } else if (hasFlag(MiscTypeFlag.F_OS_AES)) {
+                costValue = entity.getWeight() * 4000;
             } else if (is(EquipmentTypeLookup.BA_MANIPULATOR_CARGO_LIFTER)) {
                 return 250 * Math.ceil(size * 2);
             } else if (hasFlag(F_DRONE_OPERATING_SYSTEM)) {
@@ -1483,7 +1489,7 @@ public class MiscType extends EquipmentType {
             // legs
         } else if (hasFlag(F_HAND_WEAPON) && hasFlag(MiscTypeFlag.S_CLAW)) {
             return (int) Math.ceil(entity.getWeight() / 15);
-        } else if (hasFlag(F_ACTUATOR_ENHANCEMENT_SYSTEM)) {
+        } else if (hasFlag(F_ACTUATOR_ENHANCEMENT_SYSTEM) || hasFlag(MiscTypeFlag.F_OS_AES)) {
             return switch (entity.getWeightClass()) {
                 case EntityWeightClass.WEIGHT_LIGHT -> 1;
                 case EntityWeightClass.WEIGHT_MEDIUM -> 2;
@@ -1869,6 +1875,9 @@ public class MiscType extends EquipmentType {
         EquipmentType.addType(MiscType.createOSCrowNest());
         EquipmentType.addType(MiscType.createOSRavenCEWS());
         EquipmentType.addType(MiscType.createOSGhostCore());
+        // OS Actuator & Motive Systems (dev plan §11)
+        EquipmentType.addType(MiscType.createOSImprovedAES());
+        EquipmentType.addType(MiscType.createOSImprovedArmoredMotiveSystem());
         EquipmentType.addType(MiscType.createISMediumShield());
         EquipmentType.addType(MiscType.createISSmallShield());
         EquipmentType.addType(MiscType.createISLargeShield());
@@ -10826,6 +10835,72 @@ public class MiscType extends EquipmentType {
               .setPrototypeFactions(Faction.MERC)
               .setProductionFactions(Faction.RD)
               .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        return misc;
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------
+    // OS Actuator & Motive Systems (dev plan §11) — Improve tier
+    // ----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * OS Improve-tier Actuator Enhancement System (AES-I). Reconceived as a whole-Mek mobility/handling system, NOT
+     * the canon per-limb to-hit item: the new {@link MiscTypeFlag#F_OS_AES} flag deliberately triggers none of the
+     * canon per-limb/physical logic, the AES⊥TC/⊥MASC validator, or {@code hasFunctionalArmAES}. Its effects — −1 to
+     * the attacker's move-based to-hit when it RAN/JUMPED, and offsetting the Hardened/Modular Armor MP penalties —
+     * are wired in {@code ComputeAttackerToHitMods} and the {@code Mek} MP path. Weight = tonnage × 0.05, crits by
+     * weight class (L1/M2/H3/A4), cost = tonnage × 4,000; BV TBD.
+     */
+    public static MiscType createOSImprovedAES() {
+        MiscType misc = new MiscType();
+        misc.name = "Improved Actuator Enhancement System";
+        misc.setInternalName(EquipmentTypeLookup.OS_IMPROVED_AES);
+        misc.addLookupName("Legion Improved Actuator Enhancement System");
+        misc.shortName = "AES-I";
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = CRITICAL_SLOTS_VARIABLE;
+        misc.cost = COST_VARIABLE;
+        misc.flags = misc.flags.or(MiscTypeFlag.F_OS_AES, F_MEK_EQUIPMENT);
+        misc.omniFixedOnly = true;
+        misc.bv = 0;   // BV TBD (modest); see dev plan §11
+        misc.rulesRefs = "AU";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.F, AvailabilityValue.E, AvailabilityValue.D, AvailabilityValue.D)
+              .setISAdvancement(2900, 2930, 2960, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+        return misc;
+    }
+
+    /**
+     * OS Improve-tier Armored Motive System (AMS-I) — combat/support vehicle chassis mod. Reuses the canon
+     * {@link MiscTypeFlag#F_ARMORED_MOTIVE_SYSTEM} mechanic (−2 to the motive-system damage roll) but is lighter
+     * (tonnage × 0.10, matching Clan) and costs tonnage × 120,000. NOT the Anti-Missile System.
+     */
+    public static MiscType createOSImprovedArmoredMotiveSystem() {
+        MiscType misc = new MiscType();
+        misc.name = "Improved Armored Motive System";
+        misc.setInternalName(EquipmentTypeLookup.OS_IMPROVED_ARMORED_MOTIVE_SYSTEM);
+        misc.addLookupName("Legion Improved Armored Motive System");
+        misc.shortName = "Improved Armored Motive System";
+        misc.tonnage = TONNAGE_VARIABLE;
+        misc.criticalSlots = 0;
+        misc.tankSlots = 0;
+        misc.cost = COST_VARIABLE;
+        misc.omniFixedOnly = true;
+        misc.flags = misc.flags.or(F_ARMORED_MOTIVE_SYSTEM, F_TANK_EQUIPMENT, F_SUPPORT_TANK_EQUIPMENT);
+        misc.bv = 0;
+        misc.rulesRefs = "AU";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.F, AvailabilityValue.E, AvailabilityValue.D, AvailabilityValue.D)
+              .setISAdvancement(2900, 2930, 2960, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
         return misc;
     }
 

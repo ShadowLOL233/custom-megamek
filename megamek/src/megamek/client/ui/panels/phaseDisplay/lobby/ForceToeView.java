@@ -199,13 +199,15 @@ public class ForceToeView extends JPanel implements Scrollable {
         private static final double MIN_SCALE = 0.15;
         private static final double MAX_SCALE = 3.0;
 
-        // Below this on-screen unit width (px) draw the compact SLDF glyph; at or above it draw the real unit icon.
-        private static final int LOD_ICON_MIN_PX = 44;
-
-        // Below this on-screen subtree width (px) a whole sub-force collapses to one echelon formation symbol — but
-        // only once its units are already compact glyphs (never collapse while unit icons are still legible).
-        private static final int COLLAPSE_MAX_PX = 140;
-        private static final int FORMATION_SYM = 60;
+        // Semantic-zoom LOD is driven by the on-screen unit width (px/unit = scaleForGUI(UNIT_W) * scale — the value
+        // shown in the zoom readout). At or above LOD_ICON_MIN_PX units show their real icon; between it and
+        // COLLAPSE_START_PX they show the compact SLDF weight-class glyph; below COLLAPSE_START_PX forces begin
+        // collapsing to echelon symbols, smallest echelon first (per-echelon thresholds in collapsePx).
+        private static final int LOD_ICON_MIN_PX = 113;
+        private static final int COLLAPSE_START_PX = 77;   // == collapsePx(LANCE): where leaf formations first collapse
+        // Echelon-band symbol size (world). A touch larger than the unit box so a collapsed formation reads as one
+        // bigger thing; the icon-band size is tuned via SldfSymbol.paintUnitFrame, the glyph band fills the unit box.
+        private static final int FORMATION_SYM = 64;
 
         private final Color bg = new Color(40, 42, 48);
         private final Color edge = new Color(150, 155, 165);
@@ -277,6 +279,7 @@ public class ForceToeView extends JPanel implements Scrollable {
                       megamek.client.ui.Messages.getString("ChatLounge.cardView.unassigned"));
                 unassigned.children.addAll(orphans);
                 unassigned.echelon = SldfSymbol.echelonForCount(orphans.size());
+                unassigned.collapseEchelon = unassigned.echelon;
                 unassigned.symbolColor = null;
                 computeFormationGlyph(unassigned);
                 roots.add(unassigned);
@@ -295,8 +298,7 @@ public class ForceToeView extends JPanel implements Scrollable {
         }
 
         private ForceNode buildForceNode(Force force, Map<Integer, Integer> rowByEntityId) {
-            int count = game().getForces().getFullEntities(force).size();
-            ForceNode node = new ForceNode(force.getName() + SPACER + MekCardView.echelonName(count));
+            ForceNode node = new ForceNode(force.getName());
             for (int subId : force.getSubForces()) {
                 Force sub = game().getForces().getForce(subId);
                 if (sub != null) {
@@ -310,13 +312,43 @@ public class ForceToeView extends JPanel implements Scrollable {
                     node.children.add(new UnitNode(entity, row, isObscured(entity)));
                 }
             }
-            node.echelon = SldfSymbol.echelonForCount(count);
+            // Structure-based echelon (one level above its sub-forces; a leaf force by its own unit count), computed
+            // BEFORE reparenting so a designated command lance can't distort its parent's structural level.
+            node.echelon = echelonOf(node);
+            node.collapseEchelon = node.echelon;
+            node.label = force.getName() + SPACER + node.echelon.label();
             node.symbolColor = forceColor(force);
             node.isCommand = force.isCommandLance();
             computeFormationGlyph(node);
             node.sortWeight = sortWeightFor(force, node);
             reparentCommandLance(node);
             return node;
+        }
+
+        /**
+         * @return the structure-based echelon of a force node: one level above its highest-echelon sub-force
+         *       (Lance-parent → Company, Company-parent → Battalion, …), or — for a leaf force with no sub-forces —
+         *       the echelon for its own direct unit count. Follows the unit-organization standard (a force's echelon
+         *       is one level above its direct sub-forces), so a full-strength battalion is no longer misread as a
+         *       regiment merely because it holds more than 36 units.
+         */
+        private SldfSymbol.Echelon echelonOf(ForceNode node) {
+            SldfSymbol.Echelon maxChild = null;
+            int directUnits = 0;
+            for (Node child : node.children) {
+                if (child instanceof ForceNode fc) {
+                    if ((maxChild == null) || (fc.echelon.ordinal() > maxChild.ordinal())) {
+                        maxChild = fc.echelon;
+                    }
+                } else {
+                    directUnits++;
+                }
+            }
+            if (maxChild == null) {
+                return SldfSymbol.echelonForCount(directUnits);
+            }
+            int next = Math.min(maxChild.ordinal() + 1, SldfSymbol.Echelon.ARMY.ordinal());
+            return SldfSymbol.Echelon.values()[next];
         }
 
         /** Ordering priority: a user-set command lance ranks top, else its detected AS formation, else its tonnage. */
@@ -367,6 +399,10 @@ public class ForceToeView extends JPanel implements Scrollable {
             }
             node.children.removeAll(siblingForces);
             command.children.addAll(siblingForces);
+            // The command lance now visually roots its parent's whole formation, so it must collapse together with the
+            // parent (not early, at the lance threshold): give it the parent's collapse level. Its label/echelon stay
+            // "Lance" — only the collapse threshold changes.
+            command.collapseEchelon = node.echelon;
         }
 
         private List<Node> unitChildren(ForceNode f) {
@@ -541,7 +577,8 @@ public class ForceToeView extends JPanel implements Scrollable {
          */
         private void paintZoomReadout(Graphics2D g2) {
             double unitPx = scaleForGUI(UNIT_W) * scale;
-            String lod = (unitPx >= LOD_ICON_MIN_PX) ? "icons" : "symbols";
+            String lod = (unitPx >= LOD_ICON_MIN_PX) ? "icons"
+                  : (unitPx >= COLLAPSE_START_PX) ? "symbols" : "echelon";
             String text = "Zoom " + Math.round(scale * 100) + "%    " + Math.round(unitPx) + "px/unit    " + lod;
 
             g2.setFont(g2.getFont().deriveFont(Font.PLAIN, (float) scaleForGUI(11)));
@@ -600,10 +637,14 @@ public class ForceToeView extends JPanel implements Scrollable {
                   (int) Math.round(symW), (int) Math.round(symH),
                   node.echelon, node.dominantBranch, node.avgWeightClass, node.symbolColor);
 
+            // The echelon name scales up as you zoom out (world font ∝ 1/scale) so it stays legible rather than
+            // shrinking with the symbol: its on-screen size holds at ~11px and grows up to ~1.8× at far zoom.
             String name = node.label.split(SPACER, 2)[0];
-            g2.setFont(g2.getFont().deriveFont(Font.PLAIN, (float) scaleForGUI(10)));
-            drawCentered(g2, name, centerX, sy + symH + scaleForGUI(11), forceText,
-                  Math.min(node.subtreeWidth, scaleForGUI(170)));
+            double screenPt = scaleForGUI(11) * ((scale < 1.0) ? Math.min(1.8, 1.0 / Math.sqrt(scale)) : 1.0);
+            float worldPt = (float) (screenPt / scale);
+            g2.setFont(g2.getFont().deriveFont(Font.PLAIN, worldPt));
+            drawCentered(g2, name, centerX, sy + symH + worldPt, forceText,
+                  Math.min(node.subtreeWidth, scaleForGUI(160) / scale));
 
             // Selection ring when any member unit of the collapsed formation is selected in the shared table.
             if (anyMemberSelected(node)) {
@@ -776,17 +817,36 @@ public class ForceToeView extends JPanel implements Scrollable {
         }
 
         /**
-         * @return whether a force should render as one collapsed echelon symbol: only once its units are already
-         *       compact glyphs (never while unit icons are legible), and its whole subtree is small on screen.
+         * @return whether a force should render as one collapsed echelon symbol at the current zoom: true once the
+         *       on-screen unit width (px/unit) drops below the collapse threshold for the force's effective echelon.
+         *       Because {@link #walkVisibility} collapses at the highest qualifying ancestor and larger echelons have
+         *       lower thresholds, a parent collapses (hiding its children) only at a further zoom-out than its
+         *       children — giving smooth progressive collapse from Lance up to the whole force as one symbol.
          */
         private boolean shouldCollapse(ForceNode force) {
             if (force.children.isEmpty()) {
                 return false;
             }
-            if (scaleForGUI(UNIT_W) * scale >= LOD_ICON_MIN_PX) {
-                return false;
-            }
-            return force.subtreeWidth * scale < COLLAPSE_MAX_PX;
+            double unitPx = scaleForGUI(UNIT_W) * scale;
+            return unitPx < collapsePx(force.collapseEchelon);
+        }
+
+        /**
+         * @return the on-screen unit width (px/unit) below which a force of this echelon collapses to a single echelon
+         *       symbol. Smaller echelons have a higher threshold, so they collapse first as you zoom out; zooming out
+         *       further collapses progressively larger echelons. Tunable against the zoom readout.
+         */
+        private static int collapsePx(SldfSymbol.Echelon echelon) {
+            return switch (echelon) {
+                case LANCE -> COLLAPSE_START_PX;   // 77 px/unit  (≈ Zoom 140%)
+                case COMPANY -> 52;
+                case BATTALION -> 35;
+                case REGIMENT -> 24;
+                case BRIGADE -> 16;
+                case DIVISION -> 11;
+                case CORPS -> 8;
+                case ARMY -> 6;
+            };
         }
 
         /** Tallies the subtree's dominant branch and average weight class for the collapsed formation symbol. */
@@ -976,10 +1036,11 @@ public class ForceToeView extends JPanel implements Scrollable {
     }
 
     private static final class ForceNode extends Node {
-        final String label;
+        String label;
         final List<Node> children = new ArrayList<>();
         // Far-zoom collapse attributes: the whole subtree drawn as one SldfSymbol echelon formation symbol.
         SldfSymbol.Echelon echelon = SldfSymbol.Echelon.LANCE;
+        SldfSymbol.Echelon collapseEchelon = SldfSymbol.Echelon.LANCE;  // effective level driving the collapse threshold
         SldfSymbol.Branch dominantBranch = SldfSymbol.Branch.OTHER;
         int avgWeightClass;
         Color symbolColor;

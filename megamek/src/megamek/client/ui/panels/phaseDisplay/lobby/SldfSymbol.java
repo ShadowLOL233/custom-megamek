@@ -293,8 +293,10 @@ public final class SldfSymbol {
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, oldAA);
         }
 
-        double letterBand = fh * 0.24;
-        return new Rectangle2D.Double(fx + fw * 0.04, fy + letterBand, fw * 0.92, fh - 2 * letterBand);
+        // Reserve less top/bottom band for the corner letters so the caller's real icon fills more of the frame —
+        // this keeps the icon close in size to the compact glyph and avoids the "shrinks past 113 px/unit" jump.
+        double letterBand = fh * 0.16;
+        return new Rectangle2D.Double(fx + fw * 0.02, fy + letterBand, fw * 0.96, fh - 2 * letterBand);
     }
 
     /**

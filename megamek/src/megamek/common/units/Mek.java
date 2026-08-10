@@ -1213,7 +1213,8 @@ public abstract class Mek extends Entity {
         // Medium shield reduces jump mp by 1/shield
         mp -= getNumberOfShields(MiscTypeFlag.S_SHIELD_MEDIUM);
 
-        if (!mpCalculationSetting.ignoreModularArmor() && hasModularArmor()) {
+        if (!mpCalculationSetting.ignoreModularArmor() && hasModularArmor()
+              && !hasWorkingMisc(MiscTypeFlag.F_OS_AES)) {
             mp--;
         }
 
@@ -1263,7 +1264,8 @@ public abstract class Mek extends Entity {
         // Medium shield reduces jump mp by 1/shield
         mp -= getNumberOfShields(MiscTypeFlag.S_SHIELD_MEDIUM);
 
-        if (!mpCalculationSetting.ignoreModularArmor() && hasModularArmor()) {
+        if (!mpCalculationSetting.ignoreModularArmor() && hasModularArmor()
+              && !hasWorkingMisc(MiscTypeFlag.F_OS_AES)) {
             mp--;
         }
 
@@ -6129,6 +6131,10 @@ public abstract class Mek extends Entity {
      * @return The MP reduction due to hardened armor on this unit; 1 if it has HA, 0 if not.
      */
     protected int hardenedArmorMPReduction() {
+        // OS Improved AES (dev plan §11) muscles through the hardened-armour walk/run MP penalty.
+        if (hasWorkingMisc(MiscTypeFlag.F_OS_AES)) {
+            return 0;
+        }
         return hasMPReducingHardenedArmor() ? 1 : 0;
     }
 

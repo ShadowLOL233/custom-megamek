@@ -1135,7 +1135,7 @@ megamek/userdata/data/mekfiles/`.
 `git add development/os-designs && git commit`. (The tracked `development/os-designs/` copy is what's shared; the
 `userdata/` copy stays local and git-ignored.)
 
-## 11. OS Actuator & Motive Systems — AES-I & AMS-I (design, added 2026-08-06; NOT yet coded)
+## 11. OS Actuator & Motive Systems — AES-I & AMS-I (design 2026-08-06; IMPLEMENTED 2026-08-09 — compiles + equipment tests pass, NOT playtested; see dev log)
 
 OS Improve-tier takes on two canon "system enhancement" devices. Both are **Improve tier**: `TechBase.OUTER_SPHERE`,
 rating **E**, `ISAdvancement 2900/2930/2960`, static **STANDARD**, `omniFixedOnly`. Neither is a plain stat-reskin —

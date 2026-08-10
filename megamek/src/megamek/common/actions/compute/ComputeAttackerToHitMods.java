@@ -103,6 +103,14 @@ public class ComputeAttackerToHitMods {
         // attacker movement
         toHit.append(Compute.getAttackerMovementModifier(game, attacker.getId()));
 
+        // OS Improved AES (AES-I): enhanced actuators steady gunnery at speed, offsetting part of the run/jump
+        // firing penalty (dev plan §11). Mek-only via the F_OS_AES flag; walking is unaffected.
+        if (attacker.hasWorkingMisc(MiscTypeFlag.F_OS_AES)
+              && ((attacker.moved == EntityMovementType.MOVE_RUN)
+                    || (attacker.moved == EntityMovementType.MOVE_JUMP))) {
+            toHit.addModifier(-1, "OS Improved AES");
+        }
+
         // attacker prone
         toHit.append(Compute.getProneMods(game, attacker, weaponId));
 
