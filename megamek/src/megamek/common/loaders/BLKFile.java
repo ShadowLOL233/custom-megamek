@@ -502,6 +502,11 @@ public class BLKFile {
     }
 
     static int translateEngineCode(int code) {
+        // Outer Sphere engines are stored using their Engine type constant directly (14-33), which
+        // does not overlap the legacy BLK engine codes (0-13). See getEngineCode.
+        if (code >= Engine.OS_ENHANCED_FUSION_ENGINE) {
+            return code;
+        }
         if (code == BLKFile.FUSION) {
             return Engine.NORMAL_ENGINE;
         } else if (code == BLKFile.ICE) {
@@ -662,6 +667,36 @@ public class BLKFile {
                 break;
             case "Clan Level 5":
                 e.setTechLevel(TechConstants.T_CLAN_UNOFFICIAL);
+                break;
+            case "Outer Sphere Level 1":
+                e.setTechLevel(TechConstants.T_OUTER_SPHERE_INTRO);
+                break;
+            case "Outer Sphere Level 2":
+                e.setTechLevel(TechConstants.T_OUTER_SPHERE_STANDARD);
+                break;
+            case "Outer Sphere Level 3":
+                e.setTechLevel(TechConstants.T_OUTER_SPHERE_ADVANCED);
+                break;
+            case "Outer Sphere Level 4":
+                e.setTechLevel(TechConstants.T_OUTER_SPHERE_EXPERIMENTAL);
+                break;
+            case "Outer Sphere Level 5":
+                e.setTechLevel(TechConstants.T_OUTER_SPHERE_UNOFFICIAL);
+                break;
+            case "Ascended Level 1":
+                e.setTechLevel(TechConstants.T_ASCENDED_INTRO);
+                break;
+            case "Ascended Level 2":
+                e.setTechLevel(TechConstants.T_ASCENDED_STANDARD);
+                break;
+            case "Ascended Level 3":
+                e.setTechLevel(TechConstants.T_ASCENDED_ADVANCED);
+                break;
+            case "Ascended Level 4":
+                e.setTechLevel(TechConstants.T_ASCENDED_EXPERIMENTAL);
+                break;
+            case "Ascended Level 5":
+                e.setTechLevel(TechConstants.T_ASCENDED_UNOFFICIAL);
                 break;
             case "Mixed (IS Chassis)":
                 e.setTechLevel(TechConstants.T_IS_TW_NON_BOX);
@@ -1297,7 +1332,25 @@ public class BLKFile {
 
     private static String getType(Entity t) {
         String type;
-        if (t.isMixedTech()) {
+        // Outer Sphere and Ascended are strict-pure tech bases (no Mixed variant), so they are
+        // resolved before the Mixed/IS/Clan logic, mirroring Entity.getTechBase().
+        if (t.isOuterSphere()) {
+            type = switch (t.getTechLevel()) {
+                case TechConstants.T_OUTER_SPHERE_INTRO -> "Outer Sphere Level 1";
+                case TechConstants.T_OUTER_SPHERE_STANDARD -> "Outer Sphere Level 2";
+                case TechConstants.T_OUTER_SPHERE_ADVANCED -> "Outer Sphere Level 3";
+                case TechConstants.T_OUTER_SPHERE_EXPERIMENTAL -> "Outer Sphere Level 4";
+                default -> "Outer Sphere Level 5";
+            };
+        } else if (t.isAscended()) {
+            type = switch (t.getTechLevel()) {
+                case TechConstants.T_ASCENDED_INTRO -> "Ascended Level 1";
+                case TechConstants.T_ASCENDED_STANDARD -> "Ascended Level 2";
+                case TechConstants.T_ASCENDED_ADVANCED -> "Ascended Level 3";
+                case TechConstants.T_ASCENDED_EXPERIMENTAL -> "Ascended Level 4";
+                default -> "Ascended Level 5";
+            };
+        } else if (t.isMixedTech()) {
             if (!t.isClan()) {
                 type = "Mixed (IS Chassis)";
             } else {
@@ -1331,8 +1384,16 @@ public class BLKFile {
     }
 
     private static int getEngineCode(Entity t) {
+        int engineType = t.getEngine().getEngineType();
+        // Outer Sphere engine types (Engine constants 14-33) are serialized using their Engine type
+        // constant directly; that range does not collide with the legacy BLK engine codes (0-13), and
+        // translateEngineCode reverses it. Without this, OS engines fall through to the FUSION default
+        // and are silently replaced by a plain fusion engine on reload (breaking weight/crits).
+        if (engineType >= Engine.OS_ENHANCED_FUSION_ENGINE) {
+            return engineType;
+        }
         int engineCode = BLKFile.FUSION;
-        engineCode = switch (t.getEngine().getEngineType()) {
+        engineCode = switch (engineType) {
             case Engine.COMBUSTION_ENGINE -> BLKFile.ICE;
             case Engine.LIGHT_ENGINE -> BLKFile.LIGHT;
             case Engine.XL_ENGINE -> BLKFile.XL;
