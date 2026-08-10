@@ -719,14 +719,14 @@ public class MiscType extends EquipmentType {
             }
             return RoundWeight.nextTon(fTons / 4.0);
         } else if (hasFlag(MiscTypeFlag.F_OS_CC_BALLISTIC)) {
-            // OS CC modules (dev plan §9.2): max(2t, ceil(that weapon family's tonnage / ratio)); ballistic /6
+            // OS CC modules (dev plan §9.2): max(1t, ceil(that weapon family's tonnage / ratio)); ballistic /6
             double t = 0.0;
             for (Mounted<?> m : entity.getWeaponList()) {
                 if (((WeaponType) m.getType()).hasFlag(WeaponType.F_BALLISTIC)) {
                     t += m.getTonnage();
                 }
             }
-            return Math.max(2.0, Math.ceil(t / 6.0));
+            return Math.max(1.0, Math.ceil(t / 6.0));
         } else if (hasFlag(MiscTypeFlag.F_OS_CC_ENERGY)) {
             double t = 0.0;
             for (Mounted<?> m : entity.getWeaponList()) {
@@ -734,7 +734,7 @@ public class MiscType extends EquipmentType {
                     t += m.getTonnage();
                 }
             }
-            return Math.max(2.0, Math.ceil(t / 8.0));
+            return Math.max(1.0, Math.ceil(t / 8.0));
         } else if (hasFlag(MiscTypeFlag.F_OS_CC_MISSILE)) {
             double t = 0.0;
             for (Mounted<?> m : entity.getWeaponList()) {
@@ -742,7 +742,7 @@ public class MiscType extends EquipmentType {
                     t += m.getTonnage();
                 }
             }
-            return Math.max(2.0, Math.ceil(t / 7.0));
+            return Math.max(1.0, Math.ceil(t / 7.0));
         } else if (hasFlag(MiscTypeFlag.F_OS_COMPOSITE_TC)) {
             // OS Composite Targeting Computer (dev plan §9.2): all weapon types, total tonnage / 6
             double fTons = 0.0;
@@ -1309,7 +1309,7 @@ public class MiscType extends EquipmentType {
                     t += m.getTonnage();
                 }
             }
-            return (int) Math.max(2, Math.ceil(t / 6.0));
+            return (int) Math.max(1, Math.ceil(t / 6.0));
         } else if (hasFlag(MiscTypeFlag.F_OS_CC_ENERGY)) {
             double t = 0.0;
             for (WeaponMounted m : entity.getWeaponList()) {
@@ -1317,7 +1317,7 @@ public class MiscType extends EquipmentType {
                     t += m.getTonnage();
                 }
             }
-            return (int) Math.max(2, Math.ceil(t / 8.0));
+            return (int) Math.max(1, Math.ceil(t / 8.0));
         } else if (hasFlag(MiscTypeFlag.F_OS_CC_MISSILE)) {
             double t = 0.0;
             for (WeaponMounted m : entity.getWeaponList()) {
@@ -1325,7 +1325,7 @@ public class MiscType extends EquipmentType {
                     t += m.getTonnage();
                 }
             }
-            return (int) Math.max(2, Math.ceil(t / 7.0));
+            return (int) Math.max(1, Math.ceil(t / 7.0));
         } else if (hasFlag(MiscTypeFlag.F_OS_COMPOSITE_TC)) {
             double fTons = 0.0;
             for (WeaponMounted m : entity.getWeaponList()) {

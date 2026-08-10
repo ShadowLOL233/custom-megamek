@@ -845,7 +845,8 @@ electronics counterpart to the §8 weapon apex.
   (grants no TC −1); B-2500 / Crow-Nest +1 initiative (ECM-suppressible); B-2500 per-turn 2d6 coordination roll →
   network −1 direct-fire on 10+ (**UNTESTED**); OS ECM jams; OS C3 networks (Boosted).
 - **Construction legality:** CC modules / Composite require the C-2500 core; Composite ⊥ specialized; one BCS core per mek.
-- **Final stats:** both cores **2 t / 2 crit**. CC modules scale by weapon family — **max(2, ⌈family tonnage ÷ ratio⌉)**,
+- **Final stats:** both cores **2 t / 2 crit**. CC modules scale by weapon family — **max(1, ⌈family tonnage ÷ ratio⌉)**
+  (base floor lowered from 2 → 1 t/crit, 2026-08-10; scaling ratios unchanged, core stays 2 t/2 crit),
   ratios ballistic **÷6**, missile **÷7**, energy **÷8**; Composite = total weapon tonnage **÷6**. Record-sheet short
   names "C-2500 … FCM".
 - **Also landed this session (missile FCS):** re-dated the OS missile FCS to their tiers (Artemis IV → Standard
