@@ -125,10 +125,26 @@ public class TestTank extends TestEntity {
      * @return The maximum construction tonnage
      */
     public static double maxTonnage(EntityMovementMode mode, boolean superheavy) {
+        return maxTonnage(mode, superheavy, false);
+    }
+
+    /**
+     * Outer Sphere combat vehicles get a raised superheavy VTOL ceiling (130 t vs the canon 60 t).
+     * The other movement modes already reach their OS targets at the canon superheavy caps (tracked
+     * 200 / wheeled 160 / hover 100), and the vehicle chassis tech advancement is {@code TechBase.ALL},
+     * so a pure-OS superheavy vehicle is not flagged mixed-tech and needs no separate OS advancement.
+     *
+     * @param mode        The vehicle's movement mode
+     * @param superheavy  Whether the vehicle is superheavy
+     * @param outerSphere Whether the vehicle is on the Outer Sphere tech base
+     *
+     * @return The maximum construction tonnage
+     */
+    public static double maxTonnage(EntityMovementMode mode, boolean superheavy, boolean outerSphere) {
         return switch (mode) {
             case WHEELED, WIGE -> superheavy ? 160.0 : 80.0;
             case HOVER -> superheavy ? 100.0 : 50.0;
-            case VTOL -> superheavy ? 60.0 : 30.0;
+            case VTOL -> superheavy ? (outerSphere ? 130.0 : 60.0) : 30.0;
             case NAVAL, SUBMARINE -> superheavy ? 555.0 : 300.0;
             case HYDROFOIL -> 100.0; // not eligible for superheavy
             default -> superheavy ? 200.0 : 100.0;
@@ -551,7 +567,8 @@ public class TestTank extends TestEntity {
     public boolean correctWeight(StringBuffer buff, boolean ignoreOverweight, boolean ignoreUnderweight) {
         if (!(getEntity() instanceof GunEmplacement)) {
             boolean correct = super.correctWeight(buff, ignoreOverweight, ignoreUnderweight);
-            double max = maxTonnage(getEntity().getMovementMode(), getEntity().isSuperHeavy());
+            double max = maxTonnage(getEntity().getMovementMode(), getEntity().isSuperHeavy(),
+                  getEntity().isOuterSphere());
             if (getEntity().getWeight() > max) {
                 correct = false;
                 buff.append("Exceeds maximum tonnage of ").append(max).append(" for ")
