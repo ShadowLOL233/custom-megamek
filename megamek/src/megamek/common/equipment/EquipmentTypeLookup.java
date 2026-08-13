@@ -223,6 +223,11 @@ public class EquipmentTypeLookup {
     public static final String OS_RAVEN_CEWS = "OSRavenCEWS";
     @EquipmentName
     public static final String OS_GHOST_CORE = "OSGhostCore";
+    // OS Owl Tactical Network (dev plan §9.7)
+    @EquipmentName
+    public static final String OS_TNU = "OSTacticalNetworkUplink";
+    @EquipmentName
+    public static final String OS_AEGOLIUS_COMPILER = "OSAegoliusCompiler";
     // OS Actuator & Motive Systems (dev plan §11)
     @EquipmentName
     public static final String OS_IMPROVED_AES = "OSImprovedAES";

@@ -25,6 +25,9 @@ import megamek.common.units.Entity;
  */
 public final class OSNetworkDesignators {
 
+    /** Owl Tactical Network (dev plan §9.7): one Aegolius Compiler can sync at most this many Owl TNU feeds. */
+    private static final int TNU_PER_COMPILER = 6;
+
     private OSNetworkDesignators() {}
 
     /**
@@ -187,6 +190,62 @@ public final class OSNetworkDesignators {
             }
             return false;
         }
-        return attacker.onSameC3NetworkAs(other);
+        if (attacker.onSameC3NetworkAs(other)) {
+            return true;
+        }
+        // Owl bridge (dev plan §9.7): 'other' carries an Owl TNU whose data is compiled onto a C3 network the
+        // attacker shares, via a live Aegolius Compiler mounted on a C3-Node. Lets a designator on a non-C3
+        // platform reach the network.
+        return isTnuBridged(game, attacker, other);
+    }
+
+    /** @return true if {@code e} mounts an operational Owl TNU uplink. */
+    private static boolean hasWorkingTnu(Entity e) {
+        return (e != null) && e.hasWorkingMisc(MiscTypeFlag.F_OS_TNU);
+    }
+
+    /**
+     * @return true if {@code core} mounts an operational Aegolius Compiler on a valid C3-Node host — the compiler
+     *       only functions co-mounted with a C3 Node (master). ECM suppression of the compiler is a later pass.
+     */
+    private static boolean hasWorkingAegoliusHost(Entity core) {
+        return (core != null) && core.hasWorkingMisc(MiscTypeFlag.F_OS_TNU_COMPILER) && core.hasC3M();
+    }
+
+    /**
+     * @return true if the Owl-TNU carrier {@code tnuCarrier} is bridged onto the attacker's active C3 network by a
+     *       live Aegolius Compiler. Capacity is pooled at {@link #TNU_PER_COMPILER} feeds per compiler on the
+     *       attacker's network; same-team TNU carriers fill it lowest-id first (deterministic). mechanics-remaining:
+     *       exact per-compiler assignment; ECM suppression of the compiler.
+     */
+    private static boolean isTnuBridged(Game game, Entity attacker, Entity tnuCarrier) {
+        if (!hasWorkingTnu(tnuCarrier) || (tnuCarrier.getOwner() == null)) {
+            return false;
+        }
+        int team = tnuCarrier.getOwner().getTeam();
+        int capacity = 0;
+        for (Entity core : game.getEntitiesVector()) {
+            if (!hasWorkingAegoliusHost(core) || (core.getOwner() == null)
+                  || (core.getOwner().getTeam() != team)) {
+                continue;
+            }
+            if (core.equals(attacker) || attacker.onSameC3NetworkAs(core)) {
+                capacity += TNU_PER_COMPILER;
+            }
+        }
+        if (capacity <= 0) {
+            return false;
+        }
+        int rank = 0;
+        for (Entity e : game.getEntitiesVector()) {
+            if (e.equals(tnuCarrier) || !hasWorkingTnu(e) || (e.getOwner() == null)
+                  || (e.getOwner().getTeam() != team)) {
+                continue;
+            }
+            if (e.getId() < tnuCarrier.getId()) {
+                rank++;
+            }
+        }
+        return rank < capacity;
     }
 }

@@ -1875,6 +1875,9 @@ public class MiscType extends EquipmentType {
         EquipmentType.addType(MiscType.createOSCrowNest());
         EquipmentType.addType(MiscType.createOSRavenCEWS());
         EquipmentType.addType(MiscType.createOSGhostCore());
+        // OS Owl Tactical Network (dev plan §9.7)
+        EquipmentType.addType(MiscType.createOSTacticalNetworkUplink());
+        EquipmentType.addType(MiscType.createOSAegoliusCompiler());
         // OS Actuator & Motive Systems (dev plan §11)
         EquipmentType.addType(MiscType.createOSImprovedAES());
         EquipmentType.addType(MiscType.createOSImprovedArmoredMotiveSystem());
@@ -2918,6 +2921,59 @@ public class MiscType extends EquipmentType {
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(3060, 3070, 3080, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        return misc;
+    }
+
+    // ===== OS Owl Tactical Network (dev plan §9.7) — an anti-jam designator datalink. The designators
+    // (Kestrel/Shrike/Lodestar) collect the data; the Owl TNU relays it under jamming (immune to standard Guardian
+    // ECM); the Aegolius Compiler, hosted on a C3-Node, compiles up to 6 TNU feeds into the C3 network. Zero
+    // to-hit — pure infrastructure. Sub-network + designator-bridge + ECM semantics are a later pass.
+
+    public static MiscType createOSTacticalNetworkUplink() {
+        MiscType misc = new MiscType();
+        misc.name = "Owl Tactical Network Uplink (O-X40)";
+        misc.setInternalName(EquipmentTypeLookup.OS_TNU);
+        misc.addLookupName("Owl TNU");
+        misc.shortName = "Owl TNU";
+        misc.tonnage = 0.5f;
+        misc.criticalSlots = 1;
+        misc.cost = 90000;
+        misc.flags = misc.flags.or(MiscTypeFlag.F_OS_TNU, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT,
+              F_SUPPORT_TANK_EQUIPMENT, F_FIGHTER_EQUIPMENT);
+        misc.bv = 50;
+        misc.rulesRefs = "AU";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
+              .setISAdvancement(2900, 2930, 2960, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+        return misc;
+    }
+
+    public static MiscType createOSAegoliusCompiler() {
+        MiscType misc = new MiscType();
+        misc.name = "Aegolius Network Targeting Compiler (O-2600)";
+        misc.setInternalName(EquipmentTypeLookup.OS_AEGOLIUS_COMPILER);
+        misc.addLookupName("Aegolius Network Targeting Compiler");
+        misc.shortName = "Aegolius Compiler";
+        misc.tonnage = 2;
+        misc.criticalSlots = 2;
+        misc.cost = 420000;
+        misc.flags = misc.flags.or(MiscTypeFlag.F_OS_TNU_COMPILER, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT,
+              F_SUPPORT_TANK_EQUIPMENT, F_FIGHTER_EQUIPMENT);
+        misc.bv = 110;
+        misc.rulesRefs = "AU";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
+              .setISAdvancement(2900, 2930, 2960, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)

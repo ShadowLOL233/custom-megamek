@@ -488,6 +488,12 @@ public enum MiscTypeFlag implements EquipmentFlag {
     F_OS_RAVEN_CEWS,
     F_OS_GHOST_CORE,
 
+    // OS Owl Tactical Network (dev plan §9.7) — anti-jam designator datalink. F_OS_TNU = the ECM-immune uplink
+    // spoke (relays a designator's collected data under jamming); F_OS_TNU_COMPILER = the Aegolius hub (hosted on
+    // a C3-Node) that compiles up to 6 TNU feeds into the C3 network. Both are zero-to-hit infrastructure.
+    F_OS_TNU,
+    F_OS_TNU_COMPILER,
+
     // OS Actuator & Motive Systems (dev plan §11) — the Mek-only reconceived AES; distinct from the canon
     // F_ACTUATOR_ENHANCEMENT_SYSTEM so it triggers none of the canon per-limb/physical/⊥TC/⊥MASC logic.
     F_OS_AES,
