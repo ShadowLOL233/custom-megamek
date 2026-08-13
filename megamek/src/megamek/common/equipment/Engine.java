@@ -108,8 +108,8 @@ public class Engine implements Serializable, ITechnology {
     public static final int OS_ENHANCED_XL_ENGINE = 16;        // Advance XL (OSEnhancedXL) – 45% weight, 3 side-torso crits, 15 free HS
     public static final int OS_ENHANCED_XXL_ENGINE = 17;       // Advance XXL (OSEnhancedXXL) – 28% weight, 4 side-torso crits, 15 free HS, no extra heat
     public static final int OS_STANDARD_COMPACT_ENGINE = 18;   // Compact (OSCompact) – 135% weight, 3 CT crits
-    public static final int OS_SH_XL_ENGINE = 19;     // Experimental Superheavy XL – 2 SH side-torso crits, 15 free HS
-    public static final int OS_SH_XXL_ENGINE = 20;    // Experimental Superheavy XXL – 3 SH side-torso crits, 15 free HS
+    public static final int OS_SH_XL_ENGINE = 19;     // Superheavy XL Fusion – 2 SH side-torso crits, 15 free HS
+    public static final int OS_SH_XXL_ENGINE = 20;    // Superheavy XXL Fusion – 3 SH side-torso crits, 15 free HS
     public static final int OS_IMPROVE_FUSION_ENGINE = 21;   // OS Improve Fusion (OSImproveFusion) – 90% weight, 1 side-torso crit
     public static final int OS_IMPROVE_LIGHT_ENGINE = 22; // OS Improve Light (OSImproveLight) – 65% weight, 2 side-torso crits
     public static final int OS_STANDARD_XL_ENGINE = 23;   // OS XL (OSXL) – 50% weight, 3 side-torso crits
@@ -121,7 +121,7 @@ public class Engine implements Serializable, ITechnology {
     public static final int OS_IMPROVE_XXL_ENGINE = 28;   // OS Improve XXL (OSImproveXXL) – 30% weight, 4 side-torso crits
     public static final int OS_IMPROVE_COMPACT_ENGINE = 29; // OS Improve Compact (OSImproveCompact) – 120% weight, 3 CT crits
     public static final int OS_ENHANCED_COMPACT_ENGINE = 30; // OS Advance Compact (OSEnhancedCompact) – 110% weight, 3 CT crits, 15 free HS
-    public static final int OS_SH_STANDARD_ENGINE = 31; // Experimental Superheavy Standard – 90% weight, 1 SH side-torso crit, 15 free HS
+    public static final int OS_SH_STANDARD_ENGINE = 31; // Superheavy Fusion (Standard) – 90% weight, 1 SH side-torso crit, 15 free HS
     public static final int OS_IMPROVE_ICE_ENGINE = 32; // OS Improve ICE – non-fusion, ×1.7 weight, 0 free HS, needs power amps
     public static final int OS_HYBRID_ENGINE = 33;      // OS Hybrid (ICE+Fuel Cell) – non-fusion, ×1.5 weight, 0 free HS, engine-crit resilience + sealed ops
     private static final int NUM_ENGINE_TYPES = 34;
@@ -383,7 +383,7 @@ public class Engine implements Serializable, ITechnology {
             } else if (lower.contains("superhvy xl") || lower.contains("superheavy xl")) {
                 return OS_SH_XL_ENGINE;
             } else if (lower.contains("superhvy std") || lower.contains("superheavy std")
-                  || lower.contains("superheavy standard")) {
+                  || lower.contains("superheavy standard") || lower.contains("superheavy fusion")) {
                 return OS_SH_STANDARD_ENGINE;
             }
             // Non-fusion OS engines (check before family keywords)
