@@ -329,6 +329,16 @@ public class EquipmentType implements ITechnology {
         return getDesc();
     }
 
+    /**
+     * @return an authored flavor / mechanics description for the equipment "info" popup, keyed by internal name in
+     *       equipmentmessages.properties under {@code EquipmentInfo.<internalName>}. Empty when none is authored
+     *       (the UI then shows no info affordance). Distinct from {@link #getDesc()}, which is a display-name hook.
+     */
+    public String getFlavorDescription() {
+        String result = EquipmentMessages.getString("EquipmentInfo." + internalName);
+        return (result != null) ? result : "";
+    }
+
     public String getInternalName() {
         return internalName;
     }
