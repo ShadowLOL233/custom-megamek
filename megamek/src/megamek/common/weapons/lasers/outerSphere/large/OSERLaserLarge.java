@@ -30,7 +30,7 @@ import megamek.common.weapons.lasers.LaserWeapon;
 
 /**
  * Outer Sphere ER Large Laser
- * Damage 9 / Heat 12 / Range 7-14-19, 4.5t / 3 crit
+ * Damage 9 / Heat 11 / Range 7-14-19, 5t / 3 crit
  */
 public class OSERLaserLarge extends LaserWeapon {
     @Serial
@@ -43,7 +43,7 @@ public class OSERLaserLarge extends LaserWeapon {
         addLookupName("OS ER Large Laser");
         addLookupName("OSERLaserLarge");
         sortingName = "Laser OS 03 ER 1 Std D";
-        heat = 12;
+        heat = 11;
         damage = 9;
         shortRange = 7;
         mediumRange = 14;
@@ -53,7 +53,7 @@ public class OSERLaserLarge extends LaserWeapon {
         waterMediumRange = 9;
         waterLongRange = 12;
         waterExtremeRange = 18;
-        tonnage = 4.5;
+        tonnage = 5.0;
         criticalSlots = 3;
         bv = 170;
         cost = 200000;

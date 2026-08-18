@@ -17,7 +17,7 @@ import megamek.common.weapons.lasers.LaserWeapon;
 
 /**
  * Outer Sphere Advanced ER Large Laser
- * Damage 11 / Heat 14 / Range 8-15-22 / -1 ToHit, 4.5t / 4 crit
+ * Damage 11 / Heat 14 / Range 8-15-22 / -1 ToHit, 4.5t / 3 crit
  */
 public class OSEnhancedERLaserLarge extends LaserWeapon {
     @Serial
@@ -42,7 +42,7 @@ public class OSEnhancedERLaserLarge extends LaserWeapon {
         waterLongRange = 14;
         waterExtremeRange = 20;
         tonnage = 4.5;
-        criticalSlots = 4;
+        criticalSlots = 3;
         bv = 260;
         cost = 360000;
         shortAV = 11;
