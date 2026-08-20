@@ -22,8 +22,8 @@ import megamek.server.totalWarfare.TWGameManager;
  * Outer Sphere Heavy SRM Ultra-fire handler. The launcher has Single / Ultra fire modes. In Ultra it fires
  * two missile volleys in one turn — consuming two rounds and rolling the cluster table independently for
  * each volley (both benefit from a linked Artemis IV FCS or Narc). The weapon's base heat is the single-volley
- * value; the engine doubles it in Ultra via {@code Mounted.getNumShots}. The Ultra double-tap risks a jam on a
- * natural-2 attack roll, exactly like an Ultra AC. In Single mode it is a plain SRM launcher — one volley, no jam.
+ * value; the engine doubles it in Ultra via {@code Mounted.getNumShots}. The Ultra double-tap does not jam
+ * (aligned with the core-rule Ultra AC change). In Single mode it is a plain SRM launcher — one volley.
  */
 public class OSDoubleFireSRMHandler extends SRMHandler {
     @Serial
@@ -62,21 +62,5 @@ public class OSDoubleFireSRMHandler extends SRMHandler {
             hits += super.calcHits(vPhaseReport);
         }
         return hits;
-    }
-
-    @Override
-    protected boolean doChecks(Vector<Report> vPhaseReport) {
-        if (super.doChecks(vPhaseReport)) {
-            return true;
-        }
-        // Ultra double-tap jams on a natural-2 attack roll (mirrors the Ultra AC jam).
-        if (isUltra() && (roll.getIntValue() == 2) && !weaponEntity.isConventionalInfantry()) {
-            weapon.setJammed(true);
-            isJammed = true;
-            Report r = new Report(3170);
-            r.subject = subjectId;
-            vPhaseReport.addElement(r);
-        }
-        return false;
     }
 }

@@ -162,25 +162,12 @@ public class UltraWeaponHandler extends AmmoWeaponHandler {
             return true;
         }
 
-        if (!game.getOptions().booleanOption(OptionsConstants.PLAYTEST_3)) {
-            if ((roll.getIntValue() == 2) && (howManyShots == 2) && !weaponEntity.isConventionalInfantry()) {
-                Report r = new Report();
-                r.subject = subjectId;
-                weapon.setJammed(true);
-                isJammed = true;
-                if ((weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.AC_ULTRA)
-                      || (weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.AC_ULTRA_THB)) {
-                    r.messageId = 3160;
-                } else {
-                    r.messageId = 3170;
-                }
-                vPhaseReport.addElement(r);
-            }
-        } else {
-            // PLAYTEST3 Caseless ammo support for RAC
-            // Will potentially explode when rolling a 2. Can still jam if not blowing up.
-            // The check above will only get to this if playtest3 is enabled
-            if ((roll.getIntValue() <= 2) && !attackingEntity.isConventionalInfantry() 
+        // The standard Ultra AC jam-on-a-natural-2 (double-tap mode) has been removed to align with the latest core
+        // rules — Ultra ACs no longer jam. BV and cost are unchanged. The opt-in PLAYTEST3 caseless-ammo
+        // explosion/jam rule is a separate, deliberately-enabled experimental ruleset and is kept as-is.
+        if (game.getOptions().booleanOption(OptionsConstants.PLAYTEST_3)) {
+            // PLAYTEST3 Caseless ammo support: potentially explodes when rolling a 2; can still jam if not blowing up.
+            if ((roll.getIntValue() <= 2) && !attackingEntity.isConventionalInfantry()
                   && ammoType.getMunitionType().contains(AmmoType.Munitions.M_CASELESS)) {
                 Roll diceRoll = Compute.rollD6(2);
 
