@@ -83,6 +83,38 @@ public final class OSNetworkDesignators {
     }
 
     /**
+     * OS Improve C3 Point focus-fire (dev plan §9.1). While a unit on the attacker's active C3 network mounts a working
+     * Improve C3 Point, network units attacking a target the network has TAG'd get <b>-1</b> to-hit. Routed through the
+     * non-stacking network-coordination cap ({@link #networkCoordinationToHit}). The "network has TAG'd" gate reuses the
+     * canon TAG state (a networked unit must have TAG'd the target this turn) — the Improve C3 Point's literal built-in
+     * TAG is network-TAG-driven for now (a mechanics-remaining upgrade; the OS C3 Node is itself a TAG source).
+     *
+     * @return -1 if the focus-fire bonus applies, else 0
+     */
+    public static int improveC3PointFocusFire(Game game, Entity attacker, Entity target) {
+        if ((game == null) || (attacker == null) || (target == null)) {
+            return 0;
+        }
+        // The target must have been TAG'd this turn by a unit on the attacker's C3 network.
+        int taggerId = target.getTaggedBy();
+        if (taggerId < 0) {
+            return 0;
+        }
+        Entity tagger = game.getEntity(taggerId);
+        if ((tagger == null) || !networkedWith(game, attacker, tagger)) {
+            return 0;
+        }
+        // Some unit on the attacker's network (incl. the attacker) must mount a working Improve C3 Point.
+        for (Entity e : game.getEntitiesVector()) {
+            if (!e.isDestroyed() && e.hasWorkingMisc(MiscTypeFlag.F_OS_C3_FOCUS_FIRE)
+                  && networkedWith(game, attacker, e)) {
+                return -1;
+            }
+        }
+        return 0;
+    }
+
+    /**
      * @return true if a BCS / Crow Nest core on the attacker's active C3 network rolled 10+ on its coordination
      *       roll this round and is not currently jammed by hostile ECM (dev plan §9.1).
      */
@@ -105,10 +137,10 @@ public final class OSNetworkDesignators {
 
     /**
      * The single, non-stacking OS "network coordination" to-hit bonus (dev plan §9.3 / §9.6). The Shrike
-     * designation (−1, or −3 on a crit), the Kestrel network paint (−1, direct-fire only) and the B-2500
-     * coordination roll (−1, direct-fire only) are all "network coordination" — they do <b>not</b> stack with each
-     * other; only the deepest applies. A CCS module −1 (fire control, handled elsewhere) may still stack on top,
-     * so a direct-fire weapon can still reach −2 total (§9.3).
+     * designation (−1, or −3 on a crit), the Improve C3 Point focus-fire (−1), the Kestrel network paint (−1,
+     * direct-fire only) and the B-2500 coordination roll (−1, direct-fire only) are all "network coordination" — they
+     * do <b>not</b> stack with each other; only the deepest applies. A CCS module −1 (fire control, handled elsewhere)
+     * may still stack on top, so a direct-fire weapon can still reach −2 total (§9.3).
      *
      * @return the (≤ 0) to-hit modifier to apply, or 0 if none applies.
      */
@@ -117,6 +149,7 @@ public final class OSNetworkDesignators {
             return 0;
         }
         int best = Math.min(0, shrikeToHitBonus(game, attacker, target));
+        best = Math.min(best, improveC3PointFocusFire(game, attacker, target));
         if (directFire) {
             if (hasNetworkKestrelPaint(game, attacker, target)) {
                 best = Math.min(best, -1);
@@ -126,6 +159,41 @@ public final class OSNetworkDesignators {
             }
         }
         return best;
+    }
+
+    /**
+     * OS Demon Aggressive Hacking System offensive debuff (dev plan §9.1). A unit Demon-hacked this turn suffers a
+     * to-hit penalty when it shoots at the hacker's own team: <b>+1</b> on a normal designation, <b>+2</b> when the
+     * Demon designation roll was a critical (natural 9+). The penalty <b>doubles</b> (to a maximum of <b>+4</b>) when
+     * the hacked unit also sits inside a hostile Guardian/Angel ECM bubble. Unlike the network-coordination bonus this
+     * is a penalty on the ENEMY's fire, so it is not part of {@link #networkCoordinationToHit}.
+     *
+     * @param attacker the (possibly Demon-hacked) unit taking a shot
+     * @param victim   the target of that shot
+     * @return the (≥ 0) to-hit penalty to apply, or 0 if the attacker is not Demon-hacked against the hacker's team
+     */
+    public static int demonHackPenalty(Game game, Entity attacker, Entity victim) {
+        if ((game == null) || (attacker == null) || (victim == null)) {
+            return 0;
+        }
+        int hackerId = attacker.getDemonHackedBy();
+        if (hackerId < 0) {
+            return 0;
+        }
+        Entity hacker = game.getEntity(hackerId);
+        if ((hacker == null) || hacker.isDestroyed() || (hacker.getOwner() == null) || (victim.getOwner() == null)) {
+            return 0;
+        }
+        // The debuff only bites when the hacked unit shoots at the hacker's own team (dev plan §9.1).
+        if (hacker.getOwner().getTeam() != victim.getOwner().getTeam()) {
+            return 0;
+        }
+        int penalty = attacker.isDemonHackCrit() ? 2 : 1;
+        if ((attacker.getPosition() != null)
+              && ComputeECM.isAffectedByECM(attacker, attacker.getPosition(), attacker.getPosition())) {
+            penalty *= 2;
+        }
+        return Math.min(4, penalty);
     }
 
     /**

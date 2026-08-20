@@ -910,16 +910,19 @@ public final class Player extends TurnOrdered {
     }
 
     /**
-     * OS Battle Computer System — Tactical Coordination initiative bonus (dev plan §9.1). Each round a B-2500 / Crow
-     * Nest core rolls 2d6 in {@link Entity#getBcsCoordinationRoll()}; on a 12 the force's initiative bumps to +2 that
-     * round. ECM-suppressible: a core sitting under hostile ECM (without its own counter-ECM) contributes nothing.
+     * OS Battle Computer System — Tactical Coordination initiative bonus (dev plan §9.1). A B-2500 core grants the force
+     * a constant <b>+1</b> initiative, bumped to <b>+2</b> on a per-round coordination roll of 12 (see
+     * {@link Entity#getBcsCoordinationRoll()}). The Advance <b>Crow Nest</b> core grants a full constant <b>+2</b>
+     * command (§9.1 Track 2). The constant bonus is granted standalone (a normal pilot, no Triple-Core-Processor implant
+     * needed). ECM-suppressible: a core sitting under hostile ECM (without its own counter-ECM) contributes nothing.
      *
-     * @return 2 if any of this player's active, on-board BCS cores rolled a 12 this round (and is not ECM-jammed), else 0
+     * @return the best BCS initiative bonus among this player's active, on-board, non-ECM-jammed cores (0 if none)
      */
     public int getBcsCoordinationInitBonus() {
         if (game == null) {
             return 0;
         }
+        int bonus = 0;
         for (InGameObject object : game.getInGameObjects()) {
             if (!(object instanceof Entity entity) || !entity.getOwner().equals(this)) {
                 continue;
@@ -927,14 +930,16 @@ public final class Player extends TurnOrdered {
             if (!isActiveForCommandBonus(entity)) {
                 continue;
             }
-            boolean hasBcsCore = entity.hasWorkingMisc(MiscTypeFlag.F_OS_BATTLE_COMPUTER)
-                  || entity.hasWorkingMisc(MiscTypeFlag.F_OS_CROW_NEST);
-            if (hasBcsCore && (entity.getBcsCoordinationRoll() == 12)
-                  && !(isEntityECMAffected(entity) && !entity.hasECM())) {
-                return 2;
+            boolean isCrowNest = entity.hasWorkingMisc(MiscTypeFlag.F_OS_CROW_NEST);
+            boolean hasBcsCore = entity.hasWorkingMisc(MiscTypeFlag.F_OS_BATTLE_COMPUTER) || isCrowNest;
+            if (!hasBcsCore || (isEntityECMAffected(entity) && !entity.hasECM())) {
+                continue;
             }
+            // Crow Nest = full +2 command; B-2500 = +1 constant, bumped to +2 on a coordination roll of 12.
+            int constant = isCrowNest ? 2 : 1;
+            bonus = Math.max(bonus, (entity.getBcsCoordinationRoll() == 12) ? 2 : constant);
         }
-        return 0;
+        return bonus;
     }
 
     /**
@@ -947,9 +952,9 @@ public final class Player extends TurnOrdered {
             return true;
         }
 
-        // OS Battle Computer Core / Crow Nest core (dev plan §9) — carry the BCS command/initiative bonus
-        // (ECM-suppressible via the TCP path). The per-turn coordination roll (+2 on 12, network -1 on 10+) is
-        // wired separately; Crow Nest's stronger +2 command is a mechanics-remaining upgrade.
+        // OS Battle Computer / Crow Nest core (dev plan §9) counts as command equipment for the TCP +1. The BCS's own
+        // constant +1 (bumped to +2 on a coordination roll of 12) is granted standalone via
+        // getBcsCoordinationInitBonus(); Crow Nest's stronger +2 command is a mechanics-remaining upgrade (§9.1).
         if (entity.hasWorkingMisc(MiscTypeFlag.F_OS_BATTLE_COMPUTER)
               || entity.hasWorkingMisc(MiscTypeFlag.F_OS_CROW_NEST)) {
             return true;

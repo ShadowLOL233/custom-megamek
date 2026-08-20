@@ -38,9 +38,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Verifies the OS Battle Computer System "Tactical Coordination" initiative effect (dev plan §9.1): a B-2500 core that
- * rolls a 12 on its per-round 2d6 coordination die grants the force +2 initiative. Also checks that the new {@code bcs}
- * component threads correctly through {@link InitiativeBonusBreakdown} (positive, non-stacking with other positives).
+ * Verifies the OS Battle Computer System "Tactical Coordination" initiative effect (dev plan §9.1): a B-2500 core grants
+ * the force a standalone constant +1 initiative, bumped to +2 when it rolls a 12 on its per-round 2d6 coordination die.
+ * Also checks that the {@code bcs} component threads correctly through {@link InitiativeBonusBreakdown} (positive,
+ * non-stacking with other positives).
  */
 public class OSBattleComputerInitiativeTest {
 
@@ -60,37 +61,61 @@ public class OSBattleComputerInitiativeTest {
     }
 
     private Entity newDeployedMek(boolean withBattleComputer) {
+        Entity entity = newBareMek(withBattleComputer ? "B-2500" : "plain");
+        if (withBattleComputer) {
+            addCore(entity, "OSBattleComputer");
+        }
+        return entity;
+    }
+
+    private Entity newBareMek(String model) {
         Entity entity = new BipedMek();
         entity.setGame(game);
         entity.setId(nextEntityId++);
         entity.setChassis("BCS Test");
-        entity.setModel(withBattleComputer ? "B-2500" : "plain");
+        entity.setModel(model);
         entity.setCrew(new Crew(CrewType.SINGLE));
         entity.setOwner(game.getPlayer(0));
         entity.setWeight(100.0);
         entity.setOriginalWalkMP(3);
         entity.setDeployed(true); // required by Player.isActiveForCommandBonus
-        if (withBattleComputer) {
-            try {
-                entity.addEquipment(EquipmentType.get("OSBattleComputer"), Mek.LOC_CENTER_TORSO);
-            } catch (Exception e) {
-                fail("Failed to add OS Battle Computer core: " + e.getMessage());
-            }
-        }
         return entity;
     }
 
-    /** A coordination roll below 12 grants no initiative bonus. */
+    private void addCore(Entity entity, String internalName) {
+        try {
+            entity.addEquipment(EquipmentType.get(internalName), Mek.LOC_CENTER_TORSO);
+        } catch (Exception e) {
+            fail("Failed to add " + internalName + ": " + e.getMessage());
+        }
+    }
+
+    /** A coordination roll below 12 still grants the B-2500's standalone constant +1 initiative (dev plan §9.1). */
     @Test
-    void testNoInitiativeBonusBelow12() {
+    void testConstantPlus1Below12() {
         Entity core = newDeployedMek(true);
         game.addEntity(core);
         Player player = game.getPlayer(0);
 
         for (int roll : new int[] { 2, 7, 9, 10, 11 }) {
             core.setBcsCoordinationRoll(roll);
-            assertEquals(0, player.getBcsCoordinationInitBonus(),
-                  "coordination roll " + roll + " should grant no initiative bonus");
+            assertEquals(1, player.getBcsCoordinationInitBonus(),
+                  "coordination roll " + roll + " should still grant the constant +1 initiative");
+        }
+    }
+
+    /** The Advance Crow Nest core grants a full constant +2 command, even below a coordination roll of 12 (§9.1). */
+    @Test
+    void testCrowNestFullPlus2Command() {
+        Entity crowNest = newBareMek("C-X280");
+        addCore(crowNest, "OSCrowNest");
+        game.addEntity(crowNest);
+        Player player = game.getPlayer(0);
+
+        for (int roll : new int[] { 2, 7, 10, 11, 12 }) {
+            crowNest.setBcsCoordinationRoll(roll);
+            assertEquals(2, player.getBcsCoordinationInitBonus(),
+                  "a Crow Nest core should grant a full +2 command at coordination roll " + roll);
         }
     }
 

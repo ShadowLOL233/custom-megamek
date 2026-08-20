@@ -1871,6 +1871,7 @@ public class MiscType extends EquipmentType {
         EquipmentType.addType(MiscType.createOSImproveGuardianECM());
         EquipmentType.addType(MiscType.createOSImproveAngleECM());
         EquipmentType.addType(MiscType.createOSC3Point());
+        EquipmentType.addType(MiscType.createOSImproveC3Point());
         // OS Modular Electronics (dev plan §9) — BCS Advance specialized cores
         EquipmentType.addType(MiscType.createOSCrowNest());
         EquipmentType.addType(MiscType.createOSRavenCEWS());
@@ -2763,7 +2764,7 @@ public class MiscType extends EquipmentType {
         misc.tonnage = 1;
         misc.criticalSlots = 1;
         misc.cost = 200000;
-        misc.flags = misc.flags.or(F_ECM, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT);
+        misc.flags = misc.flags.or(F_ECM, MiscTypeFlag.F_OS_BCS_MODULE, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT);
         misc.bv = 61;
         misc.setModes("ECM");
         misc.setInstantModeSwitch(false);
@@ -2787,7 +2788,7 @@ public class MiscType extends EquipmentType {
         misc.tonnage = 0.5f;
         misc.criticalSlots = 1;
         misc.cost = 250000;
-        misc.flags = misc.flags.or(F_ECM, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT);
+        misc.flags = misc.flags.or(F_ECM, MiscTypeFlag.F_OS_BCS_MODULE, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT);
         misc.bv = 61;
         misc.setModes("ECM");
         misc.setInstantModeSwitch(false);
@@ -2811,7 +2812,8 @@ public class MiscType extends EquipmentType {
         misc.tonnage = 1;
         misc.criticalSlots = 1;
         misc.cost = 750000;
-        misc.flags = misc.flags.or(F_ECM, F_ANGEL_ECM, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT);
+        misc.flags = misc.flags.or(F_ECM, F_ANGEL_ECM, MiscTypeFlag.F_OS_BCS_MODULE, F_MEK_EQUIPMENT,
+              F_TANK_EQUIPMENT);
         misc.bv = 100;
         misc.setModes("ECM");
         misc.setInstantModeSwitch(false);
@@ -2837,7 +2839,8 @@ public class MiscType extends EquipmentType {
         misc.tonnage = 1;
         misc.criticalSlots = 1;
         misc.cost = 500000;
-        misc.flags = misc.flags.or(F_C3SBS, MiscTypeFlag.ANY_C3, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT);
+        misc.flags = misc.flags.or(F_C3SBS, MiscTypeFlag.ANY_C3, MiscTypeFlag.F_OS_BCS_MODULE, F_MEK_EQUIPMENT,
+              F_TANK_EQUIPMENT);
         misc.bv = 0;
         misc.rulesRefs = "AU";
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
@@ -2851,10 +2854,40 @@ public class MiscType extends EquipmentType {
         return misc;
     }
 
+    // BCS Improve C3 Point (dev plan §9.1) — the Improve-tier boosted C3 slave with focus-fire: while on a C3 network,
+    // network units attacking a target the network has TAG'd get -1 (F_OS_C3_FOCUS_FIRE, routed through the non-stacking
+    // network-coordination cap). Modeled as a MiscType C3 slave (canon C3 slaves are MiscType); its built-in TAG is
+    // network-TAG-driven for now (see the flag doc). Requires a B-2500 core (F_OS_BCS_MODULE).
+    public static MiscType createOSImproveC3Point() {
+        MiscType misc = new MiscType();
+        misc.name = "B-2500 Improve C3 Point";
+        misc.setInternalName("OSImproveC3Point");
+        misc.addLookupName("OS Improve C3 Point");
+        misc.shortName = "Improve C3 Point";
+        misc.tonnage = 1.5;
+        misc.criticalSlots = 1;
+        misc.cost = 750000;
+        misc.flags = misc.flags.or(F_C3SBS, MiscTypeFlag.ANY_C3, MiscTypeFlag.F_OS_BCS_MODULE,
+              MiscTypeFlag.F_OS_C3_FOCUS_FIRE, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT);
+        misc.bv = 0;
+        misc.rulesRefs = "AU";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+              .setISAdvancement(2900, 2930, 2960, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+        return misc;
+    }
+
     // ===== BCS Advance specialized cores (dev plan §9) — self-contained combined EW; single-core, mutually
-    // exclusive with the B-2500 (single-core legality is mechanics-remaining). Distinctive behaviors — Crow Nest's
-    // C3/Raven network lock + full +2 command, Raven's 6-unit egalitarian net + built-in Light TAG, Ghost's
-    // stealth-system coexistence — are TODO in the mechanics pass; for now they function as combined EW jammers.
+    // exclusive with the B-2500 (enforced in TestMek). Distinctive behaviors: Crow Nest's full +2 command is wired
+    // (Player.getBcsCoordinationInitBonus); Ghost's stealth-system coexistence holds by construction (it carries only
+    // ECM — no C3/C3i/probe — so it trips none of the null-sig / Chameleon-LPS exclusions). Still mechanics-remaining:
+    // Crow Nest's pre-battle C3/Raven network lock (+ its integrated C3-Node), Raven's C3i-style 6-unit egalitarian net
+    // and built-in Light TAG.
 
     public static MiscType createOSCrowNest() {
         MiscType misc = new MiscType();

@@ -242,6 +242,9 @@ public abstract class Entity extends TurnOrdered
     public static final int LOC_DESTROYED = -2;
 
     public static final int MAX_C3_NODES = 12;
+    // OS Battle Computer System (dev plan §9.1): OS Boosted C3 networks reach company scale (~26 units) via the
+    // Improve C3 Node's enlarged topology (6 slave Points / 3 master Nodes), vs the canon 12-unit C3 cap.
+    public static final int MAX_OS_C3_NODES = 26;
     public static final int MAX_C3i_NODES = 6;
     public static final int MAX_NOVA_CEWS_NODES = 3;
     public static final String C3_NETWORK_ID_SEPARATOR = ".";
@@ -432,6 +435,10 @@ public abstract class Entity extends TurnOrdered
     // (-1 = none), and whether that designation roll was a natural-9+ critical. Reset each round.
     protected int shrikeDesignatedBy = -1;
     protected boolean shrikeDesignationCrit = false;
+    // OS Demon Aggressive Hacking System (dev plan §9.1): the id of the Demon carrier that hacked this unit this
+    // turn (-1 = none), and whether that designation roll was a natural-9+ critical. Reset each round.
+    protected int demonHackedBy = -1;
+    protected boolean demonHackCrit = false;
     protected boolean layingMines = false;
     protected boolean _isEMId = false;
     protected boolean[] hardenedArmorDamaged;
@@ -6509,6 +6516,47 @@ public abstract class Entity extends TurnOrdered
     }
 
     /**
+     * @return true if this unit mounts a working OS Boosted C3 Node (plain or Improve) — an OS C3-network master.
+     *       Gates the OS company-scale (~26-unit) network cap; canon C3 masters do not carry F_OS_BCS_MODULE.
+     */
+    public boolean hasOSBoostedC3Node() {
+        if (isShutDown() || isOffBoard()) {
+            return false;
+        }
+        for (WeaponMounted m : getWeaponList()) {
+            if (m.getType().hasFlag(WeaponType.F_C3MBS) && m.getType().hasFlag(WeaponTypeFlag.F_OS_BCS_MODULE)
+                  && !m.isInoperable()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @return true if this unit mounts a working OS Improve C3 Node — the enlarged-topology master (6 slave Points, 3
+     *       master Nodes; dev plan §9.1), vs the plain OS C3 Node (3 links).
+     */
+    public boolean hasOSImproveC3Node() {
+        if (isShutDown() || isOffBoard()) {
+            return false;
+        }
+        for (WeaponMounted m : getWeaponList()) {
+            if (m.getType().hasFlag(WeaponTypeFlag.F_OS_IMPROVE_C3_NODE) && !m.isInoperable()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @return the maximum number of units allowed on this unit's C3 network: {@link #MAX_OS_C3_NODES} (~26) for an OS
+     *       Boosted C3 network, else the canon {@link #MAX_C3_NODES} (12).
+     */
+    public int getC3NetworkNodeCap() {
+        return hasOSBoostedC3Node() ? MAX_OS_C3_NODES : MAX_C3_NODES;
+    }
+
+    /**
      * Checks if the entity has a C3 Master.
      *
      * @return true if it has a working C3M computer and has a master.
@@ -6815,7 +6863,8 @@ public abstract class Entity extends TurnOrdered
     public int calculateFreeC3MNodes() {
         int nodes = 0;
         if (hasC3MM()) {
-            nodes = 2;
+            // OS Improve C3 Node company commander links 3 master Nodes (vs the canon 2); dev plan §9.1.
+            nodes = hasOSImproveC3Node() ? 3 : 2;
             if (game != null) {
                 for (Entity e : game.getEntitiesVector()) {
                     if (e.hasC3M() && (e != this)) {
@@ -6871,7 +6920,8 @@ public abstract class Entity extends TurnOrdered
                 }
             }
         } else if (hasC3M()) {
-            nodes = 3;
+            // OS Improve C3 Node links 6 slave Points (vs the plain node's 3); dev plan §9.1.
+            nodes = hasOSImproveC3Node() ? 6 : 3;
             if (game != null) {
                 for (Entity e : game.getEntitiesVector()) {
                     if (e.hasC3() && !equals(e)) {
@@ -7292,6 +7342,7 @@ public abstract class Entity extends TurnOrdered
         hitBySwarmsWeapon.clear();
         setTaggedBy(-1);
         clearShrikeDesignation();
+        clearDemonHack();
         setLayingMines(false);
         setArmsFlipped(false);
         setDisplacementAttack(null);
@@ -11816,6 +11867,27 @@ public abstract class Entity extends TurnOrdered
     public void clearShrikeDesignation() {
         shrikeDesignatedBy = -1;
         shrikeDesignationCrit = false;
+    }
+
+    /** OS Demon (dev plan §9.1): record that the Demon carrier {@code hackerId} hacked this unit this turn (crit = natural 9+). */
+    public void setDemonHackedBy(int hackerId, boolean crit) {
+        demonHackedBy = hackerId;
+        demonHackCrit = crit;
+    }
+
+    /** @return the id of the Demon carrier that hacked this unit this turn, or -1 if none. */
+    public int getDemonHackedBy() {
+        return demonHackedBy;
+    }
+
+    /** @return true if this unit's Demon hack this turn was a natural-9+ critical designation. */
+    public boolean isDemonHackCrit() {
+        return demonHackCrit;
+    }
+
+    public void clearDemonHack() {
+        demonHackedBy = -1;
+        demonHackCrit = false;
     }
 
     /**

@@ -1655,6 +1655,16 @@ public class ComputeToHit {
             }
         }
 
+        // OS Demon Aggressive Hacking System (dev plan §9.1): a unit Demon-hacked this turn takes a +1 (hit) / +2
+        // (crit designation) to-hit penalty when it shoots at the hacker's own team, doubled to a max +4 while the
+        // hacked unit also sits inside a hostile Guardian/Angel ECM bubble.
+        if (te != null) {
+            int demon = megamek.common.weapons.c3.OSNetworkDesignators.demonHackPenalty(game, ae, te);
+            if (demon != 0) {
+                toHit.addModifier(demon, Messages.getString("WeaponAttackAction.WeaponMod"));
+            }
+        }
+
         // Indirect fire (LRMs, mortars and the like) has a +1 mod
         if (isIndirect) {
             toHit.addModifier(1, Messages.getString("WeaponAttackAction.Indirect"));

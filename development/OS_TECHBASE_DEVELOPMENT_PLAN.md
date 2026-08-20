@@ -1013,22 +1013,45 @@ module).
   network cap raise (12→26); C-X280 pre-battle network lock.
 
 ### 9.5 Open (⏳)
-Mechanics-remaining (best implemented test-driven; all UNTESTED until the unified playtest):
+Mechanics-remaining (best implemented test-driven). **2026-08-20 batch — 5.5 of these landed with unit tests
+(compile + JUnit green); still NOT in-game playtested.** The enabling infra for the OS-gated changes: dedicated OS
+markers `MiscTypeFlag.F_OS_BCS_MODULE` / `F_OS_C3_FOCUS_FIRE` and `WeaponTypeFlag.F_OS_BCS_MODULE` /
+`F_OS_IMPROVE_C3_NODE` (the BCS modules otherwise reuse canon C3/ECM flags), so every change below is gated to OS gear
+and leaves canon C3/ECM untouched.
 - ~~B-2500 coordination roll — the **+2-initiative-on-12** branch~~ ✅ DONE 2026-07-23 (network −1 was already wired; +2 now wired + reported).
-- **Demon** per-turn to-hit debuff (+1/+2, doubled to +4 under friendly ECM, escalated on a Demon crit).
-- **Improve C3 Point** focus-fire −1 (needs Improve C3 Point defined as a TAG-capable component first).
-- **Network cap → 26** (company scale) + Improve C3 Node's 6-Point topology.
-- **Advance-core behaviors:** Crow Nest C3/Raven network lock + full +2 command; Raven 6-unit egalitarian net +
-  built-in Light TAG; Ghost stealth-system coexistence.
-- **BCS module → B-2500 core prerequisite** (currently C3/ECM work without a BCS core — inconsistent with the CCS
-  core-prereq).
+- ~~**Demon** per-turn to-hit debuff (+1/+2, doubled to +4 under friendly ECM, escalated on a Demon crit)~~ ✅ DONE
+  2026-08-20. `Entity.demonHackedBy`/crit state (reset in `newRound`, mirrors Shrike) + `OSDemonHackingHandler`
+  (records the hack + natural-9+ crit on the target) + `OSNetworkDesignators.demonHackPenalty` (+1/+2, ×2 capped at
+  +4 when the hacked unit sits in a hostile Guardian/Angel ECM bubble) + a `ComputeToHit` hook. Test:
+  `OSDemonHackingTest`.
+- ~~**Improve C3 Point** focus-fire −1~~ ✅ DONE 2026-08-20 (**approach C — network-TAG-driven**). New MiscType
+  `OSImproveC3Point` (boosted C3 slave `F_C3SBS` + `F_OS_C3_FOCUS_FIRE`); `OSNetworkDesignators.improveC3PointFocusFire`
+  grants −1 to network units firing at a target the network has TAG'd, joined into the non-stacking cap. **NOTE:** the
+  literal *built-in TAG* is deferred — modeled as network-TAG-driven (the OS C3 Node is itself a TAG source); upgrading
+  to a single TAG-capable slave item needs the weapon-side boosted-C3-slave approach (would require `hasC3S()` to scan
+  weapons). Test: `OSImproveC3PointFocusFireTest`.
+- ~~**Network cap → 26** (company scale) + Improve C3 Node's 6-Point topology~~ ✅ DONE 2026-08-20. `WeaponTypeFlag.
+  F_OS_IMPROVE_C3_NODE` distinguishes the Improve node; `calculateFreeC3Nodes` returns 6 slaves (vs 3) and
+  `calculateFreeC3MNodes` 3 master links (vs 2) for it; `Entity.getC3NetworkNodeCap()` = `MAX_OS_C3_NODES` (26) for any
+  OS Boosted-C3 master, wired into the `C3Util.connect` + `EquipChoicePanel` cap checks. Canon C3 keeps 12. **Interp:
+  the Improve node = larger slots** (single Improve C3MM ≈28→cap 26). Test: `OSImproveC3NodeTopologyTest`.
+- **Advance-core behaviors:** ~~Crow Nest **full +2 command**~~ ✅ DONE 2026-08-20 (`getBcsCoordinationInitBonus`,
+  test `OSBattleComputerInitiativeTest#testCrowNestFullPlus2Command`); ~~Ghost **stealth-system coexistence**~~ ✅
+  satisfied by construction 2026-08-20 (Ghost carries only ECM — no C3/C3i/probe — so it trips none of the
+  null-sig/Chameleon-LPS exclusions). **Remaining (see §9.5 follow-up):** Crow Nest pre-battle C3/Raven network lock +
+  its integrated C3-Node; Raven C3i-style 6-unit egalitarian net + built-in Light TAG.
+- ~~**BCS module → B-2500 core prerequisite**~~ ✅ DONE 2026-08-20. OS BCS modules (C3 Node/Point, OS ECM suites,
+  Demon) carry `F_OS_BCS_MODULE`; `TestMek` flags a module without an `F_OS_BATTLE_COMPUTER` core as illegal (the
+  Advance cores do not host modules). Canon C3/ECM is unmarked → never gated. Test: `OSBattleComputerModuleLegalityTest`.
 - Exact per-module BV factors; Enhanced Combat Computer revival + rename. ~~optional Round-Report line for the
   coordination roll~~ ✅ DONE 2026-07-23 (initiative-report line, double-blind aware).
-- **B-2500 constant +1 initiative** currently only applies through the TCP-implant path — make it grant standalone.
+- ~~**B-2500 constant +1 initiative** currently only applies through the TCP-implant path — make it grant standalone~~
+  ✅ DONE 2026-08-20 (`getBcsCoordinationInitBonus` now returns the constant +1 for any active, non-ECM-jammed B-2500,
+  bumped to +2 on a coordination roll of 12; Crow Nest gives +2). Test: `OSBattleComputerInitiativeTest`.
 - ~~**Network Target Designators (§9.6):** Kestrel −1, Shrike −1/−3 crit, Lodestar beacon pod, Lodestar LRM
   indirect-fire enable, and the non-stacking network-coordination cap (Kestrel/Shrike/B-2500)~~ ✅ DONE 2026-08-01
-  (see §9.6). **Remaining:** Improve C3 Point focus-fire −1 has no class yet — when built it should route through
-  `OSNetworkDesignators.networkCoordinationToHit` to join the cap. All §9.6 mechanics are UNTESTED in-game.
+  (see §9.6). Improve C3 Point focus-fire −1 now routes through `OSNetworkDesignators.networkCoordinationToHit` and
+  joins the cap (2026-08-20). All §9.6 mechanics remain UNTESTED in-game.
 
 ### 9.6 OS Network Target Designators — Kestrel / Shrike / Lodestar (added 2026-07-31)
 

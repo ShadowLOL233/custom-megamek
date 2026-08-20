@@ -25,20 +25,28 @@ package megamek.common.weapons.c3;
 import java.io.Serial;
 
 import megamek.common.SimpleTechLevel;
+import megamek.common.ToHitData;
+import megamek.common.actions.WeaponAttackAction;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
 import megamek.common.enums.TechRating;
 import megamek.common.equipment.WeaponTypeFlag;
+import megamek.common.game.Game;
+import megamek.common.loaders.EntityLoadingException;
+import megamek.common.weapons.handlers.AttackHandler;
+import megamek.common.weapons.handlers.OSDemonHackingHandler;
 import megamek.common.weapons.tag.TAGWeapon;
+import megamek.server.totalWarfare.TWGameManager;
 
 /**
  * OS "Demon Aggressive Hacking System" (dev plan §9) — an Advance-tier offensive-EW designator that borrows TAG's
  * targeting mode. It is the only TAG-type system that can score a critical hit.
  * <p>
- * Mechanics-remaining (TODO, mechanics pass): against a target hit this turn, when that target shoots at the
- * hacker's team it takes +1 to-hit (+2 if the Demon attack scored a critical hit), doubled if the target is also
- * inside a friendly Guardian/Angel ECM bubble (max +4). For now the weapon exists and designates like a TAG.
+ * Against a target hacked this turn, when that target shoots at the hacker's team it takes +1 to-hit (+2 if the Demon
+ * designation roll was a natural-9+ critical), doubled if the target is also inside a hostile Guardian/Angel ECM bubble
+ * (max +4). The crit detection + per-turn target state live in {@link OSDemonHackingHandler}; the penalty injection is
+ * in {@code ComputeToHit} (via {@link OSNetworkDesignators#demonHackPenalty}).
  */
 public class OSDemonHackingSystem extends TAGWeapon {
     @Serial
@@ -58,7 +66,8 @@ public class OSDemonHackingSystem extends TAGWeapon {
         spreadable = false;
         cost = 1000000;
         bv = 0;
-        flags = flags.or(WeaponTypeFlag.F_OS_DEMON_HACKING).or(F_MEK_WEAPON).or(F_TANK_WEAPON).andNot(F_AERO_WEAPON);
+        flags = flags.or(WeaponTypeFlag.F_OS_DEMON_HACKING).or(WeaponTypeFlag.F_OS_BCS_MODULE).or(F_MEK_WEAPON)
+              .or(F_TANK_WEAPON).andNot(F_AERO_WEAPON);
         heat = 0;
         damage = 0;
         shortRange = 5;
@@ -74,5 +83,15 @@ public class OSDemonHackingSystem extends TAGWeapon {
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
               .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+    }
+
+    @Override
+    public AttackHandler getCorrectHandler(ToHitData toHit, WeaponAttackAction waa, Game game,
+          TWGameManager manager) {
+        try {
+            return new OSDemonHackingHandler(toHit, waa, game, manager);
+        } catch (EntityLoadingException ignored) {
+            return null;
+        }
     }
 }

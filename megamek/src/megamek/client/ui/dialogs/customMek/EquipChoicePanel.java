@@ -1082,8 +1082,10 @@ public class EquipChoicePanel extends JPanel {
             Entity chosen = client.getEntity(entityCorrespondence[choC3.getSelectedIndex()]);
             int entC3nodeCount = client.getGame().getC3SubNetworkMembers(entity).size();
             int choC3nodeCount = client.getGame().getC3NetworkMembers(chosen).size();
+            // OS Boosted C3 networks reach company scale (~26); canon C3 stays at MAX_C3_NODES (dev plan §9.1).
+            int c3Cap = (chosen != null) ? chosen.getC3NetworkNodeCap() : Entity.MAX_C3_NODES;
 
-            if ((entC3nodeCount + choC3nodeCount) <= Entity.MAX_C3_NODES &&
+            if ((entC3nodeCount + choC3nodeCount) <= c3Cap &&
                   ((chosen == null) || entity.getC3MasterId() != chosen.getId())) {
                 entity.setC3Master(chosen, true);
             } else if ((chosen != null) && entity.getC3MasterId() != chosen.getId()) {
@@ -1092,7 +1094,7 @@ public class EquipChoicePanel extends JPanel {
                       chosen.getShortName(),
                       entC3nodeCount,
                       choC3nodeCount,
-                      Entity.MAX_C3_NODES);
+                      c3Cap);
                 if (clientgui == null) {
                     JOptionPane.showMessageDialog(this,
                           Messages.getString("CustomMekDialog.NetworkTooBig.title"),

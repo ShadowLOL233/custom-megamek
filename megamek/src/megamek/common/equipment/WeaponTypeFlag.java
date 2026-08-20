@@ -155,6 +155,19 @@ public enum WeaponTypeFlag implements EquipmentFlag {
     /** OS Shrike Combat Designator (dev plan §9) — a crit-capable TAG that grants the C3 network a to-hit bonus. */
     F_OS_SHRIKE_DESIGNATOR,
 
+    /**
+     * OS BCS plug-in module (WeaponType side: OS C3 Node / Improve C3 Node, dev plan §9.1). A module requires an
+     * F_OS_BATTLE_COMPUTER core on the same unit; the MiscType-side modules carry MiscTypeFlag.F_OS_BCS_MODULE.
+     */
+    F_OS_BCS_MODULE,
+
+    /**
+     * OS Improve C3 Node (dev plan §9.1) — the Improve-tier Boosted C3 master with an enlarged topology: it links 6
+     * slave Points (vs the plain node's 3) and, as a company commander, 3 master Nodes (vs 2). Drives the OS
+     * company-scale (~26-unit) C3 network cap. Distinct from the plain OS C3 Node (which also carries F_OS_BCS_MODULE).
+     */
+    F_OS_IMPROVE_C3_NODE,
+
     /** OS core LRM (long-range bombardment specialist): -1 to-hit in the long range bracket and beyond. */
     F_OS_LRM_LONG_SPEC,
 

@@ -476,6 +476,17 @@ public enum MiscTypeFlag implements EquipmentFlag {
     // OS Modular Electronics (dev plan §9) — Battle Computer System (BCS)
     F_OS_BATTLE_COMPUTER,
 
+    // OS Modular Electronics (dev plan §9.1) — marks a BCS plug-in module (MiscType side: OS C3 Point + the OS
+    // Guardian/Improve-Guardian/Improve-Angle ECM suites). A module requires an F_OS_BATTLE_COMPUTER core on the same
+    // unit (mirrors the CCS core-prereq); the WeaponType-side modules (OS C3 Node) carry WeaponTypeFlag.F_OS_BCS_MODULE.
+    F_OS_BCS_MODULE,
+
+    // OS Modular Electronics (dev plan §9.1) — the Improve C3 Point's focus-fire capability. When a working unit with
+    // this flag is on a C3 network, network units attacking a target the network has TAG'd get -1 (routed through the
+    // non-stacking network-coordination cap). A boosted C3 slave (F_C3SBS); its literal built-in TAG is modeled as
+    // network-TAG-driven for now (relies on a network TAG source such as the OS C3 Node), a mechanics-remaining upgrade.
+    F_OS_C3_FOCUS_FIRE,
+
     // OS Modular Electronics (dev plan §9) — Combat Computer System (CCS)
     F_OS_COMBAT_COMPUTER,
     F_OS_CC_BALLISTIC,

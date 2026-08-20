@@ -520,7 +520,9 @@ public class C3Util {
         }
         int newC3nodeCount = entities.stream().mapToInt(e -> game.getC3SubNetworkMembers(e).size()).sum();
         int masC3nodeCount = game.getC3NetworkMembers(master).size();
-        if (newC3nodeCount + masC3nodeCount > Entity.MAX_C3_NODES || entities.size() > master.calculateFreeC3Nodes()) {
+        // OS Boosted C3 networks reach company scale (~26); canon C3 stays at MAX_C3_NODES (dev plan §9.1).
+        if (newC3nodeCount + masC3nodeCount > master.getC3NetworkNodeCap()
+              || entities.size() > master.calculateFreeC3Nodes()) {
             throw new C3CapacityException();
         }
         entities.forEach(e -> e.setC3Master(master, true));

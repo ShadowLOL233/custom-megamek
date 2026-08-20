@@ -793,6 +793,7 @@ public class TestMek extends TestEntity {
         boolean hasCrowNest = false;
         boolean hasRaven = false;
         boolean hasGhost = false;
+        boolean hasBcsModule = false;
         EquipmentType advancedMyomer = null;
         HashSet<Integer> shieldLocations = new HashSet<>();
 
@@ -820,6 +821,7 @@ public class TestMek extends TestEntity {
             hasCrowNest |= m.getType().hasFlag(MiscTypeFlag.F_OS_CROW_NEST);
             hasRaven |= m.getType().hasFlag(MiscTypeFlag.F_OS_RAVEN_CEWS);
             hasGhost |= m.getType().hasFlag(MiscTypeFlag.F_OS_GHOST_CORE);
+            hasBcsModule |= m.getType().hasFlag(MiscTypeFlag.F_OS_BCS_MODULE);
             if (m.getType().hasFlag(MiscType.F_TSM)
                   || m.getType().hasFlag(MiscType.F_INDUSTRIAL_TSM)
                   || m.getType().hasFlag(MiscType.F_SCM)) {
@@ -1397,6 +1399,16 @@ public class TestMek extends TestEntity {
         if (bcsCoreCount > 1) {
             buff.append("Only one Battle Computer System core may be mounted "
                   + "(B-2500 / Crow Nest / Raven / Ghost are mutually exclusive).\n");
+            illegal = true;
+        }
+        // OS Battle Computer System (dev plan §9.1): a BCS plug-in module (OS C3 Node/Point, OS Guardian/Angle ECM,
+        // Demon) requires a B-2500 core on the same unit — mirroring the CCS core-prereq. The self-contained Advance
+        // cores (Crow Nest / Raven / Ghost) do NOT host modules, so they do not satisfy this requirement.
+        for (WeaponMounted w : mek.getWeaponList()) {
+            hasBcsModule |= w.getType().hasFlag(WeaponTypeFlag.F_OS_BCS_MODULE);
+        }
+        if (hasBcsModule && !hasBattleComputer) {
+            buff.append("Battle Computer System modules require a B-2500 Battle Computer Core.\n");
             illegal = true;
         }
 
