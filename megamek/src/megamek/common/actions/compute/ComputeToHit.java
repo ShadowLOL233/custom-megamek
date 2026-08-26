@@ -1541,7 +1541,20 @@ public class ComputeToHit {
                     modifier += RangeType.RANGE_LONG;
                 }
             }
-            toHit.addModifier(modifier, Messages.getString("WeaponAttackAction.WeaponMod"));
+            // Name the reason where the built-in modifier is a recognizable weapon trait (pulse -2 accuracy,
+            // heavy-laser +1, or any OS weapon's built-in accuracy - named by the weapon so it is unambiguous),
+            // so the targeting breakdown reads clearly instead of a bare "weapon to-hit modifier".
+            String weaponModLabel;
+            if (weaponType.hasFlag(WeaponType.F_PULSE)) {
+                weaponModLabel = Messages.getString("WeaponAttackAction.PulseWeapon");
+            } else if (weaponType.hasFlag(megamek.common.equipment.WeaponTypeFlag.HEAVY_LASER)) {
+                weaponModLabel = Messages.getString("WeaponAttackAction.HeavyLaser");
+            } else if (weaponType.getTechBase() == megamek.common.enums.TechBase.OUTER_SPHERE) {
+                weaponModLabel = weaponType.getName();
+            } else {
+                weaponModLabel = Messages.getString("WeaponAttackAction.WeaponMod");
+            }
+            toHit.addModifier(modifier, weaponModLabel);
 
         }
 
@@ -1560,7 +1573,7 @@ public class ComputeToHit {
                 dispersionMod = 1;
             }
             if (dispersionMod != 0) {
-                toHit.addModifier(dispersionMod, Messages.getString("WeaponAttackAction.WeaponMod"));
+                toHit.addModifier(dispersionMod, Messages.getString("WeaponAttackAction.OSPpcXDispersion"));
             }
         }
 
@@ -1583,9 +1596,9 @@ public class ComputeToHit {
             int nRange = ae.getPosition().distance(target.getPosition());
             int[] nRanges = weaponType.getRanges(weapon, ammo);
             if (nRange > nRanges[RangeType.RANGE_LONG]) {
-                toHit.addModifier(-2, Messages.getString("WeaponAttackAction.WeaponMod"));
+                toHit.addModifier(-2, Messages.getString("WeaponAttackAction.OSHvacPrecision"));
             } else if (nRange > nRanges[RangeType.RANGE_SHORT]) {
-                toHit.addModifier(-1, Messages.getString("WeaponAttackAction.WeaponMod"));
+                toHit.addModifier(-1, Messages.getString("WeaponAttackAction.OSHvacPrecision"));
             }
         }
 
@@ -1596,9 +1609,9 @@ public class ComputeToHit {
             int nRange = ae.getPosition().distance(target.getPosition());
             int[] nRanges = weaponType.getRanges(weapon, ammo);
             if (nRange <= nRanges[RangeType.RANGE_SHORT]) {
-                toHit.addModifier(1, Messages.getString("WeaponAttackAction.WeaponMod"));
+                toHit.addModifier(1, Messages.getString("WeaponAttackAction.OSRocketPropelled"));
             } else if (nRange > nRanges[RangeType.RANGE_MEDIUM]) {
-                toHit.addModifier(-1, Messages.getString("WeaponAttackAction.WeaponMod"));
+                toHit.addModifier(-1, Messages.getString("WeaponAttackAction.OSRocketPropelled"));
             }
         }
 
@@ -1609,9 +1622,9 @@ public class ComputeToHit {
             int nRange = ae.getPosition().distance(target.getPosition());
             int[] nRanges = weaponType.getRanges(weapon, ammo);
             if ((nRange > nRanges[RangeType.RANGE_SHORT]) && (nRange <= nRanges[RangeType.RANGE_MEDIUM])) {
-                toHit.addModifier(-1, Messages.getString("WeaponAttackAction.WeaponMod"));
+                toHit.addModifier(-1, Messages.getString("WeaponAttackAction.OSGaam"));
             } else if (nRange > nRanges[RangeType.RANGE_MEDIUM]) {
-                toHit.addModifier(1, Messages.getString("WeaponAttackAction.WeaponMod"));
+                toHit.addModifier(1, Messages.getString("WeaponAttackAction.OSGaam"));
             }
         }
 
@@ -1621,7 +1634,7 @@ public class ComputeToHit {
             int nRange = ae.getPosition().distance(target.getPosition());
             int[] nRanges = weaponType.getRanges(weapon, ammo);
             if (nRange > nRanges[RangeType.RANGE_MEDIUM]) {
-                toHit.addModifier(-1, Messages.getString("WeaponAttackAction.WeaponMod"));
+                toHit.addModifier(-1, Messages.getString("WeaponAttackAction.OSLrmLongSpec"));
             }
         }
 
@@ -1631,13 +1644,13 @@ public class ComputeToHit {
             int nRange = ae.getPosition().distance(target.getPosition());
             int[] nRanges = weaponType.getRanges(weapon, ammo);
             if ((nRange > nRanges[RangeType.RANGE_SHORT]) && (nRange <= nRanges[RangeType.RANGE_MEDIUM])) {
-                toHit.addModifier(-1, Messages.getString("WeaponAttackAction.WeaponMod"));
+                toHit.addModifier(-1, Messages.getString("WeaponAttackAction.OSMrmMediumSpec"));
                 if ((weapon != null) && (weapon.getLinkedBy() != null)
                       && (weapon.getLinkedBy().getType() instanceof megamek.common.equipment.MiscType fcs)
                       && fcs.hasFlag(megamek.common.equipment.MiscType.F_DIANA_III)
                       && !weapon.getLinkedBy().isDestroyed() && !weapon.getLinkedBy().isMissing()
                       && !weapon.getLinkedBy().isBreached()) {
-                    toHit.addModifier(-1, Messages.getString("WeaponAttackAction.WeaponMod"));
+                    toHit.addModifier(-1, Messages.getString("WeaponAttackAction.OSDianaIII"));
                 }
             }
         }
@@ -1651,7 +1664,7 @@ public class ComputeToHit {
             int netCoord = megamek.common.weapons.c3.OSNetworkDesignators.networkCoordinationToHit(game, ae, te,
                   directFire);
             if (netCoord != 0) {
-                toHit.addModifier(netCoord, Messages.getString("WeaponAttackAction.WeaponMod"));
+                toHit.addModifier(netCoord, Messages.getString("WeaponAttackAction.OSNetworkCoordination"));
             }
         }
 
@@ -1661,7 +1674,7 @@ public class ComputeToHit {
         if (te != null) {
             int demon = megamek.common.weapons.c3.OSNetworkDesignators.demonHackPenalty(game, ae, te);
             if (demon != 0) {
-                toHit.addModifier(demon, Messages.getString("WeaponAttackAction.WeaponMod"));
+                toHit.addModifier(demon, Messages.getString("WeaponAttackAction.OSDemonHacking"));
             }
         }
 
