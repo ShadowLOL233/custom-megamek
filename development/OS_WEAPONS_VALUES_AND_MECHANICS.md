@@ -2,7 +2,7 @@
 
 > 用途：把每一件 OS 武器的**具体数值**与**签名机制**并列成一份速查表，便于设计/调参/对局参考。
 >
-> **数值与机制来源**：机制文字取自 `megamek/resources/megamek/common/equipmentmessages.properties`（`EquipmentInfo.*`，均已对照武器类/handler 代码核实，2026-08-25）；纯数值（吨/临界/射程/伤害/热）取自各武器类。**BV / cost 见 `OS_WEAPONS_REFERENCE.md`**（注意那份表 2026-06-12 生成，命名仍用旧的 "Advance"＝现 "Enhanced"，且缺 HVAC / Enhanced Ultra AC / Electromagnetic Lance / Coil Augmented Railgun，需重新生成）。
+> **数值与机制来源**：机制文字取自 `megamek/resources/megamek/common/equipmentmessages.properties`（`EquipmentInfo.*`，均已对照武器类/handler 代码核实，2026-08-25；导弹系已同步至 2026-08-29 重做）；纯数值（吨/临界/射程/伤害/热）取自各武器类。**BV / cost 见 `OS_WEAPONS_REFERENCE.md`**（注意那份表 2026-06-12 生成，命名仍用旧的 "Advance"＝现 "Enhanced"，且缺 HVAC / Enhanced Ultra AC / Electromagnetic Lance / Coil Augmented Railgun，需重新生成）。
 >
 > **列含义**：dmg = 单发伤害（`cluster` = 按集束、`var` = 随射程/弹种变化）；heat = 开火热量；S/M/L/E = 短/中/远/极限射程（格）；t/c = 吨 / 临界槽。射程档位前的 `(min N)` = 最小射程。
 >
@@ -202,31 +202,35 @@ Heavy Laser 自带 **+1 命中惩罚**（Improve 版工程消除之）；Pulse �
 
 ## 导弹 — LRM
 
-核心 LRM 带 **远距档 −1 命中** + 间接火力；`(min6)` 除非 Enhanced（无最小射程）。ER-LRM 换长档 bonus 得极距。
+核心 LRM（Improve/Enhanced/Heavy）带 **远距档 −1 命中** + **内建 +2 集束**（发射器固有、不可被 ECM 压制、与 FCS 叠加）+ 间接火力；`(min6)` 除非 Enhanced（无最小射程）。ER-LRM 换长档 bonus 得极距。链接 Artemis IV FCS 给 +2 集束、Artemis V FCS 再给任意距离 −1 命中（均需对应 capable 弹）。
 
 | 武器 | rack | heat | S/M/L (min, ext) | t/c | 机制 |
 |---|--:|--:|:--:|:--:|---|
-| Improve LRM 5/10/15/20 | 5–20 | 2/4/5/6 | (min6) 7/14/24 (ext30) | 1.5–7 | OS 轻量核心 LRM，远档 −1；可间接 |
-| Enhanced LRM 5/10/15/20 | 5–20 | 2/4/5/6 | 7/14/24 (ext30) | 1–5 | 远档 −1 **且无最小射程**，Clan 重量 |
-| Heavy LRM 10/20/30 | 10–30 | 4/6/9 | (min6) 7/14/24 (ext30) | 5/10/14 | 单/Ultra 双齐射（双弹双热，**无卡壳**）；远档 −1 |
-| ER LRM 10/15/20 | 10–20 | 6/9/12 | 12/22/38 | 6/9/13 | 极距，Artemis IV 兼容；无长档 bonus |
-| Streak LRM 5/10/15/20 | 5–20 | 2/4/6/8 | (min6) 7/14/24 (ext30) | 2.5–11 | 锁定齐射（锁上则全中）；无长档 bonus |
+| Improve LRM 5/10/15/20 | 5–20 | 2/4/5/6 | (min6) 7/10/24 (ext30) | 1.5–7 | OS 轻量核心 LRM，远档 −1、内建 +2 集束；可间接 |
+| Enhanced LRM 5/10/15/20 | 5–20 | 2/4/5/6 | 7/10/24 (ext30) | 1–5 | 远档 −1、内建 +2 集束 **且无最小射程**，Clan 重量 |
+| Heavy LRM 10/20/30 | 10–30 | 4/6/9 | (min6) 7/10/24 (ext30) | 5/10/14 | 单/Ultra 双齐射（双弹双热，**无卡壳**）；远档 −1、内建 +2 集束 |
+| ER LRM 10/15/20 | 10–20 | 6/9/12 | 12/22/38 | 6/9/13 | 极距，Artemis 兼容；无长档 −1 与内建集束 |
+| Streak LRM 5/10/15/20 | 5–20 | 2/4/6/8 | (min6) 7/10/24 (ext30) | 2.5–11 | 锁定齐射（锁上则全中）；无长档 bonus |
 | Extended Streak LRM 10/15/20 | 10–20 | 6/9/12 | (min10) 12/22/38 (ext57) | 8/11/14 | 极距 + 保证命中 |
 
 ## 导弹 — SRM
 
+OS 核心 SRM（Improve/Enhanced/Heavy）带 **短档 −1 命中**（`F_OS_SRM_SHORT_SPEC`）+ **内建 +2 集束**；链接 Artemis V FCS 再给任意距离 −1（需 capable 弹）。Streak 系锁定必中、无命中修正。
+
 | 武器 | rack | heat | S/M/L (ext) | t/c | 机制 |
 |---|--:|--:|:--:|:--:|---|
-| Heavy SRM 4/6/8/12 | 4–12 | 3/4/5/7 | 4/8/12 (ext16) | 3–9 | 延伸射程；单/Ultra 双齐射（**无卡壳**） |
+| Improve SRM 2/4/6 | 2–6 | 2/3/4 | 6/8/10 (ext12) | 0.75–2 | OS 核心 SRM：短档 −1、内建 +2 集束 |
+| Enhanced SRM 2/4/6 | 2–6 | 2/3/4 | 6/8/10 (ext12) | 0.5–1.5 | Clan 效率版，同 Improve 战斗档 |
+| Heavy SRM 4/6/8/12 | 4–12 | 3/4/5/7 | 6/8/10 (ext12) | 3–9 | 单/Ultra 双齐射（**无卡壳**）；短档 −1、内建 +2 集束 |
 | Streak SRM 2/4/6/8 | 2–8 | 2/3/4/6 | 3/6/9 (ext12) | 1.25–5 | 锁定齐射，锁上全中 |
-| Improve Streak SRM 2/4/6/8 | 2–8 | 2/3/4/6 | 4/8/12 (ext16) | 1–4 | Clan 级锁定，延伸射程 |
+| Improve Streak SRM 2/4/6/8 | 2–8 | 2/3/4/6 | 6/8/10 (ext12) | 1–4 | Clan 级锁定，延伸射程 |
 
-## 导弹 — MRM（超大中距档 −1 命中；配 Diana III 再叠 −1）
+## 导弹 — MRM（超大中距档 −1 命中 + 内建 +2 集束；Diana III/IV 加集束，Diana IV 再 −1 命中）
 
 | 武器 | rack | heat | S/M/L (ext) | t/c | 机制 |
 |---|--:|--:|:--:|:--:|---|
-| Improve MRM 10/20/30/40 | 10–40 | 4/6/10/12 | 3/13/16 (ext20) | 3–12 | 巨大中距档全程 −1；配 Diana III FCS 再 −1 |
-| Streak MRM 10/20/30 | 10–30 | 4/6/10 | 3/13/16 (ext20) | 6/12/17 | 锁定 MRM，保证命中，但刻意重/占位以作权衡 |
+| Improve MRM 10/20/30/40 | 10–40 | 4/6/10/12 | 3/16/18 (ext20) | 3–12 | 巨大中距档全程 −1、内建 +2 集束；Diana III/IV 加集束，Diana IV 再 −1（需 capable 弹） |
+| Streak MRM 10/20/30 | 10–30 | 4/6/10 | 3/16/18 (ext20) | 6/12/17 | 锁定 MRM，保证命中，但刻意重/占位以作权衡 |
 
 ## 导弹 — MML（双模 LRM / SRM）
 
@@ -243,12 +247,14 @@ Heavy Laser 自带 **+1 命中惩罚**（Improve 版工程消除之）；Pulse �
 | ATM 3/6/9/12 | 3–12 | 2/4/6/8 | (min4) 5/10/15/20 | 1.5–7 | 装 LRTM / SRTM / APTM 改射程与单发伤 |
 | Improve ATM 3/6/9/12 | 3–12 | 2/4/6/8 | (min4) 5/10/15/20 | 1.5–7.5 | iATM 级，更丰富载荷、更高性能 |
 
-## 导弹 — Dragon Piercer（单枚大穿甲弹头，非集束；穿甲暴击）
+## 导弹 — Tactical Heavy Missile Launcher（原 Dragon Piercer 改名；单枚大穿甲弹头，非集束；穿甲暴击）
+
+> 内部名 / lookup 仍保留 `OSDragonPiercer*`（存档兼容）。
 
 | 武器 | dmg | heat | S/M/L | t/c | 机制 |
 |---|--:|--:|:--:|:--:|---|
-| Dragon Piercer 5/10/15/20 | 5–20 | 3/5/7/10 | 5/10/15 … 20/25/30 | 3–11 | 单枚 AP 弹头，穿甲暴击 **8+** |
-| Improve Dragon Piercer 5/10/15/20 | 5–20 | 3/5/7/10 | 同上 | 2.5–9.5 | 更轻，穿甲暴击加深到 **7+** |
+| Tactical Heavy Missile Launcher 5/10/15/20 | 5–20 | 3/5/7/10 | 5/10/15 … 20/25/30 | 3–11 | 单枚 AP 弹头，穿甲暴击 **8+** |
+| Improve THML 5/10/15/20 | 5–20 | 3/5/7/10 | 同上 | 2.5–9.5 | 更轻，穿甲暴击加深到 **7+** |
 
 ## 导弹 — Narc / 信标（0 伤，挂导引 pod）
 
@@ -258,18 +264,21 @@ Heavy Laser 自带 **+1 命中惩罚**（Improve 版工程消除之）；Pulse �
 | Seeker Missile Beacon | — | 3/6/9/12 | 2.5/2 | 轻量 Narc 信标，同 pod |
 | Munin Missile Beacon | — | 4/9/15/18 | 5/3 | iNarc 级多 pod：Homing / ECM / Haywire / Nemesis |
 
-## 导弹火控（装在发射器旁增益）
+## 导弹火控（装在发射器旁增益；均需装对应"capable"弹才生效）
 
 | 件 | t/c | 机制 |
 |---|:--:|---|
-| Artemis IV FCS (OS) | 1/1 | 与正史 Artemis IV 相同（+2 集束）——IS 复刻，仅 OS 技术基座 |
-| Diana III FCS | 1/1 | MRM 专用（对标 Apollo）：给 OS MRM **集束 bonus + 额外 −1 命中** |
+| Artemis IV FCS (OS) | 1/1 | +2 集束（仅 Artemis IV-capable 弹）；**无命中修正** |
+| Artemis V FCS (OS) | 1.5/1 | 高级 LRM/SRM 火控：+2 集束 **且任意距离 −1 命中**（仅 Artemis V-capable 弹；ECM/隐身压制集束半） |
+| Diana III FCS | 1/1 | MRM 专用（对标 Apollo）：+2 集束（仅 Diana III-capable MRM 弹）；**无命中修正** |
+| Diana IV FCS | 1.5/1 | 高级 MRM 火控：+2 集束 **且任意距离 −1 命中**（仅 Diana IV-capable MRM 弹） |
 | Orion V FCS | 1.5/2 | 高端整合：集束 **+3**（vs Artemis +2）；对 Streak 改助锁（锁定骰 −1 + 免标准 ECM 断锁） |
 
 ---
 
 ## 备注
 
+- **导弹系已按 2026-08-29 重做同步**（提交 `70ea7cf99c`）：LRM/MRM/SRM 重定射程、各专精档 −1（含新增 SRM 短档 `F_OS_SRM_SHORT_SPEC`）、核心发射器**内建 +2 集束**（不可被 ECM 压制、与 FCS 叠加）；Artemis IV / Diana III 退回**只给 +2 集束**，新增 **Artemis V / Diana IV**（1.5t）才另给任意距离 **−1 命中**（均需装对应 capable 弹）；Dragon Piercer 改名 **Tactical Heavy Missile Launcher**（内部名保留）。**BV 尚未按新强度重调。**
 - **未列的标准武器**（AC/2·5·10·20、标准 LB-X 2/5/10/20、标准 Ultra AC、PPC、ER PPC、标准大/中/小激光、Improve Gauss、无机制的 Improve/Enhanced 变体）均为 IS 复刻或纯数值版，机制与正史一致，具体 BV/吨位见 `OS_WEAPONS_REFERENCE.md`。
 - **测试状态**：本表所有武器均**仅过编译 + 装备初始化单元测试，未经对局实测**（见 `OS_COMPONENT_PLAYTEST_CHECKLIST.md`）。
 - **相关文档**：`OS_TECHBASE_DEVELOPMENT_PLAN.md`（设计/实现，§7 AC munitions、§8 Advance 动能、§2 HVAC）；`CANON_AMMO_REFERENCE.md`（弹药）；`equipmentmessages.properties`（游戏内 ⓘ info 原文）。
