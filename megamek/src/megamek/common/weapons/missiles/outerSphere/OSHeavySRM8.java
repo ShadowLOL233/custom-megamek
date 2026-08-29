@@ -40,10 +40,10 @@ public class OSHeavySRM8 extends SRMWeapon {
         sortingName = "Missile OS 3 2 1 08";
         heat = 5;
         rackSize = 8;
-        shortRange = 4;
+        shortRange = 6;
         mediumRange = 8;
-        longRange = 12;
-        extremeRange = 16;
+        longRange = 10;
+        extremeRange = 12;
         tonnage = 6.0;
         criticalSlots = 4;
         bv = 130;
@@ -51,7 +51,7 @@ public class OSHeavySRM8 extends SRMWeapon {
         shortAV = 11;
         medAV = 11;
         maxRange = RANGE_MED;
-        flags = flags.andNot(F_PROTO_WEAPON);
+        flags = flags.andNot(F_PROTO_WEAPON).or(F_OS_SRM_SHORT_SPEC);
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setIntroLevel(false)
               .setUnofficial(false)

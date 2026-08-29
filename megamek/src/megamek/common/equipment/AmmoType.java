@@ -491,10 +491,10 @@ public class AmmoType extends EquipmentType {
                 .setStaticTechLevel(SimpleTechLevel.STANDARD),
           "230, TM");
 
-    // Outer Sphere (OS) Artemis-capable munition mutator — same M_ARTEMIS_CAPABLE effect, but on the OS tech base
-    // and dated to the OS Standard tier (matching the OS Artemis IV FCS), so OS missile ammo stays OS-native.
-    private static final MunitionMutator OS_ARTEMIS_CAPABLE_MUNITION_MUTATOR = new MunitionMutator("Artemis-capable",
-          "Artemis",
+    // Outer Sphere (OS) Artemis IV-capable munition mutator — same M_ARTEMIS_CAPABLE effect, but on the OS tech
+    // base and dated to the OS Standard tier (matching the OS Artemis IV FCS), so OS missile ammo stays OS-native.
+    private static final MunitionMutator OS_ARTEMIS_CAPABLE_MUNITION_MUTATOR = new MunitionMutator("Artemis IV-capable",
+          "Artemis IV",
           1,
           Munitions.M_ARTEMIS_CAPABLE,
           new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
@@ -502,6 +502,58 @@ public class AmmoType extends EquipmentType {
                 .setTechRating(TechRating.E)
                 .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
                 .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
+                .setISApproximate(true, false, false, false, false)
+                .setPrototypeFactions(Faction.LEGION)
+                .setProductionFactions(Faction.LEGION)
+                .setStaticTechLevel(SimpleTechLevel.STANDARD),
+          "AU");
+
+    // Outer Sphere (OS) Diana III-capable MRM munition mutator — the dedicated round the Diana III MRM FCS keys
+    // off of (mirrors Artemis IV-capable). Only Diana III-capable MRM rounds unlock the FCS's +2 cluster bonus;
+    // plain MRM rounds still fire but get no FCS benefit. Dated to the Diana III FCS.
+    private static final MunitionMutator OS_DIANA_CAPABLE_MUNITION_MUTATOR = new MunitionMutator("Diana III-capable",
+          "Diana III",
+          1,
+          Munitions.M_DIANA_CAPABLE,
+          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
+                .setUnofficial(false)
+                .setTechRating(TechRating.E)
+                .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+                .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
+                .setISApproximate(true, false, false, false, false)
+                .setPrototypeFactions(Faction.LEGION)
+                .setProductionFactions(Faction.LEGION)
+                .setStaticTechLevel(SimpleTechLevel.STANDARD),
+          "AU");
+
+    // Outer Sphere (OS) Artemis V-capable munition mutator — the premium LRM/SRM round the Artemis V FCS keys off
+    // of. Distinct from Artemis IV-capable: unlocks Artemis V's +2 cluster AND -1 to-hit. Dated to Artemis V.
+    private static final MunitionMutator OS_ARTEMIS_V_CAPABLE_MUNITION_MUTATOR = new MunitionMutator("Artemis V-capable",
+          "Artemis V",
+          1,
+          Munitions.M_OS_ARTEMIS_V_CAPABLE,
+          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
+                .setUnofficial(false)
+                .setTechRating(TechRating.E)
+                .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+                .setISAdvancement(2830, 2845, 2865, DATE_NONE, DATE_NONE)
+                .setISApproximate(true, false, false, false, false)
+                .setPrototypeFactions(Faction.LEGION)
+                .setProductionFactions(Faction.LEGION)
+                .setStaticTechLevel(SimpleTechLevel.STANDARD),
+          "AU");
+
+    // Outer Sphere (OS) Diana IV-capable MRM munition mutator — the premium MRM round the Diana IV FCS keys off
+    // of. Distinct from Diana III-capable: unlocks Diana IV's +2 cluster AND -1 to-hit. Dated to Diana IV.
+    private static final MunitionMutator OS_DIANA_IV_CAPABLE_MUNITION_MUTATOR = new MunitionMutator("Diana IV-capable",
+          "Diana IV",
+          1,
+          Munitions.M_OS_DIANA_IV_CAPABLE,
+          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
+                .setUnofficial(false)
+                .setTechRating(TechRating.E)
+                .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
+                .setISAdvancement(2830, 2845, 2865, DATE_NONE, DATE_NONE)
                 .setISApproximate(true, false, false, false, false)
                 .setPrototypeFactions(Faction.LEGION)
                 .setProductionFactions(Faction.LEGION)
@@ -2526,7 +2578,18 @@ public class AmmoType extends EquipmentType {
 
         // OS Lodestar guidance beacon (dev plan §9.6) — an iNarc-attach beacon read by a networked Kestrel NTD.
         // Appended at the end to keep existing ordinals stable.
-        M_LODESTAR
+        M_LODESTAR,
+
+        // OS Diana III-capable MRM round — the special munition the Diana III FCS keys off of. The FCS cluster
+        // bonus only applies when a Diana III-capable MRM round is loaded (mirrors how Artemis needs
+        // Artemis-capable ammo). Appended at the end to keep existing ordinals stable.
+        M_DIANA_CAPABLE,
+
+        // OS premium-FCS rounds: Artemis V-capable (LRM/SRM) and Diana IV-capable (MRM). These unlock the premium
+        // Artemis V / Diana IV FCS bonuses (+2 cluster AND -1 to-hit); distinct from the IV/III-capable rounds.
+        // Appended at the end to keep existing ordinals stable.
+        M_OS_ARTEMIS_V_CAPABLE,
+        M_OS_DIANA_IV_CAPABLE
     }
 
     public static final EnumSet<AmmoType.Munitions> SMOKE_MUNITIONS = EnumSet.of(AmmoType.Munitions.M_SMOKE,
@@ -4223,6 +4286,7 @@ public class AmmoType extends EquipmentType {
         osArtemisMissileAmmos.add(AmmoType.createOSMML14SRMAmmo());
         munitions.clear();
         munitions.add(OS_ARTEMIS_CAPABLE_MUNITION_MUTATOR);
+        munitions.add(OS_ARTEMIS_V_CAPABLE_MUNITION_MUTATOR);
         AmmoType.createMunitions(osArtemisMissileAmmos, munitions);
 
         // OS SRM special munitions — full canon SRM munition set at OS Standard tier (reuses canon M_* mechanics).
@@ -4307,6 +4371,8 @@ public class AmmoType extends EquipmentType {
         munitions.add(OS_ANTI_TSM_MUNITION_MUTATOR);
         munitions.add(OS_MINE_CLEARANCE_MUNITION_MUTATOR);
         munitions.add(OS_DEAD_FIRE_MUNITION_MUTATOR);
+        munitions.add(OS_DIANA_CAPABLE_MUNITION_MUTATOR);
+        munitions.add(OS_DIANA_IV_CAPABLE_MUNITION_MUTATOR);
         AmmoType.createMunitions(osMrmMunitionAmmos, munitions);
 
         // PLAYTEST create the munition types for RAC rounds.
@@ -13051,10 +13117,10 @@ public class AmmoType extends EquipmentType {
     private static AmmoType createOSERLRM20Ammo() { return makeOSMissileAmmoBasic("ER LRM 20", "ER LRM 20", "OSERLRM20Ammo", AmmoTypeEnum.EXLRM, 20, 1, 4,  40, 120000); }
 
     // OS Dragon Piercer ammo (canon Thunderbolt ammo is OS-rejected); single concentrated missile
-    private static AmmoType createOSDragonPiercer5Ammo()  { return makeOSMissileAmmoBasic("Dragon Piercer 5",  "Dragon Piercer 5",  "OSDragonPiercer5Ammo",  AmmoTypeEnum.TBOLT_5,  5,  5,  6, 8,  30000); }
-    private static AmmoType createOSDragonPiercer10Ammo() { return makeOSMissileAmmoBasic("Dragon Piercer 10", "Dragon Piercer 10", "OSDragonPiercer10Ammo", AmmoTypeEnum.TBOLT_10, 10, 10, 4, 16, 50000); }
-    private static AmmoType createOSDragonPiercer15Ammo() { return makeOSMissileAmmoBasic("Dragon Piercer 15", "Dragon Piercer 15", "OSDragonPiercer15Ammo", AmmoTypeEnum.TBOLT_15, 15, 15, 3, 23, 70000); }
-    private static AmmoType createOSDragonPiercer20Ammo() { return makeOSMissileAmmoBasic("Dragon Piercer 20", "Dragon Piercer 20", "OSDragonPiercer20Ammo", AmmoTypeEnum.TBOLT_20, 20, 20, 2, 31, 90000); }
+    private static AmmoType createOSDragonPiercer5Ammo()  { return makeOSMissileAmmoBasic("Tactical Heavy Missile Launcher 5",  "Tactical Heavy Missile Launcher 5",  "OSDragonPiercer5Ammo",  AmmoTypeEnum.TBOLT_5,  5,  5,  6, 8,  30000); }
+    private static AmmoType createOSDragonPiercer10Ammo() { return makeOSMissileAmmoBasic("Tactical Heavy Missile Launcher 10", "Tactical Heavy Missile Launcher 10", "OSDragonPiercer10Ammo", AmmoTypeEnum.TBOLT_10, 10, 10, 4, 16, 50000); }
+    private static AmmoType createOSDragonPiercer15Ammo() { return makeOSMissileAmmoBasic("Tactical Heavy Missile Launcher 15", "Tactical Heavy Missile Launcher 15", "OSDragonPiercer15Ammo", AmmoTypeEnum.TBOLT_15, 15, 15, 3, 23, 70000); }
+    private static AmmoType createOSDragonPiercer20Ammo() { return makeOSMissileAmmoBasic("Tactical Heavy Missile Launcher 20", "Tactical Heavy Missile Launcher 20", "OSDragonPiercer20Ammo", AmmoTypeEnum.TBOLT_20, 20, 20, 2, 31, 90000); }
 
     // OS MRM ammo (canon MRM ammo is OS-rejected)
     private static AmmoType createOSMRM10Ammo() { return makeOSMissileAmmoBasic("MRM 10", "MRM 10", "OSMRM10Ammo", AmmoTypeEnum.MRM, 10, 1, 24, 7,  25000); }

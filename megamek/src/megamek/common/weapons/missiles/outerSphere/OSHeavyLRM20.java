@@ -41,6 +41,7 @@ public class OSHeavyLRM20 extends LRMWeapon {
         heat = 6;
         rackSize = 20;
         minimumRange = 6;
+        mediumRange = 10;
         tonnage = 10.0;
         criticalSlots = 5;
         bv = 316;

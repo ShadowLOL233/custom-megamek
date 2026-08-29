@@ -172,5 +172,8 @@ public enum WeaponTypeFlag implements EquipmentFlag {
     F_OS_LRM_LONG_SPEC,
 
     /** OS core MRM (medium-range specialist): -1 to-hit inside its (huge) medium range bracket. */
-    F_OS_MRM_MEDIUM_SPEC
+    F_OS_MRM_MEDIUM_SPEC,
+
+    /** OS core SRM (short-range specialist): -1 to-hit inside its short range bracket. */
+    F_OS_SRM_SHORT_SPEC
 }

@@ -29,9 +29,10 @@ public class OSImproveDragonPiercer20 extends Thunderbolt20Weapon {
 
     public OSImproveDragonPiercer20() {
         super();
-        name = "Improve Dragon Piercer 20";
+        name = "Improve Tactical Heavy Missile Launcher 20";
         setInternalName("OSImproveDragonPiercer20");
         addLookupName("OS Improve Dragon Piercer 20");
+        addLookupName("Improve Dragon Piercer 20");
         sortingName = "Dragon Piercer OS 2 Improve 20";
         tonnage = 12.0;
         criticalSlots = 4;

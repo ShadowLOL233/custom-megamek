@@ -1411,6 +1411,21 @@ public class ComputeToHit {
     }
 
     /**
+     * True when an OS missile launcher has a working linked Artemis V FCS and an Artemis V-capable round loaded, so
+     * the OS LRM/SRM range-specialist gains its extra -1 to-hit. Mirrors the Diana IV gate on OS MRM. (Plain
+     * Artemis IV only grants the +2 cluster bonus, no to-hit.)
+     */
+    private static boolean osArtemisVActive(Mounted<?> weapon, AmmoType ammoType) {
+        return (weapon != null) && (weapon.getLinkedBy() != null)
+              && (weapon.getLinkedBy().getType() instanceof megamek.common.equipment.MiscType fcs)
+              && fcs.hasFlag(megamek.common.equipment.MiscType.F_OS_ARTEMIS_V)
+              && !weapon.getLinkedBy().isDestroyed() && !weapon.getLinkedBy().isMissing()
+              && !weapon.getLinkedBy().isBreached()
+              && (ammoType != null)
+              && ammoType.getMunitionType().contains(megamek.common.equipment.AmmoType.Munitions.M_OS_ARTEMIS_V_CAPABLE);
+    }
+
+    /**
      * Convenience method that compiles the ToHit modifiers applicable to the weapon being fired Got a heavy large laser
      * that gets a +1 TH penalty? You'll find that here. Bonuses related to the attacker's condition? Ammunition being
      * used? Those are in other methods.
@@ -1629,29 +1644,51 @@ public class ComputeToHit {
         }
 
         // OS LRM (long-range bombardment specialist): -1 to-hit in the long range bracket and beyond — the
-        // standoff artillery walks salvos onto distant targets. Priced into the BV.
+        // standoff artillery walks salvos onto distant targets. A linked Artemis V FCS adds a further -1 at ANY
+        // range when firing Artemis V-capable rounds. Priced into the BV.
         if (target != null && weaponType.hasFlag(megamek.common.equipment.WeaponTypeFlag.F_OS_LRM_LONG_SPEC)) {
             int nRange = ae.getPosition().distance(target.getPosition());
             int[] nRanges = weaponType.getRanges(weapon, ammo);
             if (nRange > nRanges[RangeType.RANGE_MEDIUM]) {
                 toHit.addModifier(-1, Messages.getString("WeaponAttackAction.OSLrmLongSpec"));
             }
+            if (osArtemisVActive(weapon, ammoType)) {
+                toHit.addModifier(-1, Messages.getString("WeaponAttackAction.OSArtemisV"));
+            }
         }
 
-        // OS MRM (medium-range specialist): -1 to-hit inside its huge medium range bracket; a linked Diana III
-        // FCS adds a further -1. No bonus at short or long range. Priced into the BV.
+        // OS MRM (medium-range specialist): -1 to-hit inside its huge medium range bracket. A linked Diana IV
+        // FCS adds a further -1 at ANY range when firing Diana IV-capable rounds. No base bonus at short or long
+        // range. Priced into the BV. (Plain Diana III only grants the +2 cluster bonus, no to-hit.)
         if (target != null && weaponType.hasFlag(megamek.common.equipment.WeaponTypeFlag.F_OS_MRM_MEDIUM_SPEC)) {
             int nRange = ae.getPosition().distance(target.getPosition());
             int[] nRanges = weaponType.getRanges(weapon, ammo);
             if ((nRange > nRanges[RangeType.RANGE_SHORT]) && (nRange <= nRanges[RangeType.RANGE_MEDIUM])) {
                 toHit.addModifier(-1, Messages.getString("WeaponAttackAction.OSMrmMediumSpec"));
-                if ((weapon != null) && (weapon.getLinkedBy() != null)
-                      && (weapon.getLinkedBy().getType() instanceof megamek.common.equipment.MiscType fcs)
-                      && fcs.hasFlag(megamek.common.equipment.MiscType.F_DIANA_III)
-                      && !weapon.getLinkedBy().isDestroyed() && !weapon.getLinkedBy().isMissing()
-                      && !weapon.getLinkedBy().isBreached()) {
-                    toHit.addModifier(-1, Messages.getString("WeaponAttackAction.OSDianaIII"));
-                }
+            }
+            if ((weapon != null) && (weapon.getLinkedBy() != null)
+                  && (weapon.getLinkedBy().getType() instanceof megamek.common.equipment.MiscType fcs)
+                  && fcs.hasFlag(megamek.common.equipment.MiscType.F_OS_DIANA_IV)
+                  && !weapon.getLinkedBy().isDestroyed() && !weapon.getLinkedBy().isMissing()
+                  && !weapon.getLinkedBy().isBreached()
+                  && (ammoType != null)
+                  && ammoType.getMunitionType().contains(megamek.common.equipment.AmmoType.Munitions.M_OS_DIANA_IV_CAPABLE)) {
+                // FCS bonus only with a Diana IV-capable MRM round loaded (matches the cluster gate in
+                // MissileWeaponHandler); applies at any range.
+                toHit.addModifier(-1, Messages.getString("WeaponAttackAction.OSDianaIV"));
+            }
+        }
+
+        // OS SRM (short-range specialist): -1 to-hit inside its short range bracket — the close-in brawler. A
+        // linked Artemis V FCS adds a further -1 at ANY range when firing Artemis V-capable rounds. Priced into BV.
+        if (target != null && weaponType.hasFlag(megamek.common.equipment.WeaponTypeFlag.F_OS_SRM_SHORT_SPEC)) {
+            int nRange = ae.getPosition().distance(target.getPosition());
+            int[] nRanges = weaponType.getRanges(weapon, ammo);
+            if (nRange <= nRanges[RangeType.RANGE_SHORT]) {
+                toHit.addModifier(-1, Messages.getString("WeaponAttackAction.OSSrmShortSpec"));
+            }
+            if (osArtemisVActive(weapon, ammoType)) {
+                toHit.addModifier(-1, Messages.getString("WeaponAttackAction.OSArtemisV"));
             }
         }
 

@@ -29,9 +29,10 @@ public class OSDragonPiercer20 extends Thunderbolt20Weapon {
 
     public OSDragonPiercer20() {
         super();
-        name = "Dragon Piercer 20";
+        name = "Tactical Heavy Missile Launcher 20";
         setInternalName("OSDragonPiercer20");
         addLookupName("OS Dragon Piercer 20");
+        addLookupName("Dragon Piercer 20");
         sortingName = "Dragon Piercer OS 1 Base 20";
         tonnage = 15.0;
         bv = 305;

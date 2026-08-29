@@ -34,8 +34,8 @@ public class OSImproveMRM20 extends OSMRMWeapon {
         rackSize = 20;
         minimumRange = 0;
         shortRange = 3;
-        mediumRange = 13;
-        longRange = 16;
+        mediumRange = 16;
+        longRange = 18;
         extremeRange = 20;
         tonnage = 7.0;
         criticalSlots = 3;

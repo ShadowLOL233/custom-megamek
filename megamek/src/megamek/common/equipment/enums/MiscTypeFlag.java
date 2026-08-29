@@ -92,8 +92,10 @@ public enum MiscTypeFlag implements EquipmentFlag {
     F_ARTEMIS_V,
 
     // Outer Sphere (OS) missile fire-control systems
-    F_DIANA_III, // OS MRM-dedicated FCS (Apollo replacement): cluster bonus + extra -1 to-hit
-    F_ORION_V,   // OS integration FCS: +3 cluster on missiles, lock assist for Streak
+    F_DIANA_III,    // OS MRM-dedicated FCS (Apollo replacement): +2 cluster
+    F_ORION_V,      // OS integration FCS: +3 cluster on missiles, lock assist for Streak
+    F_OS_ARTEMIS_V, // OS premium LRM/SRM FCS: +2 cluster (like Artemis IV) AND extra -1 to-hit
+    F_OS_DIANA_IV,  // OS premium MRM FCS: +2 cluster (like Diana III) AND extra -1 to-hit
 
     F_BATTLEMEK_NIU,
     F_DNI_COCKPIT_MOD,

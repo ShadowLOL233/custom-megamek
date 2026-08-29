@@ -30,6 +30,7 @@ public class OSImproveLRM15 extends LRMWeapon {
         heat = 5;
         rackSize = 15;
         minimumRange = 6;
+        mediumRange = 10;
         tonnage = 5.0;
         criticalSlots = 3;
         bv = 156;

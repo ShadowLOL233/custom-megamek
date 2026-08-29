@@ -225,9 +225,38 @@ public class MissileWeaponHandler extends AmmoWeaponHandler {
               && (mLinker.getType() instanceof MiscType)
               && !mLinker.isDestroyed() && !mLinker.isMissing()
               && !mLinker.isBreached() && mLinker.getType().hasFlag(MiscType.F_DIANA_III))
-              && (ammoType.getAmmoType() == AmmoType.AmmoTypeEnum.MRM)) {
-            // OS Diana III MRM FCS: cluster bonus (the additional -1 to-hit is applied where the OS
-            // MRM weapon resolves its attack roll).
+              && (ammoType.getAmmoType() == AmmoType.AmmoTypeEnum.MRM)
+              && ammoType.getMunitionType().contains(AmmoType.Munitions.M_DIANA_CAPABLE)) {
+            // OS Diana III MRM FCS: +2 cluster, only with a Diana III-capable MRM round loaded.
+            nMissilesModifier += 2;
+        } else if (((mLinker != null)
+              && (mLinker.getType() instanceof MiscType)
+              && !mLinker.isDestroyed() && !mLinker.isMissing()
+              && !mLinker.isBreached() && mLinker.getType().hasFlag(MiscType.F_OS_ARTEMIS_V))
+              && (ammoType.getMunitionType().contains(AmmoType.Munitions.M_OS_ARTEMIS_V_CAPABLE))) {
+            // OS Artemis V FCS: +2 cluster (same as Artemis IV) with an Artemis V-capable round; the extra -1
+            // to-hit is applied in ComputeToHit. ECM/stealth suppress the cluster half.
+            if (bECMAffected) {
+                Report r = new Report(3330);
+                r.subject = subjectId;
+                r.newlines = 0;
+                vPhaseReport.addElement(r);
+            } else if (bMekTankStealthActive) {
+                Report r = new Report(3335);
+                r.subject = subjectId;
+                r.newlines = 0;
+                vPhaseReport.addElement(r);
+            } else {
+                nMissilesModifier += 2;
+            }
+        } else if (((mLinker != null)
+              && (mLinker.getType() instanceof MiscType)
+              && !mLinker.isDestroyed() && !mLinker.isMissing()
+              && !mLinker.isBreached() && mLinker.getType().hasFlag(MiscType.F_OS_DIANA_IV))
+              && (ammoType.getAmmoType() == AmmoType.AmmoTypeEnum.MRM)
+              && ammoType.getMunitionType().contains(AmmoType.Munitions.M_OS_DIANA_IV_CAPABLE)) {
+            // OS Diana IV MRM FCS: +2 cluster, only with a Diana IV-capable round; the extra -1 to-hit is in
+            // ComputeToHit.
             nMissilesModifier += 2;
         } else if (((mLinker != null)
               && (mLinker.getType() instanceof MiscType)

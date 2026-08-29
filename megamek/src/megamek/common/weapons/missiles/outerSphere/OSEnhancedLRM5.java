@@ -31,7 +31,8 @@ public class OSEnhancedLRM5 extends LRMWeapon {
         sortingName = "Missile OS 1 1 3 05";
         heat = 2;
         rackSize = 5;
-        minimumRange = 0;
+        minimumRange = 6;
+        mediumRange = 10;
         tonnage = 1.0;
         criticalSlots = 1;
         bv = 59;

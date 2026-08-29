@@ -29,9 +29,10 @@ public class OSImproveDragonPiercer5 extends Thunderbolt5Weapon {
 
     public OSImproveDragonPiercer5() {
         super();
-        name = "Improve Dragon Piercer 5";
+        name = "Improve Tactical Heavy Missile Launcher 5";
         setInternalName("OSImproveDragonPiercer5");
         addLookupName("OS Improve Dragon Piercer 5");
+        addLookupName("Improve Dragon Piercer 5");
         sortingName = "Dragon Piercer OS 2 Improve 05";
         tonnage = 2.5;
         bv = 64;

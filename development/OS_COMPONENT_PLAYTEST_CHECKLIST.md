@@ -14,6 +14,14 @@
 
 ## 一、导弹系（优先级 P1）
 
+> **状态更新 2026-08-29 — 已进行初步对局测试，正在修改细节中。** 导弹三族做了第二轮重做，当前设计（数值以本更新为准，下方 2026-07-31 首版表保留作对照）：
+> - **射程**：LRM min6·7/10/24/30；MRM 3/16/18/20；SRM（含 Heavy）6/8/10/12。
+> - **专精档命中**：LRM 远 −1 / MRM 中 −1 / SRM 近 −1（新增旗标 `F_OS_SRM_SHORT_SPEC`）。
+> - **集束**：OS 核心导弹内建 **+2 集束**（`WeaponHandler.getClusterModifiers`，按 spec 旗标门控）；FCS 再叠 +2（满配 +4）。约 +21% 命中。
+> - **FCS 分级**：Artemis IV / Diana III = 纯 +2 集束；**新增 Artemis V / Diana IV = +2 集束 + −1 命中**，各需专属弹（Artemis IV/V-capable、Diana III/IV-capable）。
+> - **改名**：Dragon Piercer → Tactical Heavy Missile Launcher（内部名保留）。
+> - ⏳ 待办：BV 未按新强度重算；FCS 吨位/成本/技术年代为初定值；细节按实测手感继续调整。详见 `开发日志.md` 2026-08-29 条。
+
 ### 1. OS 导弹射程专精三角 SRM / MRM / LRM（重设计，2026-07-31）
 **改动**：把三大集束导弹族重做成短/中/远专精。射程档为纯数据字段；括号内 −1 命中在 `ComputeToHit` 里按射程档给出，旗标 `F_OS_LRM_LONG_SPEC` / `F_OS_MRM_MEDIUM_SPEC`。
 

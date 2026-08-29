@@ -132,6 +132,8 @@ public class MiscType extends EquipmentType {
     // Outer Sphere (OS) missile fire-control systems
     public static final MiscTypeFlag F_DIANA_III = MiscTypeFlag.F_DIANA_III;
     public static final MiscTypeFlag F_ORION_V = MiscTypeFlag.F_ORION_V;
+    public static final MiscTypeFlag F_OS_ARTEMIS_V = MiscTypeFlag.F_OS_ARTEMIS_V;
+    public static final MiscTypeFlag F_OS_DIANA_IV = MiscTypeFlag.F_OS_DIANA_IV;
     // TODO: Implement me, so far only construction data
     public static final MiscTypeFlag F_TRACKS = MiscTypeFlag.F_TRACKS;
     // TODO: Implement me, so far only construction data
@@ -1767,7 +1769,9 @@ public class MiscType extends EquipmentType {
         EquipmentType.addType(MiscType.createCLArtemis());
         // Outer Sphere (OS) missile fire-control systems
         EquipmentType.addType(MiscType.createOSArtemis());
+        EquipmentType.addType(MiscType.createOSArtemisV());
         EquipmentType.addType(MiscType.createOSDianaIII());
+        EquipmentType.addType(MiscType.createOSDianaIV());
         EquipmentType.addType(MiscType.createOSOrionV());
         EquipmentType.addType(MiscType.createGECM());
         EquipmentType.addType(MiscType.createGECMPrototype());
@@ -7363,9 +7367,43 @@ public class MiscType extends EquipmentType {
         return misc;
     }
 
-    // Outer Sphere (OS) Diana III FCS: MRM-dedicated, replaces/upgrades the IS Apollo. Grants the
-    // OS MRM both a cluster bonus and an additional -1 to-hit (the to-hit half is applied where the
-    // OS MRM weapon resolves its attack roll; the cluster half is applied in MissileWeaponHandler).
+    // Outer Sphere (OS) Artemis V FCS: the premium LRM/SRM fire-control. Like Artemis IV it grants +2 to the
+    // cluster roll, but ADDS an extra -1 to-hit — both only when firing Artemis V-capable rounds. The cluster
+    // half is applied in MissileWeaponHandler; the to-hit half in ComputeToHit.
+    public static MiscType createOSArtemisV() {
+        MiscType misc = new MiscType();
+
+        misc.name = "Artemis V FCS";
+        misc.setInternalName("OSArtemisV");
+        misc.addLookupName("OS Artemis V FCS");
+        misc.tonnage = 1.5f;
+        misc.criticalSlots = 1;
+        misc.tankSlots = 0;
+        misc.cost = 250000;
+        misc.flags = misc.flags.or(F_OS_ARTEMIS_V,
+              F_WEAPON_ENHANCEMENT,
+              F_MEK_EQUIPMENT,
+              F_TANK_EQUIPMENT,
+              F_SUPPORT_TANK_EQUIPMENT,
+              F_FIGHTER_EQUIPMENT,
+              F_HEAVY_EQUIPMENT);
+        misc.rulesRefs = "OS";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setIntroLevel(false)
+              .setUnofficial(false)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
+              .setISAdvancement(2830, 2845, 2865, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+        return misc;
+    }
+
+    // Outer Sphere (OS) Diana III FCS: MRM-dedicated, replaces/upgrades the IS Apollo. Grants the OS MRM a +2
+    // cluster bonus when firing Diana III-capable rounds (applied in MissileWeaponHandler). The premium Diana IV
+    // adds an extra -1 to-hit on top.
     public static MiscType createOSDianaIII() {
         MiscType misc = new MiscType();
 
@@ -7391,6 +7429,41 @@ public class MiscType extends EquipmentType {
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
+              .setISApproximate(true, false, false, false, false)
+              .setPrototypeFactions(Faction.LEGION)
+              .setProductionFactions(Faction.LEGION)
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+        return misc;
+    }
+
+    // Outer Sphere (OS) Diana IV FCS: the premium MRM fire-control. Like Diana III it grants +2 to the cluster
+    // roll, but ADDS an extra -1 to-hit — both only when firing Diana IV-capable MRM rounds. The cluster half is
+    // applied in MissileWeaponHandler; the to-hit half in ComputeToHit.
+    public static MiscType createOSDianaIV() {
+        MiscType misc = new MiscType();
+
+        misc.name = "Diana IV FCS";
+        misc.setInternalName("OSDianaIV");
+        misc.addLookupName("OS Diana IV FCS");
+        misc.addLookupName("Diana IV MRM FCS");
+        misc.tonnage = 1.5f;
+        misc.criticalSlots = 1;
+        misc.tankSlots = 0;
+        misc.cost = 300000;
+        misc.flags = misc.flags.or(F_OS_DIANA_IV,
+              F_WEAPON_ENHANCEMENT,
+              F_MEK_EQUIPMENT,
+              F_TANK_EQUIPMENT,
+              F_SUPPORT_TANK_EQUIPMENT,
+              F_FIGHTER_EQUIPMENT,
+              F_HEAVY_EQUIPMENT);
+        misc.rulesRefs = "OS";
+        misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
+              .setIntroLevel(false)
+              .setUnofficial(false)
+              .setTechRating(TechRating.E)
+              .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
+              .setISAdvancement(2830, 2845, 2865, DATE_NONE, DATE_NONE)
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)

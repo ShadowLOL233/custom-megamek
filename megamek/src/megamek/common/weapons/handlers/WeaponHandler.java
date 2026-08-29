@@ -2139,6 +2139,15 @@ public class WeaponHandler implements AttackHandler, Serializable {
     protected int getClusterModifiers(boolean clusterRangePenalty) {
         int nMissilesModifier = getSalvoBonus();
 
+        // OS core missile launchers (LRM/MRM/SRM range-specialists) put more missiles on target: a built-in +2
+        // cluster-roll bonus, inherent to the launcher (not ECM-suppressible) and stacking with any linked FCS
+        // (Artemis IV / Diana III). dev plan §missile-redesign.
+        if ((weaponType != null) && (weaponType.hasFlag(WeaponType.F_OS_LRM_LONG_SPEC)
+              || weaponType.hasFlag(WeaponType.F_OS_MRM_MEDIUM_SPEC)
+              || weaponType.hasFlag(WeaponType.F_OS_SRM_SHORT_SPEC))) {
+            nMissilesModifier += 2;
+        }
+
         int[] ranges = weaponType.getRanges(weapon);
         if (clusterRangePenalty && game.getOptions()
               .booleanOption(OptionsConstants.ADVANCED_COMBAT_TAC_OPS_CLUSTER_HIT_PEN)) {

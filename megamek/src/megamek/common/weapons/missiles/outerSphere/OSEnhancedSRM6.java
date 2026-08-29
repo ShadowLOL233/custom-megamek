@@ -31,9 +31,9 @@ public class OSEnhancedSRM6 extends SRMWeapon {
         sortingName = "Missile OS 3 1 3 06";
         heat = 4;
         rackSize = 6;
-        shortRange = 3;
-        mediumRange = 6;
-        longRange = 9;
+        shortRange = 6;
+        mediumRange = 8;
+        longRange = 10;
         extremeRange = 12;
         tonnage = 1.5;
         criticalSlots = 1;
@@ -41,7 +41,7 @@ public class OSEnhancedSRM6 extends SRMWeapon {
         cost = 104000;
         shortAV = 8;
         maxRange = RANGE_SHORT;
-        flags = flags.andNot(F_PROTO_WEAPON);
+        flags = flags.andNot(F_PROTO_WEAPON).or(F_OS_SRM_SHORT_SPEC);
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setIntroLevel(false)
               .setUnofficial(false)

@@ -29,9 +29,10 @@ public class OSDragonPiercer15 extends Thunderbolt15Weapon {
 
     public OSDragonPiercer15() {
         super();
-        name = "Dragon Piercer 15";
+        name = "Tactical Heavy Missile Launcher 15";
         setInternalName("OSDragonPiercer15");
         addLookupName("OS Dragon Piercer 15");
+        addLookupName("Dragon Piercer 15");
         sortingName = "Dragon Piercer OS 1 Base 15";
         tonnage = 11.0;
         bv = 229;
