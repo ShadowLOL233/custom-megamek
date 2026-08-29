@@ -3100,7 +3100,10 @@ public class TWDamageManager implements IDamageManager {
         mods.ferroLamellorArmor = isMekTankAero &&
               (armorTypeAtLoc == EquipmentType.T_ARMOR_FERRO_LAMELLOR
                     || armorTypeAtLoc == EquipmentType.T_ARMOR_OS_FERRO_LAMELLOR
-                    || armorTypeAtLoc == EquipmentType.T_ARMOR_OS_HEAVY_FERRO_LAMELLOR);
+                    || armorTypeAtLoc == EquipmentType.T_ARMOR_OS_HEAVY_FERRO_LAMELLOR
+                    // Hardened Heavy Ferro-Lamellor stacks both reductions: the Ferro-Lamellor -20% here plus the
+                    // Hardened halving below (net ~0.4x incoming damage).
+                    || armorTypeAtLoc == EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FERRO_LAMELLOR);
         mods.hardenedArmor = isMekOrTank &&
               (armorTypeAtLoc == EquipmentType.T_ARMOR_HARDENED
                     || armorTypeAtLoc == EquipmentType.T_ARMOR_OS_IMP_HARDENED
@@ -3362,6 +3365,18 @@ public class TWDamageManager implements IDamageManager {
         if (!ammoExplosion && (entity.getArmor(hit) > 0) && !damageIS) {
             int tmpDamageHold = -1;
             int origDamage = damage;
+
+            // Hardened Heavy Ferro-Lamellor: flag (in yellow) that both special defensive layers are engaging,
+            // unless the hit ignores damage reduction (AP / AP-missile / ignores-reduction).
+            if ((entity.getArmorType(hit.getLocation()) == EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FERRO_LAMELLOR)
+                  && (hit.getGeneralDamageType() != HitData.DAMAGE_ARMOR_PIERCING)
+                  && (hit.getGeneralDamageType() != HitData.DAMAGE_ARMOR_PIERCING_MISSILE)
+                  && (hit.getGeneralDamageType() != HitData.DAMAGE_IGNORES_DMG_REDUCTION)) {
+                report = new Report(1275);
+                report.subject = entityId;
+                report.indent(3);
+                reportVec.addElement(report);
+            }
 
             if (ferroLamellorArmor &&
                   (hit.getGeneralDamageType() != HitData.DAMAGE_ARMOR_PIERCING) &&

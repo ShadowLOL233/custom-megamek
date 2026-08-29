@@ -383,6 +383,31 @@ Tractor/Trailer, Armored/Heavy Chassis, Turrets (Head/Quad/Shoulder/Sponson/Pint
 
 ## 5. Open tuning / review items
 
+- **✅ FIX LANDED 2026-08-29 (unplaytested) — was a blocking bug: OS armors lost their type on MTF save+load, so
+  every type-based armor effect silently failed.** Symptom (in-game, after a clean rebuild): Hardened Heavy
+  Ferro-Lamellor shows **no** damage reduction at all — no Hardened halving, no Ferro-Lamellor −20%, and the new
+  yellow report `1275` never fires. **Root cause:** the MTF round-trip keys off the armor's **display name**,
+  which is *not* a lookup key.
+  - **Save:** `EquipmentType.getArmorTypeName(type)` (EquipmentType L935) → `ArmorType.of(type).getName()` → the
+    display name, e.g. `"Hardened Heavy Ferro-Lamellor (OS)"`, written as the MTF `Armor:<name>(<techlevel>)` line.
+  - **Load:** `MtfFile` (L419-422) strips only the trailing tech paren → `"Hardened Heavy Ferro-Lamellor (OS)"` →
+    `Entity.setArmorType(String)` (L11723) → `EquipmentType.get("Hardened Heavy Ferro-Lamellor (OS)")`.
+  - `EquipmentType.get` resolves **only internalName / lookup names, NOT the display `name`** (see its javadoc at
+    EquipmentType L847; `addLookupName` L842-844; `get` L856-861). OS armors register internalName `"OS <X>"` +
+    "Legion …" lookups but **never the display `"<X> (OS)"`** → `get(displayName)` returns **null** →
+    `setArmorType(T_ARMOR_UNKNOWN)`.
+  - Net: at runtime `getArmorType(loc)` is `T_ARMOR_UNKNOWN` (not 66/67/68), so `TWDamageManager.updateArmorTypeMap`
+    never flags hardened/ferroLamellor and no reduction/report runs. **Affects ALL OS armors on save/load; only
+    *visible* for reduction armors (Ferro-Lamellor / Reactive / Hardened / …).** HHFL is just the first
+    reduction-carrying OS armor that got combat-tested.
+  - **Fix (LANDED):** one central change in `ArmorType.addArmorType` — for OS-tech-base armors, also
+    `at.addLookupName(at.getName())` so the display name `"<X> (OS)"` becomes an `EquipmentType.get` key. Covers
+    all current + future OS armors in one spot; `:megamek:compileJava` + `*EquipmentType*`/`*ArmorType*` tests pass.
+    **Still needs an in-game verify:** build a Hardened-Heavy-Ferro-Lamellor mek → save → reload → confirm
+    `getArmorType(0)` is the OS type and the Hardened/Ferro-Lamellor reductions + report `1275` now fire.
+  - **BLK** (`BLKFile` L463/912 stores the numeric `getArmorType()` per location) should already round-trip, but
+    verify. With the round-trip fixed, the earlier Ferro-Lamellor stacking + report `1275` now take effect.
+    (Independent: the megameklab head-armor >9 fix is unaffected.)
 - ~~HVAC stat tables (§2)~~ — **DONE (2026-07-06):** user-approved draft shipped as Enhanced HVAC (§2).
 - ~~Decide OS HVAC ammo~~ — **DONE:** reused canon `HYPER_VELOCITY` (HVAC base/handler keyed to it), not a
   dedicated enum.
@@ -390,6 +415,14 @@ Tractor/Trailer, Armored/Heavy Chassis, Turrets (Head/Quad/Shoulder/Sponson/Pint
   per the §0.2 tier ladder.
 - Earlier memory note said "base/Improve → static Advanced"; corrected to **STANDARD** per code — keep
   this in mind when copying tech fields.
+- **Reporting convention — yellow "special armor mitigation active" notice [rollout TODO, added 2026-08-29]:**
+  whenever a special *damage-reducing* armor mitigates a hit, print a **yellow** round-report line confirming
+  its defensive mechanic engaged, so players can verify at a glance that it is working. **Established** for
+  Hardened Heavy Ferro-Lamellor (`report-messages.properties` 1275, inline `<font color='FFCC00'>`, fired in
+  `TWDamageManager.applyEntityArmorDamage` on non-AP hits). **TODO: extend to every reduction armor** — canon
+  Reflective / Reactive / Ferro-Lamellor / Ballistic-Reinforced / Hardened and the OS variants (Imp Reactive,
+  Energy Absorption, Laser Reflective, OS Ferro-Lamellor / Heavy Ferro-Lamellor, OS Hardened family) — each
+  getting its own yellow confirmation line beside the existing reduction report (6067/6068/6073/6069/6088 …).
 
 ---
 

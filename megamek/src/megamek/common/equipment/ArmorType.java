@@ -224,6 +224,12 @@ public class ArmorType extends MiscType {
         if (at.techAdvancement.getTechBase() == TechBase.OUTER_SPHERE) {
             armorTypeLookupIS.put(at.armorType, at);
             armorTypeLookupClan.put(at.armorType, at);
+            // OS armors save/load by their DISPLAY name "<X> (OS)" (MTF writes getArmorTypeName -> getName();
+            // Entity.setArmorType(String) skips the IS/Clan prefix for OS names and calls EquipmentType.get on it).
+            // But EquipmentType.get resolves only internal/lookup names, never the display name - so register the
+            // display name as a lookup here, otherwise the round-trip falls back to T_ARMOR_UNKNOWN and every
+            // type-based armor effect (Hardened/Ferro-Lamellor reduction, reports) silently fails.
+            at.addLookupName(at.getName());
         }
     }
 
