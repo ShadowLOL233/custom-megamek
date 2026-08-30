@@ -1383,13 +1383,14 @@ public class TestMek extends TestEntity {
             }
         }
 
-        // OS Combat Computer System (dev plan §9) legality
-        if ((hasCCModule || hasComposite) && !hasCombatComputer) {
+        // OS Combat Computer System (dev plan §9) legality. Specialized modules require the C-2500 core; the
+        // T-1800 Composite is standalone (no core).
+        if (hasCCModule && !hasCombatComputer) {
             buff.append("Combat Computer System modules require a Combat Computer Core.\n");
             illegal = true;
         }
         if (hasComposite && hasCCModule) {
-            buff.append("The Composite Targeting Computer is incompatible with specialized CC modules.\n");
+            buff.append("The T-1800 Composite Fire Control Module is incompatible with specialized CC modules.\n");
             illegal = true;
         }
         // OS Battle Computer System (dev plan §9.1): at most one BCS core per mek (the B-2500 and the Advance cores

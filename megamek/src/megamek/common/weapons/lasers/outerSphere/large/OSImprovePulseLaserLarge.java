@@ -17,7 +17,7 @@ import megamek.common.weapons.lasers.PulseLaserWeapon;
 
 /**
  * Outer Sphere Improved Large Pulse Laser
- * Damage 9 / Heat 10 / Range 3-7-10 / -2 ToHit, 6t / 2 crit
+ * Damage 9 / Heat 10 / Range 4-8-12 / -2 ToHit, 6t / 2 crit
  */
 public class OSImprovePulseLaserLarge extends PulseLaserWeapon {
     @Serial
@@ -33,10 +33,10 @@ public class OSImprovePulseLaserLarge extends PulseLaserWeapon {
         heat = 10;
         damage = 9;
         toHitModifier = -2;
-        shortRange = 3;
-        mediumRange = 7;
-        longRange = 10;
-        extremeRange = 15;
+        shortRange = 4;
+        mediumRange = 8;
+        longRange = 12;
+        extremeRange = 16;
         waterShortRange = 2;
         waterMediumRange = 5;
         waterLongRange = 7;
