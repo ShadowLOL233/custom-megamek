@@ -3,12 +3,13 @@
     <Properties>
         <Property name="layout">%d{ABSOLUTE} %-5p [%logger{36}] {%t}%n%l - %m%n%ex%n</Property>
         <Property name="tsvLayout">%d{ABSOLUTE}\t%p\t[%logger{36}]\t{%t}\t%l\t%m\t%ex%n</Property>
+        <Property name="logsDir">${sys:mm.logsDir:-logs}</Property>
     </Properties>
 
     <Appenders>
         <RollingFile name="UnifiedLog"
-                     fileName="logs/unified_log.log"
-                     filePattern="logs/unified_log_%i.log.gz"
+                     fileName="${logsDir}/unified_log.log"
+                     filePattern="${logsDir}/unified_log_%i.log.gz"
                      append="true"
                      bufferedIO="false">
             <PatternLayout pattern="${layout}" />
@@ -18,15 +19,15 @@
             </Policies>
 
             <DefaultRolloverStrategy max="10">
-                <Delete basePath="logs" maxDepth="1">
+                <Delete basePath="${logsDir}" maxDepth="1">
                     <IfFileName regex="(unified_log|bot_path_ranker)_\d+\.log(\.gz)?$" />
                     <IfAccumulatedFileSize exceeds="15MB" />
                 </Delete>
             </DefaultRolloverStrategy>
         </RollingFile>
         <RollingFile name="BotLog"
-                     fileName="logs/bot_path_ranker.log"
-                     filePattern="logs/bot_path_ranker_%i.log.gz"
+                     fileName="${logsDir}/bot_path_ranker.log"
+                     filePattern="${logsDir}/bot_path_ranker_%i.log.gz"
                      append="true"
                      bufferedIO="false">
             <PatternLayout pattern="${tsvLayout}" />
@@ -36,19 +37,19 @@
             </Policies>
 
             <DefaultRolloverStrategy max="5">
-                <Delete basePath="logs" maxDepth="1">
+                <Delete basePath="${logsDir}" maxDepth="1">
                     <IfFileName regex="(unified_log|bot_path_ranker)_\d+\.log(\.gz)?$" />
                     <IfAccumulatedFileSize exceeds="15MB" />
                 </Delete>
             </DefaultRolloverStrategy>
         </RollingFile>
-        <File name="MegaMekLog" fileName="logs/megamek.log" append="false">
+        <File name="MegaMekLog" fileName="${logsDir}/megamek.log" append="false">
             <PatternLayout pattern="${layout}" />
         </File>
-        <File name="MegaMekLabLog" fileName="logs/megameklab.log" append="false">
+        <File name="MegaMekLabLog" fileName="${logsDir}/megameklab.log" append="false">
             <PatternLayout pattern="${layout}" />
         </File>
-        <File name="MekHQLog" fileName="logs/mekhq.log" append="false">
+        <File name="MekHQLog" fileName="${logsDir}/mekhq.log" append="false">
             <PatternLayout pattern="${layout}" />
         </File>
         <Console name="dev">
