@@ -49,7 +49,7 @@ public class OSImproveATM6 extends OSATMWeapon {
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
-              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
     }
 
     @Override

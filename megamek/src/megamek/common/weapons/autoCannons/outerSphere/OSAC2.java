@@ -62,7 +62,7 @@ public class OSAC2 extends ACWeapon {
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
-              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+              .setStaticTechLevel(SimpleTechLevel.INTRO);
     }
 
     @Override

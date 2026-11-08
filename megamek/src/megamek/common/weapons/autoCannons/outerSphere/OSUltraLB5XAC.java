@@ -67,7 +67,7 @@ public class OSUltraLB5XAC extends LBXACWeapon {
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
-              .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
     }
 
     @Override

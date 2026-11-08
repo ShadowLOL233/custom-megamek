@@ -52,7 +52,7 @@ public class OSExtendedStreakLRM15 extends StreakLRMWeapon {
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
-              .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
     }
 
     @Override

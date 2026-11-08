@@ -59,6 +59,6 @@ public class OSMachineGun extends MGWeapon {
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
-              .setStaticTechLevel(SimpleTechLevel.STANDARD);
+              .setStaticTechLevel(SimpleTechLevel.INTRO);
     }
 }

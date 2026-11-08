@@ -51,6 +51,6 @@ public class OSEnhancedSRM4 extends SRMWeapon {
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
-              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
     }
 }

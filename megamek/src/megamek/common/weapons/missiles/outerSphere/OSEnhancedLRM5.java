@@ -53,6 +53,6 @@ public class OSEnhancedLRM5 extends LRMWeapon {
               .setISApproximate(true, false, false, false, false)
               .setPrototypeFactions(Faction.LEGION)
               .setProductionFactions(Faction.LEGION)
-              .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+              .setStaticTechLevel(SimpleTechLevel.STANDARD);
     }
 }
