@@ -38,11 +38,12 @@ import static megamek.common.game.IGame.LOGGER;
 
 import java.io.Serial;
 
+import jakarta.annotation.Nullable;
 import megamek.common.HexTarget;
 import megamek.common.SimpleTechLevel;
+import megamek.common.SourceBookCode;
 import megamek.common.ToHitData;
 import megamek.common.actions.WeaponAttackAction;
-import megamek.common.annotations.Nullable;
 import megamek.common.board.Coords;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.TechBase;
@@ -85,11 +86,9 @@ public abstract class VehicularGrenadeLauncherWeapon extends AmmoWeapon {
         explosive = false;
         bv = 15.0;
         cost = 10000;
-        rulesRefs = "127, TO:AUE";
+        rulesRefs = rulesRefs(SourceBookCode.TO_AUE, 127);
         // Tech Progression tweaked to combine IntOps with TRO Prototypes/3145 NTNU RS
         techAdvancement.setTechBase(TechBase.ALL)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.C)
               .setAvailability(AvailabilityValue.D, AvailabilityValue.E, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(DATE_NONE, DATE_PS, 3080, DATE_NONE, DATE_NONE)

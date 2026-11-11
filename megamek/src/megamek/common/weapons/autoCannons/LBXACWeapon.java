@@ -38,10 +38,10 @@ import static megamek.common.game.IGame.LOGGER;
 
 import java.io.Serial;
 
+import jakarta.annotation.Nullable;
 import megamek.common.ToHitData;
 import megamek.common.actions.WeaponAttackAction;
 import megamek.common.alphaStrike.AlphaStrikeElement;
-import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.equipment.AmmoType;
 import megamek.common.game.Game;
@@ -122,7 +122,8 @@ public abstract class LBXACWeapon extends AmmoWeapon {
               .or(F_AERO_WEAPON)
               .or(F_PROTO_WEAPON)
               .or(F_BALLISTIC)
-              .or(F_DIRECT_FIRE);
+              .or(F_DIRECT_FIRE)
+              .or(F_AC);
 
         ammoType = AmmoType.AmmoTypeEnum.AC_LBX;
         atClass = CLASS_LBX_AC;

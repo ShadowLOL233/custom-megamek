@@ -35,7 +35,7 @@ package megamek.common.units;
 
 import java.util.Objects;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.game.InGameObject;
 
 /**
@@ -49,7 +49,7 @@ public record UnitTargetPair(InGameObject unit, Targetable target) {
     public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
-        } else if ((null == o) || (getClass() != o.getClass())) {
+        } else if ((o == null) || (getClass() != o.getClass())) {
             return false;
         } else {
             final UnitTargetPair other = (UnitTargetPair) o;

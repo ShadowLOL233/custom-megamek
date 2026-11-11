@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -37,9 +37,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -50,9 +53,9 @@ import java.util.zip.ZipFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import jakarta.annotation.Nullable;
 import megamek.MMConstants;
 import megamek.client.ui.dialogs.buttonDialogs.CommonSettingsDialog;
-import megamek.common.annotations.Nullable;
 import megamek.common.jacksonAdapters.ColorDeserializer;
 import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
@@ -105,9 +108,15 @@ public final class Factions2 {
     private static final MMLogger LOGGER = MMLogger.create(Factions2.class);
     private static Factions2 instance;
 
-    private static final String TEST_DIR = "testresources/data/universe/factions";
+    public static final String FACTIONS2_TEST_DIRECTORY = "testresources/data/universe/factions";
 
     private final Map<String, Faction2> factions = new HashMap<>();
+
+    /** Maps a retired/aliased faction code to the surviving canonical faction key. See {@link Faction2#getAliases()}. */
+    private final Map<String, String> aliasToCanonical = new HashMap<>();
+
+    /** Flattens subunits declared inside a faction file into {@link #factions}. */
+    private final SubunitRegistrar subunitRegistrar = new SubunitRegistrar(factions);
 
     private Factions2() {
         loadFactionsFromFile();
@@ -119,10 +128,14 @@ public final class Factions2 {
 
     public static synchronized Factions2 getInstance(boolean useTestDirectory) {
         if (instance == null) {
-            instance = useTestDirectory ? new Factions2(TEST_DIR) : new Factions2();
+            instance = useTestDirectory ? new Factions2(FACTIONS2_TEST_DIRECTORY) : new Factions2();
         }
 
         return instance;
+    }
+
+    public static synchronized void setInstance(@Nullable Factions2 instance) {
+        Factions2.instance = instance;
     }
 
     /**
@@ -134,6 +147,7 @@ public final class Factions2 {
     public Factions2(String factionsDataPath) {
         ObjectMapper mapper = getLoadMapper();
         loadFactionsFromDirectory(factionsDataPath, mapper);
+        registerAliases();
     }
 
     /**
@@ -150,7 +164,17 @@ public final class Factions2 {
      * @return The faction for the given faction code, if any.
      */
     public Optional<Faction2> getFaction(@Nullable String factionCode) {
-        return Optional.ofNullable(factionCode == null ? null : factions.get(factionCode));
+        if (factionCode == null) {
+            return Optional.empty();
+        }
+        Faction2 faction = factions.get(factionCode);
+        if (faction == null) {
+            String canonicalKey = aliasToCanonical.get(factionCode);
+            if (canonicalKey != null) {
+                faction = factions.get(canonicalKey);
+            }
+        }
+        return Optional.ofNullable(faction);
     }
 
     /**
@@ -167,7 +191,43 @@ public final class Factions2 {
             loadFactionsFromDirectory(new File(userDir, MMConstants.FACTIONS_DIR).toString(), mapper);
             loadFactionsFromDirectory(new File(userDir, MMConstants.COMMANDS_DIR).toString(), mapper);
         }
+        registerAliases();
         LOGGER.info("Loaded a total of {} factions and commands", factions.size());
+        logFactionsWithoutIcons();
+    }
+
+    /**
+     * Logs the factions that name a MekHQ logo ({@code logo:}) but no icon ({@code icon:}). MegaMek never shows the
+     * MekHQ logo, so such a faction silently gets the generic logo. This is typical of a custom faction written for
+     * MekHQ before icons existed. Logged at debug level, so it is off unless this class's logger is switched on in
+     * {@code mmconf/log4j2.xml}.
+     */
+    private void logFactionsWithoutIcons() {
+        List<String> factionCodes = findFactionsWithLegacyLogoOnly(factions.values());
+        if (!factionCodes.isEmpty()) {
+            LOGGER.debug("[FactionIcon] These factions have a logo: line but no icon: line, so MegaMek shows the " +
+                        "generic logo for them: {}. The logo: line is only used by MekHQ. To show their own logo in " +
+                        "MegaMek, add an icon: line naming an image in data/images/universe/factions/",
+                  String.join(", ", factionCodes));
+        }
+    }
+
+    /**
+     * @param candidateFactions the factions to check
+     *
+     * @return the sorted codes of the factions that have a MekHQ logo but no icon
+     *
+     * @see Faction2#hasLegacyLogoWithoutIcon()
+     */
+    static List<String> findFactionsWithLegacyLogoOnly(Collection<Faction2> candidateFactions) {
+        List<String> factionCodes = new ArrayList<>();
+        for (Faction2 faction : candidateFactions) {
+            if (faction.hasLegacyLogoWithoutIcon()) {
+                factionCodes.add(faction.getKey());
+            }
+        }
+        Collections.sort(factionCodes);
+        return factionCodes;
     }
 
     /**
@@ -225,8 +285,48 @@ public final class Factions2 {
         }
     }
 
+    /**
+     * Reads one faction from the given source and registers it, together with any subunits it declares.
+     *
+     * <p>A command may declare its subordinate formations inline rather than in separate files; those are flattened
+     * into this same map by {@link SubunitRegistrar} so that every consumer sees one flat faction list.</p>
+     *
+     * @param source The stream to read the faction YAML from
+     * @param mapper The Jackson ObjectMapper to parse with
+     *
+     * @throws IOException When the source cannot be read or parsed
+     */
     private void loadFaction(InputStream source, ObjectMapper mapper) throws IOException {
         Faction2 faction = mapper.readValue(source, Faction2.class);
         factions.put(faction.getKey(), faction);
+        subunitRegistrar.registerSubunits(faction);
+    }
+
+    /**
+     * Registers each faction's historical code aliases (see {@link Faction2#getAliases()}) so that a lookup by a
+     * retired faction code resolves to the surviving faction. Runs once after all faction files are loaded, so that a
+     * real faction file always wins over an alias claiming the same code - this guards against a merger of two
+     * distinct factions being mis-declared as a rename alias.
+     */
+    private void registerAliases() {
+        for (Faction2 faction : factions.values()) {
+            for (String aliasCode : faction.getAliases().values()) {
+                if (factions.containsKey(aliasCode)) {
+                    if (factions.get(aliasCode) != faction) {
+                        LOGGER.warn("[FactionAlias] Alias {} for faction {} collides with an existing faction; " +
+                                    "keeping the existing faction. Remove the {}.yml faction file to complete the merge.",
+                              aliasCode, faction.getKey(), aliasCode);
+                    }
+                    continue;
+                }
+                String previousKey = aliasToCanonical.putIfAbsent(aliasCode, faction.getKey());
+                if (previousKey != null && !previousKey.equals(faction.getKey())) {
+                    LOGGER.warn("[FactionAlias] Alias {} is claimed by both {} and {}; keeping {}.",
+                          aliasCode, previousKey, faction.getKey(), previousKey);
+                } else if (previousKey == null) {
+                    LOGGER.debug("[FactionAlias] Registered alias {} -> {}", aliasCode, faction.getKey());
+                }
+            }
+        }
     }
 }

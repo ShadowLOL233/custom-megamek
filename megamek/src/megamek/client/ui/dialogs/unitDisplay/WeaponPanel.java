@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2015-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -52,6 +52,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.MouseInputAdapter;
 
+import jakarta.annotation.Nullable;
 import megamek.client.Client;
 import megamek.client.event.MekDisplayEvent;
 import megamek.client.ui.GBC;
@@ -62,6 +63,7 @@ import megamek.client.ui.clientGUI.tooltip.UnitToolTip;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.panels.phaseDisplay.FiringDisplay;
 import megamek.client.ui.panels.phaseDisplay.TargetingPhaseDisplay;
+import megamek.client.ui.util.UIUtil;
 import megamek.client.ui.widget.BackGroundDrawer;
 import megamek.client.ui.widget.SkinXMLHandler;
 import megamek.client.ui.widget.UnitDisplaySkinSpecification;
@@ -71,9 +73,9 @@ import megamek.common.Configuration;
 import megamek.common.Hex;
 import megamek.common.RangeType;
 import megamek.common.ToHitData;
-import megamek.common.annotations.Nullable;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.board.Coords;
+import megamek.common.compute.ArtilleryRange;
 import megamek.common.compute.Compute;
 import megamek.common.enums.WeaponSortOrder;
 import megamek.common.equipment.AmmoMounted;
@@ -83,6 +85,7 @@ import megamek.common.equipment.AmmoType.AmmoTypeEnum;
 import megamek.common.equipment.AmmoType.Munitions;
 import megamek.common.equipment.HandheldWeapon;
 import megamek.common.equipment.Mounted;
+import megamek.common.equipment.TrainAmmoSharing;
 import megamek.common.equipment.WeaponMounted;
 import megamek.common.equipment.WeaponType;
 import megamek.common.game.Game;
@@ -192,6 +195,11 @@ public class WeaponPanel extends PicMap implements ListSelectionListener, Action
     private Targetable prevTarget = null;
     private JScrollPane tWeaponScroll;
     private JComboBox<String> m_chAmmo;
+    /**
+     * The weapon the ammo selector was last filled for. Until the selector is refilled, its selection belongs to this
+     * weapon and must not be applied to another one.
+     */
+    private WeaponMounted ammoSelectorWeapon;
     public JComboBox<String> m_chBayWeapon;
 
     private JLabel wBayWeapon;
@@ -564,8 +572,14 @@ public class WeaponPanel extends PicMap implements ListSelectionListener, Action
         wInfantryRange5R = new JLabel("---", SwingConstants.CENTER);
         setupLabel(wInfantryRange5R);
 
-        // range panel
-        JPanel pRange = new JPanel(new GridBagLayout());
+        // range panel. Its row count changes with the unit (aerospace adds the AV row), so its minimum height follows
+        // its content: when space is short the parent lays out at minimum sizes, and a fixed minimum cut off the AV row.
+        JPanel pRange = new JPanel(new GridBagLayout()) {
+            @Override
+            public Dimension getMinimumSize() {
+                return new Dimension(INTERNAL_PANE_WIDTH, getPreferredSize().height);
+            }
+        };
         pRange.setAlignmentX(Component.LEFT_ALIGNMENT);
         pRange.setAlignmentY(Component.TOP_ALIGNMENT);
         pRange.setOpaque(false);
@@ -783,11 +797,12 @@ public class WeaponPanel extends PicMap implements ListSelectionListener, Action
         String txt = switch (toHit.getValue()) {
             case TargetRoll.IMPOSSIBLE, TargetRoll.AUTOMATIC_FAIL -> String.format("To Hit: (0%%) %s", toHit.getDesc());
             case TargetRoll.AUTOMATIC_SUCCESS -> String.format("To Hit: (100%%) %s", toHit.getDesc());
-            default -> String.format("<font color=\"%s\">To Hit: <b>%2d (%2.0f%%)</b></font> = %s",
+            default -> String.format("<font color=\"%s\">To Hit: <b>%2d (%.1f%%)</b></font> = %s%s",
                   GUIPreferences.hexColor(GUIP.getUnitToolTipHighlightColor()),
                   toHit.getValue(),
-                  Compute.oddsAbove(toHit.getValue(), natAptGunnery),
-                  toHit.getDesc());
+                  Compute.oddsAsDisplayPercent(Compute.oddsAbove(toHit.getValue(), natAptGunnery)),
+                  toHit.getDesc(),
+                  natAptGunnery ? " " + Messages.getString("MekDisplay.NaturalAptitudeRoll") : "");
         };
 
         toHitText.setText(UnitToolTip.wrapWithHTML(txt));
@@ -1686,7 +1701,6 @@ public class WeaponPanel extends PicMap implements ListSelectionListener, Action
             wMedL.setVisible(true);
             wLongL.setVisible(true);
 
-            wMinR.setVisible(true);
             wShortR.setVisible(true);
             wMedR.setVisible(true);
             wLongR.setVisible(true);
@@ -1768,6 +1782,12 @@ public class WeaponPanel extends PicMap implements ListSelectionListener, Action
             wDamR.setText(Integer.toString(weaponType.getDamage()));
         }
 
+        if (mounted.getType().hasFlag(WeaponType.F_BOMBAST_LASER)) {
+            int damage = (mounted.curMode().equals("Damage 16")) ? 16 : (mounted.curMode().equals("Damage 12")) ? 12 :
+                                                                         8;
+            wDamR.setText(Integer.toString(damage));
+        }
+
         // update range
         int shortR = weaponType.getShortRange();
         int mediumR = weaponType.getMediumRange();
@@ -1780,10 +1800,10 @@ public class WeaponPanel extends PicMap implements ListSelectionListener, Action
         // (torpedoes)
         if ((entity.getLocationStatus(mounted.getLocation()) == ILocationExposureStatus.WET)
               || ((longR == 0) && weaponType.getWLongRange() > 0)) {
-            shortR = weaponType.getWShortRange();
-            mediumR = weaponType.getWMediumRange();
-            longR = weaponType.getWLongRange();
-            extremeR = weaponType.getWExtremeRange();
+            shortR = Game.rulesManager.getRulesUnderwater().getShortRange(weaponType);
+            mediumR = Game.rulesManager.getRulesUnderwater().getMediumRange(weaponType);
+            longR = Game.rulesManager.getRulesUnderwater().getLongRange(weaponType);
+            extremeR = Game.rulesManager.getRulesUnderwater().getExtremeRange(weaponType);
         } else if (weaponType.hasFlag(WeaponType.F_PD_BAY)) {
             // Point Defense bays have a variable range, depending on the mode they're in
             if (mounted.hasModes() && mounted.curMode().equals("Point Defense")) {
@@ -1828,20 +1848,35 @@ public class WeaponPanel extends PicMap implements ListSelectionListener, Action
         } else {
             wMedR.setText("" + mediumR);
         }
+        // The Oblique Artilleryman ability extends an artillery weapon's range by ten percent (CamOps p.78, 5th
+        // printing). Artillery ranges are rated in map sheets and the extension is a fraction of one, so the extended
+        // figure is shown with a decimal and marked with an asterisk.
+        // An aerospace unit's display is rewritten below with attack values instead of ranges, so it is left alone.
+        boolean isRangeExtendedByCrew = ArtilleryRange.isExtendedByObliqueArtilleryman(entity, weaponType)
+              && !aerospaceAttack;
+        String longRangeText = isRangeExtendedByCrew ? extendedArtilleryRange(longR) : Integer.toString(longR);
+        String extremeRangeText = isRangeExtendedByCrew ? extendedArtilleryRange(extremeR) : Integer.toString(extremeR);
+        String extendedRangeTooltip = isRangeExtendedByCrew
+              ? Messages.getString("MekDisplay.ObliqueArtillerymanRange.tooltip") : null;
+        wLongR.setToolTipText(extendedRangeTooltip);
+        wExtR.setToolTipText(extendedRangeTooltip);
+
         if ((longR - mediumR) > 1) {
-            wLongR.setText(mediumR + 1 + " - " + longR);
+            wLongR.setText(mediumR + 1 + " - " + longRangeText);
         } else {
-            wLongR.setText("" + longR);
+            wLongR.setText(longRangeText);
         }
         if ((extremeR - longR) > 1) {
-            wExtR.setText(longR + 1 + " - " + extremeR);
+            wExtR.setText(longR + 1 + " - " + extremeRangeText);
         } else {
-            wExtR.setText("" + extremeR);
+            wExtR.setText(extremeRangeText);
         }
 
         // Update the range display to account for the selected ammo, or the loaded ammo
-        // if none is selected
-        AmmoMounted mAmmo = getSelectedAmmo().orElse(mounted.getLinkedAmmo());
+        // if none is selected. The ammo selector is only refilled further down, so after switching weapons it still
+        // holds the previous weapon's ammo; its selection only counts when it was filled for this weapon.
+        Optional<AmmoMounted> selectedAmmo = (ammoSelectorWeapon == mounted) ? getSelectedAmmo() : Optional.empty();
+        AmmoMounted mAmmo = selectedAmmo.orElse(mounted.getLinkedAmmo());
         if (mAmmo != null) {
             updateRangeDisplayForAmmo(mAmmo);
         }
@@ -1897,6 +1932,9 @@ public class WeaponPanel extends PicMap implements ListSelectionListener, Action
             weaponType = mounted.getType();
         }
 
+        // Only the branches below that offer a choice fill vAmmo. The others clear it, so a later refresh cannot read
+        // the previous weapon's ammo through the selector.
+        vAmmo = new ArrayList<>();
         if (weaponType.getAmmoType() == AmmoType.AmmoTypeEnum.NA) {
             m_chAmmo.setEnabled(false);
         } else if (weaponType.hasFlag(WeaponType.F_DOUBLE_ONE_SHOT)
@@ -1937,20 +1975,8 @@ public class WeaponPanel extends PicMap implements ListSelectionListener, Action
         } else {
 
             vAmmo = new ArrayList<>();
-            // Ammo sharing between adjacent trailers
-            List<AmmoMounted> fullAmmoList = new ArrayList<>(entity.getAmmo());
-            if (entity.getTowedBy() != Entity.NONE) {
-                Entity ahead = entity.getGame().getEntity(entity.getTowedBy());
-                if (ahead != null) {
-                    fullAmmoList.addAll(ahead.getAmmo());
-                }
-            }
-            if (entity.getTowing() != Entity.NONE) {
-                Entity behind = entity.getGame().getEntity(entity.getTowing());
-                if (behind != null) {
-                    fullAmmoList.addAll(behind.getAmmo());
-                }
-            }
+            // Ammo sharing between adjacent trailers. The server validates against this same rule.
+            List<AmmoMounted> fullAmmoList = TrainAmmoSharing.getSharedAmmo(entity);
             int newSelectedIndex = -1;
             int i = 0;
             for (AmmoMounted ammo : fullAmmoList) {
@@ -1996,6 +2022,7 @@ public class WeaponPanel extends PicMap implements ListSelectionListener, Action
                 m_chAmmo.setSelectedIndex(newSelectedIndex);
             }
         }
+        ammoSelectorWeapon = oldMount;
 
         // send event to other parts of the UI which care
         unitDisplayPanel.getClientGUI().showSensorRanges(entity);
@@ -2011,7 +2038,10 @@ public class WeaponPanel extends PicMap implements ListSelectionListener, Action
         int ammoIndex = m.getDesc().indexOf(Messages.getString("MekDisplay.0"));
         int loc = m.getLocation();
         if (!m.getEntity().equals(entity) && !(m.getEntity() instanceof HandheldWeapon)) {
-            sb.append("[TR] ");
+            // Name the unit's place in the train rather than just saying the ammo is elsewhere on it. A convoy can
+            // carry several identical carriages, so "TL2" is the only thing that says which one this is.
+            String trainPosition = UIUtil.trainPositionLabel(m.getEntity());
+            sb.append('[').append(trainPosition.isEmpty() ? "TR" : trainPosition).append("] ");
         } else if (loc != Entity.LOC_NONE) {
             sb.append('[').append(entity.getLocationAbbr(loc)).append("] ");
         }
@@ -2029,6 +2059,21 @@ public class WeaponPanel extends PicMap implements ListSelectionListener, Action
 
     private String formatBayWeapon(WeaponMounted m) {
         return m.getDesc();
+    }
+
+    /**
+     * Formats an artillery weapon's range as extended by the Oblique Artilleryman ability - ten percent more range
+     * (CamOps p.78, 5th printing) - marked with an asterisk so the reader can tell it apart from the weapon's rated
+     * range. Artillery ranges are given in map sheets, and ten percent of one is a fraction, so the extended figure
+     * keeps its decimal.
+     *
+     * @param ratedRangeInMapSheets the weapon's rated range, in map sheets
+     *
+     * @return the extended range, marked with an asterisk
+     */
+    private static String extendedArtilleryRange(int ratedRangeInMapSheets) {
+        return Messages.getString("MekDisplay.ObliqueArtillerymanRange",
+              ArtilleryRange.extendedRangeInMapSheets(ratedRangeInMapSheets));
     }
 
     /**
@@ -2165,7 +2210,7 @@ public class WeaponPanel extends PicMap implements ListSelectionListener, Action
         int maxRange = weaponType.getMaxRange(weapon);
 
         // change range and attack values based upon ammo
-        if (null != ammo) {
+        if (ammo != null) {
             AmmoType ammoType = ammo.getType();
             double[] changes = changeAttackValues(ammoType, avShort, avMed,
                   avLong, avExt, maxRange);
@@ -2193,9 +2238,11 @@ public class WeaponPanel extends PicMap implements ListSelectionListener, Action
         wMedR.setText("---");
         wLongR.setText("---");
         wExtR.setText("---");
+        // range labels follow the range scale, which can differ from the damage scale
+        boolean usesCapitalRangeBrackets = weaponType.usesCapitalRangeBrackets();
         // every weapon gets at least short range
         wShortAVR.setText(Integer.toString(avShort));
-        if (weaponType.isCapital()) {
+        if (usesCapitalRangeBrackets) {
             wShortR.setText("1-12");
         } else if (weaponType.hasFlag(WeaponType.F_PD_BAY)) {
             // Point Defense bays have a variable range too, depending on the mode they're
@@ -2210,7 +2257,7 @@ public class WeaponPanel extends PicMap implements ListSelectionListener, Action
         }
         if (maxRange > WeaponType.RANGE_SHORT) {
             wMedAVR.setText(Integer.toString(avMed));
-            if (weaponType.isCapital()) {
+            if (usesCapitalRangeBrackets) {
                 wMedR.setText("13-24");
             } else {
                 wMedR.setText("7-12");
@@ -2218,7 +2265,7 @@ public class WeaponPanel extends PicMap implements ListSelectionListener, Action
         }
         if (maxRange > WeaponType.RANGE_MED) {
             wLongAVR.setText(Integer.toString(avLong));
-            if (weaponType.isCapital()) {
+            if (usesCapitalRangeBrackets) {
                 wLongR.setText("25-40");
             } else {
                 wLongR.setText("13-20");
@@ -2226,7 +2273,7 @@ public class WeaponPanel extends PicMap implements ListSelectionListener, Action
         }
         if (maxRange > WeaponType.RANGE_LONG) {
             wExtAVR.setText(Integer.toString(avExt));
-            if (weaponType.isCapital()) {
+            if (usesCapitalRangeBrackets) {
                 wExtR.setText("41-50");
             } else {
                 wExtR.setText("21-25");
@@ -2402,7 +2449,7 @@ public class WeaponPanel extends PicMap implements ListSelectionListener, Action
                 int mMaxR = bayWType.getMaxRange(m);
 
                 // deal with any ammo adjustments
-                if (null != mAmmo) {
+                if (mAmmo != null) {
                     double[] changes = changeAttackValues(mAmmo.getType(), mAVShort, mAVMed,
                           mAVLong, mAVExt, mMaxR);
                     mAVShort = changes[0];
@@ -2592,21 +2639,27 @@ public class WeaponPanel extends PicMap implements ListSelectionListener, Action
                         // FIXME: Consider new AmmoType::equals / BombType::equals
                         if (bWeapon.getType().equals(sWeapon.getType())) {
                             entity.loadWeapon(bWeapon, mAmmo);
-                            // Alert the server of the update.
+                            // Alert the server of the update. The ammo bin may belong to a connected trailer, so
+                            // its equipment number must be resolved against its own carrier.
+                            Entity ammoCarrier = mAmmo.getEntity();
                             clientgui.getClient().sendAmmoChange(
                                   entity.getId(),
                                   entity.getEquipmentNum(bWeapon),
-                                  entity.getEquipmentNum(mAmmo),
+                                  ammoCarrier.getEquipmentNum(mAmmo),
+                                  ammoCarrier.getId(),
                                   0);
                         }
                     }
                 }
             } else {
                 entity.loadWeapon(mWeapon, mAmmo);
-                // Alert the server of the update.
+                // Alert the server of the update. The ammo bin may belong to a connected trailer, so its
+                // equipment number must be resolved against its own carrier.
+                Entity ammoCarrier = mAmmo.getEntity();
                 clientgui.getClient().sendAmmoChange(entity.getId(),
                       entity.getEquipmentNum(mWeapon),
-                      entity.getEquipmentNum(mAmmo),
+                      ammoCarrier.getEquipmentNum(mAmmo),
+                      ammoCarrier.getId(),
                       0);
             }
 

@@ -39,9 +39,9 @@ import static megamek.common.game.IGame.LOGGER;
 import java.io.Serial;
 import java.util.Collections;
 
+import jakarta.annotation.Nullable;
 import megamek.common.ToHitData;
 import megamek.common.actions.WeaponAttackAction;
-import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.MiscMounted;
 import megamek.common.equipment.MiscType;
@@ -105,18 +105,26 @@ public abstract class LaserWeapon extends EnergyWeapon {
     @Override
     public int getModesCount(Mounted<?> mounted) {
         Mounted<?> linkedBy = mounted.getLinkedBy();
-        if ((linkedBy instanceof MiscMounted)
+        boolean hasRiscPulseModule = (linkedBy instanceof MiscMounted miscMounted)
               && !linkedBy.isInoperable()
-              && ((MiscMounted) linkedBy).getType().hasFlag(MiscType.F_RISC_LASER_PULSE_MODULE)) {
-            return super.getModesCount();
-        } else if (this instanceof PulseLaserWeapon) {
+              && miscMounted.getType().hasFlag(MiscType.F_RISC_LASER_PULSE_MODULE);
+        if (hasRiscPulseModule || (this instanceof PulseLaserWeapon)) {
             return super.getModesCount();
         }
 
         if (hasModes()) {
-            //Only works if laser pulse module's "Pulse" modes are added last.
+            // Counts only non-Pulse modes; relies on the pulse module's "Pulse" modes being added last.
+            // Uses an indexed loop instead of a stream: this runs in hot UI and to-hit paths where a
+            // per-call stream pipeline was a major allocation source (JFR profiling, 2026-06-21).
             synchronized (modes) {
-                return (int) modes.stream().filter(mode -> !mode.getName().startsWith("Pulse")).count();
+                int nonPulseModeCount = 0;
+                int modeCount = modes.size();
+                for (int index = 0; index < modeCount; index++) {
+                    if (!modes.get(index).getName().startsWith("Pulse")) {
+                        nonPulseModeCount++;
+                    }
+                }
+                return nonPulseModeCount;
             }
         }
         return super.getModesCount();

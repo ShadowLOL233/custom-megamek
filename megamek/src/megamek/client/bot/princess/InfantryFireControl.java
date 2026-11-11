@@ -35,9 +35,9 @@ package megamek.client.bot.princess;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.annotation.Nullable;
 import megamek.common.Hex;
 import megamek.common.RangeType;
-import megamek.common.annotations.Nullable;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.compute.Compute;
 import megamek.common.equipment.WeaponMounted;
@@ -197,12 +197,12 @@ public class InfantryFireControl extends FireControl {
         FiringPlan bestPlan = new FiringPlan(target);
 
         // Shooting isn't possible if one of us isn't on the board.
-        if ((null == shooter.getPosition()) || shooter.isOffBoard()
+        if ((shooter.getPosition() == null) ||shooter.isOffBoard()
               || !game.getBoard().contains(shooter.getPosition())) {
             logger.error("Shooter's position is NULL/Off Board!");
             return bestPlan;
         }
-        if ((null == target.getPosition()) || target.isOffBoard() || !game.getBoard().contains(target.getPosition())) {
+        if ((target.getPosition() == null) ||target.isOffBoard() || !game.getBoard().contains(target.getPosition())){
             logger.error("Target's position is NULL/Off Board!");
             return bestPlan;
         }
@@ -213,10 +213,10 @@ public class InfantryFireControl extends FireControl {
             return super.guessBestFiringPlanUnderHeat(shooter, shooterState, target, targetState, maxHeat, game);
         }
 
-        if (null == shooterState) {
+        if (shooterState == null) {
             shooterState = new EntityState(shooter);
         }
-        if (null == targetState) {
+        if (targetState == null) {
             targetState = new EntityState(target);
         }
 

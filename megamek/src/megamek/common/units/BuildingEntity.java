@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2000-2002 Ben Mazur (bmazur@sev.org)
- * Copyright (C) 2003-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2003-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -37,6 +37,7 @@ package megamek.common.units;
 import megamek.common.MPCalculationSetting;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
+import megamek.common.board.Coords;
 import megamek.common.board.CubeCoords;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.BasementType;
@@ -57,6 +58,9 @@ import megamek.common.equipment.enums.StructureEngine;
  * Extends {@link AbstractBuildingEntity}
  */
 public class BuildingEntity extends AbstractBuildingEntity {
+
+    /** The weapon arc a fixed weapon facing forward fires into; also used for a turret locked by a critical hit. */
+    private static final int FORWARD_ARC = 1;
 
     public BuildingEntity(BuildingType type, int bldgClass) {
         super(type, bldgClass);
@@ -136,8 +140,9 @@ public class BuildingEntity extends AbstractBuildingEntity {
     @Override
     public int getWeaponArc(int weaponNumber) {
         WeaponMounted weapon = getWeapon(weaponNumber);
-        if (weapon.isTurret()) {
-            return 0;
+        if (isTurretMounted(weapon)) {
+            // A turret locked by a critical hit (TO:AR p. 118) fires only into the building's forward arc
+            return isTurretLocked(weapon) ? FORWARD_ARC : 0;
         }
         return switch (weapon.getFacing()) {
             case 0 -> 1;
@@ -215,6 +220,11 @@ public class BuildingEntity extends AbstractBuildingEntity {
      * @return true if the unit has power, otherwise false
      */
     public boolean hasPower() {
+        // A structure switched off at the mains has no power, however healthy its generators are
+        if (isPowerSwitchedOff()) {
+            return false;
+        }
+
         // Return true if we have enough power - calculate the base generator weight and compare it to all the
         // generators we have that're working
         double powerNeeded = getBaseGeneratorWeight();
@@ -345,6 +355,20 @@ public class BuildingEntity extends AbstractBuildingEntity {
         return totalWeight;
     }
 
+    /**
+     * Places a demolition charge on this building (TO:AUE p.152). Demolition charges anchor to an absolute board hex,
+     * which is only valid for structures that cannot move; this is why the implementation lives here rather than in
+     * {@link AbstractBuildingEntity}, where {@link MobileStructure} would inherit it.
+     *
+     * @param playerId the ID of the player who placed the charge
+     * @param damage   the damage the charge will deal when detonated
+     * @param pos      the absolute board coordinates of the charge; see {@link Building#addDemolitionCharge}
+     */
+    @Override
+    public void addDemolitionCharge(int playerId, int damage, Coords pos) {
+        getInternalBuilding().addDemolitionCharge(playerId, damage, pos);
+    }
+
     // FIXME: IDK if this is right, just needed something to pass tests
     private static final TechAdvancement TA_BUILDING_ENTITY = new TechAdvancement(TechBase.ALL)
           .setAdvancement(DATE_PS, DATE_PS, DATE_PS)
@@ -352,4 +376,3 @@ public class BuildingEntity extends AbstractBuildingEntity {
           .setAvailability(AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A)
           .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 }
-

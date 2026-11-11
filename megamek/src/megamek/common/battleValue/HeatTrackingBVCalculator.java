@@ -37,8 +37,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import jakarta.annotation.Nullable;
 import megamek.common.CriticalSlot;
-import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.MiscType;
@@ -49,11 +49,6 @@ import megamek.common.units.ConvFighter;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
 import megamek.common.weapons.ppc.PPCWeapon;
-import megamek.common.weapons.prototypes.innerSphere.ISERLaserLargePrototype;
-import megamek.common.weapons.prototypes.innerSphere.ISPulseLaserLargePrototype;
-import megamek.common.weapons.prototypes.innerSphere.ISPulseLaserMediumPrototype;
-import megamek.common.weapons.prototypes.innerSphere.ISPulseLaserMediumRecovered;
-import megamek.common.weapons.prototypes.innerSphere.ISPulseLaserSmallPrototype;
 
 public abstract class HeatTrackingBVCalculator extends BVCalculator {
 
@@ -101,7 +96,7 @@ public abstract class HeatTrackingBVCalculator extends BVCalculator {
 
             vibroblade = getVibroblade(Mek.LOC_RIGHT_ARM);
             if (vibroblade != null) {
-                double weaponHeat = entity.getActiveVibrobladeHeat(Mek.LOC_LEFT_ARM, true);
+                double weaponHeat = entity.getActiveVibrobladeHeat(Mek.LOC_RIGHT_ARM, true);
                 double thisWeaponBV = processWeapon(vibroblade, false, false);
                 weaponRecords.add(new WeaponBvHeatRecord(vibroblade, thisWeaponBV, weaponHeat));
             }
@@ -188,14 +183,7 @@ public abstract class HeatTrackingBVCalculator extends BVCalculator {
         }
 
         // 1d6 extra heat; add half for heat calculations (1d3/+2 for small pulse)
-        if ((wType instanceof ISERLaserLargePrototype)
-              || (wType instanceof ISPulseLaserLargePrototype)
-              || (wType instanceof ISPulseLaserMediumPrototype)
-              || (wType instanceof ISPulseLaserMediumRecovered)) {
-            weaponHeat += 3;
-        } else if (wType instanceof ISPulseLaserSmallPrototype) {
-            weaponHeat += 2;
-        }
+        weaponHeat += wType.getHeatAdjustmentForBvCalculation();
 
         // RISC laser pulse module adds 2 heat
         if ((wType.hasFlag(WeaponType.F_LASER)) && (weapon.getLinkedBy() != null)

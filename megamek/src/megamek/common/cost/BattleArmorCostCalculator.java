@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -113,8 +113,6 @@ public class BattleArmorCostCalculator {
             }
         }
 
-        // TODO : we do not track the modular weapons mount for 1000 C-bills in the unit
-        // files
         costs[idx++] = Math.max(0, CostCalculator.getWeaponsAndEquipmentCost(battleArmor, ignoreAmmo));
         costs[idx] = -battleArmor.getSquadSize();
 

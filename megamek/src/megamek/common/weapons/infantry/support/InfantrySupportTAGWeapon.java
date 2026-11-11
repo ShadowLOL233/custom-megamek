@@ -37,9 +37,10 @@ import static megamek.common.game.IGame.LOGGER;
 
 import java.io.Serial;
 
+import jakarta.annotation.Nullable;
+import megamek.common.SourceBookCode;
 import megamek.common.ToHitData;
 import megamek.common.actions.WeaponAttackAction;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
@@ -76,7 +77,7 @@ public class InfantrySupportTAGWeapon extends InfantryWeapon {
         extremeRange = 12;
         cost = 40000;
         tonnage = .020;
-        rulesRefs = "273, TM";
+        rulesRefs = rulesRefs(SourceBookCode.TM, 273);
         techAdvancement.setTechBase(TechBase.ALL).setISAdvancement(2598, 2610, DATE_NONE, 2770, 3051)
               .setISApproximate(true, true, false, false, false)
               .setClanAdvancement(2598, 2610, DATE_NONE, DATE_NONE, 3051)

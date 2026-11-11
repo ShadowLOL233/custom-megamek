@@ -37,9 +37,9 @@ package megamek.common.actions;
 import java.io.Serial;
 import java.util.Enumeration;
 
+import jakarta.annotation.Nullable;
 import megamek.client.Client;
 import megamek.common.ToHitData;
-import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.Mounted;
 import megamek.common.game.Game;
@@ -241,7 +241,7 @@ public abstract class AbstractAttackAction extends AbstractEntityAction implemen
             }
         }
 
-        if ((toHit.getValue() > 0) && (null != attacker.getCrew())
+        if ((toHit.getValue() > 0) && (attacker.getCrew() != null)
               && attacker.hasAbility(OptionsConstants.UNOFFICIAL_BLIND_FIGHTER)) {
             toHit.addModifier(-1, "blind fighter");
         }

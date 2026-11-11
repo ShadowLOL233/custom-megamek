@@ -86,6 +86,7 @@ public class Engine implements Serializable, ITechnology {
     public static final int LARGE_ENGINE = 0x4;
     public static final int SUPERHEAVY_ENGINE = 0x8;
     public static final int SUPPORT_VEE_ENGINE = 0x10;
+    public static final int INDUSTRIAL_ENGINE = 0x20;
 
     // types
     public static final int COMBUSTION_ENGINE = 0;
@@ -265,7 +266,7 @@ public class Engine implements Serializable, ITechnology {
      */
     private boolean isValidEngine() {
         if (hasFlag(~(CLAN_ENGINE | TANK_ENGINE | LARGE_ENGINE
-              | SUPERHEAVY_ENGINE | SUPPORT_VEE_ENGINE))) {
+              | SUPERHEAVY_ENGINE | SUPPORT_VEE_ENGINE | INDUSTRIAL_ENGINE))) {
             problem.append("Flags:").append(engineFlags);
             return false;
         }
@@ -305,7 +306,19 @@ public class Engine implements Serializable, ITechnology {
             case STEAM:
             case EXTERNAL:
                 break;
+            case FISSION:
+                if (hasFlag(CLAN_ENGINE) && !hasFlag(INDUSTRIAL_ENGINE)) {
+                    problem.append(Messages
+                          .getString("Engine.invalidSphereOnly"));
+                    return false;
+                }
+                break;
             case COMPACT_ENGINE:
+                if (hasFlag(CLAN_ENGINE)) {
+                    problem.append(Messages
+                          .getString("Engine.invalidSphereOnly"));
+                    return false;
+                }
                 if (hasFlag(LARGE_ENGINE)) {
                     problem.append(Messages
                           .getString("Engine.invalidCompactLarge"));
@@ -313,7 +326,6 @@ public class Engine implements Serializable, ITechnology {
                 }
                 break;
             case LIGHT_ENGINE:
-            case FISSION:
                 if (hasFlag(CLAN_ENGINE)) {
                     problem.append(Messages
                           .getString("Engine.invalidSphereOnly"));
@@ -473,6 +485,15 @@ public class Engine implements Serializable, ITechnology {
 
     /** @return True if this engine is a fusion engine. */
     public boolean isFusion() {
+        return isFusion(engineType);
+    }
+
+    /**
+     * @param engineType the engine type constant, such as {@link #XL_ENGINE}
+     *
+     * @return True if engines of this type are fusion engines
+     */
+    public static boolean isFusion(int engineType) {
         return (engineType != COMBUSTION_ENGINE) && (engineType != FISSION) && (engineType != FUEL_CELL)
               && (engineType != NONE) && (engineType != BATTERY) && (engineType != SOLAR)
               && (engineType != STEAM) && (engineType != MAGLEV) && (engineType != EXTERNAL)
@@ -820,6 +841,19 @@ public class Engine implements Serializable, ITechnology {
     }
 
     /**
+     * Returns the engine rating for its owning unit. Support ratings are derived from the current design rather than
+     * stored in the engine: TM p.126, Errata v8 p.6, cruising/safe-thrust MP times tonnage, capped at 500.
+     * Fractional tonnage is retained, with no suspension adjustment or rounding to a multiple of five.
+     *
+     * @param entity the unit using this engine
+     * @return the effective engine rating, which may be fractional for support vehicles
+     */
+    public double getRating(Entity entity) {
+        return entity.isSupportVehicle() || hasFlag(SUPPORT_VEE_ENGINE)
+              ? Math.min(500, entity.getOriginalWalkMP() * entity.getWeight()) : engineRating;
+    }
+
+    /**
      * @return The slots taken up by the engine in the center torso.
      */
     public int[] getCenterTorsoCriticalSlots(int gyroType) {
@@ -1121,13 +1155,17 @@ public class Engine implements Serializable, ITechnology {
           .setAdvancement(DATE_NONE, 2630, 3120, DATE_NONE, DATE_NONE)
           .setApproximate(false, false, true, false, false)
           .setPrototypeFactions(Faction.TH)
-          .setProductionFactions(Faction.LC).setTechRating(TechRating.C)
+          .setProductionFactions(Faction.LC)
+          .setTechRating(TechRating.C)
           .setAvailability(AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A)
           .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
 
     private static final TechAdvancement LIGHT_FUSION_TA = new TechAdvancement(TechBase.IS)
-          .setISAdvancement(3055, 3062, 3067).setISApproximate(true, false, false)
-          .setPrototypeFactions(Faction.MERC).setProductionFactions(Faction.LC).setTechRating(TechRating.D)
+          .setISAdvancement(3055, 3062, 3067)
+          .setISApproximate(true, false, false)
+          .setPrototypeFactions(Faction.MERC)
+          .setProductionFactions(Faction.LC)
+          .setTechRating(TechRating.D)
           .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
           .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
@@ -1143,7 +1181,8 @@ public class Engine implements Serializable, ITechnology {
     private static final TechAdvancement COMPACT_FUSION_TA = new TechAdvancement(TechBase.IS)
           .setISAdvancement(3060, 3066, 3072, DATE_NONE, DATE_NONE)
           .setISApproximate(true, false, true, false, false)
-          .setPrototypeFactions(Faction.LC).setProductionFactions(Faction.LC)
+          .setPrototypeFactions(Faction.LC)
+          .setProductionFactions(Faction.LC)
           .setTechRating(TechRating.E)
           .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
           .setStaticTechLevel(SimpleTechLevel.STANDARD);
@@ -1207,7 +1246,8 @@ public class Engine implements Serializable, ITechnology {
           .setISAdvancement(2630, 3130, DATE_NONE, DATE_NONE, DATE_NONE)
           .setISApproximate(false, true, false, false, false)
           .setTechRating(TechRating.F)
-          .setPrototypeFactions(Faction.FS).setProductionFactions(Faction.LC)
+          .setPrototypeFactions(Faction.FS)
+          .setProductionFactions(Faction.LC)
           .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.F)
           .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
 
@@ -1215,21 +1255,27 @@ public class Engine implements Serializable, ITechnology {
           .setClanAdvancement(2630, 3130, DATE_NONE, DATE_NONE, DATE_NONE)
           .setClanApproximate(false, true, false, false, false)
           .setTechRating(TechRating.F)
-          .setPrototypeFactions(Faction.CSF).setProductionFactions(Faction.CSF)
+          .setPrototypeFactions(Faction.CSF)
+          .setProductionFactions(Faction.CSF)
           .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.F)
           .setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
 
-    private static final TechAdvancement FISSION_TA = new TechAdvancement(TechBase.ALL)
-          .setAdvancement(2470, 2882, 3079).setTechRating(TechRating.D)
-          .setPrototypeFactions(Faction.TH).setProductionFactions(Faction.TC)
+    private static final TechAdvancement FISSION_TA = new TechAdvancement(TechBase.IS)
+          .setAdvancement(2470, 2882, 3079)
+          .setTechRating(TechRating.D)
+          .setPrototypeFactions(Faction.TH)
+          .setProductionFactions(Faction.TC)
           .setAvailability(AvailabilityValue.E, AvailabilityValue.E, AvailabilityValue.D, AvailabilityValue.D)
-          .setStaticTechLevel(SimpleTechLevel.STANDARD);
+          .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
     private static final TechAdvancement FUEL_CELL_TA = new TechAdvancement(TechBase.ALL)
-          .setAdvancement(2300, 2470, 3078).setApproximate(true).setTechRating(TechRating.D)
-          .setPrototypeFactions(Faction.TA).setProductionFactions(Faction.TH)
+          .setAdvancement(2300, 2470, 3078)
+          .setApproximate(true)
+          .setTechRating(TechRating.D)
+          .setPrototypeFactions(Faction.TA)
+          .setProductionFactions(Faction.TH)
           .setAvailability(AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.D, AvailabilityValue.C)
-          .setStaticTechLevel(SimpleTechLevel.STANDARD);
+          .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
     private static final TechAdvancement OS_IMPROVE_ICE_TA = new TechAdvancement(TechBase.OUTER_SPHERE)
           .setISAdvancement(2850, 2860, 2875)
@@ -1244,12 +1290,14 @@ public class Engine implements Serializable, ITechnology {
           .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     private static final TechAdvancement SUPPORT_STEAM_TA = new TechAdvancement(TechBase.ALL)
-          .setAdvancement(DATE_PS, DATE_PS, DATE_PS).setTechRating(TechRating.A)
+          .setAdvancement(DATE_PS, DATE_PS, DATE_PS)
+          .setTechRating(TechRating.A)
           .setAvailability(AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A)
           .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     private static final TechAdvancement SUPPORT_ICE_TA = new TechAdvancement(TechBase.ALL)
-          .setAdvancement(DATE_PS, DATE_PS, DATE_PS).setTechRating(TechRating.B)
+          .setAdvancement(DATE_PS, DATE_PS, DATE_PS)
+          .setTechRating(TechRating.B)
           .setAvailability(AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A)
           .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
@@ -1260,7 +1308,8 @@ public class Engine implements Serializable, ITechnology {
           .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     private static final TechAdvancement SUPPORT_FUEL_CELL_TA = new TechAdvancement(TechBase.ALL)
-          .setAdvancement(DATE_PS, DATE_PS, DATE_PS).setTechRating(TechRating.C)
+          .setAdvancement(DATE_PS, DATE_PS, DATE_PS)
+          .setTechRating(TechRating.C)
           .setAvailability(AvailabilityValue.B, AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.B)
           .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
@@ -1271,22 +1320,26 @@ public class Engine implements Serializable, ITechnology {
           .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     private static final TechAdvancement SUPPORT_FISSION_TA = new TechAdvancement(TechBase.ALL)
-          .setAdvancement(DATE_ES, DATE_ES, DATE_ES).setTechRating(TechRating.C)
+          .setAdvancement(DATE_ES, DATE_ES, DATE_ES)
+          .setTechRating(TechRating.C)
           .setAvailability(AvailabilityValue.E, AvailabilityValue.E, AvailabilityValue.D, AvailabilityValue.C)
           .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     private static final TechAdvancement SUPPORT_FUSION_TA = new TechAdvancement(TechBase.ALL)
-          .setAdvancement(DATE_ES, DATE_ES, DATE_ES).setTechRating(TechRating.C)
+          .setAdvancement(DATE_ES, DATE_ES, DATE_ES)
+          .setTechRating(TechRating.C)
           .setAvailability(AvailabilityValue.C, AvailabilityValue.E, AvailabilityValue.D, AvailabilityValue.C)
           .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     private static final TechAdvancement SUPPORT_MAGLEV_TA = new TechAdvancement(TechBase.ALL)
-          .setAdvancement(DATE_ES, DATE_ES, DATE_ES).setTechRating(TechRating.C)
+          .setAdvancement(DATE_ES, DATE_ES, DATE_ES)
+          .setTechRating(TechRating.C)
           .setAvailability(AvailabilityValue.D, AvailabilityValue.F, AvailabilityValue.E, AvailabilityValue.D)
           .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     private static final TechAdvancement SUPPORT_NONE_TA = new TechAdvancement(TechBase.ALL)
-          .setAdvancement(DATE_PS, DATE_PS, DATE_PS).setTechRating(TechRating.A)
+          .setAdvancement(DATE_PS, DATE_PS, DATE_PS)
+          .setTechRating(TechRating.A)
           .setAvailability(AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A, AvailabilityValue.A)
           .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
@@ -1463,7 +1516,7 @@ public class Engine implements Serializable, ITechnology {
                     }
                 }
             case FUEL_CELL:
-                if (hasFlag(SUPPORT_VEE_ENGINE)) {
+                if (hasFlag(SUPPORT_VEE_ENGINE) || hasFlag(INDUSTRIAL_ENGINE)) {
                     return SUPPORT_FUEL_CELL_TA;
                 } else {
                     return FUEL_CELL_TA;
@@ -1477,7 +1530,7 @@ public class Engine implements Serializable, ITechnology {
             case COMPACT_ENGINE:
                 return COMPACT_FUSION_TA;
             case FISSION:
-                if (hasFlag(SUPPORT_VEE_ENGINE)) {
+                if (hasFlag(SUPPORT_VEE_ENGINE) || hasFlag(INDUSTRIAL_ENGINE)) {
                     return SUPPORT_FISSION_TA;
                 } else {
                     return FISSION_TA;
@@ -1542,6 +1595,7 @@ public class Engine implements Serializable, ITechnology {
      *
      * @return the tech type (tech level + tech base) for the current engine.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getTechType(int year) {
         boolean isLarge = hasFlag(LARGE_ENGINE);
         boolean isClan = hasFlag(CLAN_ENGINE);

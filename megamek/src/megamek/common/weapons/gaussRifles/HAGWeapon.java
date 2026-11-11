@@ -42,10 +42,10 @@ import static megamek.common.game.IGame.LOGGER;
 
 import java.io.Serial;
 
+import jakarta.annotation.Nullable;
 import megamek.common.ToHitData;
 import megamek.common.actions.WeaponAttackAction;
 import megamek.common.alphaStrike.AlphaStrikeElement;
-import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoType;
 import megamek.common.game.Game;
 import megamek.common.loaders.EntityLoadingException;
@@ -67,7 +67,7 @@ public abstract class HAGWeapon extends GaussWeapon {
         super();
         damage = DAMAGE_BY_CLUSTER_TABLE;
         ammoType = AmmoType.AmmoTypeEnum.HAG;
-        flags = flags.or(F_NO_AIM);
+        flags = flags.or(F_NO_AIM).or(F_HAG);
         atClass = CLASS_AC;
         infDamageClass = WEAPON_CLUSTER_BALLISTIC;
     }

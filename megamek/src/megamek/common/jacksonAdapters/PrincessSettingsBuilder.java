@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -36,20 +36,24 @@ package megamek.common.jacksonAdapters;
 import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
 import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import jakarta.annotation.Nullable;
 import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.bot.princess.CardinalEdge;
+import megamek.client.bot.princess.CombatPosture;
 import megamek.client.bot.princess.PrincessException;
-import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 
 /**
  * This class is a builder for settings for a Princess bot (BehaviorSettings) and also supports parsing such settings
  * from a yaml MM scenario definition. The difference to BehaviorSettings itself is that this builder can work with
- * incomplete settings, such as only a change to herd mentality or only a change to auto-flee. When building the final
+ * incomplete settings, such as only a change to mutual support or only a change to auto-flee. When building the final
  * BehaviorSettings, either default values or the values of a given other BehaviorSettings are used where the builder
  * has no value.
  *
@@ -66,11 +70,32 @@ public class PrincessSettingsBuilder {
     private static final String PRINCESS_SELF_PRESERVATION = "selfpreservation";
     private static final String PRINCESS_FALL_SHAME = "fallshame";
     private static final String PRINCESS_AGGRESSION = "hyperaggression";
-    private static final String PRINCESS_HERDING = "herdmentality";
+    private static final String PRINCESS_MUTUAL_SUPPORT = "mutualsupport";
+    /** Scenario key this setting used before it was renamed; still accepted so existing scenarios load. */
+    private static final String LEGACY_PRINCESS_HERDING = "herdmentality";
     private static final String PRINCESS_DESTINATION = "fleeto";
     private static final String PRINCESS_RETREAT = "withdrawto";
+    private static final String PRINCESS_POSTURE = "posture";
     private static final String PRINCESS_FLEE = "flee";
     private static final String PRINCESS_FORCED_WITHDRAW = "forcedwithdraw";
+    private static final String PRINCESS_PRIORITY_TARGETS = "prioritytargets";
+
+    /**
+     * One entry of a scenario's {@code priorityTargets:} list: a unit the bot should go for first, and optionally how
+     * keenly. Scenario units can carry a fixed {@code id:}, which is what {@code unit} refers to.
+     *
+     * <pre>
+     * bot:
+     *   priorityTargets:
+     *   - unit: 12
+     *     priority: 1
+     *   - unit: 14
+     * </pre>
+     *
+     * @param unit     the ID of the target unit
+     * @param priority the target priority, 1 (shoot first) to 5, or {@code null} for the default, 3
+     */
+    public record PriorityTarget(int unit, @Nullable Integer priority) {}
 
     @JsonAlias(PRINCESS_SELF_PRESERVATION)
     private int selfPreservation = -1;
@@ -81,8 +106,8 @@ public class PrincessSettingsBuilder {
     @JsonAlias(PRINCESS_AGGRESSION)
     private int hyperAggression = -1;
 
-    @JsonAlias(PRINCESS_HERDING)
-    private int herdMentality = -1;
+    @JsonAlias({ PRINCESS_MUTUAL_SUPPORT, LEGACY_PRINCESS_HERDING })
+    private int mutualSupport = -1;
 
     private int bravery = -1;
 
@@ -102,7 +127,12 @@ public class PrincessSettingsBuilder {
     @JsonAlias(PRINCESS_RETREAT)
     private CardinalEdge withdrawEdge;
 
+    private CombatPosture combatPosture;
+
     private String description = null;
+
+    @JsonAlias(PRINCESS_PRIORITY_TARGETS)
+    private List<PriorityTarget> priorityTargets = new ArrayList<>();
 
     @SuppressWarnings("unused")
     public PrincessSettingsBuilder selfPreservation(int selfPreservation) {
@@ -123,8 +153,8 @@ public class PrincessSettingsBuilder {
     }
 
     @SuppressWarnings("unused")
-    public PrincessSettingsBuilder herdMentality(int herdMentality) {
-        this.herdMentality = herdMentality;
+    public PrincessSettingsBuilder mutualSupport(int mutualSupport) {
+        this.mutualSupport = mutualSupport;
         return this;
     }
 
@@ -156,6 +186,12 @@ public class PrincessSettingsBuilder {
     @JsonSetter("withdrawEdge")
     public PrincessSettingsBuilder withdrawEdge(String edge) {
         withdrawEdge = CardinalEdge.valueOf(edge.toUpperCase());
+        return this;
+    }
+
+    @JsonSetter(PRINCESS_POSTURE)
+    public PrincessSettingsBuilder posture(String posture) {
+        combatPosture = CombatPosture.parse(posture);
         return this;
     }
 
@@ -194,8 +230,8 @@ public class PrincessSettingsBuilder {
         if (hyperAggression != -1) {
             settings.setHyperAggressionIndex(hyperAggression);
         }
-        if (herdMentality != -1) {
-            settings.setHerdMentalityIndex(herdMentality);
+        if (mutualSupport != -1) {
+            settings.setMutualSupportIndex(mutualSupport);
         }
         if (bravery != -1) {
             settings.setBraveryIndex(bravery);
@@ -212,6 +248,10 @@ public class PrincessSettingsBuilder {
         if (withdrawEdge != null) {
             settings.setRetreatEdge(withdrawEdge);
         }
+        if (combatPosture != null) {
+            settings.setCombatPosture(combatPosture);
+        }
+        addPriorityTargets(settings);
 
         if ((description == null) || description.isBlank()) {
             description = "(No description)";
@@ -223,6 +263,25 @@ public class PrincessSettingsBuilder {
         }
 
         return settings;
+    }
+
+    /**
+     * Puts the scenario's priority targets on the bot's list.
+     *
+     * @param settings the settings being built
+     */
+    private void addPriorityTargets(BehaviorSettings settings) {
+        if (priorityTargets == null) {
+            return;
+        }
+        for (PriorityTarget target : priorityTargets) {
+            int priority = (target.priority() == null) ? BehaviorSettings.DEFAULT_TARGET_PRIORITY : target.priority();
+            settings.setPriorityUnit(target.unit(), priority);
+        }
+        if (!priorityTargets.isEmpty()) {
+            LOGGER.debug("[PriorityTargets] scenario sets {} priority target(s): {}", priorityTargets.size(),
+                  priorityTargets);
+        }
     }
 
     /**

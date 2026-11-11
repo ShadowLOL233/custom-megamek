@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2004, 2005 Ben Mazur (bmazur@sev.org)
- * Copyright (C) 2007-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2007-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -38,10 +38,11 @@ import static megamek.common.game.IGame.LOGGER;
 
 import java.io.Serial;
 
+import jakarta.annotation.Nullable;
+import megamek.common.SourceBookCode;
 import megamek.common.ToHitData;
 import megamek.common.actions.WeaponAttackAction;
 import megamek.common.alphaStrike.AlphaStrikeElement;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
@@ -65,6 +66,7 @@ public class ISPlasmaRifle extends AmmoWeapon {
     public ISPlasmaRifle() {
         name = "Plasma Rifle";
         setInternalName("ISPlasmaRifle");
+        sortingName = "Plasma Rifle C";
         heat = 10;
         damage = 10;
         rackSize = 1;
@@ -84,10 +86,13 @@ public class ISPlasmaRifle extends AmmoWeapon {
         medAV = 10;
         maxRange = RANGE_MED;
         atClass = CLASS_PLASMA;
-        rulesRefs = "234, TM";
+        rulesRefs = rulesRefs(
+              rulesRef(SourceBookCode.TM, 234),
+              rulesRef(SourceBookCode.BMM, 106),
+              rulesRef(SourceBookCode.CORE, 189),
+              rulesRef(SourceBookCode.TW, 140)
+        );
         techAdvancement.setTechBase(TechBase.IS)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
               .setISAdvancement(3061, 3068, 3072, DATE_NONE, DATE_NONE)

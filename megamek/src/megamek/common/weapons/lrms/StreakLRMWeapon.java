@@ -38,11 +38,11 @@ import static megamek.common.game.IGame.LOGGER;
 
 import java.io.Serial;
 
+import jakarta.annotation.Nullable;
 import megamek.common.SimpleTechLevel;
 import megamek.common.ToHitData;
 import megamek.common.actions.WeaponAttackAction;
 import megamek.common.alphaStrike.AlphaStrikeElement;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
@@ -68,7 +68,7 @@ public abstract class StreakLRMWeapon extends LRMWeapon {
     public StreakLRMWeapon() {
         super();
         this.ammoType = AmmoType.AmmoTypeEnum.LRM_STREAK;
-        flags = flags.or(F_PROTO_WEAPON).andNot(F_ARTEMIS_COMPATIBLE);
+        flags = flags.or(F_PROTO_WEAPON).andNot(F_ARTEMIS_COMPATIBLE).andNot(F_INDIRECT_FIRE);
         clearModes();
         // Tech Progression tweaked to combine IntOps with TRO Prototypes/3145 NTNU RS
         techAdvancement.setTechBase(TechBase.CLAN).setTechRating(TechRating.F)
@@ -89,7 +89,7 @@ public abstract class StreakLRMWeapon extends LRMWeapon {
     }
 
     @Override
-    // Streak LRMs could end up with an Indirect mode as a result of this game option selection. Overriding to 
+    // Streak LRMs could end up with an Indirect mode as a result of this game option selection. Overriding to
     // prevent this. Bug report #7618
     public void adaptToGameOptions(IGameOptions gameOptions) {
         super.adaptToGameOptions(gameOptions);
@@ -127,10 +127,5 @@ public abstract class StreakLRMWeapon extends LRMWeapon {
             oneShotTag = "OSI ";
         }
         return "LRM STREAK " + oneShotTag + ((rackSize < 10) ? "0" + rackSize : rackSize);
-    }
-
-    @Override
-    public boolean hasIndirectFire() {
-        return false;
     }
 }

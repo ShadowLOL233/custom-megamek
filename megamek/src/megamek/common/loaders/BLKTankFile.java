@@ -160,6 +160,9 @@ public class BLKTankFile extends BLKFile implements IMekLoader {
         if ((engineRating % 5) > 0) {
             engineRating += (5 - (engineRating % 5));
         }
+        if (engineRating > 400) {
+            engineFlags |= Engine.LARGE_ENGINE;
+        }
         t.setEngine(new Engine(engineRating, BLKFile.translateEngineCode(engineCode), engineFlags));
         t.setOriginalWalkMP(dataFile.getDataAsInt("cruiseMP")[0]);
 
@@ -206,7 +209,7 @@ public class BLKTankFile extends BLKFile implements IMekLoader {
             loadEquipment(t, "Front Right", SuperHeavyTank.LOC_FRONT_RIGHT);
             loadEquipment(t, "Front Left", SuperHeavyTank.LOC_FRONT_LEFT);
             loadEquipment(t, "Rear Left", SuperHeavyTank.LOC_REAR_LEFT);
-            loadEquipment(t, "Rear Left", SuperHeavyTank.LOC_REAR_RIGHT);
+            loadEquipment(t, "Rear Right", SuperHeavyTank.LOC_REAR_RIGHT);
             loadEquipment(t, "Rear", SuperHeavyTank.LOC_REAR);
             if (t.hasNoDualTurret()) {
                 if (!t.hasNoTurret()) {

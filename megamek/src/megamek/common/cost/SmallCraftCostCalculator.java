@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -48,12 +48,12 @@ public class SmallCraftCostCalculator {
         CostCalculator.removeNegativeAdditiveCosts(costs);
 
         costs[idx] = -smallCraft.getPriceMultiplier();
-        double cost = CostCalculator.calculateCost(costs);
+        double cost = Math.round(CostCalculator.calculateCost(costs));
         String[] systemNames = { "Bridge", "Computer", "Life Support", "Sensors", "Fire Control Computer",
                                  "Gunnery Control Systems", "Structure", "Attitude Thruster", "Landing Gear", "Engine",
                                  "Drive Unit", "Fuel Tanks", "Armor", "Heat Sinks", "Equipment", "Weight Multiplier" };
         CostCalculator.fillInReport(costReport, smallCraft, ignoreAmmo, systemNames, 14, cost, costs);
-        return Math.round(cost);
+        return cost;
     }
 
     /**

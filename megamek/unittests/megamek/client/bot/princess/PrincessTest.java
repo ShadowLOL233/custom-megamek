@@ -35,24 +35,32 @@ package megamek.client.bot.princess;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
 
 import megamek.client.bot.princess.PathRanker.PathRankerType;
+import megamek.client.bot.princess.UnitBehavior.BehaviorType;
 import megamek.common.Facing;
 import megamek.common.Hex;
 import megamek.common.MPCalculationSetting;
@@ -60,7 +68,9 @@ import megamek.common.battleArmor.BattleArmor;
 import megamek.common.board.Board;
 import megamek.common.board.Coords;
 import megamek.common.compute.Compute;
+import megamek.common.enums.ForcedWithdrawalOrder;
 import megamek.common.enums.GamePhase;
+import megamek.common.enums.MoveStepType;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.IArmorState;
@@ -70,9 +80,11 @@ import megamek.common.equipment.WeaponType;
 import megamek.common.exceptions.LocationFullException;
 import megamek.common.game.Game;
 import megamek.common.game.GameTurn;
+import megamek.common.moves.MovePath;
 import megamek.common.moves.MoveStep;
 import megamek.common.options.GameOptions;
 import megamek.common.options.OptionsConstants;
+import megamek.common.pathfinder.BoardClusterTracker;
 import megamek.common.planetaryConditions.PlanetaryConditions;
 import megamek.common.rolls.PilotingRollData;
 import megamek.common.units.*;
@@ -105,6 +117,10 @@ class PrincessTest {
         MoraleUtil mockMoralUtil = mock(MoraleUtil.class);
 
         mockPrincess = mock(Princess.class);
+        // the withdrawal decisions under test ask the real tracker, which reads the stubbed forced withdrawal setting
+        when(mockPrincess.getForcedWithdrawalTracker()).thenReturn(new ForcedWithdrawalTracker(mockPrincess));
+        // units in these tests have no player orders
+        when(mockPrincess.getUnitOrdersFollower()).thenReturn(mock(UnitOrdersFollower.class));
         when(mockPrincess.getPathRanker(PathRankerType.Basic)).thenReturn(mockPathRanker);
         when(mockPrincess.getPathRanker(any(Entity.class))).thenReturn(mockPathRanker);
         when(mockPrincess.getMoraleUtil()).thenReturn(mockMoralUtil);
@@ -139,6 +155,347 @@ class PrincessTest {
 
         // Test a null ticks argument.
         assertEquals(0, Princess.calculateAdjustment(null));
+    }
+
+    private static MovePath mockPath(boolean deploys) {
+        MovePath path = mock(MovePath.class);
+        when(path.contains(MoveStepType.DEPLOY)).thenReturn(deploys);
+        return path;
+    }
+
+    @Test
+    void testGetMovePathsDoesNotRebuildPathsForUndeployedUnit() {
+        // The walk-on code rebuilds the unit's paths with the DEPLOY step just before asking for them; rebuilding them
+        // again here doubled every walk-on unit's planning time
+        when(mockPrincess.getMovePathsAndSetNecessaryTargets(any(Entity.class), anyBoolean())).thenCallRealMethod();
+
+        Precognition precognition = mock(Precognition.class);
+        PathEnumerator pathEnumerator = mock(PathEnumerator.class);
+        UnitBehavior behaviorTracker = mock(UnitBehavior.class);
+        when(mockPrincess.getPrecognition()).thenReturn(precognition);
+        when(precognition.getPathEnumerator()).thenReturn(pathEnumerator);
+        when(mockPrincess.getUnitBehaviorTracker()).thenReturn(behaviorTracker);
+        when(mockPrincess.getClusterTracker()).thenReturn(mock(BoardClusterTracker.class));
+
+        Entity undeployed = mock(Entity.class);
+        when(undeployed.getId()).thenReturn(7);
+        when(undeployed.isDeployed()).thenReturn(false);
+        when(undeployed.isImmobile()).thenReturn(false);
+        when(pathEnumerator.getPathLock(undeployed)).thenReturn(new ReentrantLock());
+        when(behaviorTracker.getBehaviorType(undeployed, mockPrincess)).thenReturn(BehaviorType.Engaged);
+        List<MovePath> cachedPaths = List.of(mockPath(true));
+        when(pathEnumerator.getUnitPaths()).thenReturn(Map.of(7, cachedPaths));
+
+        assertEquals(cachedPaths, mockPrincess.getMovePathsAndSetNecessaryTargets(undeployed, false));
+        verify(pathEnumerator, never()).recalculateMovesFor(any(Entity.class), anyBoolean());
+        verify(pathEnumerator, never()).recalculateMovesFor(any(Entity.class));
+    }
+
+    @Test
+    void testKeepDeploymentPathsDropsPathsWithoutDeployStep() {
+        // A move-to-contact long-range path has no DEPLOY step; the server would treat it as a skipped turn
+        MovePath longRangePath = mockPath(false);
+        MovePath deployingPath = mockPath(true);
+
+        assertEquals(List.of(deployingPath), Princess.keepDeploymentPaths(List.of(longRangePath, deployingPath)));
+        assertTrue(Princess.keepDeploymentPaths(List.of(longRangePath)).isEmpty());
+        assertTrue(Princess.keepDeploymentPaths(null).isEmpty());
+    }
+
+    @Test
+    void testKeepDeployingRankedPathsKeepsBestDeployingPathFirst() {
+        RankedPath bestButNoDeploy = new RankedPath(40.0, mockPath(false), "long range");
+        RankedPath secondDeploying = new RankedPath(30.0, mockPath(true), "deploy and walk");
+        RankedPath thirdDeploying = new RankedPath(20.0, mockPath(true), "deploy only");
+        TreeSet<RankedPath> rankedPaths = new TreeSet<>(Collections.reverseOrder());
+        rankedPaths.addAll(List.of(bestButNoDeploy, secondDeploying, thirdDeploying));
+
+        TreeSet<RankedPath> deployingPaths = Princess.keepDeployingRankedPaths(rankedPaths);
+
+        assertEquals(2, deployingPaths.size());
+        assertEquals(secondDeploying, deployingPaths.first());
+    }
+
+    @Test
+    void testGetEntityToMovePrefersUndeployedUnitDuringMovementPhase() {
+        when(mockPrincess.getEntityToMove()).thenCallRealMethod();
+        when(mockPrincess.canWalkOnThisRound(any(Entity.class))).thenReturn(true);
+
+        Game game = mock(Game.class);
+        GameOptions options = mock(GameOptions.class);
+        GameTurn turn = mock(GameTurn.class);
+        when(mockPrincess.getGame()).thenReturn(game);
+        when(game.getPhase()).thenReturn(GamePhase.MOVEMENT);
+        when(game.getOptions()).thenReturn(options);
+        when(game.getTurn()).thenReturn(turn);
+        when(turn.isValidEntity(any(Entity.class), eq(game))).thenReturn(true);
+        when(options.booleanOption(anyString())).thenReturn(false);
+
+        Entity deployed = mock(Entity.class);
+        when(deployed.isDone()).thenReturn(false);
+        when(deployed.isOffBoard()).thenReturn(false);
+        when(deployed.isDeployed()).thenReturn(true);
+        when(deployed.getPosition()).thenReturn(new Coords(2, 2));
+        when(deployed.getDisplayName()).thenReturn("Deployed");
+
+        Entity undeployed = mock(Entity.class);
+        when(undeployed.isDone()).thenReturn(false);
+        when(undeployed.isOffBoard()).thenReturn(false);
+        when(undeployed.isDeployed()).thenReturn(false);
+        when(undeployed.getPosition()).thenReturn(null);
+        when(undeployed.getDisplayName()).thenReturn("Undeployed");
+
+        when(mockPrincess.getEntitiesOwned()).thenReturn(List.of(deployed, undeployed));
+
+        assertEquals(undeployed, mockPrincess.getEntityToMove());
+    }
+
+    @Test
+    void testGetEntityToMoveUsesDeploymentOrderForUndeployedUnits() {
+        when(mockPrincess.getEntityToMove()).thenCallRealMethod();
+        when(mockPrincess.canWalkOnThisRound(any(Entity.class))).thenReturn(true);
+
+        Game game = mock(Game.class);
+        GameTurn turn = mock(GameTurn.class);
+        when(mockPrincess.getGame()).thenReturn(game);
+        when(game.getPhase()).thenReturn(GamePhase.MOVEMENT);
+        when(game.getTurnForPlayer(anyInt())).thenReturn(turn);
+        when(game.getFirstDeployableEntityNum(turn)).thenReturn(2);
+        when(game.getEntity(2)).thenReturn(null);
+
+        Entity firstUndeployed = mock(Entity.class);
+        when(firstUndeployed.isDone()).thenReturn(false);
+        when(firstUndeployed.isOffBoard()).thenReturn(false);
+        when(firstUndeployed.isDeployed()).thenReturn(false);
+        when(firstUndeployed.getPosition()).thenReturn(null);
+        when(firstUndeployed.getDisplayName()).thenReturn("First");
+
+        Entity secondUndeployed = mock(Entity.class);
+        when(secondUndeployed.isDone()).thenReturn(false);
+        when(secondUndeployed.isOffBoard()).thenReturn(false);
+        when(secondUndeployed.isDeployed()).thenReturn(false);
+        when(secondUndeployed.getPosition()).thenReturn(null);
+        when(secondUndeployed.getDisplayName()).thenReturn("Second");
+
+        when(game.getTurn()).thenReturn(turn);
+        when(turn.isValidEntity(any(Entity.class), eq(game))).thenReturn(true);
+        when(mockPrincess.getEntitiesOwned()).thenReturn(List.of(firstUndeployed, secondUndeployed));
+        when(game.getEntity(2)).thenReturn(secondUndeployed);
+
+        assertEquals(secondUndeployed, mockPrincess.getEntityToMove());
+    }
+
+    /** Issue #9390: a unit whose move the server refused is not picked again in the same phase. */
+    @Test
+    void testGetEntityToMoveSkipsAUnitTheServerRefused() {
+        when(mockPrincess.getEntityToMove()).thenCallRealMethod();
+        when(mockPrincess.canWalkOnThisRound(any(Entity.class))).thenReturn(true);
+
+        Game game = mock(Game.class);
+        GameTurn turn = mock(GameTurn.class);
+        when(mockPrincess.getGame()).thenReturn(game);
+        when(game.getPhase()).thenReturn(GamePhase.MOVEMENT);
+        when(game.getTurnForPlayer(anyInt())).thenReturn(turn);
+        when(game.getFirstDeployableEntityNum(turn)).thenReturn(1);
+        when(game.getTurn()).thenReturn(turn);
+        when(turn.isValidEntity(any(Entity.class), eq(game))).thenReturn(true);
+
+        Entity refused = mockUndeployedUnit("Refused");
+        Entity nextUndeployed = mockUndeployedUnit("Next");
+        when(game.getEntity(1)).thenReturn(refused);
+        when(mockPrincess.getEntitiesOwned()).thenReturn(List.of(refused, nextUndeployed));
+        when(mockPrincess.isRefusedThisPhase(refused)).thenReturn(true);
+
+        assertEquals(nextUndeployed, mockPrincess.getEntityToMove());
+    }
+
+    private static Entity mockUndeployedUnit(String name) {
+        Entity unit = mock(Entity.class);
+        when(unit.isDone()).thenReturn(false);
+        when(unit.isOffBoard()).thenReturn(false);
+        when(unit.isDeployed()).thenReturn(false);
+        when(unit.getPosition()).thenReturn(null);
+        when(unit.shouldDeploy(anyInt())).thenReturn(true);
+        when(unit.getDisplayName()).thenReturn(name);
+        return unit;
+    }
+
+    @Test
+    void testGetEntityToDeployGivesTheTurnToAUnitThatCannotWalkOn() {
+        // Under walk-on deployment a bot's tractor is the reason the deployment turn exists. A recovery vehicle that
+        // could walk on took it instead, and the tractor never deployed
+        when(mockPrincess.getEntityToDeploy(any(GameTurn.class))).thenCallRealMethod();
+        Game game = mock(Game.class);
+        GameTurn turn = mock(GameTurn.class);
+        when(mockPrincess.getGame()).thenReturn(game);
+        when(turn.isValidEntity(any(Entity.class), eq(game))).thenReturn(true);
+
+        Entity recoveryVehicle = mockUndeployedUnit("Heavy BattleMek Recovery Vehicle");
+        Entity tractor = mockUndeployedUnit("Land Train (Tractor)");
+        when(game.inGameTWEntities()).thenReturn(List.of(recoveryVehicle, tractor));
+        when(mockPrincess.canWalkOnThisRound(recoveryVehicle)).thenReturn(true);
+        when(mockPrincess.canWalkOnThisRound(tractor)).thenReturn(false);
+
+        assertEquals(tractor, mockPrincess.getEntityToDeploy(turn));
+    }
+
+    @Test
+    void testGetEntityToDeployFallsBackToAWalkOnUnit() {
+        when(mockPrincess.getEntityToDeploy(any(GameTurn.class))).thenCallRealMethod();
+        Game game = mock(Game.class);
+        GameTurn turn = mock(GameTurn.class);
+        when(mockPrincess.getGame()).thenReturn(game);
+        when(turn.isValidEntity(any(Entity.class), eq(game))).thenReturn(true);
+
+        Entity recoveryVehicle = mockUndeployedUnit("Heavy BattleMek Recovery Vehicle");
+        when(game.inGameTWEntities()).thenReturn(List.of(recoveryVehicle));
+        when(mockPrincess.canWalkOnThisRound(recoveryVehicle)).thenReturn(true);
+
+        assertEquals(recoveryVehicle, mockPrincess.getEntityToDeploy(turn));
+    }
+
+    @Test
+    void testGetEntityToMoveDoesNotWalkOnATractor() {
+        when(mockPrincess.getEntityToMove()).thenCallRealMethod();
+        Game game = mock(Game.class);
+        GameOptions options = mock(GameOptions.class);
+        GameTurn turn = mock(GameTurn.class);
+        when(mockPrincess.getGame()).thenReturn(game);
+        when(game.getPhase()).thenReturn(GamePhase.MOVEMENT);
+        when(game.getOptions()).thenReturn(options);
+        when(game.getTurn()).thenReturn(turn);
+        when(turn.isValidEntity(any(Entity.class), eq(game))).thenReturn(true);
+        when(options.booleanOption(anyString())).thenReturn(false);
+
+        Entity tractor = mockUndeployedUnit("Land Train (Tractor)");
+        Entity mek = mockUndeployedUnit("Rifleman RFL-3N");
+        when(mockPrincess.canWalkOnThisRound(tractor)).thenReturn(false);
+        when(mockPrincess.canWalkOnThisRound(mek)).thenReturn(true);
+        when(mockPrincess.getEntitiesOwned()).thenReturn(List.of(tractor, mek));
+
+        assertEquals(mek, mockPrincess.getEntityToMove());
+    }
+
+    @Test
+    void testGetEntityToMoveDoesNotWalkOnTheFirstDeployableUnitWhenItIsCarried() {
+        // Issue #9389: battle armor riding a VTOL enters with the VTOL. Picking it for a walk-on made the server refuse
+        // the move, and the game hung
+        when(mockPrincess.getEntityToMove()).thenCallRealMethod();
+        Game game = mock(Game.class);
+        GameTurn turn = mock(GameTurn.class);
+        when(mockPrincess.getGame()).thenReturn(game);
+        when(game.getPhase()).thenReturn(GamePhase.MOVEMENT);
+        when(game.getTurnForPlayer(anyInt())).thenReturn(turn);
+        when(game.getTurn()).thenReturn(turn);
+        when(turn.isValidEntity(any(Entity.class), eq(game))).thenReturn(true);
+
+        Entity battleArmor = mockUndeployedUnit("Purifier Adaptive Battle Armor");
+        when(battleArmor.isTransported()).thenReturn(true);
+        Entity vtol = mockUndeployedUnit("Pinto Attack VTOL");
+        when(game.getFirstDeployableEntityNum(turn)).thenReturn(86);
+        when(game.getEntity(86)).thenReturn(battleArmor);
+        when(mockPrincess.canWalkOnThisRound(any(Entity.class))).thenReturn(true);
+        when(mockPrincess.getEntitiesOwned()).thenReturn(List.of(battleArmor, vtol));
+
+        assertEquals(vtol, mockPrincess.getEntityToMove());
+    }
+
+    @Test
+    void testGetEntityToMoveDoesNotWalkOnACarriedUnit() {
+        when(mockPrincess.getEntityToMove()).thenCallRealMethod();
+        Game game = mock(Game.class);
+        GameOptions options = mock(GameOptions.class);
+        GameTurn turn = mock(GameTurn.class);
+        when(mockPrincess.getGame()).thenReturn(game);
+        when(game.getPhase()).thenReturn(GamePhase.MOVEMENT);
+        when(game.getOptions()).thenReturn(options);
+        when(game.getTurn()).thenReturn(turn);
+        when(turn.isValidEntity(any(Entity.class), eq(game))).thenReturn(true);
+        when(options.booleanOption(anyString())).thenReturn(false);
+
+        Entity battleArmor = mockUndeployedUnit("Purifier Adaptive Battle Armor");
+        when(battleArmor.isTransported()).thenReturn(true);
+        Entity vtol = mockUndeployedUnit("Pinto Attack VTOL");
+        when(mockPrincess.canWalkOnThisRound(any(Entity.class))).thenReturn(true);
+        when(mockPrincess.getEntitiesOwned()).thenReturn(List.of(battleArmor, vtol));
+
+        assertEquals(vtol, mockPrincess.getEntityToMove());
+    }
+
+    @Test
+    void testGetEntityToMoveSkipsAnUndeployedUnitThatIsNotDeployingThisRound() {
+        // The regular move picker must not choose a unit that cannot walk on: the server would still accept its path
+        // if it carries a DEPLOY step, and walk on a tractor or a unit due in a later round
+        when(mockPrincess.getEntityToMove()).thenCallRealMethod();
+        Game game = mock(Game.class);
+        GameOptions options = mock(GameOptions.class);
+        GameTurn turn = mock(GameTurn.class);
+        when(mockPrincess.getGame()).thenReturn(game);
+        when(game.getPhase()).thenReturn(GamePhase.MOVEMENT);
+        when(game.getOptions()).thenReturn(options);
+        when(game.getTurn()).thenReturn(turn);
+        when(turn.isValidEntity(any(Entity.class), eq(game))).thenReturn(true);
+        when(options.booleanOption(anyString())).thenReturn(false);
+
+        Entity deployed = mock(Entity.class);
+        when(deployed.isDone()).thenReturn(false);
+        when(deployed.isOffBoard()).thenReturn(false);
+        when(deployed.isDeployed()).thenReturn(true);
+        when(deployed.getPosition()).thenReturn(new Coords(2, 2));
+        when(deployed.getDisplayName()).thenReturn("Deployed");
+        // Listed last, so with equal move indexes the old picker chose it
+        Entity tractor = mockUndeployedUnit("Land Train (Tractor)");
+        when(mockPrincess.canWalkOnThisRound(tractor)).thenReturn(false);
+        when(mockPrincess.getEntitiesOwned()).thenReturn(List.of(deployed, tractor));
+
+        assertEquals(deployed, mockPrincess.getEntityToMove());
+    }
+
+    @Test
+    void testGetEntityToMoveEvaluatesAlreadyDeployedUnits() {
+        when(mockPrincess.getEntityToMove()).thenCallRealMethod();
+
+        Game game = mock(Game.class);
+        GameOptions options = mock(GameOptions.class);
+        GameTurn turn = mock(GameTurn.class);
+        when(mockPrincess.getGame()).thenReturn(game);
+        when(game.getPhase()).thenReturn(GamePhase.MOVEMENT);
+        when(game.getOptions()).thenReturn(options);
+        when(game.getTurn()).thenReturn(turn);
+        when(turn.isValidEntity(any(Entity.class), eq(game))).thenReturn(true);
+        when(options.booleanOption(anyString())).thenReturn(false);
+
+        Entity deployed = mock(Entity.class);
+        when(deployed.isDone()).thenReturn(false);
+        when(deployed.isOffBoard()).thenReturn(false);
+        when(deployed.isDeployed()).thenReturn(true);
+        when(deployed.getPosition()).thenReturn(new Coords(2, 2));
+        when(deployed.getDisplayName()).thenReturn("Deployed");
+
+        when(mockPrincess.getEntitiesOwned()).thenReturn(List.of(deployed));
+
+        assertEquals(deployed, mockPrincess.getEntityToMove());
+    }
+
+    @Test
+    void testGetMessageGuardsNonFiniteEstimate() {
+        Entity mockEntity = mock(Entity.class);
+        when(mockEntity.getChassis()).thenReturn("Flashman");
+        List<MovePath> paths = new ArrayList<>();
+
+        // A +Infinity estimate (produced when a prior zero-path turn divided elapsed time by 0) must not
+        // surface as the Integer.MAX_VALUE completion time that results from casting the double to int.
+        String infiniteMessage = Princess.getMessage(mockEntity, Double.POSITIVE_INFINITY, paths);
+        assertTrue(infiniteMessage.contains("unknown."));
+        assertFalse(infiniteMessage.contains(Integer.toString(Integer.MAX_VALUE)));
+
+        // NaN is likewise non-finite and must be reported as unknown rather than the 0 that (int) NaN yields.
+        String nanMessage = Princess.getMessage(mockEntity, Double.NaN, paths);
+        assertTrue(nanMessage.contains("unknown."));
+
+        // A normal finite estimate is still rendered as a seconds value.
+        String finiteMessage = Princess.getMessage(mockEntity, 12.0, paths);
+        assertTrue(finiteMessage.contains("12 seconds"));
     }
 
     @Test
@@ -263,6 +620,7 @@ class PrincessTest {
         when(mockMek.getRunMP()).thenReturn(6);
         when(mockMek.isOffBoard()).thenReturn(false);
         when(mockMek.getPosition()).thenReturn(mockCoords);
+        when(mockMek.isDeployed()).thenReturn(true);
         when(mockMek.isSelectableThisTurn()).thenReturn(true);
         when(mockPrincess.calculateMoveIndex(eq(mockMek), any(StringBuilder.class))).thenReturn(1.111);
 
@@ -270,6 +628,7 @@ class PrincessTest {
         when(mockBA.getRunMP()).thenReturn(3);
         when(mockBA.isOffBoard()).thenReturn(false);
         when(mockBA.getPosition()).thenReturn(mockCoords);
+        when(mockBA.isDeployed()).thenReturn(true);
         when(mockBA.isSelectableThisTurn()).thenReturn(true);
         when(mockPrincess.calculateMoveIndex(eq(mockBA), any(StringBuilder.class))).thenReturn(6.666);
 
@@ -277,6 +636,7 @@ class PrincessTest {
         when(mockTank.getRunMP()).thenReturn(6);
         when(mockTank.isOffBoard()).thenReturn(false);
         when(mockTank.getPosition()).thenReturn(mockCoords);
+        when(mockTank.isDeployed()).thenReturn(true);
         when(mockTank.isSelectableThisTurn()).thenReturn(true);
         when(mockPrincess.calculateMoveIndex(eq(mockTank), any(StringBuilder.class))).thenReturn(2.5);
 
@@ -284,18 +644,21 @@ class PrincessTest {
         when(mockEjectedMekwarrior.getRunMP()).thenReturn(1);
         when(mockEjectedMekwarrior.isOffBoard()).thenReturn(false);
         when(mockEjectedMekwarrior.getPosition()).thenReturn(mockCoords);
+        when(mockEjectedMekwarrior.isDeployed()).thenReturn(true);
         when(mockEjectedMekwarrior.isSelectableThisTurn()).thenReturn(true);
 
         Entity mockImmobileMek = mock(BipedMek.class);
         when(mockImmobileMek.getRunMP()).thenReturn(0);
         when(mockImmobileMek.isOffBoard()).thenReturn(false);
         when(mockImmobileMek.getPosition()).thenReturn(mockCoords);
+        when(mockImmobileMek.isDeployed()).thenReturn(true);
         when(mockImmobileMek.isSelectableThisTurn()).thenReturn(true);
         when(mockImmobileMek.isImmobile()).thenReturn(true);
 
         Entity mockOffBoardArty = mock(Tank.class);
         when(mockOffBoardArty.getRunMP()).thenReturn(6);
         when(mockOffBoardArty.getPosition()).thenReturn(mockCoords);
+        when(mockOffBoardArty.isDeployed()).thenReturn(true);
         when(mockOffBoardArty.isSelectableThisTurn()).thenReturn(true);
         when(mockOffBoardArty.isOffBoard()).thenReturn(true);
         when(mockPrincess.calculateMoveIndex(eq(mockOffBoardArty), any(StringBuilder.class))).thenReturn(10.0);
@@ -379,7 +742,9 @@ class PrincessTest {
     @Test
     void testWantsToFallBack() {
         Entity mockMek = mock(BipedMek.class);
-        when(mockMek.isCrippled()).thenReturn(false);
+        // wantsToFallBack checks isCrippled(true), so crew-crippled Meks withdraw too
+        when(mockMek.isCrippled(true)).thenReturn(false);
+        when(mockMek.getForcedWithdrawalOrder()).thenReturn(ForcedWithdrawalOrder.BOT_RULES);
 
         when(mockPrincess.wantsToFallBack(any(Entity.class))).thenCallRealMethod();
         when(mockPrincess.getForcedWithdrawal()).thenReturn(true);
@@ -402,7 +767,7 @@ class PrincessTest {
         assertFalse(mockPrincess.wantsToFallBack(mockMek));
 
         when(mockPrincess.getFleeBoard()).thenReturn(false);
-        when(mockMek.isCrippled()).thenReturn(true);
+        when(mockMek.isCrippled(true)).thenReturn(true);
         // Fall Back and Flee Board Disabled, Mek Crippled, Forced Withdrawal Enabled
         // Should Fall Back
         assertTrue(mockPrincess.wantsToFallBack(mockMek));
@@ -413,15 +778,79 @@ class PrincessTest {
         assertFalse(mockPrincess.wantsToFallBack(mockMek));
     }
 
+    /**
+     * Issue #8818: the attacks that cripple a unit are not an honor violation, because the unit was still a
+     * legitimate target when they were declared. Only an enemy shooting it once it is already visibly
+     * crippled and withdrawing unlocks its return fire.
+     */
+    @Test
+    void testReturnFirePermissionNeedsAnAttackAfterTheUnitWasAlreadyCrippled() {
+        Princess princess = spy(new Princess("TestPrincess", UUID.randomUUID().toString(), 1));
+        princess.getBehaviorSettings().setForcedWithdrawal(true);
+
+        // Healthy when this turn's attacks were declared, and crippled by those very attacks.
+        BipedMek crippledThisTurnMek = mock(BipedMek.class);
+        when(crippledThisTurnMek.getId()).thenReturn(10);
+        when(crippledThisTurnMek.getAttackedByThisTurn()).thenReturn(Set.of(99));
+        when(crippledThisTurnMek.getDisplayName()).thenReturn("Crippled This Turn Mek");
+
+        // Already crippled and withdrawing when this turn's attacks were declared, and attacked anyway.
+        BipedMek withdrawingMek = mock(BipedMek.class);
+        when(withdrawingMek.getId()).thenReturn(11);
+        when(withdrawingMek.getAttackedByThisTurn()).thenReturn(Set.of(99));
+        when(withdrawingMek.getDisplayName()).thenReturn("Withdrawing Mek");
+
+        // Already crippled and withdrawing, but left alone: keeps holding its fire.
+        BipedMek ignoredWithdrawingMek = mock(BipedMek.class);
+        when(ignoredWithdrawingMek.getId()).thenReturn(12);
+        when(ignoredWithdrawingMek.getAttackedByThisTurn()).thenReturn(Set.of());
+        when(ignoredWithdrawingMek.getDisplayName()).thenReturn("Ignored Withdrawing Mek");
+
+        doReturn(List.of(crippledThisTurnMek, withdrawingMek, ignoredWithdrawingMek)).when(princess)
+              .getEntitiesOwned();
+
+        // Only the last two were visibly withdrawing when the enemy declared this turn's attacks.
+        princess.updateReturnFirePermission(Set.of(withdrawingMek.getId(), ignoredWithdrawingMek.getId()));
+
+        assertFalse(princess.canShootWhileFallingBack(crippledThisTurnMek),
+              "the attacks that crippled a unit must not also unlock its return fire");
+        assertTrue(princess.canShootWhileFallingBack(withdrawingMek),
+              "a unit attacked while already crippled and withdrawing may return fire");
+        assertFalse(princess.canShootWhileFallingBack(ignoredWithdrawingMek),
+              "a withdrawing unit no one attacks keeps holding its fire");
+    }
+
+    /**
+     * With Forced Withdrawal switched off there is no withdrawal to protect, so the pass grants nothing and
+     * crippled units fight on under the ordinary firing rules.
+     */
+    @Test
+    void testReturnFirePermissionIsNotGrantedWithoutForcedWithdrawal() {
+        Princess princess = spy(new Princess("TestPrincess", UUID.randomUUID().toString(), 1));
+        princess.getBehaviorSettings().setForcedWithdrawal(false);
+
+        BipedMek withdrawingMek = mock(BipedMek.class);
+        when(withdrawingMek.getId()).thenReturn(11);
+        when(withdrawingMek.getAttackedByThisTurn()).thenReturn(Set.of(99));
+
+        doReturn(List.of(withdrawingMek)).when(princess).getEntitiesOwned();
+
+        princess.updateReturnFirePermission(Set.of(withdrawingMek.getId()));
+
+        assertFalse(princess.canShootWhileFallingBack(withdrawingMek));
+    }
+
     @Test
     void testIsFallingBack() {
         Entity mockMek = mock(BipedMek.class);
         when(mockMek.isImmobile()).thenReturn(false);
         when(mockMek.isCrippled(anyBoolean())).thenReturn(false);
         when(mockMek.getId()).thenReturn(1);
+        when(mockMek.getForcedWithdrawalOrder()).thenReturn(ForcedWithdrawalOrder.BOT_RULES);
 
         when(mockPrincess.wantsToFallBack(any(Entity.class))).thenReturn(false);
         when(mockPrincess.isFallingBack(any(Entity.class))).thenCallRealMethod();
+        when(mockPrincess.getForcedWithdrawal()).thenReturn(true);
 
         BehaviorSettings mockBehavior = mock(BehaviorSettings.class);
         when(mockBehavior.getDestinationEdge()).thenReturn(CardinalEdge.NONE);
@@ -449,6 +878,7 @@ class PrincessTest {
 
         // Unit is capable of fleeing.
         Entity mockMek = mock(BipedMek.class);
+        when(mockMek.getForcedWithdrawalOrder()).thenReturn(ForcedWithdrawalOrder.BOT_RULES);
 
         // Unit is on home edge.
         BasicPathRanker mockRanker = mock(BasicPathRanker.class);
@@ -476,8 +906,8 @@ class PrincessTest {
         assertFalse(mockPrincess.mustFleeBoard(mockMek));
 
         // Even a crippled mek should not fall back unless fleeBoard or forcedWithdrawal
-        // is enabled
-        when(mockMek.isCrippled()).thenReturn(true);
+        // is enabled (mustFleeBoard checks isCrippled(true), so crew-crippled Meks count too)
+        when(mockMek.isCrippled(true)).thenReturn(true);
         assertFalse(mockPrincess.mustFleeBoard(mockMek));
 
         // Enabling forcedWithdrawal should cause fleeing, because mek is crippled
@@ -485,7 +915,7 @@ class PrincessTest {
         assertTrue(mockPrincess.mustFleeBoard(mockMek));
 
         // But forcedWithdrawal without a crippled mek should not flee
-        when(mockMek.isCrippled()).thenReturn(false);
+        when(mockMek.isCrippled(true)).thenReturn(false);
         assertFalse(mockPrincess.mustFleeBoard(mockMek));
 
         // If fleeBoard is true, all units falling back should flee
@@ -654,6 +1084,31 @@ class PrincessTest {
         bin1.setShotsLeft(1);
         conserveMap = mockPrincess.calcAmmoConservation(mek1);
         assertTrue(conserveMap.get(wpn1) <= target);
+    }
+
+    @Test
+    void testCalcAmmoSplitsSharedShotsBetweenLaunchers() throws LocationFullException {
+        // Issue 9376: two launchers sharing two shots have one shot each, so each should be as careful as a lone
+        // launcher down to its last shot, not fire as though both shots were its own
+        BehaviorSettings mockBehavior = mock(BehaviorSettings.class);
+        when(mockBehavior.getHyperAggressionIndex()).thenReturn(5);
+        when(mockPrincess.getBehaviorSettings()).thenReturn(mockBehavior);
+
+        Mek loneLauncherMek = new BipedMek();
+        Mounted<?> loneBin = loneLauncherMek.addEquipment(mockAC5AmmoType, Mek.LOC_CENTER_TORSO);
+        Mounted<?> loneLauncher = loneLauncherMek.addEquipment(mockAC5, Mek.LOC_RIGHT_TORSO);
+        loneBin.setShotsLeft(1);
+
+        Mek twinLauncherMek = new BipedMek();
+        Mounted<?> sharedBin = twinLauncherMek.addEquipment(mockAC5AmmoType, Mek.LOC_CENTER_TORSO);
+        Mounted<?> firstLauncher = twinLauncherMek.addEquipment(mockAC5, Mek.LOC_RIGHT_TORSO);
+        Mounted<?> secondLauncher = twinLauncherMek.addEquipment(mockAC5, Mek.LOC_LEFT_TORSO);
+        sharedBin.setShotsLeft(2);
+
+        double loneThreshold = mockPrincess.calcAmmoConservation(loneLauncherMek).get((WeaponMounted) loneLauncher);
+        Map<WeaponMounted, Double> twinThresholds = mockPrincess.calcAmmoConservation(twinLauncherMek);
+        assertEquals(loneThreshold, twinThresholds.get((WeaponMounted) firstLauncher), 0.0001);
+        assertEquals(loneThreshold, twinThresholds.get((WeaponMounted) secondLauncher), 0.0001);
     }
 
     @Test
@@ -966,199 +1421,280 @@ class PrincessTest {
     }
 
     /**
-     * Tests building-based reinforcement logic and building entity retrieval.
+     * Regression tests for {@link Princess#evadeIfNotFiring} (issue #8542): an airborne entity that
+     * is not an {@code IAero} (an ejected pilot descending by parachute) must not trigger the
+     * {@code IAero} cast, which threw a {@code ClassCastException} and hung the bot's whole turn.
      */
     @Nested
-    class InfantryCombatTests {
-        @Nested
-        class GetBuildingAtPositionTests {
+    class EvadeIfNotFiringTests {
 
-            @Test
-            void testReturnsBuilding_WhenBuildingAtPosition() {
-                // Arrange
-                Princess princess = spy(new Princess("TestPrincess", UUID.randomUUID().toString(), 1));
-                Game mockGame = mock(Game.class);
-                doReturn(mockGame).when(princess).getGame();
-
-                Coords position = new Coords(5, 5);
-                AbstractBuildingEntity mockBuilding = mock(AbstractBuildingEntity.class);
-                when(mockBuilding.getId()).thenReturn(100);
-
-                List<Entity> entitiesAtPosition = new ArrayList<>();
-                entitiesAtPosition.add(mockBuilding);
-                when(mockGame.getEntitiesVector(position)).thenReturn(entitiesAtPosition);
-
-                // Act
-                Entity result;
-                try {
-                    java.lang.reflect.Method method = Princess.class.getDeclaredMethod(
-                          "getBuildingAtPosition", Coords.class);
-                    method.setAccessible(true);
-                    result = (Entity) method.invoke(princess, position);
-                } catch (Exception e) {
-                    throw new RuntimeException("Failed to test getBuildingAtPosition", e);
-                }
-
-                // Assert
-                assertEquals(mockBuilding, result);
-            }
-
-            @Test
-            void testReturnsNull_WhenNoBuildingAtPosition() {
-                // Arrange
-                Princess princess = spy(new Princess("TestPrincess", UUID.randomUUID().toString(), 1));
-                Game mockGame = mock(Game.class);
-                doReturn(mockGame).when(princess).getGame();
-
-                Coords position = new Coords(5, 5);
-                Infantry mockInfantry = mock(Infantry.class);
-
-                List<Entity> entitiesAtPosition = new ArrayList<>();
-                entitiesAtPosition.add(mockInfantry);
-                when(mockGame.getEntitiesVector(position)).thenReturn(entitiesAtPosition);
-
-                // Act
-                Entity result;
-                try {
-                    java.lang.reflect.Method method = Princess.class.getDeclaredMethod(
-                          "getBuildingAtPosition", Coords.class);
-                    method.setAccessible(true);
-                    result = (Entity) method.invoke(princess, position);
-                } catch (Exception e) {
-                    throw new RuntimeException("Failed to test getBuildingAtPosition", e);
-                }
-
-                // Assert
-                assertNull(result);
+        private void invokeEvadeIfNotFiring(Princess princess, MovePath path, boolean possibleToInflictDamage) {
+            try {
+                java.lang.reflect.Method method = Princess.class.getDeclaredMethod(
+                      "evadeIfNotFiring", MovePath.class, boolean.class);
+                method.setAccessible(true);
+                method.invoke(princess, path, possibleToInflictDamage);
+            } catch (java.lang.reflect.InvocationTargetException e) {
+                // Unwrap so the original failure (e.g. the ClassCastException this test guards
+                // against) surfaces directly instead of being hidden inside a reflection wrapper.
+                throw new RuntimeException("evadeIfNotFiring threw", e.getCause());
+            } catch (ReflectiveOperationException e) {
+                throw new RuntimeException("Failed to invoke evadeIfNotFiring", e);
             }
         }
 
-        @Nested
-        class FindEligibleInfantryCombatsToReinforceTests {
+        @Test
+        void testDoesNotCrashAndDoesNotEvadeForAirborneEjectedPilot() {
+            // An ejected pilot (MekWarrior) is airborne (altitude > 0) but is not an IAero.
+            // Before the fix, reaching the IAero cast threw a ClassCastException here.
+            Princess princess = spy(new Princess("TestPrincess", UUID.randomUUID().toString(), 1));
 
-            @Test
-            void testFindsCombat_WhenInSameBuilding() {
-                // Arrange
-                Princess princess = spy(new Princess("TestPrincess", UUID.randomUUID().toString(), 1));
-                Game mockGame = mock(Game.class);
-                doReturn(mockGame).when(princess).getGame();
+            MekWarrior ejectedPilot = mock(MekWarrior.class);
+            when(ejectedPilot.isAirborne()).thenReturn(true);
 
-                AbstractBuildingEntity mockBuilding = mock(AbstractBuildingEntity.class);
-                when(mockBuilding.getId()).thenReturn(100);
+            MovePath path = mock(MovePath.class);
+            when(path.getEntity()).thenReturn(ejectedPilot);
 
-                Infantry searchingInfantry = mock(Infantry.class);
-                Coords infantryPos = new Coords(5, 5);
-                when(searchingInfantry.getPosition()).thenReturn(infantryPos);
+            invokeEvadeIfNotFiring(princess, path, false);
 
-                List<Entity> entitiesAtInfantryPos = new ArrayList<>();
-                entitiesAtInfantryPos.add(mockBuilding);
-                when(mockGame.getEntitiesVector(infantryPos)).thenReturn(entitiesAtInfantryPos);
+            verify(path, never()).addStep(MoveStepType.EVADE);
+        }
 
-                Infantry combatInfantry = mock(Infantry.class);
-                when(combatInfantry.getInfantryCombatTargetId()).thenReturn(100);
+        @Test
+        void testAddsEvadeForAirborneAeroThatCannotFire() {
+            // An airborne aerospace fighter that cannot inflict damage and can spare the thrust
+            // should still receive an EVADE step - the fix must not change this behavior.
+            Princess princess = spy(new Princess("TestPrincess", UUID.randomUUID().toString(), 1));
 
-                List<Entity> allEntities = new ArrayList<>();
-                allEntities.add(searchingInfantry);
-                allEntities.add(combatInfantry);
-                when(mockGame.getEntitiesVector()).thenReturn(allEntities);
-                when(mockGame.getEntity(100)).thenReturn(mockBuilding);
+            AeroSpaceFighter fighter = mock(AeroSpaceFighter.class);
+            when(fighter.isAirborne()).thenReturn(true);
+            when(fighter.isAero()).thenReturn(true);
+            when(fighter.isOutControlTotal()).thenReturn(false);
+            when(fighter.getCurrentThrust()).thenReturn(5);
+            when(fighter.getSI()).thenReturn(5);
 
-                // Act
-                List<Integer> result;
-                try {
-                    java.lang.reflect.Method method = Princess.class.getDeclaredMethod(
-                          "findEligibleInfantryCombatsToReinforce", Entity.class);
-                    method.setAccessible(true);
-                    @SuppressWarnings("unchecked")
-                    List<Integer> temp = (List<Integer>) method.invoke(princess, searchingInfantry);
-                    result = temp;
-                } catch (Exception e) {
-                    throw new RuntimeException("Failed to test findEligibleInfantryCombatsToReinforce", e);
-                }
+            MovePath path = mock(MovePath.class);
+            when(path.getEntity()).thenReturn(fighter);
+            when(path.getMpUsed()).thenReturn(0);
 
-                // Assert
-                assertEquals(1, result.size());
-                assertTrue(result.contains(100));
+            invokeEvadeIfNotFiring(princess, path, false);
+
+            verify(path).addStep(MoveStepType.EVADE);
+        }
+    }
+
+    /**
+     * Regression tests for {@link Princess#canRecoverMobility(Entity)} (issue #8775): a Mek whose
+     * movement has been eaten by heat is stalled, not finished, and its crew must not be ejected while
+     * its heat sinks are still winning. The numbers come from the units in the reporter's game log.
+     */
+    @Nested
+    class CanRecoverMobilityTests {
+
+        private Game mockGame;
+        private Hex mockHex;
+
+        @BeforeEach
+        void setUpGate() {
+            mockGame = mock(Game.class);
+            mockHex = mock(Hex.class);
+            when(mockHex.containsTerrain(Terrains.FIRE)).thenReturn(false);
+            when(mockGame.getHex(any(Coords.class), anyInt())).thenReturn(mockHex);
+            doReturn(mockGame).when(mockPrincess).getGame();
+            when(mockPrincess.canRecoverMobility(any(Entity.class))).thenCallRealMethod();
+            when(mockPrincess.recurringHeat(any(Entity.class), anyBoolean())).thenCallRealMethod();
+        }
+
+        /**
+         * A heat-stalled Mek with the given dissipation and engine damage: standing, no jump jets, no
+         * stealth armor, no Nova CEWS, and a hex that is not burning.
+         */
+        private Mek stalledMek(int heatCapacity, int engineCritHeat) {
+            Mek mockMek = mock(BipedMek.class);
+            when(mockMek.isPermanentlyImmobilized(true)).thenReturn(false);
+            when(mockMek.getRunMP()).thenReturn(0);
+            when(mockMek.getHeatCapacity()).thenReturn(heatCapacity);
+            when(mockMek.getHeatCapacityWithWater()).thenReturn(heatCapacity);
+            when(mockMek.getEngineCritHeat()).thenReturn(engineCritHeat);
+            when(mockMek.isProne()).thenReturn(false);
+            when(mockMek.getAnyTypeMaxJumpMP()).thenReturn(0);
+            when(mockMek.tracksHeat()).thenReturn(true);
+            when(mockMek.getAltitude()).thenReturn(0);
+            when(mockMek.getElevation()).thenReturn(0);
+            when(mockMek.getPosition()).thenReturn(new Coords(5, 5));
+            when(mockMek.getBoardId()).thenReturn(0);
+            return mockMek;
+        }
+
+        /** Sets the Mek's hex burning, with the fire having started on an earlier turn. */
+        private void setHexOnFire() {
+            when(mockHex.containsTerrain(Terrains.FIRE)).thenReturn(true);
+            when(mockHex.getFireTurn()).thenReturn(2);
+        }
+
+        /** Gives the Mek working jump jets that cost the stated heat for a single hex. */
+        private void giveJumpJets(Mek mockMek, int jumpMP, int cheapestJumpHeat) {
+            when(mockMek.getAnyTypeMaxJumpMP()).thenReturn(jumpMP);
+            when(mockMek.getJumpHeat(1)).thenReturn(cheapestJumpHeat);
+        }
+
+        @Test
+        void carronadeCoolsAndKeepsItsPilot() {
+            // Carronade CRN-7M from the log: 10 IS doubles, so 20 points of dissipation, against two
+            // engine criticals. It sheds 10 a turn and walks again next turn.
+            assertTrue(mockPrincess.canRecoverMobility(stalledMek(20, 10)));
+        }
+
+        @Test
+        void huronWarriorCoolsSlowlyAndStillKeepsItsPilot() {
+            // Huron Warrior HUR-WO-R4L from the log: 11 single sinks against two engine criticals. One
+            // point a turn is slow, but the heat is coming down, so the Mek is not abandoned.
+            assertTrue(mockPrincess.canRecoverMobility(stalledMek(11, 10)));
+        }
+
+        @Test
+        void breakingEvenIsNotRecovery() {
+            // Dissipation exactly matching the incoming heat holds that heat forever. The comparison has
+            // to be strictly greater or this Mek stands at zero MP for the rest of the game.
+            assertFalse(mockPrincess.canRecoverMobility(stalledMek(10, 10)));
+        }
+
+        @Test
+        void fireInTheHexIsCountedWhenTheMekCannotLeave() {
+            // The same Huron Warrior, now standing in a fire: 11 against 10 engine plus 5 fire. With no
+            // jump jets it cannot get out of the hex, so the fire heat never stops.
+            Mek mockMek = stalledMek(11, 10);
+            setHexOnFire();
+            assertFalse(mockPrincess.canRecoverMobility(mockMek));
+        }
+
+        @Test
+        void heatDissipatingArmorHalvesTheFireHeat() {
+            // Intact heat-dissipating armor takes 2 from the fire rather than 5, which brings the Mek
+            // back under its 13 points of dissipation.
+            Mek mockMek = stalledMek(13, 10);
+            when(mockMek.hasIntactHeatDissipatingArmor()).thenReturn(true);
+            setHexOnFire();
+            assertTrue(mockPrincess.canRecoverMobility(mockMek));
+        }
+
+        @Test
+        void jumpingOutOfAFireLeavesTheFireBehind() {
+            // Grasshopper GHR-5H with 8 sinks shot away, two engine criticals, standing in a fire.
+            // Staying is 14 against 15 and fails; jumping is 14 against 10 engine plus 3 jump heat and
+            // succeeds, because the fire stops being its problem the moment it leaves the hex.
+            Mek mockMek = stalledMek(14, 10);
+            giveJumpJets(mockMek, 4, 3);
+            setHexOnFire();
+            assertTrue(mockPrincess.canRecoverMobility(mockMek));
+        }
+
+        @Test
+        void jumpHeatCanMakeTheEscapeUnaffordable() {
+            // The same situation with two fewer working sinks: 12 against 15 standing still, and 12
+            // against 13 jumping. The jets are there and it still cannot use them.
+            Mek mockMek = stalledMek(12, 10);
+            giveJumpJets(mockMek, 4, 3);
+            setHexOnFire();
+            assertFalse(mockPrincess.canRecoverMobility(mockMek));
+        }
+
+        @Test
+        void anXxlEngineIsChargedTheHigherMinimumJumpHeat() {
+            // Same numbers as the Grasshopper above, but an XXL engine pays max(6, hexes * 2) rather
+            // than max(3, hexes). Six heat rather than three is the difference between getting out of
+            // the fire and not.
+            Mek mockMek = stalledMek(14, 10);
+            giveJumpJets(mockMek, 4, 6);
+            setHexOnFire();
+            assertFalse(mockPrincess.canRecoverMobility(mockMek));
+        }
+
+        @Test
+        void aMechanicalJumpBoosterCostsNoHeat() {
+            // Jump boosters are not engine-driven, so they cost nothing to use. The Mek that could not
+            // afford a 3-heat jump out of the fire can afford a free one.
+            Mek mockMek = stalledMek(12, 10);
+            giveJumpJets(mockMek, 2, 0);
+            setHexOnFire();
+            assertTrue(mockPrincess.canRecoverMobility(mockMek));
+        }
+
+        @Test
+        void aProneMekCannotUseItsJumpJets() {
+            // The Grasshopper again, knocked down. Standing up needs walking MP, which heat has taken,
+            // so the jets are out of reach and the fire keeps burning it.
+            Mek mockMek = stalledMek(14, 10);
+            giveJumpJets(mockMek, 4, 3);
+            setHexOnFire();
+            when(mockMek.isProne()).thenReturn(true);
+            assertFalse(mockPrincess.canRecoverMobility(mockMek));
+        }
+
+        @Test
+        void jumpingDoesNotRescueAMekThatCannotCool() {
+            // Wolverine WVR-6R with 3 sinks destroyed and two engine criticals: 9 dissipation against 10
+            // engine heat, with no fire to escape. Jumping only adds heat, so it buys nothing.
+            Mek mockMek = stalledMek(9, 10);
+            giveJumpJets(mockMek, 5, 3);
+            assertFalse(mockPrincess.canRecoverMobility(mockMek));
+        }
+
+        @Test
+        void switchableHeatLoadsAreNotCountedBecauseTheBotShedsThem() {
+            // BotHeatEquipmentManager switches all five of these off in the end phase once a unit reaches
+            // shutdown-roll heat, and a Mek stalled badly enough to reach this question is well past that
+            // point. Counting them would abandon pilots over heat the bot has already stopped paying.
+            for (Consumer<Mek> switchOn : List.<Consumer<Mek>>of(
+                  mek -> when(mek.isStealthOn()).thenReturn(true),
+                  mek -> when(mek.isNullSigOn()).thenReturn(true),
+                  mek -> when(mek.isVoidSigOn()).thenReturn(true),
+                  mek -> when(mek.isChameleonShieldOn()).thenReturn(true),
+                  mek -> when(mek.hasActiveNovaCEWS()).thenReturn(true))) {
+                Mek mockMek = stalledMek(11, 10);
+                switchOn.accept(mockMek);
+                assertTrue(mockPrincess.canRecoverMobility(mockMek));
             }
+        }
 
-            @Test
-            void testDoesNotFindCombat_WhenInDifferentBuilding() {
-                // Arrange
-                Princess princess = spy(new Princess("TestPrincess", UUID.randomUUID().toString(), 1));
-                Game mockGame = mock(Game.class);
-                doReturn(mockGame).when(princess).getGame();
+        @Test
+        void damageThatIsNotHeatIsStillPermanent() {
+            // Both legs gone. The core rules already measure this with heat ignored, so no amount of
+            // cooling brings the movement back and the crew should get out.
+            Mek mockMek = stalledMek(20, 0);
+            when(mockMek.isPermanentlyImmobilized(true)).thenReturn(true);
+            assertFalse(mockPrincess.canRecoverMobility(mockMek));
+        }
 
-                AbstractBuildingEntity building1 = mock(AbstractBuildingEntity.class);
-                when(building1.getId()).thenReturn(100);
+        @Test
+        void aUnitThatDoesNotTrackHeatIsUnaffected() {
+            // A vehicle never lost its movement to heat, so the gate leaves it exactly as it was.
+            Tank mockTank = mock(Tank.class);
+            when(mockTank.isPermanentlyImmobilized(true)).thenReturn(false);
+            when(mockTank.getRunMP()).thenReturn(0);
+            when(mockTank.getHeatCapacity()).thenReturn(Entity.DOES_NOT_TRACK_HEAT);
+            assertFalse(mockPrincess.canRecoverMobility(mockTank));
+        }
 
-                AbstractBuildingEntity building2 = mock(AbstractBuildingEntity.class);
-                when(building2.getId()).thenReturn(200);
+        @Test
+        void aProneMekThatStillHasMovementIsNotAHeatCase() {
+            // isImmobilized also reports true for a Mek that is prone with poor odds of standing back
+            // up, which has nothing to do with temperature. Found in headless play: a cool, undamaged
+            // Doloire with 28 points of dissipation and no recurring heat was being held on the field
+            // because it had fallen over. If the unit still has run MP, cooling cannot be the answer.
+            Mek mockMek = stalledMek(28, 0);
+            when(mockMek.getRunMP()).thenReturn(6);
+            when(mockMek.isProne()).thenReturn(true);
+            assertFalse(mockPrincess.canRecoverMobility(mockMek));
+        }
 
-                Infantry searchingInfantry = mock(Infantry.class);
-                Coords infantryPos = new Coords(5, 5);
-                when(searchingInfantry.getPosition()).thenReturn(infantryPos);
-
-                List<Entity> entitiesAtInfantryPos = new ArrayList<>();
-                entitiesAtInfantryPos.add(building1);
-                when(mockGame.getEntitiesVector(infantryPos)).thenReturn(entitiesAtInfantryPos);
-
-                Infantry combatInfantry = mock(Infantry.class);
-                when(combatInfantry.getInfantryCombatTargetId()).thenReturn(200);
-
-                List<Entity> allEntities = new ArrayList<>();
-                allEntities.add(searchingInfantry);
-                allEntities.add(combatInfantry);
-                when(mockGame.getEntitiesVector()).thenReturn(allEntities);
-                when(mockGame.getEntity(200)).thenReturn(building2);
-
-                // Act
-                List<Integer> result;
-                try {
-                    java.lang.reflect.Method method = Princess.class.getDeclaredMethod(
-                          "findEligibleInfantryCombatsToReinforce", Entity.class);
-                    method.setAccessible(true);
-                    @SuppressWarnings("unchecked")
-                    List<Integer> temp = (List<Integer>) method.invoke(princess, searchingInfantry);
-                    result = temp;
-                } catch (Exception e) {
-                    throw new RuntimeException("Failed to test findEligibleInfantryCombatsToReinforce", e);
-                }
-
-                // Assert
-                assertEquals(0, result.size());
-            }
-
-            @Test
-            void testReturnsEmpty_WhenNotInBuilding() {
-                // Arrange
-                Princess princess = spy(new Princess("TestPrincess", UUID.randomUUID().toString(), 1));
-                Game mockGame = mock(Game.class);
-                doReturn(mockGame).when(princess).getGame();
-
-                Infantry searchingInfantry = mock(Infantry.class);
-                Coords infantryPos = new Coords(5, 5);
-                when(searchingInfantry.getPosition()).thenReturn(infantryPos);
-
-                List<Entity> entitiesAtInfantryPos = new ArrayList<>();
-                entitiesAtInfantryPos.add(searchingInfantry);
-                when(mockGame.getEntitiesVector(infantryPos)).thenReturn(entitiesAtInfantryPos);
-
-                // Act
-                List<Integer> result;
-                try {
-                    java.lang.reflect.Method method = Princess.class.getDeclaredMethod(
-                          "findEligibleInfantryCombatsToReinforce", Entity.class);
-                    method.setAccessible(true);
-                    @SuppressWarnings("unchecked")
-                    List<Integer> temp = (List<Integer>) method.invoke(princess, searchingInfantry);
-                    result = temp;
-                } catch (Exception e) {
-                    throw new RuntimeException("Failed to test findEligibleInfantryCombatsToReinforce", e);
-                }
-
-                // Assert
-                assertEquals(0, result.size());
-            }
+        @Test
+        void aStuckMekThatStillHasMovementIsNotAHeatCase() {
+            // Same reasoning for a Mek bogged down in a swamp: its movement is not heat's doing.
+            Mek mockMek = stalledMek(28, 0);
+            when(mockMek.getRunMP()).thenReturn(4);
+            when(mockMek.isStuck()).thenReturn(true);
+            assertFalse(mockPrincess.canRecoverMobility(mockMek));
         }
     }
 }

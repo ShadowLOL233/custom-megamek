@@ -33,14 +33,14 @@
 
 package megamek.client.bot.princess;
 
+import jakarta.annotation.Nullable;
 import megamek.common.compute.Compute;
+import megamek.common.equipment.Minefield;
+import megamek.common.moves.MovePath;
+import megamek.common.moves.MoveStep;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityMovementMode;
 import megamek.common.units.Mek;
-import megamek.common.equipment.Minefield;
-import megamek.common.annotations.Nullable;
-import megamek.common.moves.MovePath;
-import megamek.common.moves.MoveStep;
 
 /**
  * This class contains logic to evaluate the damage a unit could sustain from moving a long a move path containing
@@ -91,6 +91,7 @@ public class MinefieldUtil {
             switch (minefield.getType()) {
                 case Minefield.TYPE_CONVENTIONAL:
                 case Minefield.TYPE_INFERNO:
+                case Minefield.TYPE_EMP:
                     // if we're either not jumping or it's the last step
                     if (!isJumping || lastStep) {
                         hazardAccumulator += minefield.getDensity() * hoverMovementMultiplier;
@@ -109,6 +110,12 @@ public class MinefieldUtil {
                         hazardAccumulator += minefield.getDensity();
                     }
                     break;
+                case Minefield.TYPE_TRIPWIRE:
+                case Minefield.TYPE_PITFALL:
+                	// tripwires and pitfalls cause 'Meks to fall
+                	if (movingUnit instanceof Mek && (!isJumping || lastStep)) {
+                		hazardAccumulator += movingUnit.getWeight() / 10;
+                	}
             }
         }
 

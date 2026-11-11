@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2004, 2005 Ben Mazur (bmazur@sev.org)
- * Copyright (C) 2007-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2007-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -40,10 +40,10 @@ import java.io.Serial;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import jakarta.annotation.Nullable;
 import megamek.common.RangeType;
 import megamek.common.ToHitData;
 import megamek.common.actions.WeaponAttackAction;
-import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoMounted;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.EquipmentType;
@@ -55,10 +55,13 @@ import megamek.common.game.Game;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.IGameOptions;
 import megamek.common.options.OptionsConstants;
+import megamek.common.units.ConvInfantry;
 import megamek.common.units.Entity;
+import megamek.common.units.Targetable;
 import megamek.common.util.YamlEncDec;
 import megamek.common.weapons.Weapon;
 import megamek.common.weapons.handlers.AttackHandler;
+import megamek.common.weapons.handlers.FireExtinguisherHandler;
 import megamek.server.totalWarfare.TWGameManager;
 
 /**
@@ -239,8 +242,12 @@ public abstract class InfantryWeapon extends Weapon {
      * @return Whether the weapon has alternate inferno ammo
      */
     public boolean hasInfernoAmmo() {
-        return internalName.endsWith("Inferno")
-              || (EquipmentType.get(internalName + "Inferno") != null);
+        if (internalName.endsWith("Inferno")) {
+            return true;
+        }
+        // A withdrawn Inferno variant's name now resolves to this weapon itself, which is not an Inferno variant
+        EquipmentType inferno = EquipmentType.get(internalName + "Inferno");
+        return (inferno != null) && (inferno != this);
     }
 
     /**
@@ -295,9 +302,31 @@ public abstract class InfantryWeapon extends Weapon {
         try {
             Entity entity = game.getEntity(waa.getEntityId());
 
+            // Firefighting engineers extinguish a burning hex in place of a weapon attack (TO:AuE p.153).
+            // Route that to the shared fire extinguisher resolution.
+            Targetable target = waa.getTarget(game);
+            if ((entity != null) && entity.isFirefighter()
+                  && (target != null) && (target.getTargetType() == Targetable.TYPE_HEX_EXTINGUISH)) {
+                return new FireExtinguisherHandler(toHit, waa, game, manager);
+            }
+
             if (entity != null) {
                 Mounted<?> mounted = entity.getEquipment(waa.getWeaponId());
-                if (((null != mounted) && ((mounted.hasModes() && mounted.curMode().isHeat())
+                // A Disposable Weapon attack (TO:AuE p.116, Corrected Sixth Printing) uses the disposable damage
+                // formula instead of the weapon's normal handler, but only while the rule is enabled; otherwise the
+                // mount fires as an ordinary weapon.
+                if ((mounted instanceof WeaponMounted weaponMounted) && weaponMounted.isDisposableWeapon()
+                      && game.getOptions()
+                      .booleanOption(OptionsConstants.ADVANCED_COMBAT_DISPOSABLE_INFANTRY_WEAPONS)) {
+                    return new InfantryDisposableWeaponHandler(toHit, waa, game, manager);
+                }
+                // An SRM platoon that declared Inferno munitions before the battle delivers inferno missiles
+                // rather than damage or heat (TW p. 143).
+                if ((entity instanceof ConvInfantry infantry) && infantry.firesInfernoSrms()
+                      && isSrmLauncherMount(mounted)) {
+                    return new InfantryInfernoSRMHandler(toHit, waa, game, manager);
+                }
+                if (((mounted != null) && ((mounted.hasModes() && mounted.curMode().isHeat())
                       || (waa.getEntity(game).isSupportVehicle()
                       && mounted.getLinked() != null
                       && mounted.getLinked().getType() != null
@@ -315,6 +344,21 @@ public abstract class InfantryWeapon extends Weapon {
             LOGGER.warn("Get Correct Handler - Attach Handler Received Null Entity.");
         }
         return null;
+    }
+
+    /**
+     * @return {@code true} if the mount fires the platoon's SRM launchers, either as its own weapon or as the other
+     *       half of a combined primary and secondary weapon mount
+     */
+    static boolean isSrmLauncherMount(@Nullable Mounted<?> mounted) {
+        if (mounted == null) {
+            return false;
+        }
+        if (mounted.getType().hasFlag(WeaponType.F_SRM)) {
+            return true;
+        }
+        return (mounted instanceof InfantryWeaponMounted infantryMount)
+              && infantryMount.getOtherWeapon().hasFlag(WeaponType.F_SRM);
     }
 
     @Override

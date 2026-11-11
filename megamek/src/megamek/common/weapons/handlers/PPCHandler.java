@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2005 - Ben Mazur (bmazur@sev.org)
- * Copyright (C) 2007-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2007-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -64,6 +64,8 @@ import megamek.server.totalWarfare.TWGameManager;
 public class PPCHandler extends EnergyWeaponHandler {
     @Serial
     private static final long serialVersionUID = 5545991061428671743L;
+    /** The extra damage a charged PPC Capacitor adds to its PPC's shot. */
+    private static final int PPC_CAPACITOR_DAMAGE_BONUS = 5;
     private int chargedCapacitor = 0;
 
     public PPCHandler(ToHitData t, WeaponAttackAction w, Game g, TWGameManager m) throws EntityLoadingException {
@@ -83,6 +85,17 @@ public class PPCHandler extends EnergyWeaponHandler {
         }
     }
 
+    /**
+     * A charged PPC Capacitor adds {@code 5} to the PPC's damage, and so to its Attack Value when the Attack Value is
+     * used.
+     *
+     * @return {@code 5} with a charged capacitor, otherwise {@code 0}
+     */
+    @Override
+    protected int getAttackValueBonus() {
+        return (chargedCapacitor != 0) ? PPC_CAPACITOR_DAMAGE_BONUS : 0;
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -98,7 +111,7 @@ public class PPCHandler extends EnergyWeaponHandler {
         }
 
         if (chargedCapacitor != 0) {
-            toReturn += 5;
+            toReturn += PPC_CAPACITOR_DAMAGE_BONUS;
         }
         // during a swarm, all damage gets applied as one block to one location
         if ((attackingEntity instanceof BattleArmor)
@@ -144,8 +157,8 @@ public class PPCHandler extends EnergyWeaponHandler {
 
         if (target.isConventionalInfantry()) {
             toReturn = Compute.directBlowInfantryDamage(toReturn,
-                  bDirect ? toHit.getMoS() / 3 : 0,
-                  weaponType.getInfantryDamageClass(),
+                  getInfantryDamageClassShift(),
+                  resolveInfantryDamageClass(weaponType.getInfantryDamageClass()),
                   ((Infantry) target).isMechanized(),
                   toHit.getThruBldg() != null, attackingEntity.getId(), calcDmgPerHitReport);
         } else if (bDirect) {
@@ -221,9 +234,9 @@ public class PPCHandler extends EnergyWeaponHandler {
                     rep.indent(2);
                 }
                 vPhaseReport.addAll(newReports);
-                // Deal 2 damage to the pilot
+                // Deal damage to the pilot
                 vPhaseReport.addAll(gameManager.damageCrew(attackingEntity,
-                      2,
+                      Game.rulesManager.getRulesPilot().getExplosionPilotHits(),
                       attackingEntity.getCrew().getCurrentPilotIndex()));
                 r = new Report(3185);
                 r.subject = subjectId;
@@ -235,27 +248,10 @@ public class PPCHandler extends EnergyWeaponHandler {
         }
         // resolve roll for charged capacitor
         if (chargedCapacitor != 0) {
-            if (roll.getIntValue() == 2) {
-                Report r = new Report(3178);
-                r.subject = attackingEntity.getId();
-                r.indent();
+            Report r = Game.rulesManager.getRulesWeapons().checkPPCCapacitor(roll.getIntValue(), attackingEntity,
+                  weapon);
+            if (r != null) {
                 vPhaseReport.add(r);
-                // Oops, we ruined our day...
-                int wLocation = weapon.getLocation();
-                weapon.setHit(true);
-                for (int i = 0; i < attackingEntity.getNumberOfCriticalSlots(wLocation); i++) {
-                    CriticalSlot slot = attackingEntity.getCritical(wLocation, i);
-                    if ((slot == null)
-                          || (slot.getType() == CriticalSlot.TYPE_SYSTEM)) {
-                        continue;
-                    }
-                    // Only one Crit needs to be damaged.
-                    Mounted<?> mounted = slot.getMount();
-                    if (mounted.equals(weapon)) {
-                        slot.setDestroyed(true);
-                        break;
-                    }
-                }
             }
         }
         return false;

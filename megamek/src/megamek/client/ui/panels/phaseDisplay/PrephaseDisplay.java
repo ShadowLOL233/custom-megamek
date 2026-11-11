@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -40,12 +40,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import jakarta.annotation.Nullable;
 import megamek.client.Client;
 import megamek.client.event.BoardViewEvent;
 import megamek.client.ui.Messages;
@@ -53,6 +55,7 @@ import megamek.client.ui.clientGUI.ClientGUI;
 import megamek.client.ui.clientGUI.boardview.BoardView;
 import megamek.client.ui.clientGUI.boardview.IBoardView;
 import megamek.client.ui.clientGUI.boardview.overlay.ToastLevel;
+import megamek.client.ui.dialogs.phaseDisplay.TargetChoiceDialog;
 import megamek.client.ui.util.KeyCommandBind;
 import megamek.client.ui.util.MegaMekController;
 import megamek.client.ui.widget.MegaMekButton;
@@ -67,6 +70,7 @@ import megamek.common.event.entity.GameEntityChangeEvent;
 import megamek.common.game.Game;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
+import megamek.common.units.Targetable;
 import megamek.logging.MMLogger;
 
 /**
@@ -249,14 +253,14 @@ public class PrephaseDisplay extends StatusBarPhaseDisplay implements ListSelect
 
             // If the selected entity is not on the board, use the next one.
             // ASSUMPTION: there will always be *at least one* entity on map.
-            if (null == currentEntity().getPosition()) {
+            if (currentEntity().getPosition() == null) {
 
                 // Walk through the list of entities for this player.
                 for (int nextId = client.getNextEntityNum(en); nextId != en; nextId = client.getNextEntityNum(nextId)) {
 
                     Entity nextEntity = client.getEntity(nextId);
 
-                    if (nextEntity != null && null != nextEntity.getPosition()) {
+                    if (nextEntity != null && nextEntity.getPosition() != null) {
                         cen = nextId;
                         break;
                     }
@@ -264,7 +268,7 @@ public class PrephaseDisplay extends StatusBarPhaseDisplay implements ListSelect
                 } // Check the player's next entity.
 
                 // We were *supposed* to have found an on-board entity.
-                if (null == currentEntity().getPosition()) {
+                if (currentEntity().getPosition() == null) {
                     logger.error("Could not find an on-board entity: {}", en);
                     return;
                 }
@@ -354,6 +358,8 @@ public class PrephaseDisplay extends StatusBarPhaseDisplay implements ListSelect
             endMyTurn();
             return;
         }
+        // only ring once it is clear the turn needs the player; an auto-completed turn above stays silent
+        clientgui.bingMyTurn();
 
         if (GUIP.getAutoSelectNextUnit()) {
             selectEntity(firstEntity);
@@ -365,12 +371,14 @@ public class PrephaseDisplay extends StatusBarPhaseDisplay implements ListSelect
 
         setupButtonPanel();
         refreshButtons();
+        startTimer();
     }
 
     /**
      * Does end turn stuff.
      */
     private void endMyTurn() {
+        stopTimer();
         cen = Entity.NONE;
         ghostTargetMode = false;
         ghostTargetConfirmation = null;
@@ -457,9 +465,9 @@ public class PrephaseDisplay extends StatusBarPhaseDisplay implements ListSelect
         } else if (b.getType() == BoardViewEvent.BOARD_HEX_CLICKED) {
             b.getBoardView().select(b.getCoords());
 
-            // In ghost target mode, find a unit at the clicked hex and assign it
+            // In ghost target mode, pick a unit at the clicked hex (with a chooser for stacked units) and assign it
             if (ghostTargetMode && (b.getCoords() != null)) {
-                Entity target = findEntityAtCoords(b.getCoords());
+                Entity target = chooseGhostTarget(b.getCoords(), b.getBoardId());
                 if (target != null) {
                     assignGhostTarget(target);
                 }
@@ -482,6 +490,7 @@ public class PrephaseDisplay extends StatusBarPhaseDisplay implements ListSelect
         if (game().getPhase().isSimultaneous(game())
               && (e.getPreviousPlayerId() != clientgui.getClient().getLocalPlayerNumber())
               && (game().getTurnIndex() != 0)) {
+            setStatusBarText(getRemainingPlayerWithTurns());
             return;
         }
 
@@ -502,7 +511,7 @@ public class PrephaseDisplay extends StatusBarPhaseDisplay implements ListSelect
                           "PrephaseDisplay.its_others_turn",
                           phase.toString(), e.getPlayer().getName()));
                 }
-
+                clientgui.bingOthersTurn();
             }
         }
     }
@@ -769,15 +778,37 @@ public class PrephaseDisplay extends StatusBarPhaseDisplay implements ListSelect
     }
 
     /**
-     * Finds the first deployed entity at the given coordinates.
+     * Returns the ghost target the player wants to assign at the clicked hex. When several units are stacked in
+     * the hex, a selection dialog is shown so a specific unit can be picked (for example a Demolisher sitting
+     * underneath a tank); otherwise the single deployed unit is returned. The current entity is never offered as
+     * a target. Eligibility checks (infantry immunity, range, available equipment) are left to
+     * {@link #assignGhostTarget(Entity)} so the player still receives the matching feedback.
+     *
+     * @param coords  the clicked hex
+     * @param boardId the board the hex belongs to
+     *
+     * @return the chosen target entity, or null if the hex holds no eligible unit or the player cancels the
+     *       selection dialog
      */
-    private Entity findEntityAtCoords(Coords coords) {
-        for (Entity entity : game().inGameTWEntities()) {
-            if (entity.isDeployed() && coords.equals(entity.getPosition())) {
-                return entity;
-            }
+    private @Nullable Entity chooseGhostTarget(Coords coords, int boardId) {
+        Entity source = currentEntity();
+        List<Entity> candidates = new ArrayList<>(game().getEntitiesVector(coords, boardId));
+        candidates.removeIf(entity -> (entity == null) || !entity.isDeployed() || entity.equals(source));
+
+        if (candidates.isEmpty()) {
+            return null;
         }
-        return null;
+        if (candidates.size() == 1) {
+            return candidates.getFirst();
+        }
+
+        // Stacked units: let the player choose which one to ghost target.
+        List<Targetable> targets = new ArrayList<>(candidates);
+        Targetable choice = TargetChoiceDialog.showSingleChoiceDialog(clientgui.getFrame(),
+              "PrephaseDisplay.ghostTargetChoiceDialog.title",
+              Messages.getString("PrephaseDisplay.ghostTargetChoiceDialog.message", coords.getBoardNum()),
+              targets, clientgui, null);
+        return (choice instanceof Entity chosen) ? chosen : null;
     }
 
     private boolean isStandardGhostTargetMode() {

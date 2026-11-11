@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2001-2004 Ben Mazur (bmazur@sev.org)
- * Copyright (C) 2006-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2006-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -38,18 +38,19 @@ import static megamek.common.units.QuadVee.CONV_MODE_VEHICLE;
 
 import java.io.Serial;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.Messages;
 import megamek.common.CriticalSlot;
 import megamek.common.Hex;
 import megamek.common.Player;
 import megamek.common.RangeType;
 import megamek.common.ToHitData;
-import megamek.common.annotations.Nullable;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.compute.Compute;
 import megamek.common.game.Game;
 import megamek.common.options.OptionsConstants;
 import megamek.common.rolls.TargetRoll;
+import megamek.common.rules.totalwarfare.TWRulesManager;
 import megamek.common.units.*;
 
 public class PhysicalAttackAction extends AbstractAttackAction {
@@ -102,6 +103,11 @@ public class PhysicalAttackAction extends AbstractAttackAction {
         // can't make a physical attack if you are evading
         if (ae.isEvading()) {
             return "Attacker is evading.";
+        }
+
+        // Climbing units cannot make physical attacks (TO:AR p.20)
+        if (ae.isClimbing()) {
+            return Messages.getString("WeaponAttackAction.CantPhysicalWhileClimbing");
         }
 
         // can't make physical attacks if loading/unloading cargo
@@ -171,6 +177,7 @@ public class PhysicalAttackAction extends AbstractAttackAction {
         boolean inSameBuilding = Compute.isInSameBuilding(game, ae, target);
         int attackerId = ae.getId();
         int targetId = target.getId();
+
         // Battle Armor targets are hard for Meks and Tanks to hit.
         if (target instanceof BattleArmor) {
             toHit.addModifier(1, "battle armor target");
@@ -189,7 +196,7 @@ public class PhysicalAttackAction extends AbstractAttackAction {
         }
 
         // Enhanced Imaging bonus for physical attacks - IO p.69
-        // "All Piloting Skill rolls required for the EI-equipped unit receives a -1
+        // "All physical attack rolls required for the EI-equipped unit receives a -1
         // target number modifier. This includes checks made for physical attacks"
         if (ae.hasActiveEiCockpit()) {
             toHit.addModifier(-1, Messages.getString("Compute.EnhancedImaging"));
@@ -203,6 +210,14 @@ public class PhysicalAttackAction extends AbstractAttackAction {
 
         // target terrain
         toHit.append(Compute.getTargetTerrainModifier(game, target, 0, inSameBuilding));
+
+        // RULES large targets check
+        int largeTarget = (game.getEntity(target.getId()) == null) ? 0 :
+              Game.rulesManager.getRulesTarget().largeTargetModifier(game.getEntity(target.getId()).getWeightClass());
+        // RULESFUTURE Call this with the 2nd parameter when objectives that are large are added
+        if (largeTarget != 0 && !(game.rulesManager instanceof TWRulesManager)) {
+            toHit.addModifier(largeTarget, "large target");
+        }
 
         if (ae.hasModularArmor()) {
             toHit.addModifier(1, "Modular Armor");
@@ -274,7 +289,7 @@ public class PhysicalAttackAction extends AbstractAttackAction {
             // water partial cover?
             if ((te.height() > 0) && (te.getElevation() == -1)
                   && (targHex.terrainLevel(Terrains.WATER) == te.height())) {
-                toHit.addModifier(1, "target has partial cover");
+                toHit.addModifier(1, Messages.getString("WeaponAttackAction.AeTargetHasPartialCover"));
             }
 
             // Pilot skills

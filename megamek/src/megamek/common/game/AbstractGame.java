@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -45,10 +45,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
+import jakarta.annotation.Nullable;
 import megamek.common.Player;
 import megamek.common.Team;
 import megamek.common.actions.EntityAction;
-import megamek.common.annotations.Nullable;
+import megamek.common.actions.UnjamAction;
 import megamek.common.board.Board;
 import megamek.common.board.Coords;
 import megamek.common.equipment.ICarryable;
@@ -235,6 +236,15 @@ public abstract class AbstractGame implements IGame {
         return Collections.unmodifiableMap(gameBoards);
     }
 
+    @Override
+    @Nullable
+    public Board getBoard(int boardId) {
+        // Direct map lookup. The IGame default routes through getBoards(), which allocates an unmodifiable-map
+        // wrapper on every call; this method is called very heavily in the to-hit/LOS/ECM inner loops. Uses the
+        // gameBoards field directly (no new serialized state) so a deserialized game cannot get a null view.
+        return gameBoards.get(boardId);
+    }
+
     public Set<Integer> getBoardIds() {
         return gameBoards.keySet();
     }
@@ -255,7 +265,26 @@ public abstract class AbstractGame implements IGame {
      * @see #getActionsVector()
      */
     public void clearActions() {
+        clearActions(false);
+    }
+
+    /**
+     * Unjamming has to persist until later than the other actions. This only clears unjamming when the true is called.
+     *
+     * @see #getActionsVector()
+     */
+    public void clearActions(boolean clearUnjam) {
+        List<EntityAction> keep = new ArrayList<>();
+        if (!clearUnjam) {
+            // Keep unjam actions
+            for (EntityAction entityAction : pendingActions) {
+                if (entityAction instanceof UnjamAction) {
+                    keep.add(entityAction);
+                }
+            }
+        }
         pendingActions.clear();
+        pendingActions.addAll(keep);
     }
 
     /**
@@ -432,7 +461,7 @@ public abstract class AbstractGame implements IGame {
      */
     public void reset() {
         clearScriptedEvents();
-        clearActions();
+        clearActions(true);
         inGameObjects.clear();
         turnIndex = AWAITING_FIRST_TURN;
         groundObjects.clear();

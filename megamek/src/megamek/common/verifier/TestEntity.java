@@ -49,11 +49,11 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.common.Configuration;
 import megamek.common.CriticalSlot;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechConstants;
-import megamek.common.annotations.Nullable;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.bays.Bay;
 import megamek.common.enums.MPBoosters;
@@ -421,7 +421,21 @@ public abstract class TestEntity implements TestEntityOption {
 
     public static List<EquipmentType> validJumpJets(long entityType, boolean industrial) {
         if ((entityType & Entity.ETYPE_MEK) != 0) {
-            return MekJumpJets.allJJs(industrial);
+            List<EquipmentType> jumpJets = Arrays.asList(
+                  EquipmentType.get(EquipmentTypeLookup.JUMP_JET),
+                  EquipmentType.get(EquipmentTypeLookup.IMPROVED_JUMP_JET),
+                  EquipmentType.get(EquipmentTypeLookup.PROTOTYPE_JUMP_JET),
+                  EquipmentType.get(EquipmentTypeLookup.PROTOTYPE_IMPROVED_JJ),
+                  EquipmentType.get(EquipmentTypeLookup.MEK_UMU)
+            );
+
+            if (industrial) {
+                return jumpJets.stream()
+                      .filter(eq -> (eq != null) && ((MiscType) eq).isIndustrial())
+                      .collect(Collectors.toCollection(ArrayList::new));
+            }
+
+            return new ArrayList<>(jumpJets);
         } else if ((entityType & Entity.ETYPE_TANK) != 0) {
             return Collections.singletonList(EquipmentType.get(EquipmentTypeLookup.VEHICLE_JUMP_JET));
         } else if ((entityType & Entity.ETYPE_BATTLEARMOR) != 0) {
@@ -535,13 +549,13 @@ public abstract class TestEntity implements TestEntityOption {
     }
 
     public String printWeightEngine() {
-        return StringUtil.makeLength("Engine: " + ((null != engine) ? engine.getEngineName() : "---"),
+        return StringUtil.makeLength("Engine: " + ((engine != null) ? engine.getEngineName() : "---"),
               getPrintSize() - 5)
               + TestEntity.makeWeightString(getWeightEngine(), usesKgStandard()) + "\n";
     }
 
     public double getWeightEngine() {
-        return ((null != engine) ? engine.getWeightEngine(getEntity()) : 0);
+        return ((engine != null) ? engine.getWeightEngine(getEntity()) : 0);
     }
 
     public String printWeightStructure() {
@@ -745,11 +759,12 @@ public abstract class TestEntity implements TestEntityOption {
 
     public double getWeightWeapon() {
         double weight = 0.0;
-        for (Mounted<?> m : getEntity().getTotalWeaponList()) {
-            if (m.isWeaponGroup()) {
+        for (Mounted<?> mounted : getEntity().getTotalWeaponList()) {
+            // Bomb pods (rocket launcher, TAG, Arrow IV...) are part of the bomb load, not the unit's own weight
+            if (mounted.isWeaponGroup() || mounted.isBombMounted()) {
                 continue;
             }
-            weight += m.getTonnage();
+            weight += mounted.getTonnage();
         }
         return weight;
     }
@@ -1158,7 +1173,7 @@ public abstract class TestEntity implements TestEntityOption {
         if (unit.isProtoMek()) {
             return Math.round(armorTons / ArmorType.forEntity(unit).getWeightPerPoint());
         } else if (unit.isSupportVehicle()) {
-            return Math.floor(armorTons / TestSupportVehicle.armorWeightPerPoint(unit));
+            return Math.round(armorTons / TestSupportVehicle.armorWeightPerPoint(unit));
         } else {
             return armorTons * getArmorPointsPerTon(unit);
         }
@@ -1284,6 +1299,10 @@ public abstract class TestEntity implements TestEntityOption {
 
         int eTLYear = getEntity().getTechLevelYear();
         for (Mounted<?> mounted : getEntity().getEquipment()) {
+            // Skip anything the unit's own tech level leaves out, such as a ProtoMek's built-in EI outside Full Tracking
+            if (getEntity().isIgnoredForTechLevel(mounted)) {
+                continue;
+            }
             EquipmentType nextE = mounted.getType();
             int eqRulesLevel = getEntity().isMixedTech()
                   ? nextE.findMinimumRulesLevel().ordinal()
@@ -1480,9 +1499,9 @@ public abstract class TestEntity implements TestEntityOption {
     }
 
     /**
-      * Compares intro dates of all components to the unit intro year (or game year if available). If the unit has an
-      * explicit original build year, that year is also accepted for components retained from the original build. The
-      * current/refit year used for comparison is determined in order of priority:
+     * Compares intro dates of all components to the unit intro year (or game year if available). If the unit has an
+     * explicit original build year, that year is also accepted for components retained from the original build. The
+     * current/refit year used for comparison is determined in order of priority:
      * <ol>
      *   <li>If {@link #setGameYear(int)} was called with a value > 0, use that year</li>
      *   <li>Otherwise, use {@link Entity#getTechLevelYear()} which returns the game's ALLOWED_YEAR
@@ -1588,7 +1607,7 @@ public abstract class TestEntity implements TestEntityOption {
             cockpit = ((Mek) getEntity()).getCockpitTechAdvancement();
             cockpitName = ((Mek) getEntity()).getCockpitTypeString();
         }
-        if (null != cockpit) {
+        if (cockpit != null) {
             int introDate = cockpit.getIntroductionDate(getEntity().isClan());
             if (getEntity().isMixedTech()) {
                 introDate = cockpit.getIntroductionDate();
@@ -1603,7 +1622,7 @@ public abstract class TestEntity implements TestEntityOption {
         }
         if (getEntity() instanceof Mek) {
             ITechnology gyro = ((Mek) getEntity()).getGyroTechAdvancement();
-            if (null != gyro) {
+            if (gyro != null) {
                 int introDate = gyro.getIntroductionDate(getEntity().isClan());
                 if (getEntity().isMixedTech()) {
                     introDate = gyro.getIntroductionDate();
@@ -1644,7 +1663,8 @@ public abstract class TestEntity implements TestEntityOption {
     }
 
     private boolean isIntroducedByValidationYear(int introDate, int margin) {
-        return getIntroYearValidationYears().stream().anyMatch(year -> introDate <= year + margin);
+        // Compare in long so a year of Integer.MAX_VALUE (no year limit) or an extreme configured margin cannot overflow
+        return getIntroYearValidationYears().stream().anyMatch(year -> (long) introDate <= (long) year + margin);
     }
 
     public boolean hasFailedEquipment(StringBuffer buff) {
@@ -1674,8 +1694,8 @@ public abstract class TestEntity implements TestEntityOption {
         boolean illegal = false;
         int fieldKitchenCount = 0;
         int minesweeperCount = 0;
-        boolean hasHarjelII = false;
-        boolean hasHarjelIII = false;
+        boolean hasHarJelII = false;
+        boolean hasHarJelIII = false;
         boolean hasCoolantPod = false;
         int emergencyCoolantCount = 0;
         int networks = 0;
@@ -1718,10 +1738,10 @@ public abstract class TestEntity implements TestEntityOption {
                 buff.append("void signature system needs ECM suite\n");
             }
             if (m.getType().hasFlag(MiscType.F_HARJEL_II)) {
-                hasHarjelII = true;
+                hasHarJelII = true;
             }
             if (m.getType().hasFlag(MiscType.F_HARJEL_III)) {
-                hasHarjelIII = true;
+                hasHarJelIII = true;
             }
             if (m.getType().hasFlag(MiscType.F_FUEL)) {
                 hasExternalFuelTank = true;
@@ -1744,7 +1764,7 @@ public abstract class TestEntity implements TestEntityOption {
             if (m.getType().hasFlag(MiscType.F_LIFT_HOIST)) {
                 liftHoists++;
             } else if ((m.getLocation() > 0)
-                  && ((m.getType().hasFlag(MiscType.F_CLUB) && !((MiscType) m.getType()).isShield())
+                  && (m.getType().hasFlag(MiscType.F_CLUB)
                   || m.getType().hasFlag(MiscType.F_BULLDOZER)
                   || m.getType().hasFlag(MiscType.F_HAND_WEAPON))) {
                 physicalWeaponsByLocation.computeIfAbsent(m.getLocation(), ArrayList::new).add(m.getType());
@@ -1847,7 +1867,7 @@ public abstract class TestEntity implements TestEntityOption {
             buff.append("Unit has more than one RISC emergency coolant system\n");
             illegal = true;
         }
-        if (!(getEntity() instanceof Mek) && (hasHarjelII || hasHarjelIII)) {
+        if (!(getEntity() instanceof Mek) && (hasHarJelII || hasHarJelIII)) {
             buff.append("Cannot mount HarJel repair system on non-Mek\n");
             illegal = true;
         }
@@ -2003,7 +2023,7 @@ public abstract class TestEntity implements TestEntityOption {
         } else if (entity instanceof ProtoMek) {
             return TestProtoMek.isValidProtoMekLocation((ProtoMek) entity, eq, location, buffer);
         } else if (entity.isFighter()) {
-            return TestAero.isValidAeroLocation(eq, location, buffer);
+            return TestAero.isValidAeroLocation((Aero) entity, eq, location, buffer);
         }
         return true;
     }

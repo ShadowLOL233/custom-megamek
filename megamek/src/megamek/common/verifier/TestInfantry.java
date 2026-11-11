@@ -36,12 +36,11 @@ package megamek.common.verifier;
 
 import static megamek.client.ui.clientGUI.calculationReport.CalculationReport.formatForReport;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.clientGUI.calculationReport.CalculationReport;
 import megamek.client.ui.clientGUI.calculationReport.DummyCalculationReport;
 import megamek.client.ui.clientGUI.calculationReport.TextCalculationReport;
-import megamek.common.annotations.Nullable;
 import megamek.common.equipment.EquipmentType;
-import megamek.common.equipment.EquipmentTypeLookup;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
 import megamek.common.exceptions.LocationFullException;
@@ -53,6 +52,7 @@ import megamek.common.units.Infantry;
 import megamek.common.units.InfantryMount;
 import megamek.common.weapons.artillery.ArtilleryCannonWeapon;
 import megamek.common.weapons.artillery.ArtilleryWeapon;
+import megamek.common.weapons.infantry.InfantryWeapon;
 
 /**
  * @author Jay Lawson (Taharqa)
@@ -190,7 +190,8 @@ public class TestInfantry extends TestEntity {
         }
 
         if (inf.getSecondaryWeapon() != null) {
-            int secondaryCrew = inf.getSecondaryWeapon().getCrew();
+            InfantryWeapon secondaryWeapon = inf.getSecondaryWeapon();
+            int secondaryCrew = secondaryWeapon.getCrew();
             // Beast mounted infantry divide crew requirement in half, rounding up.
             if (inf.getMount() != null) {
                 secondaryCrew = secondaryCrew / 2 + secondaryCrew % 2;
@@ -208,6 +209,14 @@ public class TestInfantry extends TestEntity {
                 buff.append("Secondary weapon crew requirement exceeds squad size.\n\n");
                 correct = false;
             }
+
+            if (secondaryWeapon.is("Particle Cannon (Support)")
+                  && inf.getMovementMode() != EntityMovementMode.INF_MOTORIZED
+                  && inf.getMovementMode() != EntityMovementMode.TRACKED) {
+                buff.append("The Support Particle Canon may only be employed by Motorized/Mechanized (Tracked) ")
+                      .append("infantry platoons.\n\n");
+                correct = false;
+            }
         }
 
         // Use getBaseMovementMode() for validation - powered flight doesn't change squad/platoon limits
@@ -222,6 +231,7 @@ public class TestInfantry extends TestEntity {
               inf.getSpecializations(), inf.getMount());
         if (inf.getSquadCount() > max) {
             buff.append("Maximum squad count is ").append(max).append("\n\n");
+            correct = false;
         }
 
         max = maxUnitSize(baseMode, inf.hasMicrolite() || (inf.getAllUMUCount() > 1),
@@ -231,7 +241,7 @@ public class TestInfantry extends TestEntity {
             correct = false;
         }
 
-        if (inf.isMechanized() && inf.countEquipment(EquipmentTypeLookup.ANTI_MEK_GEAR) > 0) {
+        if (inf.isMechanized() && inf.hasMisc(MiscType.F_ANTI_MEK_GEAR)) {
             buff.append("Mechanized infantry may not have anti-mek gear!\n");
             correct = false;
         }

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2000-2011 Ben Mazur (bmazur@sev.org)
- * Copyright (C) 2011-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2011-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -32,6 +32,9 @@
  * affiliated with Microsoft.
  */
 package megamek.client.bot.princess;
+
+import megamek.common.ToHitData;
+import megamek.common.units.Tank;
 
 /**
  * This class stores all the calculations of probabilities given the rule set
@@ -104,6 +107,92 @@ public class ProbabilityCalculator {
         }
         // assume attackedFromFacing==4
         return hitProbabilitiesKickLeftSide[hit_location];
+    }
+
+    /**
+     * Returns the probability that {@code hitLocation} (from class Mek) is hit for an attack resolved on the
+     * given hit-location table, from facing {@code attackedFromFacing} (0 = forward). Dispatches to the punch,
+     * kick, or full-body (weapons fire) table, so callers that resolve the table by relative elevation - see
+     * {@link PhysicalHitTable} - do not need to pick the array family themselves.
+     *
+     * @param hitTable           one of {@link ToHitData#HIT_PUNCH}, {@link ToHitData#HIT_KICK}, or any other
+     *                           value for the full-body table
+     * @param attackedFromFacing the facing the attack comes from, 0 defined as forward
+     * @param hitLocation        the Mek hit location index
+     *
+     * @return the probability of hitting that location on that table
+     */
+    static double getHitProbability(int hitTable, int attackedFromFacing, int hitLocation) {
+        return switch (hitTable) {
+            case ToHitData.HIT_PUNCH -> getHitProbability_Punch(attackedFromFacing, hitLocation);
+            case ToHitData.HIT_KICK -> getHitProbability_Kick(attackedFromFacing, hitLocation);
+            default -> getHitProbability(attackedFromFacing, hitLocation);
+        };
+    }
+
+    /**
+     * How likely a shot at a vehicle is to land in a location, following the standard vehicle hit table as
+     * {@link Tank#rollHitLocation(int, int)} rolls it: the side facing the shooter takes a 2-4 and 6-8, a 5 and a 9
+     * fall on other sides, and a 10-12 hits the turret, or the facing side of a vehicle with none.
+     *
+     * @param attackedFromFacing the direction of the shot relative to the vehicle's facing, 0 being straight ahead,
+     *                           read the same way as for a Mek: 5, 0 and 1 are the front, 2 the right, 3 the rear and
+     *                           4 the left
+     * @param location           a {@link Tank} location
+     * @param hasTurret          {@code true} if the vehicle has a turret
+     * @param hasDualTurret      {@code true} if it has two
+     *
+     * @return the probability of hitting that location
+     */
+    static double getVehicleHitProbability(int attackedFromFacing, int location, boolean hasTurret,
+          boolean hasDualTurret) {
+        int facingSide = switch (attackedFromFacing) {
+            case 2 -> Tank.LOC_RIGHT;
+            case 3 -> Tank.LOC_REAR;
+            case 4 -> Tank.LOC_LEFT;
+            default -> Tank.LOC_FRONT;
+        };
+        // a 5 and a 9, four rolls in 36 each, fall away from the facing side
+        int onFive = switch (facingSide) {
+            case Tank.LOC_RIGHT, Tank.LOC_LEFT -> Tank.LOC_FRONT;
+            case Tank.LOC_REAR -> Tank.LOC_LEFT;
+            default -> Tank.LOC_RIGHT;
+        };
+        int onNine = switch (facingSide) {
+            case Tank.LOC_RIGHT, Tank.LOC_LEFT -> Tank.LOC_REAR;
+            case Tank.LOC_REAR -> Tank.LOC_RIGHT;
+            default -> Tank.LOC_LEFT;
+        };
+        double probability = 0;
+        if (location == facingSide) {
+            // 2, 3, 4, 6, 7 and 8, plus 10-12 when there is no turret to take them
+            probability += (hasTurret ? 22d : 28d) / 36;
+        }
+        if (location == onFive) {
+            probability += 4d / 36;
+        }
+        if (location == onNine) {
+            probability += 4d / 36;
+        }
+        if (hasTurret) {
+            double turretRolls = 6d / 36;
+            if (!hasDualTurret) {
+                probability += (location == Tank.LOC_TURRET) ? turretRolls : 0;
+            } else {
+                // a d6 picks the turret: shifted 2 down from the front and 2 up from the rear, 3 or less is the second
+                double secondTurretOdds = switch (facingSide) {
+                    case Tank.LOC_FRONT -> 5d / 6;
+                    case Tank.LOC_REAR -> 1d / 6;
+                    default -> 3d / 6;
+                };
+                if (location == Tank.LOC_TURRET_2) {
+                    probability += turretRolls * secondTurretOdds;
+                } else if (location == Tank.LOC_TURRET) {
+                    probability += turretRolls * (1 - secondTurretOdds);
+                }
+            }
+        }
+        return probability;
     }
 
     /**

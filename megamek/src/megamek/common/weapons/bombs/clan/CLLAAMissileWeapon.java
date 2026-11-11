@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2005 Ben Mazur (bmazur@sev.org)
- * Copyright (C) 2008-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2008-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -36,19 +36,20 @@ package megamek.common.weapons.bombs.clan;
 
 import java.io.Serial;
 
+import megamek.common.SourceBookCode;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
 import megamek.common.enums.TechRating;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.enums.BombType.BombTypeEnum;
-import megamek.common.weapons.missiles.thunderbolt.ThunderboltWeapon;
+import megamek.common.weapons.bombs.CapitalRangeBombMissileWeapon;
 
 /**
  * @author Jay Lawson
  * @author Dave Nawton
  */
-public class CLLAAMissileWeapon extends ThunderboltWeapon {
+public class CLLAAMissileWeapon extends CapitalRangeBombMissileWeapon {
 
     /**
      *
@@ -60,14 +61,15 @@ public class CLLAAMissileWeapon extends ThunderboltWeapon {
         super();
 
         this.name = "Light Air-to-Air (LAA) Missiles";
-        this.setInternalName(BombTypeEnum.LAA.getWeaponName());
+        this.setInternalName("Clan " + BombTypeEnum.LAA.getWeaponName());
         this.heat = 0;
         this.damage = 6;
         this.rackSize = 1;
-        this.shortRange = 6;
-        this.mediumRange = 12;
-        this.longRange = 24;
-        this.extremeRange = 40;
+        this.minimumRange = 7;
+        this.shortRange = 14;
+        this.mediumRange = 21;
+        this.longRange = 28;
+        this.extremeRange = 42;
         this.tonnage = 0.5;
         this.criticalSlots = 0;
         this.hittable = false;
@@ -84,10 +86,8 @@ public class CLLAAMissileWeapon extends ThunderboltWeapon {
         this.ammoType = AmmoType.AmmoTypeEnum.LAA_MISSILE;
         this.capital = false;
         this.missileArmor = 6;
-        rulesRefs = "171, TO:AUE";
+        rulesRefs = rulesRefs(SourceBookCode.TO_AUE, 171);
         techAdvancement.setTechBase(TechBase.ALL)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
               .setISAdvancement(3069, 3072, DATE_NONE, DATE_NONE, DATE_NONE)

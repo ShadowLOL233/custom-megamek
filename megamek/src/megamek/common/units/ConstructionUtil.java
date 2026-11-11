@@ -38,8 +38,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import jakarta.annotation.Nullable;
 import megamek.common.CriticalSlot;
-import megamek.common.annotations.Nullable;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.equipment.AmmoMounted;
 import megamek.common.equipment.EquipmentType;
@@ -120,7 +120,7 @@ public class ConstructionUtil {
                 removeCriticalSlots(unit, a);
                 Mounted<?> moveTo = findUnallocatedAmmo(unit, a.getType());
 
-                if (null != moveTo) {
+                if (moveTo != null) {
                     moveTo.setShotsLeft(moveTo.getBaseShotsLeft() + a.getBaseShotsLeft());
                     removeMounted(unit, a);
                 }
@@ -168,7 +168,7 @@ public class ConstructionUtil {
         // would be removing a linked Artemis IV FCS
         for (Mounted<?> m : unit.getEquipment()) {
             if (mount.equals(m.getLinkedBy())) {
-                m.setLinkedBy(null);
+                m.getLinkedBy().setLinked(null);
             }
         }
 
@@ -250,12 +250,10 @@ public class ConstructionUtil {
           boolean rear) {
         if ((location != eq.getLocation() && !eq.isOneShot())) {
             if (eq.getLinked() != null) {
-                eq.getLinked().setLinkedBy(null);
                 eq.setLinked(null);
             }
             if (eq.getLinkedBy() != null) {
                 eq.getLinkedBy().setLinked(null);
-                eq.setLinkedBy(null);
             }
         }
         eq.setLocation(location, rear);

@@ -35,8 +35,8 @@ package megamek.common.units;
 
 import java.awt.Image;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.util.FluffImageHelper;
-import megamek.common.annotations.Nullable;
 
 /**
  * This interface represents any physical object that can find itself on the battlefield, including units of any sort
@@ -203,6 +203,14 @@ public interface BTObject {
      * @return True when this object is a Handheld Weapon.
      */
     default boolean isHandheldWeapon() {
+        return false;
+    }
+
+    /**
+     * @return True when this object is a Battlefield Support Asset (a simplified unit governed by the Battlefield
+     *       Support rules rather than by full construction/combat rules). False for all standard units.
+     */
+    default boolean isBattlefieldSupportAsset() {
         return false;
     }
 

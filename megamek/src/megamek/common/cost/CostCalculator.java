@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -33,13 +33,16 @@
 
 package megamek.common.cost;
 
+import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.clientGUI.calculationReport.CalculationReport;
 import megamek.client.ui.clientGUI.calculationReport.DummyCalculationReport;
-import megamek.common.annotations.Nullable;
+import megamek.common.Messages;
+import megamek.common.battleArmor.BattleArmor;
 import megamek.common.bays.Bay;
 import megamek.common.bays.StandardSeatCargoBay;
 import megamek.common.equipment.AmmoType;
@@ -47,6 +50,7 @@ import megamek.common.equipment.ArmorType;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
 import megamek.common.units.Entity;
+import megamek.common.units.Tank;
 import megamek.common.weapons.infantry.InfantryWeapon;
 
 public class CostCalculator {
@@ -113,10 +117,27 @@ public class CostCalculator {
     static long getWeaponsAndEquipmentCost(Entity entity, CalculationReport costReport, boolean ignoreAmmo) {
         long cost = 0;
         NumberFormat commaFormatter = NumberFormat.getInstance();
-
-        Map<String, Integer> weaponsNumberMap = new HashMap<>();
+        Map<String, Double> weaponsNumberMap = new HashMap<>();
         Map<String, Long> weaponsCostMap = new HashMap<>();
+
+        if (entity.isBattleArmor() && ((BattleArmor) entity).getTurretCapacity() > 0) {
+            int turretSize = ((BattleArmor) entity).getTurretCapacity();
+            long itemCost = 2500L * turretSize;
+            String turretName = Messages.getString("CostCalculator.ModularTurretMount");
+
+            if (((BattleArmor) entity).hasModularTurretMount()) {
+                turretName = Messages.getString("CostCalculator.ConfigurableTurretMount");
+                itemCost += 2500;
+            }
+
+            turretName += " " + MessageFormat.format(Messages.getString("CostCalculator.Slots"), turretSize);
+
+            weaponsNumberMap.merge(turretName, 1.0, Double::sum);
+            weaponsCostMap.merge(turretName, itemCost, Long::sum);
+        }
+
         for (Mounted<?> mounted : entity.getEquipment()) {
+            double num = 1.0;
             if (ignoreAmmo && (mounted.getType() instanceof AmmoType)
                   && (!(((AmmoType) mounted.getType()).getAmmoType() == AmmoType.AmmoTypeEnum.COOLANT_POD))) {
                 continue;
@@ -128,6 +149,12 @@ public class CostCalculator {
             if ((mounted.getType() instanceof MiscType)
                   && mounted.getType().hasFlag(MiscType.F_BA_MANIPULATOR)) {
                 continue;
+            }
+            // BA Myomer Booster is spreadable and must be counted partially
+            if (entity.isBattleArmor()
+                  && (mounted.getType() instanceof MiscType)
+                  && mounted.getType().hasFlag(MiscType.F_MASC)) {
+                num = 1.0 / mounted.getNumCriticalSlots();
             }
             // EI Interface is built-in for ProtoMeks and doesn't add cost (IO:AE p.69)
             if (entity.isProtoMek() && (mounted.getType() instanceof MiscType)
@@ -143,13 +170,12 @@ public class CostCalculator {
 
             cost += itemCost;
             if (itemCost > 0) {
-                weaponsNumberMap.merge(mounted.getName(), 1, Integer::sum);
+                weaponsNumberMap.merge(mounted.getName(), num, Double::sum);
                 weaponsCostMap.merge(mounted.getName(), itemCost, Long::sum);
             }
-
         }
         for (String weapon : weaponsNumberMap.keySet()) {
-            costReport.addLine(weaponsNumberMap.get(weapon) + " " + weapon, "",
+            costReport.addLine((int) Math.ceil(weaponsNumberMap.get(weapon)) + " " + weapon, "",
                   commaFormatter.format(weaponsCostMap.get(weapon)));
         }
 
@@ -158,7 +184,7 @@ public class CostCalculator {
             long itemCost = 50000;
             cost += count * itemCost;
             for (int i = 0; i < count; i++) {
-                costReport.addLine("CASE", "", commaFormatter.format(itemCost));
+                costReport.addLine(Messages.getString("CostCalculator.Case"), "", commaFormatter.format(itemCost));
             }
         }
         // Large craft have a separate section for bays
@@ -177,15 +203,16 @@ public class CostCalculator {
             }
             if (seatCost > 0) {
                 cost += seatCost;
-                costReport.addLine("Seating", "", commaFormatter.format(seatCost));
+                costReport.addLine(Messages.getString("CostCalculator.Seating"), "", commaFormatter.format(seatCost));
             }
             if (quartersCost > 0) {
                 cost += quartersCost;
-                costReport.addLine("Quarters", "", commaFormatter.format(quartersCost));
+                costReport.addLine(Messages.getString("CostCalculator.Quarters"), "",
+                      commaFormatter.format(quartersCost));
             }
             if (bayCost > 0) {
                 cost += bayCost;
-                costReport.addLine("Bays", "", commaFormatter.format(bayCost));
+                costReport.addLine(Messages.getString("CostCalculator.Bays"), "", commaFormatter.format(bayCost));
             }
         }
         return cost;
@@ -207,22 +234,45 @@ public class CostCalculator {
      */
     static void fillInReport(CalculationReport costReport, Entity entity, boolean ignoreAmmo,
           String[] systemNames, int equipIndex, double cost, double[] costs) {
+          fillInReport(costReport, entity, ignoreAmmo, systemNames, equipIndex, 0, cost, costs);
+    }
+
+    /**
+     * Fills in a cost report while identifying leading rows that are inputs to a later rolled-up cost rather than
+     * independently additive costs.
+     *
+     * @param costStartIndex the first system-cost index included directly in the unit's running total
+     */
+    static void fillInReport(CalculationReport costReport, Entity entity, boolean ignoreAmmo, String[] systemNames,
+          int equipIndex, int costStartIndex, double cost, double[] costs) {
         NumberFormat commaFormatter = NumberFormat.getInstance();
-        costReport.addHeader("Cost Calculations For " + entity.getChassis() + " " + entity.getModel());
+        commaFormatter.setMaximumFractionDigits(3);
+        costReport.addHeader(MessageFormat.format(
+              Messages.getString("CostCalculator.CostCalculatorHeader"),
+              entity.getChassis(),
+              entity.getModel()));
         for (int l = 0; l < systemNames.length; l++) {
             if (l == equipIndex) {
                 CostCalculator.getWeaponsAndEquipmentCost(entity, costReport, ignoreAmmo);
+                if ((entity instanceof Tank tank) && (tank.getExtraCrewSeats() > 0)) {
+                    costReport.addLine(Messages.getString("CostCalculator.ExtraCrewSeats"), "",
+                          commaFormatter.format(tank.getExtraCrewSeats() * 100L));
+                }
             } else {
                 String result = commaFormatter.format(costs[l]);
                 if (costs[l] == 0) {
-                    result = "N/A";
+                    result = Messages.getString("CostCalculator.Na");
                 } else if (costs[l] < 0) {
                     result = "x " + commaFormatter.format(-costs[l]);
                 }
-                costReport.addLine(systemNames[l], "", result);
+                if (l < costStartIndex) {
+                    costReport.addInformationalLine(systemNames[l], "", result);
+                } else {
+                    costReport.addLine(systemNames[l], "", result);
+                }
             }
         }
-        costReport.addResultLine("Total Cost:", "", commaFormatter.format(cost));
+        costReport.addResultLine(Messages.getString("CostCalculator.TotalCost"), "", commaFormatter.format(cost));
     }
 
 
@@ -236,11 +286,13 @@ public class CostCalculator {
     public static void addNoReportNote(@Nullable CalculationReport costReport, @Nullable Entity entity) {
         if (costReport != null) {
             if (entity != null) {
-                costReport.addHeader("Cost Calculations For");
-                costReport.addHeader(entity.getChassis() + " " + entity.getModel());
-                costReport.addLine("There is currently no report available for units of this type.");
+                costReport.addHeader(MessageFormat.format(
+                      Messages.getString("CostCalculator.CostCalculatorHeader"),
+                      entity.getChassis(),
+                      entity.getModel()));
+                costReport.addLine(Messages.getString("CostCalculator.NoReport"));
             } else {
-                costReport.addLine("Could not access the unit.");
+                costReport.addLine(Messages.getString("CostCalculator.NoAccess"));
             }
         }
     }

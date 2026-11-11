@@ -55,12 +55,13 @@ import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 
 import io.sentry.Sentry;
+import jakarta.annotation.Nullable;
 import megamek.client.ui.clientGUI.ButtonOrderPreferences;
 import megamek.client.ui.clientGUI.MegaMekGUI;
 import megamek.client.ui.dialogs.MMAboutDialog;
 import megamek.client.ui.preferences.SuitePreferences;
 import megamek.client.ui.util.FontHandler;
-import megamek.common.annotations.Nullable;
+import megamek.client.ui.util.LauncherReadySignal;
 import megamek.common.commandLine.AbstractCommandLineParser;
 import megamek.common.commandLine.ClientServerCommandLineParser;
 import megamek.common.commandLine.MegaMekCommandLineFlag;
@@ -81,7 +82,7 @@ public class MegaMek {
     private static final SuitePreferences mmPreferences = new SuitePreferences();
     private static final MMOptions mmOptions = new MMOptions();
 
-    private static final NumberFormat numberFormatter = NumberFormat.getInstance();
+    private static final NumberFormat numberFormatter = NumberFormat.getInstance(SuiteOptions.getNumberFormatLocale());
 
     private static final MMLogger LOGGER = MMLogger.create(MegaMek.class);
     private static final SanityInputFilter sanityInputFilter = new SanityInputFilter();
@@ -90,6 +91,7 @@ public class MegaMek {
     private static String originProject = "Unknown";
 
     public static void main(String... args) {
+        Locale.setDefault(Locale.Category.FORMAT, SuiteOptions.getNumberFormatLocale());
         originProject = MMConstants.PROJECT_NAME;
         ObjectInputFilter.Config.setSerialFilter(sanityInputFilter);
 
@@ -429,6 +431,8 @@ public class MegaMek {
      * @param currentProject the currently described project
      */
     public static void initializeSuiteGraphicalSetups(final String currentProject) {
+        LauncherReadySignal.install();
+
         // on Mac, use the system setting to color the window top bar light or dark
         // it's not possible to use dark/light based on the current FlatLaf
         System.setProperty("apple.awt.application.appearance", "system");

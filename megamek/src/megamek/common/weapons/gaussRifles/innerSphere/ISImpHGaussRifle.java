@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2004, 2005 Ben Mazur (bmazur@sev.org)
- * Copyright (C) 2008-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2008-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -38,10 +38,11 @@ import static megamek.common.game.IGame.LOGGER;
 
 import java.io.Serial;
 
+import jakarta.annotation.Nullable;
 import megamek.common.SimpleTechLevel;
+import megamek.common.SourceBookCode;
 import megamek.common.ToHitData;
 import megamek.common.actions.WeaponAttackAction;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
@@ -69,7 +70,7 @@ public class ISImpHGaussRifle extends GaussWeapon {
         shortName = "Imp. Heavy Gauss Rifle";
         setInternalName("ISImprovedHeavyGaussRifle");
         addLookupName("IS Improved Heavy Gauss Rifle");
-        sortingName = "Gauss IMP D";
+        sortingName = "Gauss Imp D";
         heat = 2;
         damage = 22;
         ammoType = AmmoType.AmmoTypeEnum.IGAUSS_HEAVY;
@@ -87,7 +88,7 @@ public class ISImpHGaussRifle extends GaussWeapon {
         longAV = 22;
         maxRange = RANGE_LONG;
         explosionDamage = 30;
-        rulesRefs = "126, TO:AUE";
+        rulesRefs = rulesRefs(SourceBookCode.TO_AUE, 126);
         // Tech Progression tweaked to combine IntOps with TRO Prototypes/3145 NTNU RS
         techAdvancement.setTechBase(TechBase.IS).setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)

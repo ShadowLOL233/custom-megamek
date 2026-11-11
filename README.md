@@ -53,7 +53,7 @@ and [Strategic Operations](https://store.catalystgamelabs.com/collections/battle
 | Latest Release | [![Release](https://img.shields.io/github/release/MegaMek/megamek.svg)](https://gitHub.com/MegaMek/megamek/releases/)                                                  | [![Release](https://img.shields.io/github/release/MegaMek/megameklab.svg)](https://gitHub.com/MegaMek/megameklab/releases/)                                                      | [![Release](https://img.shields.io/github/release/MegaMek/mekhq.svg)](https://gitHub.com/MegaMek/mekhq/releases/)                                                 |
 | Javadocs | [![javadoc](https://badgen.net/badge/javadoc/master/red?icon=github)](https://megamek.org/megamek) | [![javadoc](https://badgen.net/badge/javadoc/master/red?icon=github)](https://megamek.org/megameklab) | [![javadoc](https://badgen.net/badge/javadoc/master/red?icon=github)](https://megamek.org/mekhq) |
 | License        | [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)                                                     | [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)                                                               | [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0.html)                                                 |
-| Build (CI)     | [![MM Nightly CI](https://github.com/MegaMek/megamek/workflows/MegaMek%20Nightly%20CI/badge.svg)](https://github.com/MegaMek/megamek/actions/workflows/nightly-ci.yml) | [![MML Nightly CI](https://github.com/MegaMek/megameklab/workflows/MegaMekLab%20Nightly%20CI/badge.svg)](https://github.com/MegaMek/megameklab/actions/workflows/nightly-ci.yml) | [![MHQ Nightly CI](https://github.com/MegaMek/mekhq/workflows/MekHQ%20Nightly%20CI/badge.svg)](https://github.com/MegaMek/mekhq/actions/workflows/nightly-ci.yml) |
+| Build (CI)     | [![MM CI](https://github.com/MegaMek/megamek/actions/workflows/code-coverage.yml/badge.svg)](https://github.com/MegaMek/megamek/actions/workflows/code-coverage.yml) | [![MML CI](https://github.com/MegaMek/megameklab/actions/workflows/code-coverage.yml/badge.svg)](https://github.com/MegaMek/megameklab/actions/workflows/code-coverage.yml) | [![MHQ CI](https://github.com/MegaMek/mekhq/actions/workflows/code-coverage.yml/badge.svg)](https://github.com/MegaMek/mekhq/actions/workflows/code-coverage.yml) |
 | Issues         | [![GitHub Issues](https://badgen.net/github/open-issues/MegaMek/megamek)](https://gitHub.com/MegaMek/megamek/issues/)                                                  | [![GitHub Issues](https://badgen.net/github/open-issues/MegaMek/megameklab)](https://gitHub.com/MegaMek/megameklab/issues/)                                                      | [![GitHub Issues](https://badgen.net/github/open-issues/MegaMek/mekhq)](https://gitHub.com/MegaMek/mekhq/issues/)                                                 |
 | PRs            | [![GitHub Open Pull Requests](https://badgen.net/github/open-prs/MegaMek/megamek)](https://gitHub.com/MegaMek/megamek/pull/)                                           | [![GitHub Open Pull Requests](https://badgen.net/github/open-prs/MegaMek/megameklab)](https://gitHub.com/MegaMek/megameklab/pull/)                                               | [![GitHub Open Pull Requests](https://badgen.net/github/open-prs/MegaMek/mekhq)](https://gitHub.com/MegaMek/mekhq/pull/)                                          |
 | Code Coverage  | [![MegaMek codecov.io](https://codecov.io/github/MegaMek/megamek/coverage.svg)](https://codecov.io/github/MegaMek/megamek)                                             | [![MegaMekLab codecov.io](https://codecov.io/github/MegaMek/megameklab/coverage.svg)](https://codecov.io/github/MegaMek/megameklab)                                              | [![MekHQ codecov.io](https://codecov.io/github/MegaMek/mekhq/coverage.svg)](https://codecov.io/github/MegaMek/mekhq)                                              |
@@ -78,7 +78,7 @@ If none of the above options work for you, see the "INSTALLING OR UPDATING YOUR 
 
 ### INSTALLING OR UPDATING YOUR JAVA RUNTIME
 
-Of the versions available, we now require Java 17 LTS as the bare minimal version. Newer versions should work but are
+Of the versions available, we now require Java 21 LTS as the bare minimal version. Newer versions should work but are
 not currently supported.
 
 #### Adoptium (Windows)
@@ -89,7 +89,7 @@ is installed correctly for the most seamless experience.
 #### Adoptium (Mac)
 
 For Mac, download the installer
-from [Adoptium]( https://adoptium.net/temurin/releases/?os=mac&version=17&arch=aarch64&package=jre) directly for your
+from [Adoptium]( https://adoptium.net/temurin/releases/?os=mac&version=21&arch=aarch64&package=jre) directly for your
 version of macOS and underling platform (AARCH64 is for M-Series Mac's).
 
 #### Linux
@@ -427,6 +427,15 @@ When contributing to this project, please enable the EditorConfig option within 
 with our [style guide](https://github.com/MegaMek/megamek/wiki/MegaMek-Coding-Style-Guide) which includes some defaults
 for line length, tabs vs. spaces, etc. When all else fails, we follow
 the [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html).
+
+The build enforces formatting, so it does not matter which editor (or tool) wrote the code. Before you push:
+
+```
+./gradlew spotlessApply
+```
+
+That formats every Java file you changed. `./gradlew spotlessCheck` reports the same violations without changing
+anything. The check runs first on every pull request and lists every violation in one go.
 
 ## Support
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -33,6 +33,7 @@
 
 package megamek.common.equipment;
 
+import jakarta.annotation.Nullable;
 import megamek.common.CriticalSlot;
 import megamek.common.Messages;
 import megamek.common.equipment.enums.MiscTypeFlag;
@@ -54,6 +55,10 @@ public class MiscMounted extends Mounted<MiscType> {
     private int damageTaken = 0;
     private int mineType = MINE_NONE;
     private int vibraSetting = 20;
+    private int empSetting = 10;
+
+    /** Carried folding-bridge state for Bridge-Layer (AVLB) equipment; {@code null} for all other equipment. */
+    private BridgeLayerState bridgeLayerState = null;
 
     public MiscMounted(Entity entity, MiscType type) {
         super(entity, type);
@@ -71,12 +76,41 @@ public class MiscMounted extends Mounted<MiscType> {
         if (type.hasFlag(MiscType.F_SENSOR_DISPENSER)) {
             setShotsLeft(type.hasFlag(MiscType.F_BA_EQUIPMENT) ? 6 : 30);
         }
-        if (((type.isShield() || type.hasFlag(MiscType.F_MODULAR_ARMOR)))) {
+        if (((type.hasFlag(MiscType.F_SHIELD) || type.hasFlag(MiscType.F_MODULAR_ARMOR)))) {
             baseDamageAbsorptionRate = type.getBaseDamageAbsorptionRate();
             baseDamageCapacity = type.getBaseDamageCapacity();
         }
         if (type.hasFlag(MiscType.F_MINESWEEPER)) {
             setArmorValue(30);
+        }
+        if (BridgeLayerState.isBridgeLayer(type)) {
+            bridgeLayerState = new BridgeLayerState(type);
+        }
+    }
+
+    /**
+     * @return the carried folding-bridge state for a Bridge-Layer (AVLB) mount, or {@code null} if this equipment is
+     *       not a bridgelayer
+     */
+    public @Nullable BridgeLayerState getBridgeLayerState() {
+        return bridgeLayerState;
+    }
+
+    /**
+     * @return {@code true} if this equipment is a Bridge-Layer (AVLB) variant
+     */
+    public boolean isBridgeLayer() {
+        return bridgeLayerState != null;
+    }
+
+    @Override
+    public void clearGameState() {
+        super.clearGameState();
+        // Without this, a bridge laid or about to be laid in the last game still counts as placed, at a hex of that
+        // game's map. Damage to the bridge and its deploy mechanism is kept.
+        if (bridgeLayerState != null) {
+            bridgeLayerState.clearPendingDeploy();
+            bridgeLayerState.setDeployed(false);
         }
     }
 
@@ -122,7 +156,7 @@ public class MiscMounted extends Mounted<MiscType> {
 
             Mounted<?> m = cs.getMount();
             EquipmentType type = m.getType();
-            if ((type instanceof MiscType) && ((MiscType) type).isShield()) {
+            if (type.hasFlag(MiscType.F_SHIELD)) {
                 if (cs.isDamaged()) {
                     base--;
                 }
@@ -182,7 +216,7 @@ public class MiscMounted extends Mounted<MiscType> {
 
             Mounted<?> m = cs.getMount();
             EquipmentType type = m.getType();
-            if ((type instanceof MiscType) && ((MiscType) type).isShield()) {
+            if (type.hasFlag(MiscType.F_SHIELD)) {
                 if (cs.isDamaged()) {
                     base -= 5;
                 }
@@ -255,6 +289,24 @@ public class MiscMounted extends Mounted<MiscType> {
         return vibraSetting;
     }
 
+    /**
+     * set the EMP mine weight threshold
+     *
+     * @param empSetting the <code>int</code> weight threshold (in tons) to set
+     */
+    public void setEmpSetting(int empSetting) {
+        this.empSetting = empSetting;
+    }
+
+    /**
+     * get the EMP mine weight threshold
+     *
+     * @return the <code>int</code> weight threshold (in tons) this mine is set to.
+     */
+    public int getEmpSetting() {
+        return empSetting;
+    }
+
     @Override
     public String getBaseDesc() {
         return switch (getMineType()) {
@@ -263,6 +315,7 @@ public class MiscMounted extends Mounted<MiscType> {
             case MINE_COMMAND_DETONATED -> Messages.getString("Mounted.CommandDetonatedMine");
             case MINE_ACTIVE -> Messages.getString("Mounted.ActiveMine");
             case MINE_INFERNO -> Messages.getString("Mounted.InfernoMine");
+            case MINE_EMP -> Messages.getString("Mounted.EMPMine");
             default -> super.getBaseDesc();
         };
     }

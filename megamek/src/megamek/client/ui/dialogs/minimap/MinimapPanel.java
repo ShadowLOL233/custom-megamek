@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2002-2005 Ben Mazur (bmazur@sev.org)
  * Copyright (c) 2013 Edward Cullen (eddy@obsessedcomputers.co.uk)
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -53,6 +53,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.Reader;
 import java.io.StreamTokenizer;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -62,13 +63,18 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.imageio.ImageIO;
+import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
 import javax.swing.JMenu;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import jakarta.annotation.Nullable;
 import megamek.MMConstants;
 import megamek.client.Client;
 import megamek.client.event.BoardViewEvent;
@@ -78,6 +84,7 @@ import megamek.client.ui.Messages;
 import megamek.client.ui.clientGUI.AbstractClientGUI;
 import megamek.client.ui.clientGUI.ClientGUI;
 import megamek.client.ui.clientGUI.GUIPreferences;
+import megamek.client.ui.clientGUI.GifRecordingMode;
 import megamek.client.ui.clientGUI.IClientGUI;
 import megamek.client.ui.clientGUI.boardview.BoardView;
 import megamek.client.ui.util.ScalingPopup;
@@ -89,7 +96,6 @@ import megamek.common.Player;
 import megamek.common.actions.AttackAction;
 import megamek.common.actions.EntityAction;
 import megamek.common.actions.WeaponAttackAction;
-import megamek.common.annotations.Nullable;
 import megamek.common.board.Board;
 import megamek.common.board.BoardHelper;
 import megamek.common.board.BoardLocation;
@@ -109,12 +115,11 @@ import megamek.common.game.Game;
 import megamek.common.game.GameTurn;
 import megamek.common.interfaces.IEntityRemovalConditions;
 import megamek.common.options.OptionsConstants;
-import megamek.common.preference.ClientPreferences;
 import megamek.common.preference.IPreferenceChangeListener;
 import megamek.common.preference.PreferenceChangeEvent;
-import megamek.common.preference.PreferenceManager;
 import megamek.common.units.*;
 import megamek.common.util.ImageUtil;
+import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.logging.MMLogger;
 import megamek.utilities.GifWriter;
 import megamek.utilities.GifWriterThread;
@@ -179,7 +184,8 @@ public final class MinimapPanel extends JPanel implements IPreferenceChangeListe
     private static final String ACTION_SENSORS_SHOW = "SENSORS_SHOW";
 
     private static final GUIPreferences GUIP = GUIPreferences.getInstance();
-    private static final ClientPreferences CLIENT_PREFERENCES = PreferenceManager.getClientPreferences();
+    /** The colour theme file (in the minimap themes directory) used for every minimap. */
+    private static final String MINIMAP_THEME_FILE = "defaultminimap.theme";
     private BufferedImage mapImage;
     private final BoardView bv;
     private final Game game;
@@ -188,7 +194,21 @@ public final class MinimapPanel extends JPanel implements IPreferenceChangeListe
     private final JDialog dialog;
     private Client client;
     private final IClientGUI clientGui;
+    /**
+     * Game UUIDs that already have a {@link MinimapPanel} writing the summary GIF. A multi-board game creates one
+     * MinimapPanel per board, but the GIF file is keyed per game, so without this guard several panels would write
+     * the same file at once and then race when saving at game end. Only the first panel per game owns the GIF.
+     */
+    private static final Set<String> GIF_WRITING_GAMES = ConcurrentHashMap.newKeySet();
+
+    /**
+     * Per-game consent for GIF recording when the preference is {@link GifRecordingMode#ASK}, keyed by game UUID
+     * so the player is asked only once even in multi-board games with several minimap panels.
+     */
+    private static final Map<String, Boolean> GIF_RECORDING_DECISIONS = new ConcurrentHashMap<>();
+
     private GifWriterThread gifWriterThread;
+    private volatile boolean ownsSummaryGif = false;
     private int margin = MARGIN;
     private int topMargin;
     private int leftMargin;
@@ -229,35 +249,22 @@ public final class MinimapPanel extends JPanel implements IPreferenceChangeListe
 
     /** Returns a minimap image of the given board at the maximum zoom index. */
     public static BufferedImage getMinimapImageMaxZoom(Board board) {
-        return getMinimapImage(board, MAX_ZOOM, null);
-    }
-
-    /** Returns a minimap image of the given board at the maximum zoom index. */
-    public static BufferedImage getMinimapImageMaxZoom(Board board, @Nullable File minimapTheme) {
-        return getMinimapImage(board, MAX_ZOOM, minimapTheme);
+        return getMinimapImage(board, MAX_ZOOM);
     }
 
     /** Returns a minimap image of the given board at the given zoom index. */
     public static BufferedImage getMinimapImage(Board board, int zoom) {
         Game game = new Game();
         game.setBoard(board);
-        return getMinimapImage(game, null, zoom, null, 0);
-    }
-
-    /** Returns a minimap image of the given board at the given zoom index. */
-    public static BufferedImage getMinimapImage(Board board, int zoom, @Nullable File minimapTheme) {
-        Game game = new Game();
-        game.setBoard(board);
-        return getMinimapImage(game, null, zoom, minimapTheme, 0);
+        return getMinimapImage(game, null, zoom, 0);
     }
 
     /**
      * Returns a minimap image of the given board at the given zoom index. The game and {@link BoardView} object will be
      * used to display additional information.
      */
-    public static BufferedImage getMinimapImage(Game game, BoardView boardView, int zoom, @Nullable File minimapTheme,
-          int boardId) {
-        return getMinimapImage(game, boardView, zoom, null, minimapTheme, Collections.emptyList(), boardId);
+    public static BufferedImage getMinimapImage(Game game, BoardView boardView, int zoom, int boardId) {
+        return getMinimapImage(game, boardView, zoom, null, Collections.emptyList(), boardId);
     }
 
     /**
@@ -265,14 +272,14 @@ public final class MinimapPanel extends JPanel implements IPreferenceChangeListe
      * used to display additional information.
      */
     public static BufferedImage getMinimapImage(Game game, BoardView boardView, int zoom, IClientGUI clientGui,
-          @Nullable File minimapTheme, List<Line> movePathLines, int boardId) {
+          List<Line> movePathLines, int boardId) {
         try {
             // Send the fail image when the zoom index is wrong to make this noticeable
             if ((zoom < MIM_ZOOM) || (zoom > MAX_ZOOM)) {
                 throw new Exception("The given zoom index is out of bounds.");
             }
 
-            MinimapPanel tempMM = new MinimapPanel(null, game, boardView, clientGui, minimapTheme, boardId);
+            MinimapPanel tempMM = new MinimapPanel(null, game, boardView, clientGui, boardId);
             tempMM.zoom = zoom;
             tempMM.movePathLines.clear();
             tempMM.movePathLines.addAll(movePathLines);
@@ -293,8 +300,7 @@ public final class MinimapPanel extends JPanel implements IPreferenceChangeListe
      */
 
     public MinimapPanel(@Nullable MinimapDialog minimapDialog, Game game, @Nullable BoardView boardView,
-          @Nullable IClientGUI clientGUI,
-          @Nullable File minimapTheme, int boardId) {
+          @Nullable IClientGUI clientGUI, int boardId) {
         this.game = Objects.requireNonNull(game);
         board = Objects.requireNonNull(this.game.getBoard(boardId));
         this.boardId = boardId;
@@ -305,7 +311,7 @@ public final class MinimapPanel extends JPanel implements IPreferenceChangeListe
         if (clientGui != null && clientGui.getClient() instanceof Client castClient) {
             client = castClient;
         }
-        initializeColors(minimapTheme);
+        initializeColors();
         if (dialog != null) {
             initializeDialog();
             initializeListeners();
@@ -322,11 +328,14 @@ public final class MinimapPanel extends JPanel implements IPreferenceChangeListe
 
             @Override
             public void gamePhaseChange(GamePhaseChangeEvent e) {
-                if ((GUIP.getGameSummaryMinimap() || GUIP.getGifGameSummaryMinimap())
-                      && (e.getOldPhase().isDeployment() || e.getOldPhase().isMovement()
+                boolean phaseProducesSummaryFrame = e.getOldPhase().isDeployment() || e.getOldPhase().isMovement()
                       || e.getOldPhase().isTargeting() || e.getOldPhase().isPremovement()
                       || e.getOldPhase().isPreFiring() || e.getOldPhase().isFiring()
-                      || e.getOldPhase().isPhysical())) {
+                      || e.getOldPhase().isPhysical();
+                // GIF consent is established before any rendering happens, so a game the player declined (or a
+                // NEVER preference) does no summary work at all - the recording costs CPU for the whole game.
+                boolean recordGifFrame = phaseProducesSummaryFrame && shouldRecordGifForThisGame();
+                if (phaseProducesSummaryFrame && (GUIP.getGameSummaryMinimap() || recordGifFrame)) {
 
                     File dir = new File(Configuration.gameSummaryImagesMMDir(), game.getUUIDString());
                     if (!dir.exists()) {
@@ -337,29 +346,46 @@ public final class MinimapPanel extends JPanel implements IPreferenceChangeListe
                           filenameTemplate.formatted(game.getRoundCount(), e.getOldPhase().ordinal(), e.getOldPhase()));
 
                     try {
-                        BufferedImage image = getMinimapImage(game, bv, GAME_SUMMARY_ZOOM, clientGui, null,
-                              movePathLines, boardId);
+                        BufferedImage image = getMinimapImage(game, bv, GAME_SUMMARY_ZOOM, clientGui, movePathLines,
+                              boardId);
                         if (GUIP.getGameSummaryMinimap()) {
                             ImageIO.write(image, "png", imgFile);
                         }
-                        if (GUIP.getGifGameSummaryMinimap()) {
-                            if (gifWriterThread == null || !gifWriterThread.isAlive()) {
-                                gifWriterThread = new GifWriterThread(new GifWriter(game.getUUIDString()),
-                                      "GifWriterThread");
-                                gifWriterThread.start();
+                        if (recordGifFrame) {
+                            // Only one panel per game writes the GIF. In a multi-board game every board's panel
+                            // reaches this code, but only the owner (first to claim the game UUID) writes; the others
+                            // skip it so they don't share the file and race when saving at game end. Ownership is
+                            // tracked separately from the thread instance, so the owner also restarts its writer if
+                            // that thread has died, instead of silently ending the GIF for the rest of the game.
+                            if ((gifWriterThread == null) || !gifWriterThread.isAlive()) {
+                                if (ownsSummaryGif || GIF_WRITING_GAMES.add(game.getUUIDString())) {
+                                    ownsSummaryGif = true;
+                                    gifWriterThread = new GifWriterThread(new GifWriter(game.getUUIDString()),
+                                          "GifWriterThread");
+                                    gifWriterThread.start();
+                                }
                             }
-                            gifWriterThread.addFrame(image, 400);
+                            if (ownsSummaryGif && (gifWriterThread != null) && gifWriterThread.isAlive()) {
+                                gifWriterThread.addFrame(image, 400);
+                            }
                         }
                     } catch (Exception ex) {
                         logger.error(ex, "Error saving game summary image.");
                     }
                 }
 
-                if (e.getNewPhase().isVictory() && (gifWriterThread != null) && gifWriterThread.isAlive()) {
-                    try {
-                        gifWriterThread.stopThread();
-                    } catch (Exception ex) {
-                        logger.error(ex, "Error closing gif writer.");
+                if (e.getNewPhase().isVictory()) {
+                    GIF_RECORDING_DECISIONS.remove(game.getUUIDString());
+                    if (ownsSummaryGif && (gifWriterThread != null)) {
+                        try {
+                            if (gifWriterThread.isAlive()) {
+                                gifWriterThread.stopThread();
+                            }
+                        } catch (Exception ex) {
+                            logger.error(ex, "Error closing gif writer.");
+                        } finally {
+                            releaseSummaryGifOwnership();
+                        }
                     }
                 }
 
@@ -421,12 +447,135 @@ public final class MinimapPanel extends JPanel implements IPreferenceChangeListe
         }
         if (client != null) {
             client.addCloseClientListener(() -> {
-                if (gifWriterThread != null && gifWriterThread.isAlive()) {
-                    gifWriterThread.stopThread(true);
+                GIF_RECORDING_DECISIONS.remove(game.getUUIDString());
+                if (ownsSummaryGif && (gifWriterThread != null)) {
+                    if (gifWriterThread.isAlive()) {
+                        gifWriterThread.stopThread(true);
+                    }
+                    releaseSummaryGifOwnership();
                 }
             });
         }
         GUIP.addPreferenceChangeListener(this);
+    }
+
+    /**
+     * Releases this panel's claim on the summary GIF so a later game (a new UUID) can be written, and so the entry
+     * does not linger after the writer has stopped. Safe to call when this panel is not the owner.
+     */
+    private void releaseSummaryGifOwnership() {
+        if (ownsSummaryGif) {
+            GIF_WRITING_GAMES.remove(game.getUUIDString());
+            ownsSummaryGif = false;
+        }
+    }
+
+    /**
+     * Prompts the local player, if necessary, whether to record this game's combat-summary GIF and stores the
+     * answer, so the per-phase recording never has to ask mid-game. This is the "at game start" entry point,
+     * intended to be called when the player readies up in the lobby.
+     *
+     * <p>No-op unless the preference is {@link GifRecordingMode#ASK} and no decision has been made for this game
+     * yet, so it is safe to call every time the player toggles ready. Must be called on the event dispatch
+     * thread.</p>
+     *
+     * @param game   The game about to start
+     * @param parent The parent component for the dialog, or {@code null} to center on screen
+     */
+    public static void promptForGifRecordingConsent(Game game, @Nullable Component parent) {
+        if (GUIPreferences.getInstance().getGifGameSummaryRecording() != GifRecordingMode.ASK) {
+            return;
+        }
+        GIF_RECORDING_DECISIONS.computeIfAbsent(game.getUUIDString(),
+              gameId -> askWhetherToRecordGif(parent));
+    }
+
+    /**
+     * Returns {@code true} when the combat-summary GIF should be recorded for this game. With
+     * {@link GifRecordingMode#ASK} (the default) the answer normally comes from the lobby prompt
+     * ({@link #promptForGifRecordingConsent(Game, Component)}); this asks lazily only as a fallback for a game
+     * that never went through a lobby ready (e.g. a save resumed mid-game).
+     *
+     * @return {@code true} if this game should be recorded
+     */
+    private boolean shouldRecordGifForThisGame() {
+        return switch (GUIP.getGifGameSummaryRecording()) {
+            case ALWAYS -> true;
+            case NEVER -> false;
+            case ASK -> recallOrAskRecordingDecision();
+        };
+    }
+
+    /**
+     * Returns this game's remembered recording decision, asking the player (on the EDT) if none exists yet. The
+     * dialog is deliberately shown outside any map computation: blocking on the EDT while holding a map lock could
+     * deadlock if the EDT itself entered this code for another board's panel.
+     *
+     * @return {@code true} if this game should be recorded; {@code false} also when the dialog could not be shown
+     *       (in that case no decision is stored, so the player is asked again at the next frame)
+     */
+    private boolean recallOrAskRecordingDecision() {
+        String gameId = game.getUUIDString();
+        Boolean existingDecision = GIF_RECORDING_DECISIONS.get(gameId);
+        if (existingDecision != null) {
+            return existingDecision;
+        }
+        Boolean answer = askWhetherToRecordGifOnEdt();
+        if (answer == null) {
+            return false;
+        }
+        Boolean concurrentDecision = GIF_RECORDING_DECISIONS.putIfAbsent(gameId, answer);
+        return (concurrentDecision != null) ? concurrentDecision : answer;
+    }
+
+    /**
+     * Shows the recording dialog on the event dispatch thread, blocking the calling game-event thread until the
+     * player answers.
+     *
+     * @return The player's answer, or {@code null} if the dialog could not be shown
+     */
+    private @Nullable Boolean askWhetherToRecordGifOnEdt() {
+        if (SwingUtilities.isEventDispatchThread()) {
+            return askWhetherToRecordGif(this);
+        }
+        AtomicReference<Boolean> answerHolder = new AtomicReference<>();
+        try {
+            SwingUtilities.invokeAndWait(() -> answerHolder.set(askWhetherToRecordGif(this)));
+        } catch (InterruptedException interruptedException) {
+            Thread.currentThread().interrupt();
+            return null;
+        } catch (InvocationTargetException invocationTargetException) {
+            logger.error(invocationTargetException, "Error showing the GIF recording dialog");
+            return null;
+        }
+        return answerHolder.get();
+    }
+
+    /**
+     * Asks the player whether this game should be recorded as a combat-summary GIF. Checking "remember my choice"
+     * persists the answer as {@link GifRecordingMode#ALWAYS} or {@link GifRecordingMode#NEVER} so the dialog never
+     * shows again. Must be called on the event dispatch thread.
+     *
+     * @param parent The parent component for the dialog, or {@code null} to center on screen
+     *
+     * @return {@code true} if the player wants this game recorded
+     */
+    private static boolean askWhetherToRecordGif(@Nullable Component parent) {
+        JCheckBox rememberChoice = new JCheckBox(Messages.getString("MinimapPanel.RecordGifDialog.remember"));
+        Object[] dialogContent = { Messages.getString("MinimapPanel.RecordGifDialog.message"),
+                                   Messages.getString("MinimapPanel.RecordGifDialog.warning"),
+                                   rememberChoice };
+        int response = JOptionPane.showConfirmDialog(parent,
+              dialogContent,
+              Messages.getString("MinimapPanel.RecordGifDialog.title"),
+              JOptionPane.YES_NO_OPTION,
+              JOptionPane.QUESTION_MESSAGE);
+        boolean recordThisGame = (response == JOptionPane.YES_OPTION);
+        if (rememberChoice.isSelected()) {
+            GUIPreferences.getInstance()
+                  .setGifGameSummaryRecording(recordThisGame ? GifRecordingMode.ALWAYS : GifRecordingMode.NEVER);
+        }
+        return recordThisGame;
     }
 
     /**
@@ -462,7 +611,7 @@ public final class MinimapPanel extends JPanel implements IPreferenceChangeListe
     }
 
     /** Initialize default colors and override with config file if there is one. */
-    private void initializeColors(File minimapTheme) {
+    private void initializeColors() {
 
         BACKGROUND = Color.black;
         terrainColors[0] = new Color(218, 215, 170);
@@ -495,9 +644,7 @@ public final class MinimapPanel extends JPanel implements IPreferenceChangeListe
         int green;
         int blue;
 
-        if (minimapTheme == null || !minimapTheme.exists()) {
-            minimapTheme = CLIENT_PREFERENCES.getMinimapTheme();
-        }
+        File minimapTheme = new MegaMekFile(Configuration.minimapThemesDir(), MINIMAP_THEME_FILE).getFile();
 
         // only while the defaults are hard-coded!
         if (!minimapTheme.exists()) {
@@ -815,7 +962,7 @@ public final class MinimapPanel extends JPanel implements IPreferenceChangeListe
 
             // In case the flag SHOW SYMBOLS is set, it will draw the units and other stuff
             if (symbolsDisplayMode == SHOW_SYMBOLS) {
-                if (null != game) {
+                if (game != null) {
                     // draw dead units
                     multiUnits.clear();
                     for (Entity e : game.getOutOfGameEntitiesVector()) {
@@ -883,7 +1030,7 @@ public final class MinimapPanel extends JPanel implements IPreferenceChangeListe
 
     /** Indicates the deployment hexes. */
     private void drawDeploymentZone(Graphics g) {
-        if ((null != client) && (null != game) && game.getPhase().isDeployment() && (bv != null)
+        if ((client != null) && (game != null) && game.getPhase().isDeployment() && (bv != null)
               && (bv.getDeployingEntity() != null) && (dialog != null) && (getLocalPlayer() != null)) {
             GameTurn turn = game.getTurn();
             if ((turn != null) && (turn.playerId() == getLocalPlayer().getId())) {
@@ -1245,7 +1392,7 @@ public final class MinimapPanel extends JPanel implements IPreferenceChangeListe
         // sanity check...
         // cross-board attacks don't get attack arrows (for now, must possibly allow some A2G, O2G, A2A attacks later
         // when target/attacker hexes are not really but effectively on the same board)
-        if ((null == source) || (null == target) || !game.onTheSameBoard(source, target)
+        if ((source == null) || (target == null) || !game.onTheSameBoard(source, target)
               || (target.getBoardId() != boardId)) {
             return;
         }

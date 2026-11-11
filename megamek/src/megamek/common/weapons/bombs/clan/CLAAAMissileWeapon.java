@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2005 Ben Mazur (bmazur@sev.org)
- * Copyright (C) 2008-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2008-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -36,19 +36,20 @@ package megamek.common.weapons.bombs.clan;
 
 import java.io.Serial;
 
+import megamek.common.SourceBookCode;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
 import megamek.common.enums.TechRating;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.enums.BombType.BombTypeEnum;
-import megamek.common.weapons.missiles.thunderbolt.ThunderboltWeapon;
+import megamek.common.weapons.bombs.CapitalRangeBombMissileWeapon;
 
 /**
  * @author Jay Lawson
  * @author Dave Nawton
  */
-public class CLAAAMissileWeapon extends ThunderboltWeapon {
+public class CLAAAMissileWeapon extends CapitalRangeBombMissileWeapon {
 
     /**
      *
@@ -59,8 +60,8 @@ public class CLAAAMissileWeapon extends ThunderboltWeapon {
     public CLAAAMissileWeapon() {
         super();
 
-        this.name = "AAA Missile";
-        this.setInternalName(BombTypeEnum.AAA.getWeaponName());
+        this.name = BombTypeEnum.AAA.getWeaponName();
+        this.setInternalName("Clan " + BombTypeEnum.AAA.getWeaponName());
         this.heat = 0;
         this.damage = 20;
         this.rackSize = 1;
@@ -86,10 +87,8 @@ public class CLAAAMissileWeapon extends ThunderboltWeapon {
         this.capital = false;
         this.missileArmor = 20;
         cost = 9000;
-        rulesRefs = "169, TO:AUE";
+        rulesRefs = rulesRefs(SourceBookCode.TO_AUE, 169);
         techAdvancement.setTechBase(TechBase.ALL)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(3069, 3072, DATE_NONE, DATE_NONE, DATE_NONE)

@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2000-2002 - Ben Mazur (bmazur@sev.org)
  * Copyright (c) 2013 - Edward Cullen (eddy@obsessedcomputers.co.uk)
- * Copyright (C) 2002-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2002-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -47,6 +47,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 import megamek.common.battleArmor.BattleArmor;
+import megamek.common.battlefieldSupport.BattlefieldSupportAsset;
 import megamek.common.equipment.GunEmplacement;
 import megamek.common.equipment.HandheldWeapon;
 import megamek.common.units.*;
@@ -73,11 +74,11 @@ public class MekTileset {
     private static final String MEDIUM_STRING = "default_medium";
     private static final String HEAVY_STRING = "default_heavy";
     private static final String ASSAULT_STRING = "default_assault";
-    private static final String SUPER_HEAVY_MEK_STRING = "default_super_heavy_mek";
+    private static final String SUPER_HEAVY_STRING = "default_super_heavy";
     private static final String QUAD_STRING = "default_quad";
     private static final String QUADVEE_STRING = "default_quadvee";
     private static final String QUADVEE_VEHICLE_STRING = "default_quadvee_vehicle";
-    private static final String LAM_MEK_STRING = "default_lam_mek";
+    private static final String LAM_STRING = "default_lam";
     private static final String LAM_AIRMEK_STRING = "default_lam_air_mek";
     private static final String LAM_FIGHTER_STRING = "default_lam_fighter";
     private static final String TRIPOD_STRING = "default_tripod";
@@ -94,8 +95,16 @@ public class MekTileset {
     private static final String INF_STRING = "default_infantry";
     private static final String BA_STRING = "default_ba";
     private static final String PROTO_STRING = "default_proto";
+    private static final String PROTO_QUAD_STRING = "default_proto_quad";
     private static final String GUN_EMPLACEMENT_STRING = "default_gun_emplacement";
     private static final String WIGE_STRING = "default_wige";
+    private static final String RAIL_STRING = "default_rail";
+    private static final String RAIL_TRACTOR_STRING = "default_rail_tractor";
+    private static final String RAIL_CAR_STRING = "default_rail_car";
+    private static final String MAGLEV_TRACTOR_STRING = "default_maglev_tractor";
+    private static final String TRAILER_SMALL_STRING = "default_trailer_small";
+    private static final String TRAILER_STRING = "default_trailer";
+    private static final String TRAILER_LARGE_STRING = "default_trailer_large";
     private static final String AERO_STRING = "default_aero";
     private static final String SMALL_CRAFT_AERO_STRING = "default_small_craft_aero";
     private static final String SMALL_CRAFT_SPHERE_STRING = "default_small_craft_sphere";
@@ -128,11 +137,11 @@ public class MekTileset {
     private MekEntry default_medium;
     private MekEntry default_heavy;
     private MekEntry default_assault;
-    private MekEntry default_super_heavy_mek;
+    private MekEntry default_super_heavy;
     private MekEntry default_quad;
     private MekEntry default_quadvee;
     private MekEntry default_quadvee_vehicle;
-    private MekEntry default_lam_mek;
+    private MekEntry default_lam;
     private MekEntry default_lam_air_mek;
     private MekEntry default_lam_fighter;
     private MekEntry default_tripod;
@@ -149,8 +158,16 @@ public class MekTileset {
     private MekEntry default_inf;
     private MekEntry default_ba;
     private MekEntry default_proto;
+    private MekEntry default_proto_quad;
     private MekEntry default_gun_emplacement;
     private MekEntry default_wige;
+    private MekEntry default_rail;
+    private MekEntry default_rail_tractor;
+    private MekEntry default_rail_car;
+    private MekEntry default_maglev_tractor;
+    private MekEntry default_trailer_small;
+    private MekEntry default_trailer;
+    private MekEntry default_trailer_large;
     private MekEntry default_aero;
     private MekEntry default_small_craft_aero;
     private MekEntry default_small_craft_sphere;
@@ -211,6 +228,10 @@ public class MekTileset {
             entry = default_light;
         }
 
+        if (entry == null) {
+            return null;
+        }
+
         if (entry.getImage() == null) {
             entry.loadImage();
         }
@@ -240,11 +261,17 @@ public class MekTileset {
     }
 
     public MekEntry genericFor(Entity entity, int secondaryPos) {
-        if (entity instanceof BattleArmor) {
+        if (entity instanceof BattlefieldSupportAsset asset) {
+            return assetGenericFor(asset);
+        } else if (entity instanceof BattleArmor) {
             return default_ba;
         } else if (entity instanceof Infantry) {
             return default_inf;
         } else if (entity instanceof ProtoMek) {
+            if (((ProtoMek) entity).isQuad()) {
+                return default_proto_quad;
+            }
+
             return default_proto;
         } else if (entity instanceof TripodMek) {
             return default_tripod;
@@ -254,21 +281,21 @@ public class MekTileset {
             return switch (entity.getConversionMode()) {
                 case LandAirMek.CONV_MODE_FIGHTER -> default_lam_fighter;
                 case LandAirMek.CONV_MODE_AIR_MEK -> default_lam_air_mek;
-                default -> default_lam_mek;
+                default -> default_lam;
             };
         } else if (entity instanceof Mek) {
             if (entity.getMovementMode() == EntityMovementMode.QUAD) {
                 return default_quad;
-            } else {
-                return switch (entity.getWeightClass()) {
-                    case EntityWeightClass.WEIGHT_ULTRA_LIGHT -> default_ultra_light;
-                    case EntityWeightClass.WEIGHT_LIGHT -> default_light;
-                    case EntityWeightClass.WEIGHT_MEDIUM -> default_medium;
-                    case EntityWeightClass.WEIGHT_HEAVY -> default_heavy;
-                    case EntityWeightClass.WEIGHT_SUPER_HEAVY -> default_super_heavy_mek;
-                    default -> default_assault;
-                };
             }
+
+            return switch (entity.getWeightClass()) {
+                case EntityWeightClass.WEIGHT_ULTRA_LIGHT -> default_ultra_light;
+                case EntityWeightClass.WEIGHT_LIGHT -> default_light;
+                case EntityWeightClass.WEIGHT_MEDIUM -> default_medium;
+                case EntityWeightClass.WEIGHT_HEAVY -> default_heavy;
+                case EntityWeightClass.WEIGHT_SUPER_HEAVY -> default_super_heavy;
+                default -> default_assault;
+            };
         } else if (entity.getMovementMode() == EntityMovementMode.NAVAL) {
             return default_naval;
         } else if (entity.getMovementMode() == EntityMovementMode.SUBMARINE) {
@@ -278,27 +305,65 @@ public class MekTileset {
         } else if (entity instanceof GunEmplacement) {
             return default_gun_emplacement;
         } else if (entity instanceof Tank) {
-            switch (entity.getMovementMode()) {
-                case WHEELED:
-                    if (entity.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-                        return default_wheeled_heavy;
-                    } else {
-                        return default_wheeled;
+            return switch (entity.getMovementMode()) {
+                case WHEELED -> {
+                    if (entity.isTrailer()) {
+                        if ((entity.isSupportVehicle() && entity.getWeightClass() == EntityWeightClass.WEIGHT_LARGE_SUPPORT)
+                              || (!entity.isSupportVehicle() && entity.getWeightClass() >= EntityWeightClass.WEIGHT_HEAVY)) {
+                            yield default_trailer_large;
+                        } else if (entity.isSupportVehicle() && entity.getWeightClass() == EntityWeightClass.WEIGHT_SMALL_SUPPORT) {
+                            yield default_trailer_small;
+                        }
+
+                        yield default_trailer;
+                    } else if ((entity.isSupportVehicle() && entity.getWeightClass() == EntityWeightClass.WEIGHT_LARGE_SUPPORT)
+                          || (!entity.isSupportVehicle() && entity.getWeightClass() >= EntityWeightClass.WEIGHT_HEAVY)) {
+                        yield default_wheeled_heavy;
                     }
-                case HOVER:
-                    return default_hover;
-                case VTOL:
-                    return default_vtol;
-                case WIGE:
-                    return default_wige;
-                case TRACKED:
-                default:
-                    return switch (entity.getWeightClass()) {
-                        case EntityWeightClass.WEIGHT_HEAVY -> default_tracked_heavy;
-                        case EntityWeightClass.WEIGHT_ASSAULT -> default_tracked_assault;
-                        default -> default_tracked;
-                    };
-            }
+
+                    yield default_wheeled;
+                }
+                case HOVER -> default_hover;
+                case VTOL -> default_vtol;
+                case WIGE -> default_wige;
+                case RAIL -> {
+                    if (entity.isTractor()) {
+                        yield default_rail_tractor;
+                    } else if (entity.isTrailer()) {
+                        yield default_rail_car;
+                    }
+
+                    yield default_rail;
+                }
+                case MAGLEV -> {
+                    if (entity.isTractor()) {
+                        yield default_maglev_tractor;
+                    } else if (entity.isTrailer()) {
+                        yield default_rail_car;
+                    }
+
+                    yield default_rail;
+                }
+                default -> {
+                    if (entity.isTrailer()) {
+                        if ((entity.isSupportVehicle() && entity.getWeightClass() == EntityWeightClass.WEIGHT_LARGE_SUPPORT)
+                              || (!entity.isSupportVehicle() && entity.getWeightClass() >= EntityWeightClass.WEIGHT_HEAVY)) {
+                            yield default_trailer_large;
+                        } else if (entity.isSupportVehicle() && entity.getWeightClass() == EntityWeightClass.WEIGHT_SMALL_SUPPORT) {
+                            yield default_trailer_small;
+                        }
+
+                        yield default_trailer;
+                    } else if ((entity.isSupportVehicle() && entity.getWeightClass() == EntityWeightClass.WEIGHT_LARGE_SUPPORT)
+                          || (!entity.isSupportVehicle() && entity.getWeightClass() >= EntityWeightClass.WEIGHT_ASSAULT)) {
+                        yield default_tracked_assault;
+                    } else if (!entity.isSupportVehicle() && entity.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+                        yield default_tracked_heavy;
+                    }
+
+                    yield default_tracked;
+                }
+            };
         } else if (entity instanceof Aero) {
             switch (entity) {
                 case SpaceStation ignored -> {
@@ -348,6 +413,28 @@ public class MekTileset {
         return default_unknown;
     }
 
+    /**
+     * Returns the generic sprite entry for a Battlefield Support Asset based on its asset type (and, for vehicles, its
+     * movement mode). This is the fallback used when no chassis/exact sprite is resolved for the asset's linked base
+     * unit, so an asset always yields a sensible top-down icon of the right kind (tank, hover, VTOL, infantry, battle
+     * armor, gun emplacement).
+     */
+    private MekEntry assetGenericFor(BattlefieldSupportAsset asset) {
+        return switch (asset.getAssetType()) {
+            case CONV_INFANTRY -> default_inf;
+            case BATTLE_ARMOR -> default_ba;
+            case EMPLACEMENT -> default_gun_emplacement;
+            case VEHICLE -> switch (asset.getMovementMode()) {
+                case HOVER -> default_hover;
+                case VTOL -> default_vtol;
+                case WIGE -> default_wige;
+                case WHEELED -> default_wheeled;
+                case RAIL, MAGLEV -> default_rail;
+                default -> default_tracked;
+            };
+        };
+    }
+
     public void loadFromFile(String filename) throws IOException {
         LOGGER.info("Loading unit icons from {}", filename);
         try (Reader r = new BufferedReader(new FileReader(new MegaMekFile(dir, filename).getFile(),
@@ -365,9 +452,11 @@ public class MekTileset {
                             LOGGER.error("... failed: {}.", e.getMessage(), e);
                         }
                     } else if (tokens.getFirst().equals(CHASSIS_KEY)) {
-                        chassis.put(tokens.get(1).toUpperCase(Locale.ROOT), new MekEntry(tokens.get(2)));
+                        chassis.put(tokens.get(1).toUpperCase(Locale.ROOT),
+                              new MekEntry(tokens.get(2), tokens.size() == 4 ? tokens.get(3) : null));
                     } else {
-                        exact.put(tokens.get(1).toUpperCase(Locale.ROOT), new MekEntry(tokens.get(2)));
+                        exact.put(tokens.get(1).toUpperCase(Locale.ROOT),
+                              new MekEntry(tokens.get(2), tokens.size() == 4 ? tokens.get(3) : null));
                     }
                 } else {
                     LOGGER.warn("Malformed line in {}: {}", filename, tokens.toString());
@@ -380,11 +469,11 @@ public class MekTileset {
         default_medium = exact.get(MEDIUM_STRING.toUpperCase(Locale.ROOT));
         default_heavy = exact.get(HEAVY_STRING.toUpperCase(Locale.ROOT));
         default_assault = exact.get(ASSAULT_STRING.toUpperCase(Locale.ROOT));
-        default_super_heavy_mek = exact.get(SUPER_HEAVY_MEK_STRING.toUpperCase(Locale.ROOT));
+        default_super_heavy = exact.get(SUPER_HEAVY_STRING.toUpperCase(Locale.ROOT));
         default_quad = exact.get(QUAD_STRING.toUpperCase(Locale.ROOT));
         default_quadvee = exact.get(QUADVEE_STRING.toUpperCase(Locale.ROOT));
         default_quadvee_vehicle = exact.get(QUADVEE_VEHICLE_STRING.toUpperCase(Locale.ROOT));
-        default_lam_mek = exact.get(LAM_MEK_STRING.toUpperCase(Locale.ROOT));
+        default_lam = exact.get(LAM_STRING.toUpperCase(Locale.ROOT));
         default_lam_air_mek = exact.get(LAM_AIRMEK_STRING.toUpperCase(Locale.ROOT));
         default_lam_fighter = exact.get(LAM_FIGHTER_STRING.toUpperCase(Locale.ROOT));
         default_tripod = exact.get(TRIPOD_STRING.toUpperCase(Locale.ROOT));
@@ -401,8 +490,16 @@ public class MekTileset {
         default_inf = exact.get(INF_STRING.toUpperCase(Locale.ROOT));
         default_ba = exact.get(BA_STRING.toUpperCase(Locale.ROOT));
         default_proto = exact.get(PROTO_STRING.toUpperCase(Locale.ROOT));
+        default_proto_quad = exact.get(PROTO_QUAD_STRING.toUpperCase(Locale.ROOT));
         default_gun_emplacement = exact.get(GUN_EMPLACEMENT_STRING.toUpperCase(Locale.ROOT));
         default_wige = exact.get(WIGE_STRING.toUpperCase(Locale.ROOT));
+        default_rail = exact.get(RAIL_STRING.toUpperCase(Locale.ROOT));
+        default_rail_tractor = exact.get(RAIL_TRACTOR_STRING.toUpperCase(Locale.ROOT));
+        default_rail_car = exact.get(RAIL_CAR_STRING.toUpperCase(Locale.ROOT));
+        default_maglev_tractor = exact.get(MAGLEV_TRACTOR_STRING.toUpperCase(Locale.ROOT));
+        default_trailer_small = exact.get(TRAILER_SMALL_STRING.toUpperCase(Locale.ROOT));
+        default_trailer = exact.get(TRAILER_STRING.toUpperCase(Locale.ROOT));
+        default_trailer_large = exact.get(TRAILER_LARGE_STRING.toUpperCase(Locale.ROOT));
         default_aero = exact.get(AERO_STRING.toUpperCase(Locale.ROOT));
         default_small_craft_aero = exact.get(SMALL_CRAFT_AERO_STRING.toUpperCase(Locale.ROOT));
         default_dropship_aero = exact.get(DROPSHIP_AERO_STRING.toUpperCase(Locale.ROOT));
@@ -441,10 +538,16 @@ public class MekTileset {
      */
     public class MekEntry {
         private final String imageFile;
+        private final String modelFile;
         private Image image;
 
         public MekEntry(String imageFile) {
+            this(imageFile, null);
+        }
+
+        public MekEntry(String imageFile, String modelFile) {
             this.imageFile = imageFile;
+            this.modelFile = modelFile;
             image = null;
         }
 
@@ -462,6 +565,10 @@ public class MekTileset {
 
         public String getImageFile() {
             return imageFile;
+        }
+
+        public String getModelFile() {
+            return modelFile;
         }
 
     }

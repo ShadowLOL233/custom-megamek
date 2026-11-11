@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2004, 2005 Ben Mazur (bmazur@sev.org)
- * Copyright (C) 2008-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2008-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -38,10 +38,10 @@ import static megamek.common.game.IGame.LOGGER;
 
 import java.io.Serial;
 
+import jakarta.annotation.Nullable;
 import megamek.common.RangeType;
 import megamek.common.ToHitData;
 import megamek.common.actions.WeaponAttackAction;
-import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.equipment.Mounted;
 import megamek.common.game.Game;
@@ -49,7 +49,7 @@ import megamek.common.loaders.EntityLoadingException;
 import megamek.common.units.Entity;
 import megamek.common.weapons.AmmoWeapon;
 import megamek.common.weapons.handlers.AttackHandler;
-import megamek.common.weapons.handlers.artillery.ArtilleryWeaponIndirectFireHandler;
+import megamek.common.weapons.handlers.artillery.ArtilleryWeaponDistantFireHandler;
 import megamek.common.weapons.handlers.capitalMissile.CapitalMissileBearingsOnlyHandler;
 import megamek.common.weapons.handlers.capitalMissile.CapitalMissileHandler;
 import megamek.server.totalWarfare.TWGameManager;
@@ -85,7 +85,7 @@ public abstract class CapitalMissileWeapon extends AmmoWeapon {
             int rangeToTarget = attacker.getPosition().distance(waa.getTarget(game).getPosition());
             // Capital missiles work like artillery for surface to surface fire
             if (Compute.isGroundToGround(attacker, waa.getTarget(game))) {
-                return new ArtilleryWeaponIndirectFireHandler(toHit, waa, game, manager);
+                return new ArtilleryWeaponDistantFireHandler(toHit, waa, game, manager);
             }
             if (weapon.isInBearingsOnlyMode()
                   && (rangeToTarget >= RangeType.RANGE_BEARINGS_ONLY_MINIMUM)) {

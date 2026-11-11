@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -34,8 +34,8 @@
 package megamek.common.cost;
 
 import megamek.client.ui.clientGUI.calculationReport.CalculationReport;
-import megamek.common.units.Aero;
 import megamek.common.equipment.ArmorType;
+import megamek.common.units.Aero;
 
 public class AeroCostCalculator {
 
@@ -80,11 +80,11 @@ public class AeroCostCalculator {
         CostCalculator.removeNegativeAdditiveCosts(costs);
 
         costs[idx] = -aero.getPriceMultiplier();
-        double cost = CostCalculator.calculateCost(costs);
+        double cost = Math.round(CostCalculator.calculateCost(costs));
         String[] systemNames = { "Cockpit", "Life Support", "Sensors", "Structure", "Flight Systems", "Engine",
                                  "Fuel Tanks", "Armor", "Heat Sinks", "Equipment", "Weight Multiplier" };
         CostCalculator.fillInReport(costReport, aero, ignoreAmmo, systemNames, 9, cost, costs);
 
-        return Math.round(cost);
+        return cost;
     }
 }

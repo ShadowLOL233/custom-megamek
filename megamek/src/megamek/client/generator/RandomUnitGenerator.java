@@ -53,6 +53,7 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -85,13 +86,14 @@ public class RandomUnitGenerator implements Serializable {
     private static final long serialVersionUID = 5765118329881301375L;
 
     // The RATs are stored in a hashmap of string vectors. The keys are the RAT names and the vectors just contain
-    // the unit names listed a number of times equal to the frequency
-    private final Map<String, RatEntry> rats = new HashMap<>();
+    // the unit names listed a number of times equal to the frequency. RATs are loaded on a background thread while
+    // other threads may already be iterating the map, so it must be safe for concurrent access.
+    private final Map<String, RatEntry> rats = new ConcurrentHashMap<>();
     private static RandomUnitGenerator rug;
     private static boolean interrupted = false;
     private Thread loader;
-    private boolean initialized;
-    private boolean initializing;
+    private volatile boolean initialized;
+    private volatile boolean initializing;
 
     private final ArrayList<ActionListener> listeners;
 
@@ -176,7 +178,7 @@ public class RandomUnitGenerator implements Serializable {
             float totalWeight = 0.0f;
             RatEntry re = new RatEntry();
             String line;
-            while (null != (line = reader.readLine())) {
+            while ((line = reader.readLine()) != null) {
                 if (interrupted) {
                     return;
                 }
@@ -215,7 +217,7 @@ public class RandomUnitGenerator implements Serializable {
                     }
 
                     // The @ symbol denotes a reference to another RAT rather than a unit.
-                    if (!name.startsWith("@") && (null == msc.getMek(name))) {
+                    if (!name.startsWith("@") && (msc.getMek(name) == null)) {
                         LOGGER.error("The unit {} could not be found in the {} RAT ({})", name, key, fileName);
                         continue;
                     }
@@ -231,7 +233,7 @@ public class RandomUnitGenerator implements Serializable {
                     re.getWeights().set(i, re.getWeights().get(i) / totalWeight);
                 }
                 rats.put(key, re);
-                if (null != node) {
+                if (node != null) {
                     node.children.add(new RatTreeNode(key));
                 }
             }
@@ -253,7 +255,7 @@ public class RandomUnitGenerator implements Serializable {
                 }
             }
 
-            if (null == subNode) {
+            if (subNode == null) {
                 subNode = new RatTreeNode(pathElements[i]);
                 result.children.addElement(subNode);
             }
@@ -278,12 +280,12 @@ public class RandomUnitGenerator implements Serializable {
             return;
         }
 
-        if ((null == dir) || (null == node)) {
+        if ((dir == null) || (node == null)) {
             return;
         }
 
         File[] files = dir.listFiles();
-        if (null == files) {
+        if (files == null) {
             return;
         }
 
@@ -375,7 +377,7 @@ public class RandomUnitGenerator implements Serializable {
             }
 
             Map<String, RatEntry> ratMap = getRatMap();
-            if (null != ratMap) {
+            if (ratMap != null) {
                 RatEntry re = ratMap.get(ratName);
                 if (filter != null) {
                     RatEntry filtered = new RatEntry();
@@ -397,7 +399,7 @@ public class RandomUnitGenerator implements Serializable {
                     }
                     re = filtered;
                 }
-                if ((null != re) && !re.getUnits().isEmpty()) {
+                if ((re != null) && !re.getUnits().isEmpty()) {
                     for (int roll = 0; roll < numRolls; roll++) {
                         double rand = getRandom();
                         int i = 0;
@@ -414,7 +416,7 @@ public class RandomUnitGenerator implements Serializable {
                         }
 
                         MekSummary unit = getMekByName(name);
-                        if (null != unit) {
+                        if (unit != null) {
                             units.add(unit);
                         }
                     }
@@ -463,7 +465,7 @@ public class RandomUnitGenerator implements Serializable {
     }
 
     public static synchronized RandomUnitGenerator getInstance() {
-        if (null == rug) {
+        if (rug == null) {
             rug = new RandomUnitGenerator();
         }
 

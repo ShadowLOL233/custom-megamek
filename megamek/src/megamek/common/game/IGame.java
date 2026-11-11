@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -43,10 +43,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import jakarta.annotation.Nullable;
 import megamek.common.Hex;
 import megamek.common.Player;
 import megamek.common.Team;
-import megamek.common.annotations.Nullable;
 import megamek.common.board.Board;
 import megamek.common.board.BoardLocation;
 import megamek.common.board.Coords;
@@ -385,7 +385,7 @@ public interface IGame {
      */
     @Nullable
     default Board getBoard(BoardLocation boardLocation) {
-        return getBoards().get(boardLocation.boardId());
+        return getBoard(boardLocation.boardId());
     }
 
     /**

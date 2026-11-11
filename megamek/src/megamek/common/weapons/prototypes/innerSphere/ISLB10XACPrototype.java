@@ -38,11 +38,12 @@ import static megamek.common.game.IGame.LOGGER;
 
 import java.io.Serial;
 
+import jakarta.annotation.Nullable;
 import megamek.common.SimpleTechLevel;
+import megamek.common.SourceBookCode;
 import megamek.common.ToHitData;
 import megamek.common.actions.WeaponAttackAction;
 import megamek.common.alphaStrike.AlphaStrikeElement;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
@@ -88,10 +89,8 @@ public class ISLB10XACPrototype extends LBXACWeapon {
         extAV = shortAV;
         bv = 148;
         cost = 2000000; // Cost in the AoW is 160000 but not making another version for one field.
-        rulesRefs = "66, IO:AE";
+        rulesRefs = rulesRefs(SourceBookCode.IO_AE, 66);
         techAdvancement.setTechBase(TechBase.IS)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.F, AvailabilityValue.F, AvailabilityValue.X, AvailabilityValue.X)
               .setISAdvancement(2590, DATE_NONE, DATE_NONE, 2595, 3035)

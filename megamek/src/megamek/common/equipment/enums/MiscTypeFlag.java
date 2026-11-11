@@ -128,6 +128,7 @@ public enum MiscTypeFlag implements EquipmentFlag {
     F_MINESWEEPER,
 
     F_AP_POD,
+    F_PHYSICAL_WEAPON,
     F_CLUB,
     F_HAND_WEAPON,
     F_COWL,
@@ -136,6 +137,7 @@ public enum MiscTypeFlag implements EquipmentFlag {
     F_TALON,
     F_SPIKES,
     F_COMMUNICATIONS,
+    F_SHIELD,
 
     F_PPC_CAPACITOR,
 
@@ -282,6 +284,7 @@ public enum MiscTypeFlag implements EquipmentFlag {
 
     F_BA_MEA, // Flag for BattleArmor Modular Equipment Adaptor
     F_INF_EQUIPMENT, // Flag for Infantry Equipment
+    F_ANTI_MEK_GEAR,
 
     F_SCM,
 
@@ -510,5 +513,15 @@ public enum MiscTypeFlag implements EquipmentFlag {
     // OS Actuator & Motive Systems (dev plan §11) — the Mek-only reconceived AES; distinct from the canon
     // F_ACTUATOR_ENHANCEMENT_SYSTEM so it triggers none of the canon per-limb/physical/⊥TC/⊥MASC logic.
     F_OS_AES,
+
+    // Flag for LAM fuel tanks
+    F_LAM_FUEL_TANK,
+
+    /**
+     * Marks the MekWarrior Combat Suit so a crew wearing one can be recognised. It grants nothing on its own: what
+     * the suit protects against is decided by the optional rule in {@code CrewArmorKitRules}, so a platoon that simply
+     * wears one is unaffected.
+     */
+    S_COMBAT_SUIT,
 
 }

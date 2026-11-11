@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2005 Ben Mazur (bmazur@sev.org)
- * Copyright (C) 2005-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2005-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -44,6 +44,7 @@ import megamek.common.event.player.GamePlayerChangeEvent;
 import megamek.common.event.player.GamePlayerChatEvent;
 import megamek.common.event.player.GamePlayerConnectedEvent;
 import megamek.common.event.player.GamePlayerDisconnectedEvent;
+import megamek.common.event.player.GamePlayerPingEvent;
 import megamek.common.event.player.GamePlayerStrategicActionEvent;
 
 /**
@@ -81,6 +82,10 @@ public interface GameListener extends java.util.EventListener {
 
     void gameSettingsChange(GameSettingsChangeEvent e);
 
+    /** A vote among the players - a gamemaster request - was called, received a ballot, or resolved. */
+    default void gamePollChange(GamePollEvent e) {
+    }
+
     void gameMapQuery(GameMapQueryEvent e);
 
     void gameEntityNew(GameEntityNewEvent e);
@@ -98,6 +103,12 @@ public interface GameListener extends java.util.EventListener {
     void gameVictory(PostGameResolution e);
 
     default void gameScriptedEvent(GameScriptedEvent event) {}
+
+    /** Raised when the server asks the client to show a transient toast notification on the board view. */
+    default void gameToast(GameToastEvent event) {}
+
+    /** Raised when another player pings this client to get its attention. */
+    default void gamePlayerPing(GamePlayerPingEvent event) {}
 
     /**
      * This event is used in SBF games when a unit (formation) changes.

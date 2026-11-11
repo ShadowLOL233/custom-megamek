@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2004, 2005 Ben Mazur (bmazur@sev.org)
- * Copyright (C) 2009-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2009-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -40,7 +40,6 @@ import java.util.Map;
 import java.util.Vector;
 
 import megamek.common.HexTarget;
-import megamek.common.HitData;
 import megamek.common.Messages;
 import megamek.common.Player;
 import megamek.common.Report;
@@ -51,7 +50,10 @@ import megamek.common.ToHitData;
 import megamek.common.actions.WeaponAttackAction;
 import megamek.common.board.Coords;
 import megamek.common.compute.Compute;
+import megamek.common.compute.scatter.Scatter;
+import megamek.common.compute.scatter.ScatterMethod;
 import megamek.common.enums.GamePhase;
+import megamek.common.enums.HitDamageType;
 import megamek.common.equipment.BombLoadout;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponType;
@@ -60,6 +62,7 @@ import megamek.common.equipment.enums.BombType.BombTypeEnum;
 import megamek.common.game.Game;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.OptionsConstants;
+import megamek.common.rolls.Roll;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Entity;
 import megamek.common.units.IBomber;
@@ -80,7 +83,7 @@ public class BombAttackHandler extends WeaponHandler {
     public BombAttackHandler(ToHitData toHit, WeaponAttackAction waa, Game g, TWGameManager m)
           throws EntityLoadingException {
         super(toHit, waa, g, m);
-        generalDamageType = HitData.DAMAGE_NONE;
+        generalDamageType = HitDamageType.DAMAGE_NONE;
     }
 
     /**
@@ -94,7 +97,7 @@ public class BombAttackHandler extends WeaponHandler {
     @Override
     protected void useAmmo() {
         BombLoadout payload = weaponAttackAction.getBombPayload();
-        if (!attackingEntity.isBomber() || (null == payload)) {
+        if (!attackingEntity.isBomber() || (payload == null)) {
             return;
         }
         for (Map.Entry<BombTypeEnum, Integer> entry : payload.entrySet()) {
@@ -138,6 +141,8 @@ public class BombAttackHandler extends WeaponHandler {
         Player player = entity.getOwner();
         String bombMsg;
         Vector<Integer> hitIds = null;
+        // The first bomb uses the roll made when this handler was created; every later bomb rolls its own.
+        boolean firstBomb = true;
 
         // now go through the payload and drop the bombs one at a time
         for (Map.Entry<BombTypeEnum, Integer> entry : payload.entrySet()) {
@@ -173,6 +178,12 @@ public class BombAttackHandler extends WeaponHandler {
             }
 
             for (int i = 0; i < bombCount; i++) {
+                // Rolled at the top of the loop, so a bomb that leaves the board cannot pass its dice to the next one
+                if (!firstBomb) {
+                    roll = rollBombAttack();
+                }
+                firstBomb = false;
+
                 // Report weapon attack and its to-hit value.
                 Report report;
 
@@ -260,14 +271,10 @@ public class BombAttackHandler extends WeaponHandler {
                           new SpecialHexDisplay(Type.BOMB_HIT, game.getRoundCount(),
                                 player, bombMsg));
                 } else {
-                    int moF = -typeModifiedToHit.getMoS();
-                    if (attackingEntity.hasAbility(OptionsConstants.GUNNERY_GOLDEN_GOOSE)) {
-                        if ((-typeModifiedToHit.getMoS() - 2) < 1) {
-                            moF = 0;
-                        } else {
-                            moF = -typeModifiedToHit.getMoS() - 2;
-                        }
-                    }
+                    // Golden Goose reduces bomb scatter distance by two hexes, minimum 0 (CamOps p.75, 5th printing).
+                    int scatterReduction = attackingEntity.hasAbility(OptionsConstants.GUNNERY_GOLDEN_GOOSE)
+                          ? Scatter.SPA_SCATTER_REDUCTION : 0;
+                    ScatterMethod scatterMethod = ScatterMethod.forGame(game);
                     if (weaponType.hasFlag(WeaponType.F_ALT_BOMB)) {
                         // Need to determine location in flight path
                         int idx = 0;
@@ -279,9 +286,11 @@ public class BombAttackHandler extends WeaponHandler {
                         // Retrieve facing at current step in flight path
                         int facing = attackingEntity.getPassedThroughFacing().get(idx);
                         // Scatter, based on location and facing
-                        drop = Compute.scatterAltitudeBombs(coords, facing, moF);
+                        drop = scatterMethod.frontArc(coords, facing, typeModifiedToHit.getMoS(), scatterReduction)
+                              .landing();
                     } else {
-                        drop = Compute.scatterDiveBombs(coords, moF);
+                        drop = scatterMethod.omnidirectional(coords, typeModifiedToHit.getMoS(), scatterReduction)
+                              .landing();
                     }
 
                     if (game.getBoard(target).contains(drop)) {
@@ -321,7 +330,8 @@ public class BombAttackHandler extends WeaponHandler {
                 dropHex.setTargetLevel(((HexTarget) target).getTargetLevel());
 
                 if (type == BombTypeEnum.INFERNO) {
-                    hitIds = gameManager.deliverBombInferno(drop, attackingEntity, subjectId, vPhaseReport);
+                    hitIds = gameManager.deliverBombInferno(drop, target.getBoardId(), attackingEntity, subjectId,
+                          vPhaseReport);
                 } else if (type == BombTypeEnum.THUNDER) {
                     gameManager.deliverThunderMinefield(drop,
                           attackingEntity.getOwner().getId(),
@@ -354,12 +364,20 @@ public class BombAttackHandler extends WeaponHandler {
                                     + " " + coords.getBoardNum()));
                     }
                 }
-
-                // Finally, we need a new attack roll for the next bomb, if any.
-                roll = Compute.rollD6(2);
             }
         }
 
         return false;
+    }
+
+    /**
+     * Rolls the to-hit for the next bomb in the run. Made the same way as the first bomb's roll in WeaponHandler, so
+     * the crew's Natural Aptitude applies to every bomb in the run.
+     */
+    private Roll rollBombAttack() {
+        if (attackingEntity.getCrew() != null) {
+            return attackingEntity.getCrew().rollGunnerySkill(game, weaponAttackAction);
+        }
+        return Compute.rollD6(2);
     }
 }

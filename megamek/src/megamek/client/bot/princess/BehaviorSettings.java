@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2003 Ben Mazur (bmazur@sev.org)
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -35,12 +35,13 @@ package megamek.client.bot.princess;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
-import megamek.codeUtilities.MathUtility;
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.StringUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.util.StringUtil;
 import megamek.logging.MMLogger;
 import megamek.utilities.xml.MMXMLUtility;
@@ -59,6 +60,15 @@ public class BehaviorSettings implements Serializable {
     // region Variable Declarations
     @Serial
     private static final long serialVersionUID = -1895924639830817372L;
+
+    /** The keenest target priority: shoot this first. */
+    public static final int HIGHEST_TARGET_PRIORITY = 1;
+
+    /** The target priority a unit gets when nobody chose one, which plays the same as a priority target always has. */
+    public static final int DEFAULT_TARGET_PRIORITY = 3;
+
+    /** The mildest target priority: barely preferred over any other enemy. */
+    public static final int LOWEST_TARGET_PRIORITY = 5;
 
     static final double[] SELF_PRESERVATION_VALUES = {
           2.5,
@@ -112,7 +122,17 @@ public class BehaviorSettings implements Serializable {
           50,
           500 };
 
-    static final double[] HERD_MENTALITY_VALUES = {
+    /**
+     * Element name this setting was saved under before it was renamed to mutual support. Behavior presets written by
+     * older versions are still read, so a player's saved bots keep working; new files are written under the current
+     * name only.
+     */
+    private static final String LEGACY_HERD_MENTALITY_ELEMENT = "herdMentalityIndex";
+
+    /** Pre-rename element name for {@link #isExclusiveMutualSupport()}. See {@link #LEGACY_HERD_MENTALITY_ELEMENT}. */
+    private static final String LEGACY_EXCLUSIVE_HERDING_ELEMENT = "exclusiveHerding";
+
+    static final double[] MUTUAL_SUPPORT_VALUES = {
           0.1,
           0.2,
           0.4,
@@ -144,13 +164,18 @@ public class BehaviorSettings implements Serializable {
     private final Set<String> strategicBuildingTargets = new HashSet<>(); // What (besides enemy units) do I want to
     // blow up?
     private final Set<Integer> priorityUnitTargets = new HashSet<>(); // What units do I especially want to blow up?
-    private int herdMentalityIndex = 5; // How close do I want to stick to my teammates?
+    // How keenly, 1 to 5, for each priority unit set to anything but the default. Not final, and read only through
+    // targetPriorityMap(), because a save or settings packet written before this field existed loads it as null.
+    // A plain HashMap: the network input filter rejects immutable maps.
+    private HashMap<Integer, Integer> targetPriorities = new HashMap<>();
+    private int mutualSupportIndex = 5; // How close do I want to stick to my teammates?
     private int braveryIndex = 5; // How quickly will I try to escape once damaged?
     private int antiCrowding = 0; // How much do I want to avoid crowding my teammates?
     private int favorHigherTMM = 0; // How much do I want to favor moving in my turn?
     private int numberOfEnemiesToConsiderFacing = DEFAULT_NUMBER_OF_ENEMIES_TO_CONSIDER_FACING; // How many enemies do I want to consider when calculating facing?
     private int allowFacingTolerance = DEFAULT_ALLOW_FACING_TOLERANCE; // How much tolerance do I want to allow for facing?
-    private boolean exclusiveHerding = false; // should I only herd with my units or consider also friends?
+    private boolean exclusiveMutualSupport = false; // should I only form up with my units or consider also friends?
+    private CombatPosture combatPosture = CombatPosture.AUTO; // Am I attacking or defending?
     private boolean iAmAPirate = false; // Am I a pirate?
     private boolean ignoreDamageOutput = false;
     private boolean experimental = false; // running experimental features?
@@ -174,19 +199,20 @@ public class BehaviorSettings implements Serializable {
         copy.setDescription(getDescription());
         copy.setFallShameIndex(getFallShameIndex());
         copy.setBraveryIndex(getBraveryIndex());
-        copy.setHerdMentalityIndex(getHerdMentalityIndex());
+        copy.setMutualSupportIndex(getMutualSupportIndex());
         copy.setHyperAggressionIndex(getHyperAggressionIndex());
         copy.setSelfPreservationIndex(getSelfPreservationIndex());
         copy.setAntiCrowding(getAntiCrowding());
         copy.setFavorHigherTMM(getFavorHigherTMM());
         copy.setNumberOfEnemiesToConsiderFacing(getNumberOfEnemiesToConsiderFacing());
         copy.setAllowFacingTolerance(getAllowFacingTolerance());
-        copy.setExclusiveHerding(isExclusiveHerding());
+        copy.setExclusiveMutualSupport(isExclusiveMutualSupport());
+        copy.setCombatPosture(getCombatPosture());
         copy.setIAmAPirate(iAmAPirate());
         copy.setIgnoreDamageOutput(isIgnoreDamageOutput());
         copy.setExperimental(isExperimental());
         getStrategicBuildingTargets().forEach(copy::addStrategicTarget);
-        getPriorityUnitTargets().forEach(copy::addPriorityUnit);
+        getPriorityUnitTargets().forEach(unitId -> copy.setPriorityUnit(unitId, getTargetPriority(unitId)));
         getIgnoredUnitTargets().forEach(copy::addIgnoredUnitTarget);
 
         return copy;
@@ -249,21 +275,71 @@ public class BehaviorSettings implements Serializable {
     }
 
     /**
-     * @return TRUE if I should only herd with my units.
+     * @return TRUE if I should only form up with my units.
      */
-    public boolean isExclusiveHerding() {
-        return exclusiveHerding;
+    public boolean isExclusiveMutualSupport() {
+        return exclusiveMutualSupport;
     }
 
     /**
-     * @param exclusiveHerding Set TRUE if I should only herd with my units.
+     * @param exclusiveMutualSupport Set TRUE if I should only form up with my units.
      */
-    public void setExclusiveHerding(boolean exclusiveHerding) {
-        this.exclusiveHerding = exclusiveHerding;
+    public void setExclusiveMutualSupport(boolean exclusiveMutualSupport) {
+        this.exclusiveMutualSupport = exclusiveMutualSupport;
     }
 
+    public void setExclusiveMutualSupport(String exclusiveMutualSupport) {
+        setExclusiveMutualSupport(Boolean.parseBoolean(exclusiveMutualSupport));
+    }
+
+    /**
+     * @return whether my force is attacking, defending, or deciding for itself. See {@link CombatPosture}.
+     */
+    public CombatPosture getCombatPosture() {
+        return combatPosture;
+    }
+
+    /**
+     * @param combatPosture whether my force is attacking, defending, or deciding for itself; {@code null}
+     *                      resets to {@link CombatPosture#AUTO}
+     */
+    public void setCombatPosture(@Nullable CombatPosture combatPosture) {
+        this.combatPosture = (combatPosture == null) ? CombatPosture.AUTO : combatPosture;
+    }
+
+    public void setCombatPosture(String combatPosture) {
+        setCombatPosture(CombatPosture.parse(combatPosture));
+    }
+
+    /**
+     * @return TRUE if I should only form up with my units.
+     *
+     * @deprecated since 0.50.08, use {@link #isExclusiveMutualSupport()}. The setting was renamed from herding to
+     *       mutual support; this delegates so code outside MegaMek keeps building.
+     */
+    @Deprecated(since = "0.50.08", forRemoval = true)
+    public boolean isExclusiveHerding() {
+        return isExclusiveMutualSupport();
+    }
+
+    /**
+     * @param exclusiveHerding Set TRUE if I should only form up with my units.
+     *
+     * @deprecated since 0.50.08, use {@link #setExclusiveMutualSupport(boolean)}.
+     */
+    @Deprecated(since = "0.50.08", forRemoval = true)
+    public void setExclusiveHerding(boolean exclusiveHerding) {
+        setExclusiveMutualSupport(exclusiveHerding);
+    }
+
+    /**
+     * @param exclusiveHerding Set TRUE if I should only form up with my units.
+     *
+     * @deprecated since 0.50.08, use {@link #setExclusiveMutualSupport(String)}.
+     */
+    @Deprecated(since = "0.50.08", forRemoval = true)
     public void setExclusiveHerding(String exclusiveHerding) {
-        setExclusiveHerding(Boolean.parseBoolean(exclusiveHerding));
+        setExclusiveMutualSupport(exclusiveHerding);
     }
 
     /**
@@ -408,6 +484,54 @@ public class BehaviorSettings implements Serializable {
      */
     void removePriorityUnit(final int id) {
         priorityUnitTargets.remove(id);
+        targetPriorityMap().remove(id);
+    }
+
+    /**
+     * Adds an enemy unit to the priority list with a target priority, or changes the target priority of one already on
+     * it. Priorities outside 1 to 5 are pulled back into that range.
+     *
+     * @param unitId   the ID of the unit
+     * @param priority how keenly the bot goes for it, from {@link #HIGHEST_TARGET_PRIORITY} (shoot first) to
+     *                 {@link #LOWEST_TARGET_PRIORITY}
+     */
+    public void setPriorityUnit(final int unitId, final int priority) {
+        int clampedPriority = Math.clamp(priority, HIGHEST_TARGET_PRIORITY, LOWEST_TARGET_PRIORITY);
+        if (clampedPriority != priority) {
+            logger.debug("[PriorityTargets] target priority {} for unit {} is out of range, using {}", priority, unitId,
+                  clampedPriority);
+        }
+        priorityUnitTargets.add(unitId);
+        // only non-default priorities are stored, so two settings with the same targets compare equal however the
+        // default was reached
+        if (clampedPriority == DEFAULT_TARGET_PRIORITY) {
+            targetPriorityMap().remove(unitId);
+        } else {
+            targetPriorityMap().put(unitId, clampedPriority);
+        }
+    }
+
+    /**
+     * Returns how keenly the bot goes for a unit on its priority list. A unit added without a priority, including every
+     * unit in settings saved before priorities existed, reads as {@link #DEFAULT_TARGET_PRIORITY}.
+     *
+     * @param unitId the ID of the unit
+     *
+     * @return the target priority, 1 (shoot first) to 5
+     */
+    public int getTargetPriority(final int unitId) {
+        return targetPriorityMap().getOrDefault(unitId, DEFAULT_TARGET_PRIORITY);
+    }
+
+    /**
+     * @return the stored non-default target priorities, created on first use when this object was loaded from a save
+     *       or packet written before the field existed
+     */
+    private Map<Integer, Integer> targetPriorityMap() {
+        if (targetPriorities == null) {
+            targetPriorities = new HashMap<>();
+        }
+        return targetPriorities;
     }
 
     /**
@@ -454,7 +578,7 @@ public class BehaviorSettings implements Serializable {
     }
 
     private int validateIndex(final int index) {
-        return MathUtility.clamp(index, 0, 10);
+        return Math.clamp(index, 0, 10);
     }
 
     /**
@@ -553,52 +677,115 @@ public class BehaviorSettings implements Serializable {
     /**
      * How close do I want to stick to my teammates?
      *
-     * @return Index of the current herd mentality value.
+     * @return Index of the current mutual support value.
      */
-    public int getHerdMentalityIndex() {
-        return herdMentalityIndex;
+    public int getMutualSupportIndex() {
+        return mutualSupportIndex;
     }
 
     /**
      * How close do I want to stick to my teammates?
      *
-     * @return Current herd mentality value.
+     * @return Current mutual support value.
      */
-    public double getHerdMentalityValue() {
-        return getHerdMentalityValue(herdMentalityIndex);
+    public double getMutualSupportValue() {
+        return getMutualSupportValue(mutualSupportIndex);
     }
 
     /**
      * How close do I want to stick to my teammates?
      *
-     * @param index The index [0-10] of the herd mentality value that should be used.
+     * @param index The index [0-10] of the mutual support value that should be used.
      *
-     * @return The herd mentality value at the specified index.
+     * @return The mutual support value at the specified index.
      */
-    public double getHerdMentalityValue(final int index) {
-        return HERD_MENTALITY_VALUES[validateIndex(index)];
+    public double getMutualSupportValue(final int index) {
+        return MUTUAL_SUPPORT_VALUES[validateIndex(index)];
     }
 
     /**
      * How close do I want to stick to my teammates?
      *
-     * @param herdMentalityIndex The index [0-10] of the herd mentality that should be used.
+     * @param mutualSupportIndex The index [0-10] of the mutual support that should be used.
      */
-    public void setHerdMentalityIndex(final int herdMentalityIndex) {
-        this.herdMentalityIndex = validateIndex(herdMentalityIndex);
+    public void setMutualSupportIndex(final int mutualSupportIndex) {
+        this.mutualSupportIndex = validateIndex(mutualSupportIndex);
     }
 
     /**
      * How close do I want to stick to my teammates?
      *
-     * @param index The index ["0"-"10"] of the herd mentality value that should be used.
+     * @param index The index ["0"-"10"] of the mutual support value that should be used.
      */
-    public void setHerdMentalityIndex(final String index) throws PrincessException {
+    public void setMutualSupportIndex(final String index) throws PrincessException {
         try {
-            setHerdMentalityIndex(Integer.parseInt(index));
+            setMutualSupportIndex(Integer.parseInt(index));
         } catch (final NumberFormatException ex) {
             throw new PrincessException(ex);
         }
+    }
+
+    /**
+     * How close do I want to stick to my teammates?
+     *
+     * @return Index of the current mutual support value.
+     *
+     * @deprecated since 0.50.08, use {@link #getMutualSupportIndex()}. The setting was renamed from herding to
+     *       mutual support; this delegates so code outside MegaMek keeps building.
+     */
+    @Deprecated(since = "0.50.08", forRemoval = true)
+    public int getHerdMentalityIndex() {
+        return getMutualSupportIndex();
+    }
+
+    /**
+     * How close do I want to stick to my teammates?
+     *
+     * @return Current mutual support value.
+     *
+     * @deprecated since 0.50.08, use {@link #getMutualSupportValue()}.
+     */
+    @Deprecated(since = "0.50.08", forRemoval = true)
+    public double getHerdMentalityValue() {
+        return getMutualSupportValue();
+    }
+
+    /**
+     * How close do I want to stick to my teammates?
+     *
+     * @param index The index [0-10] of the mutual support value that should be used.
+     *
+     * @return The mutual support value at the specified index.
+     *
+     * @deprecated since 0.50.08, use {@link #getMutualSupportValue(int)}.
+     */
+    @Deprecated(since = "0.50.08", forRemoval = true)
+    public double getHerdMentalityValue(final int index) {
+        return getMutualSupportValue(index);
+    }
+
+    /**
+     * How close do I want to stick to my teammates?
+     *
+     * @param herdMentalityIndex The index [0-10] of the mutual support that should be used.
+     *
+     * @deprecated since 0.50.08, use {@link #setMutualSupportIndex(int)}.
+     */
+    @Deprecated(since = "0.50.08", forRemoval = true)
+    public void setHerdMentalityIndex(final int herdMentalityIndex) {
+        setMutualSupportIndex(herdMentalityIndex);
+    }
+
+    /**
+     * How close do I want to stick to my teammates?
+     *
+     * @param index The index ["0"-"10"] of the mutual support value that should be used.
+     *
+     * @deprecated since 0.50.08, use {@link #setMutualSupportIndex(String)}.
+     */
+    @Deprecated(since = "0.50.08", forRemoval = true)
+    public void setHerdMentalityIndex(final String index) throws PrincessException {
+        setMutualSupportIndex(index);
     }
 
     /**
@@ -616,7 +803,7 @@ public class BehaviorSettings implements Serializable {
      * @param destinationEdge The {@link CardinalEdge} princess should flee to.
      */
     public void setDestinationEdge(final @Nullable CardinalEdge destinationEdge) {
-        if (null == destinationEdge) {
+        if (destinationEdge == null) {
             return;
         }
 
@@ -665,7 +852,7 @@ public class BehaviorSettings implements Serializable {
      * @param retreatEdge The {@link CardinalEdge} princess should flee to.
      */
     public void setRetreatEdge(final @Nullable CardinalEdge retreatEdge) {
-        if (null == retreatEdge) {
+        if (retreatEdge == null) {
             return;
         }
 
@@ -764,7 +951,7 @@ public class BehaviorSettings implements Serializable {
     }
 
     public void setNumberOfEnemiesToConsiderFacing(int numberOfEnemiesToConsiderFacing) {
-        this.numberOfEnemiesToConsiderFacing = MathUtility.clamp(numberOfEnemiesToConsiderFacing,
+        this.numberOfEnemiesToConsiderFacing = Math.clamp(numberOfEnemiesToConsiderFacing,
               MIN_NUMBER_OF_ENEMIES_TO_CONSIDER_FACING,
               MAX_NUMBER_OF_ENEMIES_TO_CONSIDER_FACING);
     }
@@ -774,7 +961,7 @@ public class BehaviorSettings implements Serializable {
     }
 
     public void setAllowFacingTolerance(int allowFacingTolerance) {
-        this.allowFacingTolerance = MathUtility.clamp(
+        this.allowFacingTolerance = Math.clamp(
               allowFacingTolerance, MIN_ALLOW_FACING_TOLERANCE, MAX_ALLOW_FACING_TOLERANCE);
     }
 
@@ -894,8 +1081,9 @@ public class BehaviorSettings implements Serializable {
                 setDestinationEdge(CardinalEdge.parseFromString(child.getTextContent()));
             } else if ("retreatEdge".equalsIgnoreCase(child.getNodeName())) {
                 setRetreatEdge(CardinalEdge.parseFromString(child.getTextContent()));
-            } else if ("herdMentalityIndex".equalsIgnoreCase(child.getNodeName())) {
-                setHerdMentalityIndex(child.getTextContent());
+            } else if ("mutualSupportIndex".equalsIgnoreCase(child.getNodeName())
+                  || LEGACY_HERD_MENTALITY_ELEMENT.equalsIgnoreCase(child.getNodeName())) {
+                setMutualSupportIndex(child.getTextContent());
             } else if ("braveryIndex".equalsIgnoreCase(child.getNodeName())) {
                 setBraveryIndex(child.getTextContent());
             } else if ("antiCrowding".equalsIgnoreCase(child.getNodeName())) {
@@ -906,8 +1094,11 @@ public class BehaviorSettings implements Serializable {
                 setNumberOfEnemiesToConsiderFacing(child.getTextContent());
             } else if ("allowFacingTolerance".equalsIgnoreCase(child.getNodeName())) {
                 setAllowFacingTolerance(child.getTextContent());
-            } else if ("exclusiveHerding".equalsIgnoreCase(child.getNodeName())) {
-                setExclusiveHerding(child.getTextContent());
+            } else if ("exclusiveMutualSupport".equalsIgnoreCase(child.getNodeName())
+                  || LEGACY_EXCLUSIVE_HERDING_ELEMENT.equalsIgnoreCase(child.getNodeName())) {
+                setExclusiveMutualSupport(child.getTextContent());
+            } else if ("combatPosture".equalsIgnoreCase(child.getNodeName())) {
+                setCombatPosture(child.getTextContent());
             } else if ("iAmAPirate".equalsIgnoreCase(child.getNodeName())) {
                 setIAmAPirate(child.getTextContent());
             } else if ("ignoreDamageOutput".equalsIgnoreCase(child.getNodeName())) {
@@ -985,9 +1176,9 @@ public class BehaviorSettings implements Serializable {
             selfPreservationNode.setTextContent("" + getSelfPreservationIndex());
             behavior.appendChild(selfPreservationNode);
 
-            final Element herdMentalityNode = doc.createElement("herdMentalityIndex");
-            herdMentalityNode.setTextContent("" + getHerdMentalityIndex());
-            behavior.appendChild(herdMentalityNode);
+            final Element mutualSupportNode = doc.createElement("mutualSupportIndex");
+            mutualSupportNode.setTextContent("" + getMutualSupportIndex());
+            behavior.appendChild(mutualSupportNode);
 
             final Element braveryNode = doc.createElement("braveryIndex");
             braveryNode.setTextContent("" + getBraveryIndex());
@@ -1013,9 +1204,13 @@ public class BehaviorSettings implements Serializable {
             iAmAPirateNode.setTextContent("" + iAmAPirate());
             behavior.appendChild(iAmAPirateNode);
 
-            final Element exclusiveHerdingNode = doc.createElement("exclusiveHerding");
-            exclusiveHerdingNode.setTextContent("" + isExclusiveHerding());
-            behavior.appendChild(exclusiveHerdingNode);
+            final Element exclusiveMutualSupportNode = doc.createElement("exclusiveMutualSupport");
+            exclusiveMutualSupportNode.setTextContent("" + isExclusiveMutualSupport());
+            behavior.appendChild(exclusiveMutualSupportNode);
+
+            final Element combatPostureNode = doc.createElement("combatPosture");
+            combatPostureNode.setTextContent(getCombatPosture().name());
+            behavior.appendChild(combatPostureNode);
 
             final Element experimentalNode = doc.createElement("experimental");
             experimentalNode.setTextContent("" + isExperimental());
@@ -1073,9 +1268,10 @@ public class BehaviorSettings implements Serializable {
         out.append("\n\t FavorHigherTMM: ").append(getFavorHigherTMM());
         out.append("\n\t NumberOfEnemiesToConsiderFacing: ").append(getNumberOfEnemiesToConsiderFacing());
         out.append("\n\t AllowFacingTolerance: ").append(getAllowFacingTolerance());
-        out.append("\n\t Herd Mentality: ").append(getHerdMentalityIndex()).append(":")
-              .append(getHerdMentalityValue(getHerdMentalityIndex()));
-        out.append("\n\t Exclusive Herding: ").append(isExclusiveHerding());
+        out.append("\n\t Mutual Support: ").append(getMutualSupportIndex()).append(":")
+              .append(getMutualSupportValue(getMutualSupportIndex()));
+        out.append("\n\t Exclusive Mutual Support: ").append(isExclusiveMutualSupport());
+        out.append("\n\t Combat Posture: ").append(getCombatPosture());
         out.append("\n\t I am a Pirate: ").append(iAmAPirate());
         out.append("\n\t I Ignore Damage Output: ").append(isIgnoreDamageOutput());
         out.append("\n\t Experimental: ").append(isExperimental());
@@ -1086,7 +1282,7 @@ public class BehaviorSettings implements Serializable {
         }
         out.append("\n\t\t Priority Units:");
         for (final int id : getPriorityUnitTargets()) {
-            out.append("  ").append(id);
+            out.append("  ").append(id).append(" (target priority ").append(getTargetPriority(id)).append(')');
         }
         out.append("\n\t\t Ignored Units:");
         for (final int id : getIgnoredUnitTargets()) {
@@ -1112,7 +1308,7 @@ public class BehaviorSettings implements Serializable {
             return false;
         } else if (forcedWithdrawal != that.forcedWithdrawal) {
             return false;
-        } else if (herdMentalityIndex != that.herdMentalityIndex) {
+        } else if (mutualSupportIndex != that.mutualSupportIndex) {
             return false;
         } else if (hyperAggressionIndex != that.hyperAggressionIndex) {
             return false;
@@ -1136,9 +1332,13 @@ public class BehaviorSettings implements Serializable {
             return false;
         } else if (!priorityUnitTargets.equals(that.priorityUnitTargets)) {
             return false;
+        } else if (!targetPriorityMap().equals(that.targetPriorityMap())) {
+            return false;
         } else if (!ignoredUnitTargets.equals(that.ignoredUnitTargets)) {
             return false;
-        } else if (exclusiveHerding != that.exclusiveHerding) {
+        } else if (exclusiveMutualSupport != that.exclusiveMutualSupport) {
+            return false;
+        } else if (combatPosture != that.combatPosture) {
             return false;
         } else if (iAmAPirate != that.iAmAPirate) {
             return false;
@@ -1162,12 +1362,14 @@ public class BehaviorSettings implements Serializable {
         result = 31 * result + retreatEdge.hashCode();
         result = 31 * result + strategicBuildingTargets.hashCode();
         result = 31 * result + priorityUnitTargets.hashCode();
+        result = 31 * result + targetPriorityMap().hashCode();
         result = 31 * result + ignoredUnitTargets.hashCode();
         result = 31 * result + numberOfEnemiesToConsiderFacing;
         result = 31 * result + allowFacingTolerance;
-        result = 31 * result + herdMentalityIndex;
+        result = 31 * result + mutualSupportIndex;
         result = 31 * result + braveryIndex;
-        result = 31 * result + (exclusiveHerding ? 1 : 0);
+        result = 31 * result + (exclusiveMutualSupport ? 1 : 0);
+        result = 31 * result + combatPosture.hashCode();
         result = 31 * result + (iAmAPirate ? 1 : 0);
         result = 31 * result + (experimental ? 1 : 0);
         result = 31 * result + (ignoreDamageOutput ? 1 : 0);

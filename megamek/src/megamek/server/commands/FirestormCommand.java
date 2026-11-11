@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -82,6 +82,7 @@ public class FirestormCommand extends GamemasterServerCommand {
     protected void runCommand(int connId, Arguments args) {
         if (getGameManager().getGame().getBoard().isSpace()) {
             server.sendServerChat(connId, "Can't start a firestorm in space");
+            return;
         }
         try {
             var fireType = (int) args.get(TYPE).getValue();
@@ -117,11 +118,11 @@ public class FirestormCommand extends GamemasterServerCommand {
 
     private void igniteHex(Coords coords, int fireType) {
         Hex hex = gameManager.getGame().getBoard().getHex(coords);
-        if (null == hex) {
+        if (hex == null) {
             // Just ignore null hexes...
             // they should not happen, but I don't want to crash the command
             return;
         }
-        gameManager.ignite(coords, fireType, gameManager.getMainPhaseReport());
+        gameManager.igniteByGameMaster(coords, fireType, gameManager.getMainPhaseReport());
     }
 }

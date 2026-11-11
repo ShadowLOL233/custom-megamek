@@ -38,10 +38,10 @@ import static megamek.common.game.IGame.LOGGER;
 
 import java.io.Serial;
 
+import jakarta.annotation.Nullable;
 import megamek.common.ToHitData;
 import megamek.common.actions.WeaponAttackAction;
 import megamek.common.alphaStrike.AlphaStrikeElement;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.TechBase;
 import megamek.common.enums.TechRating;
@@ -72,6 +72,7 @@ public abstract class CLIATMWeapon extends MissileWeapon {
         // assume bad things will happen.
         atClass = CLASS_ATM; // Do I need to change this? Streak LRMs still use the CLASS_LRM flag... I think
         // I can leave it.
+        flags = flags.or(F_INDIRECT_FIRE);
         techAdvancement.setTechBase(TechBase.CLAN);
         techAdvancement.setClanAdvancement(3049, 3070);
         techAdvancement.setTechRating(TechRating.F);
@@ -122,11 +123,6 @@ public abstract class CLIATMWeapon extends MissileWeapon {
     @Override
     public boolean isAlphaStrikeIndirectFire() {
         return false;
-    }
-
-    @Override
-    public boolean hasIndirectFire() {
-        return true;
     }
 
     @Override

@@ -42,9 +42,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
+import jakarta.annotation.Nullable;
 import megamek.common.CriticalSlot;
 import megamek.common.MPCalculationSetting;
-import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.EquipmentType;
@@ -57,15 +57,6 @@ import megamek.common.units.Entity;
 import megamek.common.units.LandAirMek;
 import megamek.common.units.Mek;
 import megamek.common.units.QuadMek;
-import megamek.common.weapons.autoCannons.HVACWeapon;
-import megamek.common.weapons.gaussRifles.GaussWeapon;
-import megamek.common.weapons.lasers.clan.large.CLImprovedHeavyLaserLarge;
-import megamek.common.weapons.lasers.clan.medium.CLImprovedHeavyLaserMedium;
-import megamek.common.weapons.lasers.clan.small.CLImprovedHeavyLaserSmall;
-import megamek.common.weapons.lasers.innerSphere.ISRISCHyperLaser;
-import megamek.common.weapons.other.TSEMPWeapon;
-import megamek.common.weapons.other.innerSphere.ISMekTaser;
-import megamek.common.weapons.ppc.PPCWeapon;
 
 public class MekBVCalculator extends HeatTrackingBVCalculator {
 
@@ -221,21 +212,21 @@ public class MekBVCalculator extends HeatTrackingBVCalculator {
             int toSubtract = 15;
 
             // Logic for Weapons with Reduced Penalty
-            if ((etype instanceof GaussWeapon) ||
-                  (etype instanceof HVACWeapon) ||
-                  (etype instanceof CLImprovedHeavyLaserLarge) ||
-                  (etype instanceof CLImprovedHeavyLaserMedium) ||
-                  (etype instanceof CLImprovedHeavyLaserSmall) ||
-                  (etype instanceof ISRISCHyperLaser) ||
-                  (etype instanceof TSEMPWeapon) ||
-                  (etype instanceof ISMekTaser) ||
-                  (etype instanceof WeaponType &&
-                        (etype.hasFlag(WeaponType.F_B_POD) || etype.hasFlag(WeaponType.F_M_POD)))) {
+            if (etype instanceof WeaponType weaponType
+                && (weaponType.hasFlag(WeaponType.F_GAUSS)
+                || weaponType.hasFlag(WeaponType.F_HVAC)
+                || weaponType.hasFlag(WeaponType.F_HYPER)
+                || weaponType.hasFlag(WeaponType.F_TSEMP)
+                || weaponType.hasFlag(WeaponType.F_TASER)
+                || weaponType.hasFlag(WeaponType.F_B_POD)
+                || weaponType.hasFlag(WeaponType.F_M_POD)
+                || (weaponType.hasFlag(WeaponType.F_LASER) && weaponType.hasFlag(WeaponType.S_IMPROVED)))) {
                 toSubtract = 1;
             }
 
             // PPC Weapons with Capacitors
-            if (etype instanceof PPCWeapon) {
+            if (etype instanceof WeaponType weaponType
+                && weaponType.hasFlag(WeaponType.F_PPC)) {
                 toSubtract = 1;
             }
 
@@ -268,7 +259,7 @@ public class MekBVCalculator extends HeatTrackingBVCalculator {
                     }
                     criticalSlots += criticalSlotsCopy.size();
                 }
-            } else if (mounted.getType() instanceof HVACWeapon) {
+            } else if (mounted.getType() instanceof WeaponType weaponType && weaponType.hasFlag(WeaponType.F_HVAC)) {
                 criticalSlots = 1; // HVAC weapons are -1 total regardless of slot count
             } else {
                 criticalSlots = mounted.getNumCriticalSlots();

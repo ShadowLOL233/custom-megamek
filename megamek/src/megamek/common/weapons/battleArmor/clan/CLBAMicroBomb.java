@@ -38,9 +38,10 @@ import static megamek.common.game.IGame.LOGGER;
 
 import java.io.Serial;
 
+import jakarta.annotation.Nullable;
+import megamek.common.SourceBookCode;
 import megamek.common.ToHitData;
 import megamek.common.actions.WeaponAttackAction;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
@@ -86,10 +87,8 @@ public class CLBAMicroBomb extends Weapon {
         tonnage = .1;
         criticalSlots = 2;
         cost = 30000;
-        rulesRefs = "253, TM";
+        rulesRefs = rulesRefs(SourceBookCode.TM, 253);
         techAdvancement.setTechBase(TechBase.CLAN)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setClanAdvancement(3055, 3060, 3065, DATE_NONE, DATE_NONE)

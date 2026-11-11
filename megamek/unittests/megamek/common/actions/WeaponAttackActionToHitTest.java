@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -45,6 +45,7 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Vector;
 
@@ -52,6 +53,7 @@ import megamek.common.CalledShot;
 import megamek.common.Hex;
 import megamek.common.LosEffects;
 import megamek.common.Player;
+import megamek.common.TargetRollModifier;
 import megamek.common.ToHitData;
 import megamek.common.WoodsClearingTracker;
 import megamek.common.board.Board;
@@ -60,6 +62,7 @@ import megamek.common.compute.Compute;
 import megamek.common.enums.GamePhase;
 import megamek.common.enums.Gender;
 import megamek.common.equipment.AmmoMounted;
+import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.BombMounted;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.HandheldWeapon;
@@ -76,15 +79,7 @@ import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.planetaryConditions.Light;
 import megamek.common.planetaryConditions.PlanetaryConditions;
-import megamek.common.units.Aero;
-import megamek.common.units.BipedMek;
-import megamek.common.units.Crew;
-import megamek.common.units.CrewType;
-import megamek.common.units.Entity;
-import megamek.common.units.Mek;
-import megamek.common.units.MekWithArms;
-import megamek.common.units.Tank;
-import megamek.common.units.Targetable;
+import megamek.common.units.*;
 import megamek.common.weapons.handlers.AttackHandler;
 import megamek.server.totalWarfare.TWGameManager;
 import org.junit.jupiter.api.BeforeAll;
@@ -161,7 +156,7 @@ public class WeaponAttackActionToHitTest {
         when(mockGame.onConnectedBoards(any(Targetable.class), any(Targetable.class))).thenReturn(true);
         when(mockGame.onTheSameBoard(any(Targetable.class), any(Targetable.class))).thenReturn(true);
         when(mockGame.isOnGroundMap(any(Targetable.class))).thenReturn(true);
-
+        new Game().initializeRulesManager(OptionsConstants.RULES_CORE);
         // Mock LosEffects
         mockLos = mock(LosEffects.class);
         when(mockGame.getBoard()).thenReturn(mockBoard);
@@ -887,5 +882,161 @@ public class WeaponAttackActionToHitTest {
         assertFalse(waa.getAssumedHit());
         assertEquals(4.58f, returnValue, 0.1f);
         assertEquals(4.58f, waa.getExpectedDamage(), 0.1f);
+    }
+
+    /**
+     * Regression tests for issue #8370: direct-fire artillery against an airborne VTOL/WiGE/aerospace target resolves
+     * as a flak attack, which must still include the attacker's movement modifier (TO:AR corrected 7th printing,
+     * p.153). The flak branch in {@code ComputeToHit.artilleryDirectToHit} previously short-circuited via special
+     * resolution without applying that modifier.
+     */
+    @Nested
+    class ArtilleryDirectFlakAttackerMovementTests {
+
+        Tank mockAttackingEntity;
+        VTOL mockTarget;
+        AmmoType mockAmmoType;
+
+        @BeforeEach
+        void beforeEach() {
+            // Weapon is a direct-fire artillery piece (Arrow IV) loaded with standard, flak-capable ammo
+            when(mockWeaponType.hasFlag(WeaponType.F_ARTILLERY)).thenReturn(true);
+            when(mockWeaponType.getAmmoType()).thenReturn(AmmoType.AmmoTypeEnum.ARROW_IV);
+
+            mockAmmoType = mock(AmmoType.class);
+            when(mockAmmoType.getAmmoType()).thenReturn(AmmoType.AmmoTypeEnum.ARROW_IV);
+            when(mockAmmoType.getMunitionType()).thenReturn(EnumSet.of(AmmoType.Munitions.M_STANDARD));
+            when(mockAmmoType.countsAsFlak()).thenReturn(true);
+            when(mockAmmo.getType()).thenReturn(mockAmmoType);
+
+            // Attacker is a vehicle (e.g. a Long Tom carrier) that ran this turn, so the movement modifier is
+            // "attacker ran" (+2)
+            mockAttackingEntity = mock(Tank.class);
+            when(mockAttackingEntity.getOwner()).thenReturn(mockPlayer);
+            when(mockAttackingEntity.getPosition()).thenReturn(new Coords(0, 0));
+            when(mockAttackingEntity.getWeapon(anyInt())).thenReturn(mockWeapon);
+            when(mockAttackingEntity.getEquipment(anyInt())).thenReturn(mockWeaponEquipment);
+            when(mockAttackingEntity.getCrew()).thenReturn(mockCrew);
+            when(mockAttackingEntity.getSwarmTargetId()).thenReturn(Entity.NONE);
+            when(mockAttackingEntity.getAttackingEntity()).thenReturn(mockAttackingEntity);
+            when(mockAttackingEntity.getGame()).thenReturn(mockGame);
+            // Not grappling: an unstubbed mock returns 0, which is != Entity.NONE (-1) and would send the
+            // impossible-checks down the grapple-only targeting path; keep the test focused on flak behavior.
+            when(mockAttackingEntity.getGrappled()).thenReturn(Entity.NONE);
+            mockAttackingEntity.moved = EntityMovementType.MOVE_RUN;
+
+            when(mockWeapon.getEntity()).thenReturn(mockAttackingEntity);
+
+            // Target is an airborne VTOL, which routes the attack through the artillery flak branch. It sits
+            // beyond the 6-hex direct-fire minimum (and within the 17-hex maximum) so the attack is legal.
+            mockTarget = mock(VTOL.class);
+            when(mockTarget.getOwner()).thenReturn(mockEnemy);
+            when(mockTarget.getPosition()).thenReturn(new Coords(0, 10));
+            when(mockTarget.getTargetType()).thenReturn(Targetable.TYPE_ENTITY);
+            when(mockTarget.getSwarmTargetId()).thenReturn(Entity.NONE);
+            when(mockTarget.isAirborneVTOLorWIGE()).thenReturn(true);
+            when(mockTarget.getGame()).thenReturn(mockGame);
+
+            when(mockGame.getEntity(0)).thenReturn(mockAttackingEntity);
+            when(mockGame.getEntity(1)).thenReturn(mockTarget);
+        }
+
+        @Test
+        void testAttackerMovementAppliedToArtilleryFlak() {
+            try (MockedStatic<LosEffects> mockedLosEffects = mockStatic(LosEffects.class,
+                  invocationOnMock -> mockLos)) {
+                mockedLosEffects.when(() -> LosEffects.calculateLOS(any(), any(), any(), anyBoolean()))
+                      .thenReturn(mockLos);
+
+                ToHitData toHit = WeaponAttackAction.toHit(mockGame, 0, mockTarget, 0, false);
+
+                boolean hasAttackerRanModifier = toHit.getModifiers().stream()
+                      .anyMatch(modifier -> "attacker ran".equals(modifier.description()) && (modifier.value() == 2));
+                assertTrue(hasAttackerRanModifier,
+                      "Direct-fire artillery flak vs. an airborne VTOL must include the attacker movement modifier. "
+                            + "Modifiers: " + toHit.getModifiers().stream()
+                            .map(modifier -> "[" + modifier.value() + ": " + modifier.description() + "]")
+                            .collect(java.util.stream.Collectors.joining(", ")));
+            }
+        }
+    }
+
+    /**
+     * Regression tests for issue #9105: TW p.114 (errata v12.0) gives flak -2 against a unit that "expended any VTOL
+     * or WiGE MP or Thrust Points that turn (even if it landed at the end of that Movement Phase)". A WiGE that flew
+     * and then landed lost the bonus because only units airborne right now counted.
+     */
+    @Nested
+    class FlakAgainstLandedFlyerTests {
+
+        Tank mockAttackingEntity;
+        Tank mockWiGETarget;
+
+        @BeforeEach
+        void beforeEach() {
+            // An autocannon loaded with flak ammo
+            when(mockWeaponType.getAmmoType()).thenReturn(AmmoType.AmmoTypeEnum.AC);
+            AmmoType mockFlakAmmoType = mock(AmmoType.class);
+            when(mockFlakAmmoType.getAmmoType()).thenReturn(AmmoType.AmmoTypeEnum.AC);
+            when(mockFlakAmmoType.getMunitionType()).thenReturn(EnumSet.of(AmmoType.Munitions.M_FLAK));
+            when(mockAmmo.getType()).thenReturn(mockFlakAmmoType);
+
+            mockAttackingEntity = mock(Tank.class);
+            when(mockAttackingEntity.getOwner()).thenReturn(mockPlayer);
+            when(mockAttackingEntity.getPosition()).thenReturn(new Coords(0, 0));
+            when(mockAttackingEntity.getWeapon(anyInt())).thenReturn(mockWeapon);
+            when(mockAttackingEntity.getEquipment(anyInt())).thenReturn(mockWeaponEquipment);
+            when(mockAttackingEntity.getCrew()).thenReturn(mockCrew);
+            when(mockAttackingEntity.getSwarmTargetId()).thenReturn(Entity.NONE);
+            when(mockAttackingEntity.getAttackingEntity()).thenReturn(mockAttackingEntity);
+            when(mockAttackingEntity.getGame()).thenReturn(mockGame);
+            when(mockAttackingEntity.getGrappled()).thenReturn(Entity.NONE);
+            mockAttackingEntity.moved = EntityMovementType.MOVE_NONE;
+            when(mockWeapon.getEntity()).thenReturn(mockAttackingEntity);
+
+            // A WiGE that has landed: elevation 0, so not airborne now
+            mockWiGETarget = mock(Tank.class);
+            when(mockWiGETarget.getOwner()).thenReturn(mockEnemy);
+            when(mockWiGETarget.getPosition()).thenReturn(new Coords(0, 3));
+            when(mockWiGETarget.getTargetType()).thenReturn(Targetable.TYPE_ENTITY);
+            when(mockWiGETarget.getSwarmTargetId()).thenReturn(Entity.NONE);
+            when(mockWiGETarget.isIlluminated()).thenReturn(true);
+            when(mockWiGETarget.getMovementMode()).thenReturn(EntityMovementMode.WIGE);
+            when(mockWiGETarget.isAirborneVTOLorWIGE()).thenReturn(false);
+            when(mockWiGETarget.getGame()).thenReturn(mockGame);
+
+            when(mockGame.getEntity(0)).thenReturn(mockAttackingEntity);
+            when(mockGame.getEntity(1)).thenReturn(mockWiGETarget);
+        }
+
+        private boolean hasFlakModifier() {
+            try (MockedStatic<LosEffects> mockedLosEffects = mockStatic(LosEffects.class,
+                  invocationOnMock -> mockLos)) {
+                mockedLosEffects.when(() -> LosEffects.calculateLOS(any(), any(), any(), anyBoolean()))
+                      .thenReturn(mockLos);
+
+                ToHitData toHit = WeaponAttackAction.toHit(mockGame, 0, mockWiGETarget, 0, false);
+                for (TargetRollModifier modifier : toHit.getModifiers()) {
+                    if ((modifier.value() == -2) && "flak to-hit modifier".equals(modifier.description())) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+
+        @Test
+        void flakBonusAppliesToWiGEThatFlewThenLanded() {
+            mockWiGETarget.moved = EntityMovementType.MOVE_VTOL_WALK;
+
+            assertTrue(hasFlakModifier(), "a WiGE that spent WiGE MP this turn is a flak target even after landing");
+        }
+
+        @Test
+        void flakBonusDoesNotApplyToWiGEThatStayedOnTheGround() {
+            mockWiGETarget.moved = EntityMovementType.MOVE_WALK;
+
+            assertFalse(hasFlakModifier(), "a WiGE that never flew this turn is a ground target");
+        }
     }
 }

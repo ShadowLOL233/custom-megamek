@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -55,10 +55,12 @@ import megamek.common.compute.Compute;
 import megamek.common.enums.MoveStepType;
 import megamek.common.equipment.MiscType;
 import megamek.common.game.Game;
+import megamek.common.moves.ClimbingHelper;
 import megamek.common.moves.MoveStep;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityMovementMode;
 import megamek.common.units.EntityMovementType;
+import megamek.common.units.Mek;
 
 /**
  * Sprite for a step in a movement path. Only one sprite should exist for any hex in a path. Contains a colored number,
@@ -181,6 +183,7 @@ public class StepSprite extends Sprite {
             case HULL_DOWN:
             case DOWN:
             case DIG_IN:
+            case HIT_THE_DECK:
             case FORTIFY:
             case TAKE_COVER:
                 // draw arrow indicating dropping prone
@@ -238,6 +241,10 @@ public class StepSprite extends Sprite {
             case LOAD:
                 String load = Messages.getString("BoardView1.Load");
                 drawAnnouncement(g2D, load, step, col);
+                break;
+            case DEPLOY:
+                String deploy = Messages.getString("MovementDisplay.moveDeploy");
+                drawAnnouncement(g2D, deploy, step, col);
                 break;
             case PICKUP_CARGO:
                 String pickup = Messages.getString("MovementDisplay.movePickupCargo");
@@ -297,7 +304,7 @@ public class StepSprite extends Sprite {
                 // show new movement mode
                 String mode = Messages.getString("BoardView1.ConversionMode."
                       + step.getMovementMode());
-                graph.setFont(new Font(MMConstants.FONT_SANS_SERIF, Font.PLAIN, 12));
+                graph.setFont(fitCentred(graph, new Font(MMConstants.FONT_SANS_SERIF, Font.PLAIN, 12), mode));
                 int modeX = 42 - (graph.getFontMetrics(graph.getFont()).stringWidth(mode) / 2);
                 graph.setColor(Color.darkGray);
                 graph.drawString(mode, modeX, modePos - 1);
@@ -346,7 +353,7 @@ public class StepSprite extends Sprite {
         if (step.isPastDanger()) {
             text = "(" + text + ")";
         }
-        graph.setFont(new Font(MMConstants.FONT_SANS_SERIF, Font.PLAIN, 12));
+        graph.setFont(fitCentred(graph, new Font(MMConstants.FONT_SANS_SERIF, Font.PLAIN, 12), text));
         int posX = 42 - (graph.getFontMetrics(graph.getFont()).stringWidth(text) / 2);
         int posY = 38 + graph.getFontMetrics(graph.getFont()).getHeight();
         graph.setColor(Color.darkGray);
@@ -362,7 +369,7 @@ public class StepSprite extends Sprite {
     private void drawConditions(MoveStep step, Graphics graph, Color col) {
         if (step.isEvading()) {
             String evade = Messages.getString("BoardView1.Evade");
-            graph.setFont(new Font(MMConstants.FONT_SANS_SERIF, Font.PLAIN, 12));
+            graph.setFont(fitCentred(graph, new Font(MMConstants.FONT_SANS_SERIF, Font.PLAIN, 12), evade));
             int evadeX = 42 - (graph.getFontMetrics(graph.getFont()).stringWidth(evade) / 2);
             graph.setColor(Color.darkGray);
             graph.drawString(evade, evadeX, 64);
@@ -373,7 +380,7 @@ public class StepSprite extends Sprite {
         if (step.isRolled()) {
             // Announce roll
             String roll = Messages.getString("BoardView1.Roll");
-            graph.setFont(new Font(MMConstants.FONT_SANS_SERIF, Font.PLAIN, 12));
+            graph.setFont(fitCentred(graph, new Font(MMConstants.FONT_SANS_SERIF, Font.PLAIN, 12), roll));
             int rollX = 42 - (graph.getFontMetrics(graph.getFont()).stringWidth(roll) / 2);
             graph.setColor(Color.darkGray);
             graph.drawString(roll, rollX, 18);
@@ -413,22 +420,39 @@ public class StepSprite extends Sprite {
         return step;
     }
 
-    private Font getMovementFont() {
+    private static Font getMovementFont() {
         String fontName = GUIP.getMoveFontType();
         int fontStyle = GUIP.getMoveFontStyle();
         int fontSize = GUIP.getMoveFontSize();
         return new Font(fontName, fontStyle, fontSize);
     }
 
-    private void drawMovementCost(MoveStep step, boolean isLastStep,
-          Point stepPos, Graphics graph, Color col, boolean shiftFlag) {
-        StringBuilder costStringBuf = new StringBuilder();
-        costStringBuf.append(step.getMpUsed());
+    /**
+     * Returns the font shrunk, if needed, so the text fits across the hex when drawn centred.
+     */
+    private static Font fitCentred(Graphics graph, Font font, String text) {
+        return HexLabelFitter.fitToWidth(graph, font, text, HexLabelFitter.centredLabelWidth());
+    }
 
-        Entity e = step.getEntity();
+    /**
+     * Draws the MP cost label of the step. The font is shrunk when the label would not fit in the hex.
+     */
+    static void drawMovementCost(MoveStep step, boolean isLastStep,
+          Point stepPos, Graphics graph, Color col, boolean shiftFlag) {
+        Entity stepEntity = step.getEntity();
+
+        StringBuilder costStringBuf = new StringBuilder();
+        // For climbing steps, show the per-turn MP cost capped to walk MP
+        if (step.isClimbing() && (stepEntity != null)) {
+            int walkMP = stepEntity.getWalkMP();
+            costStringBuf.append(Math.min(step.getMpUsed(), walkMP));
+        } else {
+            costStringBuf.append(step.getMpUsed());
+        }
 
         // If the step is using a road bonus, mark it.
-        if (step.isOnlyPavementOrRoad() && e.isEligibleForPavementOrRoadBonus()) {
+        if (step.isOnlyPavementOrRoad()
+              && (stepEntity != null) && stepEntity.isEligibleForPavementOrRoadBonus()) {
             costStringBuf.append('+');
         }
 
@@ -446,6 +470,31 @@ public class StepSprite extends Sprite {
             costStringBuf.append(')');
         }
 
+        // Show climbing turn count when climb takes multiple turns (TO:AR p.20)
+        if (step.isClimbing() && (stepEntity instanceof Mek climbingMek)) {
+            int walkMP = stepEntity.getWalkMP();
+            int totalLevels = step.getClimbingTotalLevels();
+            if ((walkMP > 0) && (totalLevels > 0)) {
+                int costPerLevel = ClimbingHelper.getClimbingMPCostPerLevel(climbingMek);
+                // Use the levels actually charged THIS turn (which equals chosen levels
+                // for partial climbs, full delta otherwise) instead of the full climb
+                // height. step.getMpUsed() only includes MP for the charged levels, so
+                // subtracting (totalLevels * costPerLevel) would go negative when the
+                // player picked fewer levels than the full climb and inflate
+                // levelsPerTurn. Falling back to totalLevels keeps prior behavior for
+                // older serialized paths where the field defaults to 0.
+                int chargedLevels = step.getClimbingChargedLevels();
+                int levelsForCostCalc = (chargedLevels > 0) ? chargedLevels : totalLevels;
+                int nonClimbCost = step.getMpUsed() - (levelsForCostCalc * costPerLevel);
+                int availablePerTurn = walkMP - Math.max(0, nonClimbCost);
+                int levelsPerTurn = Math.max(1, availablePerTurn / costPerLevel);
+                int turnsToClimb = (int) Math.ceil((double) totalLevels / levelsPerTurn);
+                if (turnsToClimb > 1) {
+                    costStringBuf.append('[').append(turnsToClimb).append("T]");
+                }
+            }
+        }
+
         EntityMovementType moveType = step.getMovementType(isLastStep);
         if ((moveType == EntityMovementType.MOVE_VTOL_WALK)
               || (moveType == EntityMovementType.MOVE_VTOL_RUN)
@@ -461,8 +510,10 @@ public class StepSprite extends Sprite {
 
         // Convert the buffer to a String and draw it.
         String costString = costStringBuf.toString();
-        graph.setFont(getMovementFont());
         int costX = stepPos.x + 42;
+        int availableWidth = shiftFlag ? HexLabelFitter.centredLabelWidth() : HexLabelFitter.labelWidthFrom(costX);
+        Font movementFont = getMovementFont();
+        graph.setFont(HexLabelFitter.fitToWidth(graph, movementFont, costString, availableWidth));
         if (shiftFlag) {
             costX -= (graph.getFontMetrics(graph.getFont()).stringWidth(costString) / 2);
         }
@@ -470,6 +521,8 @@ public class StepSprite extends Sprite {
         graph.drawString(costString, costX, stepPos.y + 39);
         graph.setColor(col);
         graph.drawString(costString, costX - 1, stepPos.y + 38);
+        // The TMM line below is placed using the current font height; keep it where it was before any shrinking
+        graph.setFont(movementFont);
     }
 
     private void drawTMMAndRolls(MoveStep step, boolean jumped, Game game, Point stepPos, Graphics graph, Color col,
@@ -506,7 +559,7 @@ public class StepSprite extends Sprite {
             int subscriptY = stepPos.y + 39 + (graph.getFontMetrics(graph.getFont()).getHeight() / 2);
             String subscriptString = subscriptStringBuf.toString();
             Font subscriptFont = getMovementFont().deriveFont(getMovementFont().getSize() * 0.5f);
-            graph.setFont(subscriptFont);
+            graph.setFont(fitCentred(graph, subscriptFont, subscriptString));
             int subscriptX = stepPos.x + 42;
             if (shiftFlag) {
                 subscriptX -= (graph.getFontMetrics(graph.getFont()).stringWidth(subscriptString) / 2);

@@ -38,9 +38,9 @@ import static megamek.common.game.IGame.LOGGER;
 
 import java.io.Serial;
 
+import jakarta.annotation.Nullable;
 import megamek.common.ToHitData;
 import megamek.common.actions.WeaponAttackAction;
-import megamek.common.annotations.Nullable;
 import megamek.common.equipment.EquipmentTypeLookup;
 import megamek.common.game.Game;
 import megamek.common.loaders.EntityLoadingException;
@@ -70,7 +70,7 @@ public class LRMBayWeapon extends AmmoBayWeapon {
         this.tonnage = 0.0;
         this.bv = 0;
         this.cost = 0;
-        this.flags = flags.or(F_MISSILE);
+        this.flags = flags.or(F_MISSILE).or(F_LRM);
         this.atClass = CLASS_LRM;
     }
 

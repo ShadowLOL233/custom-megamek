@@ -38,9 +38,10 @@ import static megamek.common.game.IGame.LOGGER;
 
 import java.io.Serial;
 
+import jakarta.annotation.Nullable;
+import megamek.common.SourceBookCode;
 import megamek.common.ToHitData;
 import megamek.common.actions.WeaponAttackAction;
-import megamek.common.annotations.Nullable;
 import megamek.common.equipment.EquipmentTypeLookup;
 import megamek.common.game.Game;
 import megamek.common.loaders.EntityLoadingException;
@@ -74,7 +75,10 @@ public class ScreenLauncherBayWeapon extends AmmoBayWeapon {
         // Per errata: Screen Launchers use standard aerospace range, not capital scale
         // See: https://battletech.com/forums/index.php?topic=77239
         this.capital = false;
-        rulesRefs = "237, TM";
+        rulesRefs = rulesRefs(
+              rulesRef(SourceBookCode.TM, 237),
+              rulesRef(SourceBookCode.TW, 251)
+        );
     }
 
     /*

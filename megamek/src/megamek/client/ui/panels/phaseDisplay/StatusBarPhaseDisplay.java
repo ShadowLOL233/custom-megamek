@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2000-2003 Ben Mazur (bmazur@sev.org)
- * Copyright (C) 2003-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2003-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -58,6 +58,7 @@ import javax.swing.SwingConstants;
 import javax.swing.ToolTipManager;
 import javax.swing.border.EmptyBorder;
 
+import jakarta.annotation.Nullable;
 import megamek.client.AbstractClient;
 import megamek.client.ui.GBC;
 import megamek.client.ui.Messages;
@@ -73,7 +74,6 @@ import megamek.client.ui.widget.SkinSpecification;
 import megamek.client.ui.widget.SkinXMLHandler;
 import megamek.common.KeyBindParser;
 import megamek.common.Player;
-import megamek.common.annotations.Nullable;
 import megamek.common.game.Game;
 import megamek.common.game.IGame;
 import megamek.common.interfaces.PlayerTurn;
@@ -96,6 +96,12 @@ public abstract class StatusBarPhaseDisplay extends AbstractPhaseDisplay
 
     private static final int BUTTON_ROWS = 2;
     private static final String SBPD_KEY_CLEAR_BUTTON = "clearButton";
+
+    /**
+     * How many buttons the Done column has to make room for: the Done button, and the Skip button the action phases
+     * add below it.
+     */
+    private static final int DONE_PANEL_ROWS = 2;
 
     protected final IClientGUI clientGUI;
 
@@ -288,7 +294,7 @@ public abstract class StatusBarPhaseDisplay extends AbstractPhaseDisplay
     protected UIUtil.FixedXPanel setupDonePanel() {
         UIUtil.FixedXPanel donePanel = new UIUtil.FixedXPanel();
         donePanel.setPreferredSize(new Dimension(
-              UIUtil.scaleForGUI(DONE_BUTTON_WIDTH + 5), MIN_BUTTON_SIZE.height * 2 + 5));
+              UIUtil.scaleForGUI(DONE_BUTTON_WIDTH + 5), MIN_BUTTON_SIZE.height * DONE_PANEL_ROWS + 5));
         donePanel.setOpaque(false);
         donePanel.setBackground(Color.DARK_GRAY);
         donePanel.setBorder(new EmptyBorder(0, 10, 0, 0));

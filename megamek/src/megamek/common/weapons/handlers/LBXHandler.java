@@ -47,7 +47,6 @@ import megamek.common.equipment.WeaponType;
 import megamek.common.game.Game;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.OptionsConstants;
-import megamek.common.planetaryConditions.PlanetaryConditions;
 import megamek.common.units.Infantry;
 import megamek.server.totalWarfare.TWGameManager;
 
@@ -75,8 +74,8 @@ public class LBXHandler extends AmmoWeaponHandler {
     protected int calcDamagePerHit() {
         if (target.isConventionalInfantry()) {
             double toReturn = Compute.directBlowInfantryDamage(
-                  weaponType.getDamage(), bDirect ? toHit.getMoS() / 3 : 0,
-                  WeaponType.WEAPON_CLUSTER_BALLISTIC,
+                  weaponType.getDamage(), getInfantryDamageClassShift(),
+                  resolveInfantryDamageClass(WeaponType.WEAPON_CLUSTER_BALLISTIC),
                   ((Infantry) target).isMechanized(),
                   toHit.getThruBldg() != null, attackingEntity.getId(), calcDmgPerHitReport);
             toReturn = applyGlancingBlowModifier(toReturn, true);
@@ -113,8 +112,7 @@ public class LBXHandler extends AmmoWeaponHandler {
                 shotsHit = (int) Math.ceil(shotsHit * .5);
             }
         } else {
-            PlanetaryConditions conditions = game.getPlanetaryConditions();
-            shotsHit = Compute.missilesHit(weaponType.getRackSize(), nHitsModifier, conditions.getEMI().isEMI());
+            shotsHit = Compute.missilesHit(weaponType.getRackSize(), nHitsModifier);
         }
 
         Report report = new Report(3325);

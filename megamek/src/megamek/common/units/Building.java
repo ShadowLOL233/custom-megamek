@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2000-2002 Ben Mazur (bmazur@sev.org)
- * Copyright (C) 2003-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2003-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -46,6 +46,7 @@ import java.util.Vector;
 
 import megamek.common.Report;
 import megamek.common.board.Board;
+import megamek.common.board.Coords;
 import megamek.common.board.CubeCoords;
 import megamek.common.compute.Compute;
 import megamek.common.enums.BasementType;
@@ -322,20 +323,7 @@ public class Building implements Serializable {
             Roll diceRoll = Compute.rollD6(2);
             r.add(diceRoll);
 
-            BasementType rolledType;
-            if (diceRoll.getIntValue() == 2) {
-                rolledType = BasementType.TWO_DEEP_FEET;
-            } else if (diceRoll.getIntValue() == 3) {
-                rolledType = BasementType.ONE_DEEP_FEET;
-            } else if (diceRoll.getIntValue() == 4 || diceRoll.getIntValue() == 10) {
-                rolledType = BasementType.ONE_DEEP_NORMAL;
-            } else if (diceRoll.getIntValue() == 11) {
-                rolledType = BasementType.ONE_DEEP_HEAD;
-            } else if (diceRoll.getIntValue() == 12) {
-                rolledType = BasementType.TWO_DEEP_HEAD;
-            } else {
-                rolledType = BasementType.NONE;
-            }
+            BasementType rolledType = basementTypeForRoll(diceRoll.getIntValue());
 
             basement.put(coords, rolledType);
             r.add(rolledType.toString());
@@ -345,6 +333,28 @@ public class Building implements Serializable {
         }
 
         return false;
+    }
+
+    /**
+     * The Basements Table (TW p. 179): 2 is a two-level basement entered feet first, 3 a one-level basement entered
+     * feet first, 4 and 10 a one-level basement with a normal fall, 9 a small basement that only infantry can enter,
+     * 11 a one-level basement entered head first and 12 a two-level basement entered head first. Every other result
+     * is no basement.
+     *
+     * @param roll the 2D6 result
+     *
+     * @return the basement type for that result
+     */
+    static BasementType basementTypeForRoll(int roll) {
+        return switch (roll) {
+            case 2 -> BasementType.TWO_DEEP_FEET;
+            case 3 -> BasementType.ONE_DEEP_FEET;
+            case 4, 10 -> BasementType.ONE_DEEP_NORMAL;
+            case 9 -> BasementType.ONE_DEEP_NORMAL_INFANTRY_ONLY;
+            case 11 -> BasementType.ONE_DEEP_HEAD;
+            case 12 -> BasementType.TWO_DEEP_HEAD;
+            default -> BasementType.NONE;
+        };
     }
 
     /**
@@ -530,8 +540,17 @@ public class Building implements Serializable {
         burning.put(coords, onFire);
     }
 
-    public void addDemolitionCharge(int playerId, int damage, CubeCoords pos) {
-        DemolitionCharge charge = new DemolitionCharge(playerId, damage, pos.toOffset());
+    /**
+     * Adds a demolition charge to this building. The position is stored as absolute board coordinates (not
+     * building-relative coordinates) because all consumers of {@link DemolitionCharge#pos} - the touch-off menu, the
+     * end-phase building lookup and the damage application - operate on board coordinates.
+     *
+     * @param playerId the ID of the player that owns the charge
+     * @param damage   the damage the charge inflicts when detonated
+     * @param pos      the absolute board {@link Coords} of the building hex the charge is placed in
+     */
+    public void addDemolitionCharge(int playerId, int damage, Coords pos) {
+        DemolitionCharge charge = new DemolitionCharge(playerId, damage, pos);
         demolitionCharges.add(charge);
     }
 

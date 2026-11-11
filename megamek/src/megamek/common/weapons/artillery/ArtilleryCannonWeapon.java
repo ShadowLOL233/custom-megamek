@@ -38,9 +38,9 @@ import static megamek.common.game.IGame.LOGGER;
 
 import java.io.Serial;
 
+import jakarta.annotation.Nullable;
 import megamek.common.ToHitData;
 import megamek.common.actions.WeaponAttackAction;
-import megamek.common.annotations.Nullable;
 import megamek.common.game.Game;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.IGameOptions;
@@ -61,18 +61,13 @@ public abstract class ArtilleryCannonWeapon extends AmmoWeapon {
     public ArtilleryCannonWeapon() {
         super();
         damage = DAMAGE_ARTILLERY;
-        flags = flags.or(F_BALLISTIC).or(F_MEK_WEAPON).or(F_AERO_WEAPON).or(F_TANK_WEAPON);
+        flags = flags.or(F_BALLISTIC).or(F_MEK_WEAPON).or(F_AERO_WEAPON).or(F_TANK_WEAPON).or(F_INDIRECT_FIRE);
         atClass = CLASS_AC;
     }
 
     @Override
     public boolean isAlphaStrikeIndirectFire() {
         return false;
-    }
-
-    @Override
-    public boolean hasIndirectFire() {
-        return true;
     }
 
     /*

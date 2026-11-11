@@ -38,9 +38,9 @@ import static megamek.common.game.IGame.LOGGER;
 
 import java.io.Serial;
 
+import jakarta.annotation.Nullable;
 import megamek.common.ToHitData;
 import megamek.common.actions.WeaponAttackAction;
-import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.Mounted;
 import megamek.common.game.Game;
@@ -68,7 +68,7 @@ public abstract class NarcWeapon extends MissileWeapon {
      */
     public NarcWeapon() {
         super();
-        flags = flags.or(F_NO_FIRES).or(F_PROTO_WEAPON);
+        flags = flags.or(F_NO_FIRES).or(F_PROTO_WEAPON).or(F_NARC);
         ammoType = AmmoType.AmmoTypeEnum.NARC;
     }
 

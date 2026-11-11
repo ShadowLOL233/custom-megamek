@@ -48,12 +48,12 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import jakarta.annotation.Nullable;
 import megamek.MMConstants;
 import megamek.client.ui.Messages;
 import megamek.client.ui.util.ViewFormatting;
 import megamek.common.SourceBook;
 import megamek.common.SourceBooks;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.TechBase;
 import megamek.common.equipment.AmmoMounted;
 import megamek.common.equipment.ArmorType;
@@ -101,6 +101,7 @@ class GeneralEntityReadout implements EntityReadout {
     protected final boolean ignorePilotBV;
 
     private boolean initialized = false;
+    private @Nullable Double costOverride = null;
 
     private final DecimalFormat dFormatter;
     private final List<ViewElement> headerSection = new ArrayList<>();
@@ -324,10 +325,20 @@ class GeneralEntityReadout implements EntityReadout {
         return entity.hasRole() ? new LabeledLine("Role", entity.getRole().toString()) : new EmptyElement();
     }
 
+    @Override
+    public void setCostOverride(@Nullable Double cost) {
+        costOverride = cost;
+    }
+
     protected ViewElement createCostElement() {
-        double cost = (useAlternateCost && entity.getAlternateCost() > 0)
-              ? entity.getAlternateCost()
-              : entity.getCost(false);
+        double cost;
+        if (costOverride != null) {
+            cost = costOverride;
+        } else {
+            cost = (useAlternateCost && entity.getAlternateCost() > 0)
+                  ? entity.getAlternateCost()
+                  : entity.getCost(false);
+        }
         return new LabeledLine(Messages.getString("MekView.Cost"), dFormatter.format(cost) + " C-bills");
     }
 
@@ -360,8 +371,9 @@ class GeneralEntityReadout implements EntityReadout {
             if (book.isPresent()) {
                 SourceBook sourceBook = book.get();
                 String displaySource = sourceBookDisplayText(source, sourceBook);
-                if ((sourceBook.getMul_url() != null) && !sourceBook.getMul_url().isBlank()) {
-                    return new HyperLinkLine(sourceLabel, sourceBook.getMul_url(), displaySource);
+                String linkUrl = sourceBook.getLinkUrl();
+                if (linkUrl != null) {
+                    return new HyperLinkLine(sourceLabel, linkUrl, displaySource);
                 } else {
                     source = displaySource;
                 }
@@ -388,7 +400,8 @@ class GeneralEntityReadout implements EntityReadout {
 
     private ViewElement sourceBookDisplayElement(String sourceName, SourceBook sourceBook) {
         String displaySource = sourceBookDisplayText(sourceName, sourceBook);
-        if ((sourceBook.getMul_url() == null) || sourceBook.getMul_url().isBlank()) {
+        String linkUrl = sourceBook.getLinkUrl();
+        if (linkUrl == null) {
             return new PlainElement(displaySource);
         }
 
@@ -400,7 +413,7 @@ class GeneralEntityReadout implements EntityReadout {
 
             @Override
             public String toHTML() {
-                return "<A HREF=" + sourceBook.getMul_url() + ">" + displaySource + "</A>";
+                return "<A " + HyperLinkLine.hrefAttribute(linkUrl) + ">" + displaySource + "</A>";
             }
 
             @Override
@@ -413,7 +426,7 @@ class GeneralEntityReadout implements EntityReadout {
     private String sourceBookDisplayText(String sourceName, SourceBook sourceBook) {
         String displaySource = Objects.requireNonNullElse(sourceBook.getTitle(), sourceName);
         if (!sourceBook.isCanon()) {
-            displaySource += " (non-canon)";
+            displaySource += " (Non-Canon)";
         }
         return displaySource;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -65,7 +65,7 @@ public class NewtonianAerospacePathRanker extends BasicPathRanker {
         Entity closest = null;
         List<Entity> enemies = getOwner().getEnemyEntities();
         var ignoredTargets = getOwner().getBehaviorSettings().getIgnoredUnitTargets();
-        var priorityTargets = getOwner().getBehaviorSettings().getPriorityUnitTargets();
+        var priorityTargets = getOwner().getPriorityUnitTargets();
         for (Entity enemy : enemies) {
             // targets that are withdrawing and are not priorities are ignored
             // targets in the ignore list are ignored
@@ -78,13 +78,17 @@ public class NewtonianAerospacePathRanker extends BasicPathRanker {
             }
 
             // If a unit has not moved, assume it will move away from me.
-            int unmovedDistMod = 0;
+            int unmovedDistanceModifier = 0;
             if (enemy.isSelectableThisTurn() && !enemy.isImmobile()) {
-                unmovedDistMod = enemy.getWalkMP();
+                unmovedDistanceModifier = enemy.getWalkMP();
             }
 
-            if ((position.distance(enemy.getPosition()) + unmovedDistMod) < range) {
-                range = position.distance(enemy.getPosition());
+            // "Closest" is measured by the adjusted distance (an unmoved enemy is treated as farther), so store the
+            // same adjusted value we compare against, not the raw distance.
+            int distance = position.distance(enemy.getPosition());
+            int adjustedDistance = distance + unmovedDistanceModifier;
+            if (adjustedDistance < range) {
+                range = adjustedDistance;
                 closest = enemy;
             }
         }

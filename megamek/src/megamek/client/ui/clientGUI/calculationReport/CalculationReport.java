@@ -35,7 +35,7 @@ package megamek.client.ui.clientGUI.calculationReport;
 import java.util.Locale;
 import javax.swing.JComponent;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * This represents a report for any typical MegaMek suite calculation such as BV, cost or AS conversion. It assumes that
@@ -68,6 +68,22 @@ public interface CalculationReport {
      * @return The CalculationReport itself. Enables multiple stringed addLine calls
      */
     CalculationReport addLine(@Nullable String type, @Nullable String calculation, @Nullable String result);
+
+        /**
+         * Adds a line that provides inputs or context but is not itself part of a report's running total.
+         * Display-oriented reports render this exactly like a regular line; structured report implementations may retain
+         * the semantic distinction.
+         *
+         * @param type        The first element of this line
+         * @param calculation A calculation or other info
+         * @param result      A result or other info displayed on the right side
+         *
+         * @return The CalculationReport itself
+         */
+        default CalculationReport addInformationalLine(@Nullable String type, @Nullable String calculation,
+                    @Nullable String result) {
+                return addLine(type, calculation, result);
+        }
 
     /**
      * Adds a single line to the CalculationReport. This method performs rounding to a single decimal digit on the

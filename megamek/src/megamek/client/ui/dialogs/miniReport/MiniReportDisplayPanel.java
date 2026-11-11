@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2000-2002 Ben Mazur (bmazur@sev.org)
- * Copyright (C) 2003-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2003-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -43,6 +43,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
@@ -52,6 +53,7 @@ import javax.swing.text.Document;
 
 import megamek.client.Client;
 import megamek.client.ui.Messages;
+import megamek.client.ui.clientGUI.ClientGUI;
 import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.clientGUI.IClientGUI;
 import megamek.client.ui.clientGUI.IHasBoardView;
@@ -61,6 +63,7 @@ import megamek.client.ui.util.KeyCommandBind;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.Player;
 import megamek.common.Report;
+import megamek.common.board.BoardLocation;
 import megamek.common.enums.GamePhase;
 import megamek.common.event.GameListener;
 import megamek.common.event.GameListenerAdapter;
@@ -307,8 +310,10 @@ public class MiniReportDisplayPanel extends JPanel implements ActionListener, Hy
     private void filterReportOutput(String text) {
         if (tabs.getTabCount() > 0) {
             int phaseTab = tabs.getTabCount() - 1;
+            // preserve the live phase tab's label (e.g. "Targeting Report") across the filter rebuild
+            String phaseTabTitle = tabs.getTitleAt(phaseTab);
             tabs.removeTabAt(phaseTab);
-            tabs.add(Messages.getString("MiniReportDisplay.Phase"), loadHtmlScrollPane(text));
+            tabs.add(phaseTabTitle, loadHtmlScrollPane(text));
             tabs.setSelectedIndex(phaseTab);
         }
     }
@@ -549,7 +554,7 @@ public class MiniReportDisplayPanel extends JPanel implements ActionListener, Hy
         BASE64ToolKit toolKit = new BASE64ToolKit();
         ta.setEditorKit(toolKit);
 
-        ta.setText("<div class='report'>" + t + "</div>");
+        ta.setText("<div class='report'>" + ReportHexLinks.linkHexes(t) + "</div>");
 
         ta.setEditable(false);
         ta.setOpaque(false);
@@ -581,8 +586,9 @@ public class MiniReportDisplayPanel extends JPanel implements ActionListener, Hy
             tabs.add(Messages.getString("MiniReportDisplay.Round") + " " + round, loadHtmlScrollPane(text));
         }
 
-        // add the new current phase tab
-        tabs.add(Messages.getString("MiniReportDisplay.Phase"), loadHtmlScrollPane(currentClient.phaseReport));
+        // add the new current phase tab, labeled with its round and phase name (e.g. "Round 2 - Firing Report")
+        tabs.add(Messages.getString("MiniReportDisplay.livePhaseTab", String.valueOf(numRounds), phase.localizedName()),
+              loadHtmlScrollPane(currentClient.phaseReport));
 
         tabs.setSelectedIndex(tabs.getTabCount() - 1);
         tabs.setMinimumSize(new Dimension(0, 0));
@@ -617,6 +623,8 @@ public class MiniReportDisplayPanel extends JPanel implements ActionListener, Hy
                     }
 
                 }
+            } else if (evtDesc.startsWith(ReportHexLinks.HEX_LINK)) {
+                centerOnHexLink(evtDesc.substring(ReportHexLinks.HEX_LINK.length()));
             } else if (evtDesc.startsWith(Report.TOOLTIP_LINK)) {
                 String desc = evtDesc.substring(Report.TOOLTIP_LINK.length());
                 JOptionPane.showMessageDialog(currentClientGUI.getFrame(),
@@ -631,6 +639,16 @@ public class MiniReportDisplayPanel extends JPanel implements ActionListener, Hy
             }
         } else if (evt.getEventType() == HyperlinkEvent.EventType.EXITED) {
             activePane().setToolTipText(null);
+        }
+    }
+
+    private void centerOnHexLink(String linkBody) {
+        Optional<BoardLocation> location = ReportHexLinks.parseHexLink(linkBody, currentClient.getGame());
+        if (location.isEmpty()) {
+            LOGGER.info("[ReportHexLink] {} is not on any board of this game", linkBody);
+        } else if (currentClientGUI instanceof ClientGUI clientGUI) {
+            LOGGER.info("[ReportHexLink] {} centers on {}", linkBody, location.get());
+            clientGUI.centerOnHex(location.get());
         }
     }
 }

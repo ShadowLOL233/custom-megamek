@@ -40,10 +40,10 @@ import static megamek.common.units.Terrains.ROUGH;
 import static megamek.common.units.Terrains.RUBBLE;
 import static megamek.common.units.Terrains.SWAMP;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.Messages;
 import megamek.common.Hex;
 import megamek.common.ToHitData;
-import megamek.common.annotations.Nullable;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponMounted;
 import megamek.common.equipment.WeaponType;
@@ -73,7 +73,7 @@ class ComputeAbilityMods {
             toHit.addModifier(+1, Messages.getString("WeaponAttackAction.SensorGhosts"));
         }
 
-        if (null != weapon) {
+        if (weapon != null) {
 
             // Flat -1 for Accurate Weapon
             if (weapon.hasQuirk(OptionsConstants.QUIRK_WEAPON_POS_ACCURATE)) {
@@ -242,7 +242,7 @@ class ComputeAbilityMods {
 
     static void processDefenderSPAs(ToHitData toHit, Entity attacker, Entity target, Game game) {
 
-        if (null == target) {
+        if (target == null) {
             return;
         }
 

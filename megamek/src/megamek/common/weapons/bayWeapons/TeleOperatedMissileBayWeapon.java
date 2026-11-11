@@ -38,10 +38,10 @@ import static megamek.common.game.IGame.LOGGER;
 
 import java.io.Serial;
 
+import jakarta.annotation.Nullable;
 import megamek.common.RangeType;
 import megamek.common.ToHitData;
 import megamek.common.actions.WeaponAttackAction;
-import megamek.common.annotations.Nullable;
 import megamek.common.equipment.EquipmentTypeLookup;
 import megamek.common.equipment.Mounted;
 import megamek.common.game.Game;
@@ -65,6 +65,7 @@ public class TeleOperatedMissileBayWeapon extends CapitalMissileBayWeapon {
 
     public TeleOperatedMissileBayWeapon() {
         super();
+        clearLookupNames(); // required to remove the pre-assigned names from CapitalMissileBayWeapon
         // tech levels are a little tricky
         this.name = "Tele-Operated Capital Missile Bay";
         this.setInternalName(EquipmentTypeLookup.TELE_CAPITAL_MISSILE_BAY);

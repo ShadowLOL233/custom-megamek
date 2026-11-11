@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2005 Ben Mazur (bmazur@sev.org)
- * Copyright (C) 2008-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2008-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -38,9 +38,11 @@ import static megamek.common.game.IGame.LOGGER;
 
 import java.io.Serial;
 
+import jakarta.annotation.Nullable;
+import megamek.common.SimpleTechLevel;
+import megamek.common.SourceBookCode;
 import megamek.common.ToHitData;
 import megamek.common.actions.WeaponAttackAction;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.TechBase;
 import megamek.common.enums.TechRating;
@@ -48,15 +50,15 @@ import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.enums.BombType.BombTypeEnum;
 import megamek.common.game.Game;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.weapons.bombs.CapitalRangeBombMissileWeapon;
 import megamek.common.weapons.handlers.ASEWMissileWeaponHandler;
 import megamek.common.weapons.handlers.AttackHandler;
-import megamek.common.weapons.missiles.thunderbolt.ThunderboltWeapon;
 import megamek.server.totalWarfare.TWGameManager;
 
 /**
  * @author Jay Lawson
  */
-public class CLASEWMissileWeapon extends ThunderboltWeapon {
+public class CLASEWMissileWeapon extends CapitalRangeBombMissileWeapon {
 
     /**
      *
@@ -68,7 +70,7 @@ public class CLASEWMissileWeapon extends ThunderboltWeapon {
         super();
 
         this.name = "Anti-Ship Electronic Warfare (ASEW) Missiles";
-        this.setInternalName(BombTypeEnum.ASEW.getWeaponName());
+        this.setInternalName("Clan " + BombTypeEnum.ASEW.getWeaponName());
         this.heat = 0;
         this.damage = 0;
         this.rackSize = 1;
@@ -94,10 +96,9 @@ public class CLASEWMissileWeapon extends ThunderboltWeapon {
         this.ammoType = AmmoType.AmmoTypeEnum.ASEW_MISSILE;
         this.capital = false;
         this.missileArmor = 30;
-        rulesRefs = "170, TO:AUE";
+        rulesRefs = rulesRefs(SourceBookCode.TO_AUE, 170);
         techAdvancement.setTechBase(TechBase.IS)
-              .setIntroLevel(false)
-              .setUnofficial(true)
+              .setStaticTechLevel(SimpleTechLevel.UNOFFICIAL)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.E)
               .setISAdvancement(3067, 3073, DATE_NONE, DATE_NONE, DATE_NONE)

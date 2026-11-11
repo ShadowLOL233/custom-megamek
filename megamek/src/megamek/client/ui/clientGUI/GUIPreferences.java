@@ -39,19 +39,21 @@ import java.awt.Font;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Window;
-import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.StringJoiner;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.clientGUI.boardview.BoardView;
 import megamek.client.ui.clientGUI.boardview.LabelDisplayStyle;
 import megamek.client.ui.util.PlayerColour;
-import megamek.common.Configuration;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.WeaponSortOrder;
+import megamek.common.equipment.SensorFamily;
+import megamek.common.preference.IPreferenceStore;
 import megamek.common.preference.PreferenceManager;
 import megamek.common.preference.PreferenceStoreProxy;
 import megamek.common.units.EntityMovementType;
@@ -81,6 +83,10 @@ public class GUIPreferences extends PreferenceStoreProxy {
     public static final String ADVANCED_KEY_REPEAT_DELAY = "AdvancedKeyRepeatDelay";
     public static final String ADVANCED_KEY_REPEAT_RATE = "AdvancedKeyRepeatRate";
     public static final String ADVANCED_SHOW_FPS = "AdvancedShowFPS";
+    // Testing/observer aid: reveal otherwise-obscured artillery markers (e.g. enemy incoming) on the local view only
+    public static final String ADVANCED_REVEAL_OBSCURED_ARTILLERY = "AdvancedRevealObscuredArtillery";
+    // Testing aid: have Princess paint her artillery heat map (predicted impacts + chosen targets) on the board
+    public static final String ADVANCED_SHOW_BOT_ARTILLERY_HEATMAP = "AdvancedShowBotArtilleryHeatMap";
     public static final String ADVANCED_NO_SAVE_NAG = "AdvancedNoSaveNag";
     public static final String ADVANCED_SAVE_LOBBY_ON_START = "AdvancedSaveLobbyOnStart";
 
@@ -113,6 +119,8 @@ public class GUIPreferences extends PreferenceStoreProxy {
     public static final String BOARD_UNIT_SELECTED_COLOR = "BoardUnitSelectedColor";
     public static final String BOARD_UNIT_VALID_COLOR = "BoardUnitValidColor";
     public static final String BOARD_UNIT_TEXT_COLOR = "BoardUnitTextColor";
+    public static final String BOARD_DEMOLITION_CHARGE_COLOR = "BoardDemolitionChargeColor";
+    public static final String BOARD_DEMOLITION_CHARGE_HAZARD_OUTLINE = "BoardDemolitionChargeHazardOutline";
 
     public static final String BOARD_ATTACK_ARROW_TRANSPARENCY = "BoardAttackArrowTransparency";
     public static final String BOARD_ECM_TRANSPARENCY = "BoardECMTransparency";
@@ -122,6 +130,7 @@ public class GUIPreferences extends PreferenceStoreProxy {
 
     public static final String SHOW_ARTILLERY_MISSES = "ShowArtilleryMisses";
     public static final String SHOW_ARTILLERY_DRIFTS = "ShowArtilleryHits";
+    public static final String SHOW_ARTILLERY_DRIFT_ARROWS = "ShowArtilleryDriftArrows";
     public static final String SHOW_BOMB_MISSES = "ShowBombMisses";
     public static final String SHOW_BOMB_DRIFTS = "ShowBombDrifts";
     public static final String SHOW_DEPLOY_ZONES_ARTY_AUTO = "ShowDeployZonesArtyAuto";
@@ -148,11 +157,15 @@ public class GUIPreferences extends PreferenceStoreProxy {
     public static final String TRACE_OVERLAY_ORIGIN_Y = "TraceOverlayOriginY";
     public static final String TRACE_OVERLAY_IMAGE_FILE = "TraceOverlayImageFile";
 
+    public static final String TOAST_ENABLED = "ToastEnabled";
+    public static final String TOAST_DURATION_SECONDS = "ToastDurationSeconds";
+    public static final String TOAST_REPORT_EVENTS = "ToastReportEvents";
     public static final String TOAST_DRIP_SECONDS = "ToastDripSeconds";
 
     public static final String PLAYERS_REMAINING_TO_SHOW = "PlayersRemainingToShow";
     public static final String BUTTONS_PER_ROW = "ButtonsPerRow";
     public static final String DOCK_ON_LEFT = "DockOnLeft";
+    public static final String EXPAND_OPTION_SECTIONS = "ExpandOptionSections";
     public static final String DOCK_MULTIPLE_ON_Y_AXIS = "DockMultipleOnYAxis";
     public static final String USE_CAMO_OVERLAY = "UseCamoOverlay";
 
@@ -177,6 +190,8 @@ public class GUIPreferences extends PreferenceStoreProxy {
 
     public static final String CUSTOM_UNIT_HEIGHT = "CustomUnitDialogSizeHeight";
     public static final String CUSTOM_UNIT_WIDTH = "CustomUnitDialogSizeWidth";
+    public static final String SHOW_UNIMPLEMENTED_SPAS = "ShowUnimplementedSpas";
+    public static final String SHOW_UNIMPLEMENTED_QUIRKS = "ShowUnimplementedQuirks";
 
     public static final String FORCE_DISPLAY_POS_X = "ForceDisplayPosX";
     public static final String FORCE_DISPLAY_POS_Y = "ForceDisplayPosY";
@@ -268,6 +283,7 @@ public class GUIPreferences extends PreferenceStoreProxy {
     public static final String GAME_SUMMARY_BOARD_VIEW = "GameSummaryBoardView";
     public static final String GAME_SUMMARY_MINIMAP = "GameSummaryMinimap";
     public static final String GIF_GAME_SUMMARY_MINIMAP = "GifGameSummaryMinimap";
+    public static final String GIF_GAME_SUMMARY_RECORDING = "GifGameSummaryRecording";
     public static final String SHOW_UNIT_DISPLAY_NAMES_ON_MINIMAP = "ShowUnitDisplayNamesOnMinimap";
     public static final String ENTITY_OWNER_LABEL_COLOR = "EntityOwnerLabelColor";
     public static final String UNIT_LABEL_BORDER = "EntityOwnerLabelColor";
@@ -290,6 +306,7 @@ public class GUIPreferences extends PreferenceStoreProxy {
     public static final String FOV_STRIPES = "FoVFogStripes";
     public static final String FOV_GRAYSCALE = "FoVFogGrayscale";
     public static final String FOV_SPOTTING_MODE = "FovSpottingMode";
+    public static final String SHOW_OBJECTIVE_OVERLAYS = "ShowObjectiveOverlays";
     public static final String GUI_SCALE = "GUIScale";
     public static final String LOBBY_MEK_TABLE_UNIT_WIDTH = "LobbyMekTableUnitWidth";
     public static final String LOBBY_MEK_TABLE_PILOT_WIDTH = "LobbyMekTablePilotWidth";
@@ -336,6 +353,14 @@ public class GUIPreferences extends PreferenceStoreProxy {
     public static final String PLAYER_LIST_POS_X = "PlayerListPosX";
     public static final String PLAYER_LIST_POS_Y = "PlayerListPosY";
     public static final String PLAYER_LIST_ENABLED = "PlayerListEnabled";
+    public static final String ROUNDS_IN_AIR_POS_X = "RoundsInAirPosX";
+    public static final String ROUNDS_IN_AIR_POS_Y = "RoundsInAirPosY";
+    public static final String ROUNDS_IN_AIR_ENABLED = "RoundsInAirEnabled";
+    // Hidden testing/debug flag: reveals ALL in-flight artillery (both teams' target hexes) to this client, overriding
+    // the normal hidden-information rule that a player sees only their own and allied rounds' target hexes. Deliberately
+    // NOT prefixed "Advanced" so it does not appear in the Client Settings > Advanced list - it can only be enabled by
+    // manually adding RevealAllArtilleryRounds=true to clientsettings.xml.
+    public static final String REVEAL_ALL_ARTILLERY_ROUNDS = "RevealAllArtilleryRounds";
     public static final String PLAYER_LIST_AUTO_DISPLAY_REPORT_PHASE = "PlayerListAutoDisplayReportPhase";
     public static final String PLAYER_LIST_AUTO_DISPLAY_NON_REPORT_PHASE = "PlayerListAutoDisplayNonReportPhase";
     public static final String MINI_MAP_COLOURS = "MinimapColours";
@@ -365,11 +390,18 @@ public class GUIPreferences extends PreferenceStoreProxy {
     public static final String NAG_FOR_NO_UNJAM_RAC = "NagForNoUnjamRAC";
     public static final String NAG_FOR_PSR = "NagForPSR";
     public static final String NAG_FOR_README = "NagForReadme";
+    /** The suite version last started, which tells when it changed. */
+    public static final String RELEASE_NOTES_VERSION = "ReleaseNotesVersion";
+    /** The suite version started before the last one, where Help &gt; Release Notes starts. */
+    public static final String RELEASE_NOTES_PREVIOUS_VERSION = "ReleaseNotesPreviousVersion";
     public static final String NAG_FOR_SPRINT = "NagForSprint";
     public static final String NAG_FOR_OVERHEAT = "NagForOverHeat";
     public static final String NAG_FOR_LAUNCH_DOORS = "NagForLaunchDoors";
     public static final String NAG_FOR_MECHANICAL_FALL_DAMAGE = "NagForMechanicalFallDamage";
     public static final String NAG_FOR_DOOMED = "NagForDoomed";
+    public static final String NAG_FOR_DOOMED_MOVE = "NagForDoomedMove";
+    public static final String NAG_FOR_AUTO_EJECT = "NagForAutoEject";
+    public static final String NAG_FOR_DISHONOR = "NagForDishonor";
     public static final String NAG_FOR_WIGE_LANDING = "NagForWiGELanding";
     public static final String NAG_FOR_ODD_SIZED_BOARD = "NagForOddSizedBoard";
     public static final String RULER_COLOR_1 = "RulerColor1";
@@ -391,10 +423,13 @@ public class GUIPreferences extends PreferenceStoreProxy {
     public static final String SOUND_BING_FILENAME_CHAT = "SoundBingFilenameChat";
     public static final String SOUND_BING_FILENAME_MY_TURN = "SoundBingFilenameMyTurn";
     public static final String SOUND_BING_FILENAME_OTHERS_TURN = "SoundBingFilenameOthersTurn";
+    public static final String SOUND_BING_FILENAME_PING = "SoundBingFilenamePing";
     public static final String MASTER_VOLUME = "MasterVolume";
     public static final String SOUND_MUTE_CHAT = "SoundMuteChat";
     public static final String SOUND_MUTE_MY_TURN = "SoundMuteMyTurn";
     public static final String SOUND_MUTE_OTHERS_TURN = "SoundMuteOthersTurn";
+    public static final String SOUND_MUTE_PING = "SoundMutePing";
+    public static final String SOUND_PROMPT_SUPPRESS = "SoundPrompt";
     public static final String TOOLTIP_DELAY = "TooltipDelay";
     public static final String TOOLTIP_DISMISS_DELAY = "TooltipDismissDelay";
     public static final String TOOLTIP_DIST_SUPPRESSION = "TooltipDistSuppression";
@@ -407,6 +442,14 @@ public class GUIPreferences extends PreferenceStoreProxy {
     public static final String RND_ARMY_POS_X = "RndArmyPosX";
     public static final String RND_ARMY_POS_Y = "RndArmyPosY";
     public static final String RND_ARMY_SPLIT_POS = "RndArmySplitPos";
+    // The army generator's last-used settings, restored when the dialog reopens. The year is
+    // deliberately absent: it follows the game options and is re-read every time the dialog opens.
+    public static final String RND_ARMY_LAST_FACTION = "RndArmyLastFaction";
+    public static final String RND_ARMY_LAST_SUB_FACTION = "RndArmyLastSubFaction";
+    public static final String RND_ARMY_LAST_UNIT_TYPE = "RndArmyLastUnitType";
+    public static final String RND_ARMY_LAST_RATING = "RndArmyLastRating";
+    public static final String RND_ARMY_LAST_UNIT_COUNT = "RndArmyLastUnitCount";
+    public static final String RND_ARMY_LAST_TAB = "RndArmyLastTab";
     public static final String RND_MAP_POS_X = "RndMapPosX";
     public static final String RND_MAP_POS_Y = "RndMapPosY";
     public static final String RND_MAP_SIZE_HEIGHT = "RndMapSizeHeight";
@@ -421,6 +464,7 @@ public class GUIPreferences extends PreferenceStoreProxy {
     public static final String SHOW_DAMAGE_DECAL = "ShowDamageDecal";
     public static final String SKIN_FILE = "SkinFile";
     public static final String DEFAULT_WEAPON_SORT_ORDER = "DefaultWeaponSortOrder";
+    public static final String SENSOR_PREFERENCE_ORDER = "SensorPreferenceOrder";
     public static final String UI_THEME = "UITheme";
     public static final String BOARD_EDIT_LOAD_SIZE_HEIGHT = "BoardEditLoadSizeHeight";
     public static final String BOARD_EDIT_LOAD_SIZE_WIDTH = "BoardEditLoadSizeWidth";
@@ -443,6 +487,8 @@ public class GUIPreferences extends PreferenceStoreProxy {
     public static final String SUMMARY_FONT = "SummaryCardFont";
 
     public static final String BOT_COMMANDS_ENABLED = "BotCommandsEnabled";
+    public static final String BOT_COMMANDS_PAUSE_AT_START = "BotCommandsPauseAtStart";
+    public static final String BOT_COMMANDS_LOCATION = "BotCommandsLocation";
     public static final String BOT_COMMANDS_POS_X = "BotCommandsPosX";
     public static final String BOT_COMMANDS_POS_Y = "BotCommandsPosY";
     public static final String BOT_COMMANDS_WIDTH = "BotCommandsWidth";
@@ -511,6 +557,9 @@ public class GUIPreferences extends PreferenceStoreProxy {
     private static final String _TAB_ORDER = "_tabOrder";
     private static final String _WINDOW = "_window";
 
+    // Persisted typo used by older releases; this is not a valid localization key.
+    static final String LEGACY_PLAYER_COLOUR_BROWN = "layerColour.BROWN.text";
+
     protected static GUIPreferences instance = new GUIPreferences();
 
     public static final int HIDE = 0;
@@ -519,6 +568,14 @@ public class GUIPreferences extends PreferenceStoreProxy {
 
     public static GUIPreferences getInstance() {
         return instance;
+    }
+
+    static void migrateLegacyBrownPlayerColour(IPreferenceStore preferenceStore) {
+        if (preferenceStore.hasProperty(LEGACY_PLAYER_COLOUR_BROWN)
+              && !preferenceStore.hasProperty(PlayerColour.PLAYER_COLOUR_BROWN)) {
+            preferenceStore.setValue(PlayerColour.PLAYER_COLOUR_BROWN,
+                preferenceStore.getString(LEGACY_PLAYER_COLOUR_BROWN));
+        }
     }
 
     protected GUIPreferences() {
@@ -557,6 +614,9 @@ public class GUIPreferences extends PreferenceStoreProxy {
         setDefault(TRACE_OVERLAY_ORIGIN_Y, 0);
         setDefault(TRACE_OVERLAY_IMAGE_FILE, "");
 
+        setDefault(TOAST_ENABLED, true);
+        setDefault(TOAST_DURATION_SECONDS, 3);
+        setDefault(TOAST_REPORT_EVENTS, true);
         setDefault(TOAST_DRIP_SECONDS, 2);
 
         setDefault(WARNING_COLOR, DEFAULT_RED);
@@ -588,6 +648,7 @@ public class GUIPreferences extends PreferenceStoreProxy {
         setDefault(PlayerColour.PLAYER_COLOUR_CHARTREUSE, new Color(0x7FFF00));
         setDefault(PlayerColour.PLAYER_COLOUR_DEEP_PURPLE, new Color(0x9400D3));
         setDefault(PlayerColour.PLAYER_COLOUR_YELLOW, new Color(0xF2F261));
+        migrateLegacyBrownPlayerColour(store);
 
         setDefault(BOARD_MOVE_DEFAULT_CLIMB_MODE, true);
         setDefault(BOARD_MOVE_DEFAULT_COLOR, Color.CYAN);
@@ -614,6 +675,8 @@ public class GUIPreferences extends PreferenceStoreProxy {
         setDefault(BOARD_UNIT_SELECTED_COLOR, DEFAULT_MAGENTA);
         setDefault(BOARD_UNIT_VALID_COLOR, DEFAULT_CYAN);
         setDefault(BOARD_UNIT_TEXT_COLOR, Color.white);
+        setDefault(BOARD_DEMOLITION_CHARGE_COLOR, new Color(255, 80, 80));
+        setDefault(BOARD_DEMOLITION_CHARGE_HAZARD_OUTLINE, true);
 
         setDefault(BOARD_MOVE_FONT_TYPE, "SansSerif");
         setDefault(BOARD_MOVE_FONT_SIZE, 26);
@@ -626,6 +689,9 @@ public class GUIPreferences extends PreferenceStoreProxy {
 
         store.setDefault(SHOW_ARTILLERY_MISSES, true);
         store.setDefault(SHOW_ARTILLERY_DRIFTS, true);
+        store.setDefault(SHOW_ARTILLERY_DRIFT_ARROWS, true);
+        store.setDefault(ADVANCED_REVEAL_OBSCURED_ARTILLERY, false);
+        store.setDefault(ADVANCED_SHOW_BOT_ARTILLERY_HEATMAP, false);
         store.setDefault(SHOW_BOMB_MISSES, true);
         store.setDefault(SHOW_BOMB_DRIFTS, false);
         store.setDefault(SHOW_DEPLOY_ZONES_ARTY_AUTO, false);
@@ -637,6 +703,7 @@ public class GUIPreferences extends PreferenceStoreProxy {
         store.setDefault(BUTTONS_PER_ROW, 12);
 
         setDefault(DOCK_ON_LEFT, true);
+        store.setDefault(EXPAND_OPTION_SECTIONS, true);
         setDefault(DOCK_MULTIPLE_ON_Y_AXIS, true);
         setDefault(USE_CAMO_OVERLAY, true);
 
@@ -650,6 +717,7 @@ public class GUIPreferences extends PreferenceStoreProxy {
         store.setDefault(FOV_STRIPES, 35);
         store.setDefault(FOV_GRAYSCALE, false);
         store.setDefault(FOV_SPOTTING_MODE, false);
+        store.setDefault(SHOW_OBJECTIVE_OVERLAYS, true);
 
         store.setDefault(HIGH_QUALITY_GRAPHICS, true);
         store.setDefault(AO_HEX_SHADOWS, false);
@@ -662,10 +730,19 @@ public class GUIPreferences extends PreferenceStoreProxy {
         store.setDefault(AUTO_DECLARE_SEARCHLIGHT, true);
         store.setDefault(CUSTOM_UNIT_HEIGHT, 400);
         store.setDefault(CUSTOM_UNIT_WIDTH, 600);
+        store.setDefault(SHOW_UNIMPLEMENTED_SPAS, false);
+        store.setDefault(SHOW_UNIMPLEMENTED_QUIRKS, false);
 
         store.setDefault(FORCE_DISPLAY_AUTO_DISPLAY_REPORT_PHASE, 2);
         store.setDefault(FORCE_DISPLAY_AUTO_DISPLAY_NON_REPORT_PHASE, 2);
         store.setDefault(FORCE_DISPLAY_ENABLED, false);
+
+        // without these defaults the auto-display values read 0 (= HIDE) and the Bot Commands dialog
+        // is force-hidden on every phase change; 2 (= MANUAL) leaves it as the player set it
+        store.setDefault(BOT_COMMANDS_AUTO_DISPLAY_REPORT_PHASE, 2);
+        store.setDefault(BOT_COMMANDS_AUTO_DISPLAY_NON_REPORT_PHASE, 2);
+        store.setDefault(BOT_COMMANDS_ENABLED, true);
+        store.setDefault(BOT_COMMANDS_PAUSE_AT_START, true);
         store.setDefault(FORCE_DISPLAY_SIZE_HEIGHT, 500);
         store.setDefault(FORCE_DISPLAY_SIZE_WIDTH, 300);
         store.setDefault(FORCE_DISPLAY_BTN_ID, true);
@@ -696,6 +773,15 @@ public class GUIPreferences extends PreferenceStoreProxy {
         store.setDefault(UNIT_DISPLAY_AUTO_DISPLAY_NON_REPORT_PHASE, 1);
         store.setDefault(UNIT_DISPLAY_ENABLED, true);
         store.setDefault(UNIT_DISPLAY_LOCATION, 0);
+        store.setDefault(BOT_COMMANDS_LOCATION, ClientGUI.BOT_COMMANDS_LOCATION_DOCKED);
+        // -1 is the "no saved position yet" sentinel so the floating dialog centers on first use; a real saved
+        // position (including a legitimate top-left 0,0) is restored instead.
+        store.setDefault(BOT_COMMANDS_POS_X, -1);
+        store.setDefault(BOT_COMMANDS_POS_Y, -1);
+        // Default to MANUAL so the bot commands panel stays in whatever mode the player chose (Float/Dock/Off)
+        // instead of being auto-hidden on every phase change.
+        store.setDefault(BOT_COMMANDS_AUTO_DISPLAY_REPORT_PHASE, MANUAL);
+        store.setDefault(BOT_COMMANDS_AUTO_DISPLAY_NON_REPORT_PHASE, MANUAL);
         store.setDefault(SPLIT_PANE_A_DIVIDER_LOCATION, 300);
         setDefault(UNIT_DISPLAY_HEAT_COLOR_1, DEFAULT_HEAT_1_COLOR);
         setDefault(UNIT_DISPLAY_HEAT_COLOR_2, DEFAULT_HEAT_2_COLOR);
@@ -746,7 +832,7 @@ public class GUIPreferences extends PreferenceStoreProxy {
         store.setDefault(GAME_SUMMARY_BOARD_VIEW, false);
         store.setDefault(ENTITY_OWNER_LABEL_COLOR, true);
         store.setDefault(UNIT_LABEL_BORDER, true);
-        store.setDefault(UNIT_LABEL_STYLE, LabelDisplayStyle.NICKNAME.name());
+        store.setDefault(UNIT_LABEL_STYLE, LabelDisplayStyle.NICKNAME_AND_ABBREVIATED.name());
         store.setDefault(FIRING_SOLUTIONS, true);
         store.setDefault(CONSTRUCTOR_FACTOR_WARNING, true);
         store.setDefault(GUI_SCALE, 1);
@@ -778,6 +864,12 @@ public class GUIPreferences extends PreferenceStoreProxy {
         store.setDefault(RND_ARMY_POS_X, 200);
         store.setDefault(RND_ARMY_POS_Y, 200);
         store.setDefault(RND_ARMY_SPLIT_POS, 300);
+        store.setDefault(RND_ARMY_LAST_FACTION, "");
+        store.setDefault(RND_ARMY_LAST_SUB_FACTION, "");
+        store.setDefault(RND_ARMY_LAST_UNIT_TYPE, "");
+        store.setDefault(RND_ARMY_LAST_RATING, "");
+        store.setDefault(RND_ARMY_LAST_UNIT_COUNT, "");
+        store.setDefault(RND_ARMY_LAST_TAB, "");
 
         store.setDefault(MINI_MAP_COLOURS, "defaultminimap.txt");
         store.setDefault(MINI_MAP_ENABLED, true);
@@ -787,7 +879,15 @@ public class GUIPreferences extends PreferenceStoreProxy {
         store.setDefault(MINI_MAP_SHOW_FACING_ARROW, true);
         store.setDefault(MINI_MAP_PAINT_BORDERS, true);
         store.setDefault(MINI_MAP_MOVE_PATH_PERSISTENCE, 2);
-        store.setDefault(GIF_GAME_SUMMARY_MINIMAP, true);
+        store.setDefault(GIF_GAME_SUMMARY_RECORDING, GifRecordingMode.ASK.name());
+        // Migrate the pre-0.51.01 boolean GIF setting: an explicit player choice carries over (true -> ALWAYS,
+        // false -> NEVER); players who never touched it get the new ask-at-game-start default.
+        if (store.hasProperty(GIF_GAME_SUMMARY_MINIMAP) && !store.hasProperty(GIF_GAME_SUMMARY_RECORDING)) {
+            store.setValue(GIF_GAME_SUMMARY_RECORDING,
+                  store.getBoolean(GIF_GAME_SUMMARY_MINIMAP)
+                        ? GifRecordingMode.ALWAYS.name()
+                        : GifRecordingMode.NEVER.name());
+        }
         store.setDefault(GAME_SUMMARY_MINIMAP, false);
         store.setDefault(SHOW_UNIT_DISPLAY_NAMES_ON_MINIMAP, false);
         store.setDefault(MOVE_DISPLAY_TAB_DURING_PHASES, true);
@@ -820,6 +920,10 @@ public class GUIPreferences extends PreferenceStoreProxy {
         store.setDefault(PLAYER_LIST_ENABLED, true);
         store.setDefault(PLAYER_LIST_POS_X, 200);
         store.setDefault(PLAYER_LIST_POS_Y, 150);
+        store.setDefault(ROUNDS_IN_AIR_ENABLED, false);
+        store.setDefault(ROUNDS_IN_AIR_POS_X, 200);
+        store.setDefault(ROUNDS_IN_AIR_POS_Y, 150);
+        store.setDefault(REVEAL_ALL_ARTILLERY_ROUNDS, false);
         store.setDefault(PLAYER_LIST_AUTO_DISPLAY_REPORT_PHASE, 1);
         store.setDefault(PLAYER_LIST_AUTO_DISPLAY_NON_REPORT_PHASE, 0);
 
@@ -827,6 +931,8 @@ public class GUIPreferences extends PreferenceStoreProxy {
         store.setDefault(MOUSE_WHEEL_ZOOM_FLIP, true);
 
         store.setDefault(NAG_FOR_CRUSHING_BUILDINGS, true);
+        store.setDefault(NAG_FOR_DOOMED_MOVE, true);
+        store.setDefault(NAG_FOR_AUTO_EJECT, true);
         store.setDefault(NAG_FOR_MAP_ED_README, true);
         store.setDefault(NAG_FOR_MASC, true);
         store.setDefault(NAG_FOR_NO_ACTION, true);
@@ -838,6 +944,7 @@ public class GUIPreferences extends PreferenceStoreProxy {
         store.setDefault(NAG_FOR_LAUNCH_DOORS, true);
         store.setDefault(NAG_FOR_MECHANICAL_FALL_DAMAGE, true);
         store.setDefault(NAG_FOR_DOOMED, true);
+        store.setDefault(NAG_FOR_DISHONOR, true);
         store.setDefault(NAG_FOR_WIGE_LANDING, true);
         store.setDefault(NAG_FOR_ODD_SIZED_BOARD, true);
 
@@ -859,9 +966,12 @@ public class GUIPreferences extends PreferenceStoreProxy {
         store.setDefault(SOUND_BING_FILENAME_CHAT, "data/sounds/call.wav");
         store.setDefault(SOUND_BING_FILENAME_MY_TURN, "data/sounds/call.wav");
         store.setDefault(SOUND_BING_FILENAME_OTHERS_TURN, "data/sounds/call.wav");
+        store.setDefault(SOUND_BING_FILENAME_PING, "data/sounds/call.wav");
         store.setDefault(SOUND_MUTE_CHAT, true);
         store.setDefault(SOUND_MUTE_MY_TURN, false);
         store.setDefault(SOUND_MUTE_OTHERS_TURN, true);
+        store.setDefault(SOUND_MUTE_PING, false);
+        store.setDefault(SOUND_PROMPT_SUPPRESS, false);
 
         store.setDefault(TOOLTIP_DELAY, 1000);
         store.setDefault(TOOLTIP_DISMISS_DELAY, -1);
@@ -888,6 +998,7 @@ public class GUIPreferences extends PreferenceStoreProxy {
 
         store.setDefault(SHOW_UNIT_OVERVIEW, true);
         store.setDefault(DEFAULT_WEAPON_SORT_ORDER, WeaponSortOrder.DEFAULT.name());
+        store.setDefault(SENSOR_PREFERENCE_ORDER, joinSensorPreference(SensorFamily.defaultOrder()));
         store.setDefault(SHOW_DAMAGE_LEVEL, true);
         store.setDefault(SHOW_DAMAGE_DECAL, true);
         store.setDefault(SKIN_FILE, "BW - Default.xml");
@@ -979,6 +1090,16 @@ public class GUIPreferences extends PreferenceStoreProxy {
 
     public int getCustomUnitWidth() {
         return store.getInt(CUSTOM_UNIT_WIDTH);
+    }
+
+    /** @return whether the pilot options list also shows the CamOps SPAs MegaMek does not implement */
+    public boolean getShowUnimplementedSpas() {
+        return store.getBoolean(SHOW_UNIMPLEMENTED_SPAS);
+    }
+
+    /** @return whether the quirks list also shows the quirks MegaMek will not act on */
+    public boolean getShowUnimplementedQuirks() {
+        return store.getBoolean(SHOW_UNIMPLEMENTED_QUIRKS);
     }
 
     public int getForceDisplayPosX() {
@@ -1185,8 +1306,20 @@ public class GUIPreferences extends PreferenceStoreProxy {
         return store.getBoolean(GAME_SUMMARY_MINIMAP);
     }
 
+    /**
+     * @return How the combat-summary GIF is recorded: always, ask at game start (the default), or never.
+     */
+    public GifRecordingMode getGifGameSummaryRecording() {
+        return GifRecordingMode.parse(store.getString(GIF_GAME_SUMMARY_RECORDING));
+    }
+
+    /**
+     * @deprecated since 0.51.01, use {@link #getGifGameSummaryRecording()}; returns {@code true} only for
+     *       {@link GifRecordingMode#ALWAYS}.
+     */
+    @Deprecated(since = "0.51.01", forRemoval = true)
     public boolean getGifGameSummaryMinimap() {
-        return store.getBoolean(GIF_GAME_SUMMARY_MINIMAP);
+        return getGifGameSummaryRecording() == GifRecordingMode.ALWAYS;
     }
 
     public boolean showUnitDisplayNamesOnMinimap() {
@@ -1464,6 +1597,18 @@ public class GUIPreferences extends PreferenceStoreProxy {
         return store.getInt(PLAYER_LIST_POS_Y);
     }
 
+    public boolean getRoundsInAirEnabled() {
+        return store.getBoolean(ROUNDS_IN_AIR_ENABLED);
+    }
+
+    public int getRoundsInAirPosX() {
+        return store.getInt(ROUNDS_IN_AIR_POS_X);
+    }
+
+    public int getRoundsInAirPosY() {
+        return store.getInt(ROUNDS_IN_AIR_POS_Y);
+    }
+
     public int getPlayerListAutoDisplayReportPhase() {
         return store.getInt(PLAYER_LIST_AUTO_DISPLAY_REPORT_PHASE);
     }
@@ -1516,6 +1661,22 @@ public class GUIPreferences extends PreferenceStoreProxy {
         return store.getBoolean(MOUSE_WHEEL_ZOOM_FLIP);
     }
 
+    public boolean getNagForDoomedMove() {
+        return store.getBoolean(NAG_FOR_DOOMED_MOVE);
+    }
+
+    public void setNagForDoomedMove(boolean shouldNag) {
+        store.setValue(NAG_FOR_DOOMED_MOVE, shouldNag);
+    }
+
+    public boolean getNagForAutoEject() {
+        return store.getBoolean(NAG_FOR_AUTO_EJECT);
+    }
+
+    public void setNagForAutoEject(boolean shouldNag) {
+        store.setValue(NAG_FOR_AUTO_EJECT, shouldNag);
+    }
+
     public boolean getNagForCrushingBuildings() {
         return store.getBoolean(NAG_FOR_CRUSHING_BUILDINGS);
     }
@@ -1544,12 +1705,30 @@ public class GUIPreferences extends PreferenceStoreProxy {
         return store.getBoolean(NAG_FOR_README);
     }
 
+    /**
+     * @return The suite version last started, or an empty string
+     */
+    public String getReleaseNotesVersion() {
+        return store.getString(RELEASE_NOTES_VERSION);
+    }
+
+    /**
+     * @return The suite version started before the last one, or an empty string when unknown
+     */
+    public String getReleaseNotesPreviousVersion() {
+        return store.getString(RELEASE_NOTES_PREVIOUS_VERSION);
+    }
+
     public boolean getNagForSprint() {
         return store.getBoolean(NAG_FOR_SPRINT);
     }
 
     public boolean getNagForOverheat() {
         return store.getBoolean(NAG_FOR_OVERHEAT);
+    }
+
+    public boolean getNagForDishonor() {
+        return store.getBoolean(NAG_FOR_DISHONOR);
     }
 
     public boolean getNagForLaunchDoors() {
@@ -1661,6 +1840,14 @@ public class GUIPreferences extends PreferenceStoreProxy {
         return store.getBoolean(SOUND_MUTE_OTHERS_TURN);
     }
 
+    public String getSoundBingFilenamePing() {
+        return store.getString(SOUND_BING_FILENAME_PING);
+    }
+
+    public boolean getSoundMutePing() {
+        return store.getBoolean(SOUND_MUTE_PING);
+    }
+
     public int getTooltipDelay() {
         return store.getInt(TOOLTIP_DELAY);
     }
@@ -1723,6 +1910,41 @@ public class GUIPreferences extends PreferenceStoreProxy {
 
     public WeaponSortOrder getDefaultWeaponSortOrder() {
         return WeaponSortOrder.valueOf(store.getString(DEFAULT_WEAPON_SORT_ORDER));
+    }
+
+    /**
+     * Returns the player's sensor families in preference order, most preferred first. A unit deploys using the first
+     * family on this list that it actually carries a sensor for.
+     *
+     * <p>The stored value is tolerated rather than trusted: unknown names left over from an older or newer build are
+     * dropped, duplicates are ignored, and any family the stored list does not mention is appended in
+     * {@link SensorFamily#defaultOrder()} order. The returned list therefore always holds every family exactly
+     * once.</p>
+     *
+     * @return every sensor family, most preferred first
+     */
+    public List<SensorFamily> getSensorPreferenceOrder() {
+        List<SensorFamily> order = new ArrayList<>();
+        for (String familyName : store.getString(SENSOR_PREFERENCE_ORDER).split(",")) {
+            String trimmedName = familyName.trim();
+            if (trimmedName.isEmpty()) {
+                continue;
+            }
+            try {
+                SensorFamily family = SensorFamily.valueOf(trimmedName);
+                if (!order.contains(family)) {
+                    order.add(family);
+                }
+            } catch (IllegalArgumentException ignored) {
+                // A family that no longer exists; the default order below fills the gap
+            }
+        }
+        for (SensorFamily family : SensorFamily.defaultOrder()) {
+            if (!order.contains(family)) {
+                order.add(family);
+            }
+        }
+        return order;
     }
 
     public String getAsCardFont() {
@@ -1798,6 +2020,23 @@ public class GUIPreferences extends PreferenceStoreProxy {
         store.setValue(DEFAULT_WEAPON_SORT_ORDER, weaponSortOrder.name());
     }
 
+    /**
+     * Stores the sensor families in preference order, most preferred first.
+     *
+     * @param sensorPreferenceOrder the families, most preferred first
+     */
+    public void setSensorPreferenceOrder(final List<SensorFamily> sensorPreferenceOrder) {
+        store.setValue(SENSOR_PREFERENCE_ORDER, joinSensorPreference(sensorPreferenceOrder));
+    }
+
+    private static String joinSensorPreference(List<SensorFamily> sensorPreferenceOrder) {
+        StringJoiner joiner = new StringJoiner(",");
+        for (SensorFamily family : sensorPreferenceOrder) {
+            joiner.add(family.name());
+        }
+        return joiner.toString();
+    }
+
     public boolean getBoardEdRndStart() {
         return store.getBoolean(BOARD_EDIT_RANDOM_DIALOG_START);
     }
@@ -1856,6 +2095,14 @@ public class GUIPreferences extends PreferenceStoreProxy {
 
     public void setCustomUnitWidth(int state) {
         store.setValue(CUSTOM_UNIT_WIDTH, state);
+    }
+
+    public void setShowUnimplementedSpas(boolean state) {
+        store.setValue(SHOW_UNIMPLEMENTED_SPAS, state);
+    }
+
+    public void setShowUnimplementedQuirks(boolean state) {
+        store.setValue(SHOW_UNIMPLEMENTED_QUIRKS, state);
     }
 
     public void setForceDisplayPosX(int i) {
@@ -2088,8 +2335,17 @@ public class GUIPreferences extends PreferenceStoreProxy {
         store.setValue(GAME_SUMMARY_MINIMAP, state);
     }
 
+    public void setGifGameSummaryRecording(GifRecordingMode mode) {
+        store.setValue(GIF_GAME_SUMMARY_RECORDING, mode.name());
+    }
+
+    /**
+     * @deprecated since 0.51.01, use {@link #setGifGameSummaryRecording(GifRecordingMode)}; maps {@code true} to
+     *       {@link GifRecordingMode#ALWAYS} and {@code false} to {@link GifRecordingMode#NEVER}.
+     */
+    @Deprecated(since = "0.51.01", forRemoval = true)
     public void setGifGameSummaryMinimap(boolean state) {
-        store.setValue(GIF_GAME_SUMMARY_MINIMAP, state);
+        setGifGameSummaryRecording(state ? GifRecordingMode.ALWAYS : GifRecordingMode.NEVER);
     }
 
     public void setShowUnitDisplayNamesOnMinimap(boolean state) {
@@ -2159,6 +2415,15 @@ public class GUIPreferences extends PreferenceStoreProxy {
 
     public void setFovSpottingMode(boolean state) {
         store.setValue(FOV_SPOTTING_MODE, state);
+    }
+
+    /** @return whether the objective overlays - control zone outlines and scheme words - are shown */
+    public boolean getShowObjectiveOverlays() {
+        return store.getBoolean(SHOW_OBJECTIVE_OVERLAYS);
+    }
+
+    public void setShowObjectiveOverlays(boolean state) {
+        store.setValue(SHOW_OBJECTIVE_OVERLAYS, state);
     }
 
     public void setMapZoomIndex(int zoomIndex) {
@@ -2391,6 +2656,22 @@ public class GUIPreferences extends PreferenceStoreProxy {
         store.setValue(PLAYER_LIST_POS_Y, i);
     }
 
+    public void setRoundsInAirEnabled(boolean b) {
+        store.setValue(ROUNDS_IN_AIR_ENABLED, b);
+    }
+
+    public void toggleRoundsInAirEnabled() {
+        setRoundsInAirEnabled(!getRoundsInAirEnabled());
+    }
+
+    public void setRoundsInAirPosX(int i) {
+        store.setValue(ROUNDS_IN_AIR_POS_X, i);
+    }
+
+    public void setRoundsInAirPosY(int i) {
+        store.setValue(ROUNDS_IN_AIR_POS_Y, i);
+    }
+
     public void setPlayerListAutoDisplayReportPhase(int i) {
         store.setValue(PLAYER_LIST_AUTO_DISPLAY_REPORT_PHASE, i);
     }
@@ -2455,12 +2736,24 @@ public class GUIPreferences extends PreferenceStoreProxy {
         store.setValue(NAG_FOR_README, b);
     }
 
+    public void setReleaseNotesVersion(String version) {
+        store.setValue(RELEASE_NOTES_VERSION, version);
+    }
+
+    public void setReleaseNotesPreviousVersion(String version) {
+        store.setValue(RELEASE_NOTES_PREVIOUS_VERSION, version);
+    }
+
     public void setNagForSprint(boolean b) {
         store.setValue(NAG_FOR_SPRINT, b);
     }
 
     public void setNagForOverheat(boolean b) {
         store.setValue(NAG_FOR_OVERHEAT, b);
+    }
+
+    public void setNagForDishonor(boolean b) {
+        store.setValue(NAG_FOR_DISHONOR, b);
     }
 
     public void setNagForLaunchDoors(boolean b) {
@@ -2561,8 +2854,34 @@ public class GUIPreferences extends PreferenceStoreProxy {
         store.setValue(SOUND_MUTE_MY_TURN, state);
     }
 
+    /**
+     * Should we prompt for turn sounds?
+     *
+     * @param state enable or disable prompting
+     */
+    public void setSoundPromptSuppress(boolean state) {
+        store.setValue(SOUND_PROMPT_SUPPRESS, state);
+    }
+
+    /**
+     * Are we prompting?
+     *
+     * @return the value of SOUND_PROMPT
+     */
+    public boolean getSoundPromptSuppress() {
+        return store.getBoolean(SOUND_PROMPT_SUPPRESS);
+    }
+
     public void setSoundMuteOthersTurn(boolean state) {
         store.setValue(SOUND_MUTE_OTHERS_TURN, state);
+    }
+
+    public void setSoundBingFilenamePing(String name) {
+        store.setValue(SOUND_BING_FILENAME_PING, name);
+    }
+
+    public void setSoundMutePing(boolean state) {
+        store.setValue(SOUND_MUTE_PING, state);
     }
 
     public void setTooltipDelay(int i) {
@@ -2671,6 +2990,31 @@ public class GUIPreferences extends PreferenceStoreProxy {
 
     public String getRATSelectedRAT() {
         return store.getString(RAT_SELECTED_RAT);
+    }
+
+    public void setRATSelectedRAT(String selectedRat) {
+        store.setValue(RAT_SELECTED_RAT, selectedRat);
+    }
+
+    /**
+     * The army generator's last-used settings, so the dialog reopens on the choices the player made
+     * rather than resetting to nothing. Stored as strings because the values are faction keys, rating
+     * codes and echelon codes rather than numbers.
+     *
+     * @param key   the setting name, from the {@code RND_ARMY_LAST_*} constants
+     * @param value the value to remember
+     */
+    public void setRandomArmySetting(String key, String value) {
+        store.setValue(key, value);
+    }
+
+    /**
+     * @param key the setting name, from the {@code RND_ARMY_LAST_*} constants
+     *
+     * @return the remembered value, blank when the player has not chosen one yet
+     */
+    public String getRandomArmySetting(String key) {
+        return store.getString(key);
     }
 
     public void setBoardEdRndStart(boolean b) {
@@ -2851,6 +3195,22 @@ public class GUIPreferences extends PreferenceStoreProxy {
         store.setValue(BOARD_BUILDING_TEXT_COLOR, getColorString(color));
     }
 
+    public Color getDemolitionChargeColor() {
+        return getColor(BOARD_DEMOLITION_CHARGE_COLOR);
+    }
+
+    public void setDemolitionChargeColor(Color color) {
+        store.setValue(BOARD_DEMOLITION_CHARGE_COLOR, getColorString(color));
+    }
+
+    public boolean getDemolitionChargeHazardOutline() {
+        return store.getBoolean(BOARD_DEMOLITION_CHARGE_HAZARD_OUTLINE);
+    }
+
+    public void setDemolitionChargeHazardOutline(boolean state) {
+        store.setValue(BOARD_DEMOLITION_CHARGE_HAZARD_OUTLINE, state);
+    }
+
     public Color getLowFoliageColor() {
         return getColor(BOARD_LOW_FOLIAGE_COLOR);
     }
@@ -3009,6 +3369,14 @@ public class GUIPreferences extends PreferenceStoreProxy {
 
     public boolean getShowArtilleryDrifts() {
         return getBoolean(SHOW_ARTILLERY_DRIFTS);
+    }
+
+    public void setShowArtilleryDriftArrows(boolean b) {
+        store.setValue(SHOW_ARTILLERY_DRIFT_ARROWS, b);
+    }
+
+    public boolean getShowArtilleryDriftArrows() {
+        return getBoolean(SHOW_ARTILLERY_DRIFT_ARROWS);
     }
 
     public void setShowBombMisses(boolean b) {
@@ -3171,6 +3539,10 @@ public class GUIPreferences extends PreferenceStoreProxy {
         return getBoolean(DOCK_ON_LEFT);
     }
 
+    public boolean getExpandOptionSections() {
+        return getBoolean(EXPAND_OPTION_SECTIONS);
+    }
+
     public boolean getDockMultipleOnYAxis() {
         return getBoolean(DOCK_MULTIPLE_ON_Y_AXIS);
     }
@@ -3185,6 +3557,29 @@ public class GUIPreferences extends PreferenceStoreProxy {
 
     public boolean getBotCommandsEnabled() {
         return getBoolean(BOT_COMMANDS_ENABLED);
+    }
+
+    /**
+     * @return {@code true} if a game only bots have units in, watched by a player, starts paused so the player can
+     *       give the bots orders first
+     */
+    public boolean getBotCommandsPauseAtStart() {
+        return getBoolean(BOT_COMMANDS_PAUSE_AT_START);
+    }
+
+    /**
+     * @param state {@code true} to start a watched bots-only game paused
+     */
+    public void setBotCommandsPauseAtStart(boolean state) {
+        store.setValue(BOT_COMMANDS_PAUSE_AT_START, state);
+    }
+
+    /**
+     * @return The bot commands panel location: {@code 0} for a floating dialog, {@code 1} for docked into the top of
+     *       the board area
+     */
+    public int getBotCommandsLocation() {
+        return store.getInt(BOT_COMMANDS_LOCATION);
     }
 
     public void setReportLinkColor(Color color) {
@@ -3311,6 +3706,43 @@ public class GUIPreferences extends PreferenceStoreProxy {
         store.setValue(TRACE_OVERLAY_SCALE, i);
     }
 
+    /**
+     * @return {@code true} if board toast notifications are shown at all. When {@code false}, every toast is
+     *       suppressed, including those whose content never reaches the report or chat log (Game Master actions,
+     *       artillery fire missions, effects wearing off, and the reasons an action was refused).
+     */
+    public boolean getToastEnabled() {
+        return getBoolean(TOAST_ENABLED);
+    }
+
+    public void setToastEnabled(boolean state) {
+        store.setValue(TOAST_ENABLED, state);
+    }
+
+    /**
+     * @return the base display time in seconds for a board toast. Each {@code ToastLevel} adds its own offset on top
+     *       of this, so more urgent levels always linger longer than the base.
+     */
+    public int getToastDurationSeconds() {
+        return getInt(TOAST_DURATION_SECONDS);
+    }
+
+    public void setToastDurationSeconds(int seconds) {
+        store.setValue(TOAST_DURATION_SECONDS, seconds);
+    }
+
+    /**
+     * @return {@code true} if round-report events are echoed as toasts. When {@code false}, only toasts that carry
+     *       information the report log does not already hold are shown.
+     */
+    public boolean getToastReportEvents() {
+        return getBoolean(TOAST_REPORT_EVENTS);
+    }
+
+    public void setToastReportEvents(boolean state) {
+        store.setValue(TOAST_REPORT_EVENTS, state);
+    }
+
     public int getToastDripSeconds() {
         return getInt(TOAST_DRIP_SECONDS);
     }
@@ -3435,6 +3867,10 @@ public class GUIPreferences extends PreferenceStoreProxy {
         store.setValue(DOCK_ON_LEFT, state);
     }
 
+    public void setExpandOptionSections(boolean expanded) {
+        store.setValue(EXPAND_OPTION_SECTIONS, expanded);
+    }
+
     public void setDockMultipleOnYAxis(Boolean state) {
         store.setValue(DOCK_MULTIPLE_ON_Y_AXIS, state);
     }
@@ -3449,6 +3885,15 @@ public class GUIPreferences extends PreferenceStoreProxy {
 
     public void setBotCommandsEnabled(boolean state) {
         store.setValue(BOT_COMMANDS_ENABLED, state);
+    }
+
+    /**
+     * Sets the bot commands panel location.
+     *
+     * @param location {@code 0} for a floating dialog, {@code 1} for docked into the top of the board area
+     */
+    public void setBotCommandsLocation(int location) {
+        store.setValue(BOT_COMMANDS_LOCATION, location);
     }
 
     public void setBotCommandsPosX(int i) {
@@ -3626,11 +4071,6 @@ public class GUIPreferences extends PreferenceStoreProxy {
      */
     public static boolean isSupportedLookAndFeel(UIManager.LookAndFeelInfo lookAndFeelInfo) {
         return lookAndFeelInfo.getClassName().toLowerCase().contains("formdev");
-    }
-
-    public File[] getMinimapThemes() {
-        // List all .theme files inside the minimap themes folder
-        return Configuration.minimapThemesDir().listFiles((dir, name) -> name.endsWith(".theme"));
     }
 
     public boolean getDrawFacingArrowsOnMiniMap() {

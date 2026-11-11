@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2000-2003 Ben Mazur (bmazur@sev.org)
- * Copyright (C) 2002-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2002-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -63,6 +63,22 @@ public class InitiativeRoll implements Comparable<InitiativeRoll>, Serializable 
 
     public InitiativeRoll() {
 
+    }
+
+    /**
+     * Copy constructor. Produces an independent {@link InitiativeRoll} with its own backing vectors, so mutating the
+     * copy (e.g. appending tiebreak rolls) does not affect the source. This is important because several call sites
+     * carry initiative state over between game/team/entity instances; sharing the same instance by reference lets two
+     * distinct candidates compare equal forever, which causes unbounded tie-break recursion.
+     *
+     * @param other The initiative roll to copy; must not be {@code null}
+     */
+    public InitiativeRoll(InitiativeRoll other) {
+        // Integer, Boolean and InitiativeBonusBreakdown are immutable, so copying the vectors themselves is sufficient.
+        rolls.addAll(other.rolls);
+        originalRolls.addAll(other.originalRolls);
+        wasRollReplaced.addAll(other.wasRollReplaced);
+        bonuses.addAll(other.bonuses);
     }
 
     public void clear() {
@@ -158,6 +174,15 @@ public class InitiativeRoll implements Comparable<InitiativeRoll>, Serializable 
 
     public int getRoll(int index) {
         return rolls.elementAt(index) + bonuses.elementAt(index).total();
+    }
+
+    /**
+     * @param index which roll in the sequence (later entries are tie-break rolls)
+     *
+     * @return the total bonus added to that roll, so the dice alone are {@code getRoll(index) - getBonus(index)}
+     */
+    public int getBonus(int index) {
+        return bonuses.elementAt(index).total();
     }
 
     /**

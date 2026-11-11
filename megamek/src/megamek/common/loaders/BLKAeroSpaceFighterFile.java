@@ -139,6 +139,9 @@ public class BLKAeroSpaceFighterFile extends BLKFile implements IMekLoader {
                 engineRating = engineRating - (engineRating % 5) + 5;
             }
         }
+        if (engineRating > 400) {
+            engineFlags |= Engine.LARGE_ENGINE;
+        }
         a.setEngine(new Engine(engineRating, BLKFile.translateEngineCode(engineCode), engineFlags));
 
         boolean patchworkArmor = false;
@@ -266,7 +269,7 @@ public class BLKAeroSpaceFighterFile extends BLKFile implements IMekLoader {
                     equipName = equipName.substring(0, equipName.length() - 4).trim();
                 }
 
-                EquipmentType etype = EquipmentType.get(equipName);
+                EquipmentType etype = getEquipmentType(t, equipName);
 
                 if ((etype instanceof MiscType) && etype.hasFlag(MiscType.F_CASE)) {
                     if (etype.isClan() || addedCase) {

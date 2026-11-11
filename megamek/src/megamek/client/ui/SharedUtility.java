@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008 - Ben Mazur (bmazur@sev.org).
- * Copyright (C) 2008-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2008-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -38,10 +38,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
+import jakarta.annotation.Nullable;
 import megamek.client.Client;
 import megamek.common.Hex;
 import megamek.common.MPCalculationSetting;
-import megamek.common.annotations.Nullable;
 import megamek.common.board.Board;
 import megamek.common.board.Coords;
 import megamek.common.compute.Compute;
@@ -597,7 +597,12 @@ public class SharedUtility {
         }
 
         // running with destroyed hip or gyro needs a check
-        rollTarget = entity.checkRunningWithDamage(overallMoveType);
+        rollTarget = entity.checkRunningWithDamage(overallMoveType, md.getHexesMoved());
+        checkNag(rollTarget, nagReport, psrList);
+
+        // if we moved a hex with a destroyed leg, but it was not a run
+        rollTarget = Game.rulesManager.getRulesPSR().checkWalkWithLegDestroyed(entity,
+              overallMoveType, md.getHexesMoved());
         checkNag(rollTarget, nagReport, psrList);
 
         // if we sprinted with MASC or a supercharger, then we need a PSR

@@ -41,8 +41,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ratgenerator.FactionRecord;
-import megamek.common.annotations.Nullable;
 import megamek.common.game.Game;
 import megamek.common.game.IGame;
 import megamek.common.game.InitiativeBonusBreakdown;
@@ -214,7 +214,7 @@ public final class Team extends TurnOrdered {
         if (this == object) {
             return true;
         }
-        if ((null == object) || (getClass() != object.getClass())) {
+        if ((object == null) || (getClass() != object.getClass())) {
             return false;
         }
         final Team other = (Team) object;

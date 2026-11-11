@@ -2,7 +2,7 @@ name: Checkstyle
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [ main, 'releases/**' ]
 
 jobs:
   checkstyle:
@@ -17,24 +17,57 @@ jobs:
 
     steps:
       - name: Checkout Data Repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: megamek/mm-data
+          ref: ${{ github.base_ref }}
           path: mm-data
 
       - name: "Check out MegaMek"
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: megamek
 
       - name: Set up ${{ matrix.java-distribution }} JDK ${{ matrix.java-version }}
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           distribution: ${{ matrix.java-distribution }}
           java-version: ${{ matrix.java-version }}
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
+
+      # Formatting first: it finishes in about a minute and reports every violation in one run.
+      # The ratchet in build.gradle compares against the PR's target branch, which a shallow checkout does not have.
+      - name: Fetch the target branch for the formatting ratchet
+        working-directory: megamek
+        env:
+          BASE_REF: ${{ github.base_ref || 'main' }}
+        run: git fetch --depth=1 origin "+refs/heads/${BASE_REF}:refs/remotes/origin/${BASE_REF}"
+
+      - name: Formatting (Spotless)
+        env:
+          BASE_REF: ${{ github.base_ref || 'main' }}
+        working-directory: megamek
+        run: |
+          ./gradlew spotlessApply "-PspotlessRatchetFrom=origin/${BASE_REF}"
+          if git diff --quiet; then
+            echo "Formatting clean."
+            exit 0
+          fi
+          {
+            echo "## Formatting violations"
+            echo
+            echo "Run \`./gradlew spotlessApply\` and commit the result. Every file below is fixed by that one command."
+            echo
+            echo '```diff'
+            git diff | head -c 900000
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          git diff --name-only | while read -r changedFile; do
+            echo "::error file=${changedFile}::Formatting violation. Run ./gradlew spotlessApply"
+          done
+          exit 1
 
       - name: Checkstyle
         working-directory: megamek

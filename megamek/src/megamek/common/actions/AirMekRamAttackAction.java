@@ -37,6 +37,7 @@ import java.io.Serial;
 import java.util.ListIterator;
 
 import megamek.common.Hex;
+import megamek.common.Messages;
 import megamek.common.Player;
 import megamek.common.ToHitData;
 import megamek.common.board.Coords;
@@ -186,10 +187,10 @@ public class AirMekRamAttackAction extends DisplacementAttackAction {
 
         // check range
         if (src.distance(target.getPosition()) > 1) {
-            if (null != targetEntity.getSecondaryPositions()) {
+            if (targetEntity.getSecondaryPositions() != null) {
                 boolean inSecondaryRange = false;
                 for (int i : targetEntity.getSecondaryPositions().keySet()) {
-                    if (null != targetEntity.getSecondaryPositions().get(i)) {
+                    if (targetEntity.getSecondaryPositions().get(i) != null) {
                         if (src.distance(targetEntity.getSecondaryPositions().get(i)) < 2) {
                             inSecondaryRange = true;
                             break;
@@ -235,7 +236,7 @@ public class AirMekRamAttackAction extends DisplacementAttackAction {
         }
 
         // Can't target units in buildings (from the outside).
-        if ((null != bldg) && (!targIsBuilding)
+        if ((bldg != null) && (!targIsBuilding)
               && Compute.isInBuilding(game, targetEntity)) {
             if (!Compute.isInBuilding(game, ae)) {
                 return new ToHitData(TargetRoll.IMPOSSIBLE,
@@ -296,7 +297,7 @@ public class AirMekRamAttackAction extends DisplacementAttackAction {
         // water partial cover?
         if ((targetEntity.height() > 0) && (targetEntity.getElevation() == -1)
               && (targHex.terrainLevel(Terrains.WATER) == targetEntity.height())) {
-            toHit.addModifier(1, "target has partial cover");
+            toHit.addModifier(1, Messages.getString("WeaponAttackAction.AeTargetHasPartialCover"));
         }
 
         // target immobile
@@ -383,9 +384,9 @@ public class AirMekRamAttackAction extends DisplacementAttackAction {
         if ((ramStep != null)) {
             isReachable = target.getPosition().equals(ramStep.getPosition());
             if (!isReachable && (target instanceof Entity)
-                  && (null != target.getSecondaryPositions())) {
+                && (target.getSecondaryPositions() != null)) {
                 for (int i : target.getSecondaryPositions().keySet()) {
-                    if (null != target.getSecondaryPositions().get(i)) {
+                    if (target.getSecondaryPositions().get(i) != null) {
                         isReachable = target.getSecondaryPositions().get(i).equals(ramStep.getPosition());
                         if (isReachable) {
                             break;

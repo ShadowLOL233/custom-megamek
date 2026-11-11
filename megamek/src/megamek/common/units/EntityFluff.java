@@ -42,8 +42,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.Base64Image;
-import megamek.common.annotations.Nullable;
 
 /**
  * Tracks fluff details for entities.
@@ -140,7 +140,7 @@ public class EntityFluff implements Serializable {
      * @param manufacturer The name of the manufacturer, or {@code null} or an empty string to remove the entry.
      */
     public void setSystemManufacturer(System system, @Nullable String manufacturer) {
-        if ((null != manufacturer) && !manufacturer.isBlank()) {
+        if ((manufacturer != null) && !manufacturer.isBlank()) {
             systemManufacturers.put(system, manufacturer);
         } else {
             systemManufacturers.remove(system);
@@ -165,7 +165,7 @@ public class EntityFluff implements Serializable {
      * @param model  The model name, or {@code null} or an empty string to remove the entry.
      */
     public void setSystemModel(System system, @Nullable String model) {
-        if ((null != model) && !model.isBlank()) {
+        if ((model != null) && !model.isBlank()) {
             systemModels.put(system, model);
         } else {
             systemModels.remove(system);

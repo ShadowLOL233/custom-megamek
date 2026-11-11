@@ -35,7 +35,7 @@ package megamek.client.ui;
 
 import java.util.Set;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import org.commonmark.node.Block;
 import org.commonmark.node.BlockQuote;
 import org.commonmark.node.Heading;
@@ -72,7 +72,7 @@ public class MMMarkdownRenderer {
      * @return a string rendered to html
      */
     public static String getRenderedHtml(@Nullable String input) {
-        if (null == input) {
+        if (input == null) {
             return "";
         } else {
             return RENDERER.htmlRenderer.render(RENDERER.parser.parse(input));

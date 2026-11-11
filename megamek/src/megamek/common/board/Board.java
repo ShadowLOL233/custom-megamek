@@ -1,7 +1,7 @@
 /*
   Copyright (Cc) 2000-2004 Ben Mazur (bmazur@sev.org)
  * Copyright (c) 2013 Edward Cullen (eddy@obsessedcomputers.co.uk)
- * Copyright (C) 2002-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2002-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -46,6 +46,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.common.Configuration;
 import megamek.common.Hex;
@@ -54,7 +55,6 @@ import megamek.common.Inferno;
 import megamek.common.InfernoTracker;
 import megamek.common.Player;
 import megamek.common.SpecialHexDisplay;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.BasementType;
 import megamek.common.equipment.FuelTank;
 import megamek.common.event.board.BoardEvent;
@@ -64,13 +64,17 @@ import megamek.common.loaders.MapSettings;
 import megamek.common.units.AbstractBuildingEntity;
 import megamek.common.units.BuildingTerrain;
 import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
 import megamek.common.units.IBuilding;
+import megamek.common.units.SupportTank;
 import megamek.common.units.Terrain;
 import megamek.common.units.Terrains;
+import megamek.common.units.TrainLayout;
 import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.logging.MMLogger;
 
 public class Board implements Serializable {
+
     @Serial
     private static final long serialVersionUID = -5744058872091016636L;
     private static final MMLogger logger = MMLogger.create(Board.class);
@@ -115,29 +119,33 @@ public class Board implements Serializable {
      * current year when saving.
      */
     public static final String LICENSE_HEADER = """
-          # MegaMek Data (C) %s by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
-          # To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
-          #
-          # NOTICE: The MegaMek organization is a non-profit group of volunteers
-          # creating free software for the BattleTech community.
-          #
-          # MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
-          # of The Topps Company, Inc. All Rights Reserved.
-          #
-          # Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
-          # InMediaRes Productions, LLC.
-          #
-          # MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
-          # Microsoft's "Game Content Usage Rules"
-          # <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
-          # affiliated with Microsoft.
-          """;
+            # MegaMek Data (C) %s by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+            # To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+            #
+            # NOTICE: The MegaMek organization is a non-profit group of volunteers
+            # creating free software for the BattleTech community.
+            #
+            # MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+            # of The Topps Company, Inc. All Rights Reserved.
+            #
+            # Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+            # InMediaRes Productions, LLC.
+            #
+            # MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+            # Microsoft's "Game Content Usage Rules"
+            # <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+            # affiliated with Microsoft.
+            """;
 
-    /** Regex pattern to extract the copyright year(s) from board file headers. */
+    /**
+     * Regex pattern to extract the copyright year(s) from board file headers.
+     */
     private static final Pattern COPYRIGHT_YEAR_PATTERN = Pattern.compile(
-          "#\\s*MegaMek Data \\(C\\)\\s*(\\d{4})(?:-(\\d{4}))?");
+            "#\\s*MegaMek Data \\(C\\)\\s*(\\d{4})(?:-(\\d{4}))?");
 
-    /** The original copyright year from the loaded board file, or -1 if none found. */
+    /**
+     * The original copyright year from the loaded board file, or -1 if none found.
+     */
     private int originalCopyrightYear = -1;
 
     // The min and max elevation values for this board.
@@ -162,6 +170,14 @@ public class Board implements Serializable {
      */
     private final Hashtable<Coords, InfernoTracker> infernos = new Hashtable<>();
 
+    /**
+     * Coords of fires started by fuel-fed flamers (such as Vehicular Flamers). These fires are harder for firefighting
+     * engineers to put out (TO:AuE p.153), the same way inferno fires are.
+     * <p>Not final: save games made before this field existed deserialize it as null, so the accessors guard against
+     * that.</p>
+     */
+    private Set<Coords> flamerStartedFires = new HashSet<>();
+
     private Map<Coords, Collection<SpecialHexDisplay>> specialHexes = new Hashtable<>();
 
     /**
@@ -179,7 +195,9 @@ public class Board implements Serializable {
      */
     private final Map<Coords, Collection<String>> annotations = new HashMap<>();
 
-    /** Tags associated with this board to facilitate searching for it. */
+    /**
+     * Tags associated with this board to facilitate searching for it.
+     */
     private final Set<String> tags = new HashSet<>();
 
     private int boardId = 0;
@@ -231,7 +249,8 @@ public class Board implements Serializable {
      * @param width  the width dimension.
      * @param height the height dimension.
      */
-    public Board(int width, int height) {
+    public Board(int width,
+                 int height) {
         this.width = width;
         this.height = height;
         data = new Hex[width * height];
@@ -245,7 +264,9 @@ public class Board implements Serializable {
      * @param height the height dimension
      * @param data   the Hexes of the new board
      */
-    public Board(int width, int height, Hex... data) {
+    public Board(int width,
+                 int height,
+                 Hex... data) {
         this.width = width;
         this.height = height;
         this.data = Arrays.copyOf(data, data.length);
@@ -256,10 +277,10 @@ public class Board implements Serializable {
      *
      * @param width  the width of the board
      * @param height the height of the board
-     *
      * @return the new board, ready to be used
      */
-    public static Board getSkyBoard(int width, int height) {
+    public static Board getSkyBoard(int width,
+                                    int height) {
         Hex[] data = new Hex[width * height];
         int index = 0;
         for (int h = 0; h < height; h++) {
@@ -277,10 +298,10 @@ public class Board implements Serializable {
      *
      * @param width  the width of the board
      * @param height the height of the board
-     *
      * @return the new board, ready to be used
      */
-    public static Board getSpaceBoard(int width, int height) {
+    public static Board getSpaceBoard(int width,
+                                      int height) {
         Hex[] data = new Hex[width * height];
         int index = 0;
         for (int h = 0; h < height; h++) {
@@ -313,6 +334,36 @@ public class Board implements Serializable {
     }
 
     /**
+     * for a given deployment position, return the center point of it
+     *
+     * @param deploymentPosition Deployment zone
+     * @return a coordinate
+     */
+    public Coords getDeploymentCenter(int deploymentPosition) {
+        switch (deploymentPosition) {
+            case Board.START_W:
+                return new Coords(0, getHeight() / 2);
+            case Board.START_SW:
+                return new Coords(0, getHeight() - 1);
+            case Board.START_SE:
+                return new Coords(getWidth() - 1, getHeight() - 1);
+            case Board.START_E:
+                return new Coords(getWidth() - 1, getHeight() / 2);
+            case Board.START_NW:
+                return new Coords(0, 0);
+            case Board.START_NE:
+                return new Coords(getWidth() - 1, 0);
+            case Board.START_N:
+                return new Coords(getWidth() / 2, 0);
+            case Board.START_S:
+                return new Coords(getWidth() / 2, getHeight() - 1);
+            default:
+                // Any, Center, custom zones
+                return getCenter();
+        }
+    }
+
+    /**
      * Creates a new data set for the board, with the specified dimensions and data; notifies listeners that a new data
      * set has been created.
      *
@@ -321,8 +372,10 @@ public class Board implements Serializable {
      * @param data   new hex data appropriate for the board.
      * @param errors A buffer for storing error messages, if any. This is allowed to be null.
      */
-    public void newData(final int width, final int height, final Hex[] data,
-          final @Nullable List<String> errors) {
+    public void newData(final int width,
+                        final int height,
+                        final Hex[] data,
+                        final @Nullable List<String> errors) {
         this.width = width;
         this.height = height;
         this.data = data;
@@ -336,20 +389,20 @@ public class Board implements Serializable {
      *
      * @param x the x Coords.
      * @param y the y Coords.
-     *
      * @return the Hex, if this Board contains the (x, y) location; null otherwise.
      */
-    public @Nullable Hex getHex(final int x, final int y) {
+    public @Nullable Hex getHex(final int x,
+                                final int y) {
         return contains(x, y) ? data[(y * width) + x] : null;
     }
 
     /**
      * @param c   starting coordinates
      * @param dir direction
-     *
      * @return the hex in the specified direction from the specified starting coordinates.
      */
-    public Hex getHexInDir(Coords c, int dir) {
+    public Hex getHexInDir(Coords c,
+                           int dir) {
         return getHex(c.xInDir(dir), c.yInDir(dir));
     }
 
@@ -360,10 +413,11 @@ public class Board implements Serializable {
      * @param x   starting x coordinate
      * @param y   starting y coordinate
      * @param dir direction
-     *
      * @return the hex in the specified direction from the specified starting coordinates.
      */
-    public Hex getHexInDir(int x, int y, int dir) {
+    public Hex getHexInDir(int x,
+                           int y,
+                           int dir) {
         return getHex(Coords.xInDir(x, y, dir), Coords.yInDir(x, y, dir));
     }
 
@@ -391,7 +445,7 @@ public class Board implements Serializable {
                         // Nope. Try to create an object for the new building.
                         try {
                             IBuilding bldg = new BuildingTerrain(coords, this, Terrains.BUILDING,
-                                  BasementType.getType(curHex.terrainLevel(Terrains.BLDG_BASEMENT_TYPE)));
+                                                                 BasementType.getType(curHex.terrainLevel(Terrains.BLDG_BASEMENT_TYPE)));
                             addBuildingToBoard(bldg);
                         } catch (IllegalArgumentException exception) {
                             // Log the error and remove the building from the board.
@@ -463,7 +517,8 @@ public class Board implements Serializable {
     /**
      * Initialize a hex and the hexes around it
      */
-    public void initializeAround(int x, int y) {
+    public void initializeAround(int x,
+                                 int y) {
         initializeHex(x, y);
         for (int i = 0; i < 6; i++) {
             initializeInDir(x, y, i);
@@ -473,7 +528,9 @@ public class Board implements Serializable {
     /**
      * Initializes a hex in a specific direction from an origin hex
      */
-    private void initializeInDir(int x, int y, int dir) {
+    private void initializeInDir(int x,
+                                 int y,
+                                 int dir) {
         initializeHex(Coords.xInDir(x, y, dir), Coords.yInDir(x, y, dir));
     }
 
@@ -481,11 +538,14 @@ public class Board implements Serializable {
      * Initializes a hex in its surroundings. Currently, sets the connects parameter appropriately to the surrounding
      * hexes. If a surrounding hex is off the board, it checks the hex opposite the missing hex.
      */
-    public void initializeHex(int x, int y) {
+    public void initializeHex(int x,
+                              int y) {
         initializeHex(x, y, true);
     }
 
-    private void initializeHex(int x, int y, boolean event) {
+    private void initializeHex(int x,
+                               int y,
+                               boolean event) {
         Hex hex = getHex(x, y);
 
         if (hex == null) {
@@ -512,14 +572,17 @@ public class Board implements Serializable {
         }
     }
 
-    /** Adds the FOLIAGE_ELEV terrain when none is present. */
-    private void initializeFoliageElev(int x, int y) {
+    /**
+     * Adds the FOLIAGE_ELEV terrain when none is present.
+     */
+    private void initializeFoliageElev(int x,
+                                       int y) {
         Hex hex = getHex(x, y);
 
         // If the foliage elevation is present or the hex doesn't even have foliage,
         // nothing needs to be done
         if (hex.containsTerrain(Terrains.FOLIAGE_ELEV) ||
-              (!hex.containsTerrain(Terrains.WOODS) && !hex.containsTerrain(Terrains.JUNGLE))) {
+            (!hex.containsTerrain(Terrains.WOODS) && !hex.containsTerrain(Terrains.JUNGLE))) {
             return;
         }
 
@@ -539,7 +602,8 @@ public class Board implements Serializable {
      * @param x The hex X-Coordinate.
      * @param y The hex Y-Coordinate.
      */
-    private void initializeAutomaticTerrain(int x, int y) {
+    private void initializeAutomaticTerrain(int x,
+                                            int y) {
         Hex hex = getHex(x, y);
         int origCliffTopExits = 0;
         int correctedCliffTopExits = 0;
@@ -552,7 +616,7 @@ public class Board implements Serializable {
         // Get the currently set cliff-tops for correction. When exits
         // are not specified, the cliff-tops are removed.
         if (hex.containsTerrain(Terrains.CLIFF_TOP)
-              && hex.getTerrain(Terrains.CLIFF_TOP).hasExitsSpecified()) {
+            && hex.getTerrain(Terrains.CLIFF_TOP).hasExitsSpecified()) {
             origCliffTopExits = hex.getTerrain(Terrains.CLIFF_TOP).getExits();
         }
 
@@ -577,23 +641,23 @@ public class Board implements Serializable {
 
             // Should there be an incline top?
             if (((levelDiff == 1) || (levelDiff == 2))
-                  && !cliffTopExitInThisDir
-                  && !inWater
-                  && !towardsWater) {
+                && !cliffTopExitInThisDir
+                && !inWater
+                && !towardsWater) {
                 inclineTopExits += (1 << i);
             }
 
             if (towardsWater
-                  && !inWater
-                  && !cliffTopExitInThisDir
-                  && ((levelDiffToWaterSurface == 1) || levelDiffToWaterSurface == 2)) {
+                && !inWater
+                && !cliffTopExitInThisDir
+                && ((levelDiffToWaterSurface == 1) || levelDiffToWaterSurface == 2)) {
                 inclineTopExits += (1 << i);
             }
 
             // Should there be a high level cliff top?
             if (levelDiff > 2
-                  && !inWater
-                  && (!towardsWater || levelDiffToWaterSurface > 2)) {
+                && !inWater
+                && (!towardsWater || levelDiffToWaterSurface > 2)) {
                 highInclineTopExits += (1 << i);
             }
 
@@ -631,7 +695,9 @@ public class Board implements Serializable {
     /**
      * Adds automatically handled terrain such as inclines when the given exits value is not 0, otherwise removes it.
      */
-    private void addOrRemoveAutoTerrain(Hex hex, int terrainType, int exits) {
+    private void addOrRemoveAutoTerrain(Hex hex,
+                                        int terrainType,
+                                        int exits) {
         if (exits > 0) {
             hex.addTerrain(new Terrain(terrainType, 1, true, exits));
         } else {
@@ -657,10 +723,10 @@ public class Board implements Serializable {
      *
      * @param x the x Coords.
      * @param y the y Coords.
-     *
      * @return <code>true</code> if the board contains the specified coords
      */
-    public boolean contains(int x, int y) {
+    public boolean contains(int x,
+                            int y) {
         return (x >= 0) && (y >= 0) && (x < width) && (y < height);
     }
 
@@ -668,7 +734,6 @@ public class Board implements Serializable {
      * Determines whether this Board "contains" the specified Coords.
      *
      * @param coords the Coords.
-     *
      * @return <code>true</code> if the board contains the specified coords
      */
     public boolean contains(@Nullable Coords coords) {
@@ -680,7 +745,6 @@ public class Board implements Serializable {
      * coords of the location are within the borders of the board.
      *
      * @param location the location to test
-     *
      * @return true if the board contains the specified location
      */
     public boolean contains(@Nullable BoardLocation location) {
@@ -691,7 +755,6 @@ public class Board implements Serializable {
      * Returns the Hex at the given Coords, both of which may be null.
      *
      * @param coords the Coords to look for the Hex
-     *
      * @return the Hex at the specified Coords, or null if there is not a hex there
      */
     public @Nullable Hex getHex(final @Nullable Coords coords) {
@@ -703,7 +766,6 @@ public class Board implements Serializable {
      * Coords collection. If the given Coords collection is null, the returned list will be empty.
      *
      * @param coords the Coords to query
-     *
      * @return the Hexes at the specified Coords
      */
     public List<Hex> getHexes(final @Nullable Collection<Coords> coords) {
@@ -723,7 +785,9 @@ public class Board implements Serializable {
      * @param y   the y Coords.
      * @param hex the hex to be set into position.
      */
-    public void setHex(int x, int y, Hex hex) {
+    public void setHex(int x,
+                       int y,
+                       Hex hex) {
         Map<BoardLocation, Hex> changedHex = new HashMap<>();
         changedHex.put(BoardLocation.of(new Coords(x, y), boardId), hex);
         setHexes(changedHex);
@@ -749,7 +813,7 @@ public class Board implements Serializable {
             int y = currCoords.getY();
 
             // Client may have sent off-board coordinates or null info; ignore.
-            if (!contains(x, y) || null == currHex) {
+            if (!contains(x, y) || currHex == null) {
                 continue;
             }
 
@@ -777,7 +841,8 @@ public class Board implements Serializable {
      * @param c   the Coords.
      * @param hex the hex to be set into position.
      */
-    public void setHex(Coords c, Hex hex) {
+    public void setHex(Coords c,
+                       Hex hex) {
         setHex(c.getX(), c.getY(), hex);
         if (hex.getLevel() < minElevation && minElevation != UNDEFINED_MIN_ELEV) {
             minElevation = hex.getLevel();
@@ -792,10 +857,10 @@ public class Board implements Serializable {
      *
      * @param filepath The path to the board file.
      * @param size     The dimensions of the board to test.
-     *
      * @return {@code true} if the dimensions match.
      */
-    public static boolean boardIsSize(final File filepath, final BoardDimensions size) {
+    public static boolean boardIsSize(final File filepath,
+                                      final BoardDimensions size) {
         int boardX = 0;
         int boardY = 0;
         try (FileReader fr = new FileReader(filepath); BufferedReader br = new BufferedReader(fr)) {
@@ -807,7 +872,7 @@ public class Board implements Serializable {
             streamTokenizer.wordChars('_', '_');
             while (streamTokenizer.nextToken() != StreamTokenizer.TT_EOF) {
                 if ((streamTokenizer.ttype == StreamTokenizer.TT_WORD)
-                      && streamTokenizer.sval.equalsIgnoreCase("size")) {
+                    && streamTokenizer.sval.equalsIgnoreCase("size")) {
                     streamTokenizer.nextToken();
                     boardX = (int) streamTokenizer.nval;
                     streamTokenizer.nextToken();
@@ -827,14 +892,13 @@ public class Board implements Serializable {
      * Inspect specified board file and return its dimensions.
      *
      * @param filepath The path to the board file.
-     *
      * @return A {@link BoardDimensions} object containing the dimension.
      */
     public static BoardDimensions getSize(final File filepath) {
         int boardX = 0;
         int boardY = 0;
         try (FileReader fileReader = new FileReader(filepath);
-              BufferedReader bufferedReader = new BufferedReader(fileReader)) {
+             BufferedReader bufferedReader = new BufferedReader(fileReader)) {
             // read board, looking for "size"
             StreamTokenizer streamTokenizer = new StreamTokenizer(bufferedReader);
             streamTokenizer.eolIsSignificant(true);
@@ -843,7 +907,7 @@ public class Board implements Serializable {
             streamTokenizer.wordChars('_', '_');
             while (streamTokenizer.nextToken() != StreamTokenizer.TT_EOF) {
                 if ((streamTokenizer.ttype == StreamTokenizer.TT_WORD)
-                      && streamTokenizer.sval.equalsIgnoreCase("size")) {
+                    && streamTokenizer.sval.equalsIgnoreCase("size")) {
                     streamTokenizer.nextToken();
                     boardX = (int) streamTokenizer.nval;
                     streamTokenizer.nextToken();
@@ -857,7 +921,9 @@ public class Board implements Serializable {
         return new BoardDimensions(boardX, boardY);
     }
 
-    /** Inspects the given board file and returns a set of its tags. */
+    /**
+     * Inspects the given board file and returns a set of its tags.
+     */
     public static Set<String> getTags(final File filepath) {
         var result = new HashSet<String>();
         try (FileReader fr = new FileReader(filepath); BufferedReader br = new BufferedReader(fr)) {
@@ -903,29 +969,68 @@ public class Board implements Serializable {
     /**
      * Can the given player deploy at these coordinates?
      */
-    public boolean isLegalDeployment(Coords c, Player p) {
+    public boolean isLegalDeployment(Coords c,
+                                     Player p) {
         return isLegalDeployment(c, p.getStartingPos(), p.getStartWidth(), p.getStartOffset(), p.getStartingAnyNWx(),
-              p.getStartingAnyNWy(), p.getStartingAnySEx(), p.getStartingAnySEy());
+                                 p.getStartingAnyNWy(), p.getStartingAnySEx(), p.getStartingAnySEy());
     }
 
     /**
      * Can the given entity be deployed at these coordinates
      */
-    public boolean isLegalDeployment(Coords c, Entity e) {
+    public boolean isLegalDeployment(Coords c,
+                                     Entity e) {
         if (e == null) {
             return false;
         }
+        int startingWidth = e.getStartingWidth();
+        // For Walk On Deployment, we need to restrict the deployment width if it not the deployment phase.
+        if (!(e.getGame().getPhase().isDeployment())) {
+            startingWidth = e.getGame().rulesManager.getRulesGame()
+                                                    .getDeploymentWidth(e.getOwner(),
+                                                                        e.getStartingPos(), e.getStartingWidth());
+        }
 
-        return isLegalDeployment(c, e.getStartingPos(), e.getStartingWidth(), e.getStartingOffset(),
-              e.getStartingAnyNWx(), e.getStartingAnyNWy(), e.getStartingAnySEx(), e.getStartingAnySEy());
+        // A walk-on train enters tractor first, its trailers following it in from the edge, so it may start as many
+        // hexes deep as it is long; a one-hex strip cannot hold a straight train of three hexes or more. This applies
+        // in the deployment phase too, so the train's walk-on area can be shown there.
+        if (!e.getAllTowedUnits().isEmpty() && e.getGame().rulesManager.getRulesGame().canWalkOnThisRound(e)) {
+            int trainLength = TrainLayout.trainLengthInHexes(e.getGame(), e);
+            // Large support vehicles take up their entire hex, so their first trailer cannot share it
+            if ((e instanceof SupportTank) && (e.getWeightClass() == EntityWeightClass.WEIGHT_LARGE_SUPPORT)) {
+                trainLength++;
+            }
+            int walkOnWidth = e.getGame().rulesManager.getRulesGame()
+                                    .getDeploymentWidth(e.getOwner(), e.getStartingPos(), e.getStartingWidth());
+            startingWidth = Math.max(walkOnWidth, trainLength);
+        }
+
+        if (e.isDropShip()) {
+            startingWidth = e.getStartingWidth();
+        }
+
+        return isLegalDeployment(c,
+                                 e.getStartingPos(),
+                                 startingWidth,
+                                 e.getStartingOffset(),
+                                 e.getStartingAnyNWx(),
+                                 e.getStartingAnyNWy(),
+                                 e.getStartingAnySEx(),
+                                 e.getStartingAnySEy());
     }
 
     /**
      * Can an object be deployed at these coordinates, given a starting zone, width of starting zone and offset from
      * edge of board?
      */
-    public boolean isLegalDeployment(Coords c, int zoneType, int startingWidth, int startingOffset, int startingAnyNWx,
-          int startingAnyNWy, int startingAnySEx, int startingAnySEy) {
+    public boolean isLegalDeployment(Coords c,
+                                     int zoneType,
+                                     int startingWidth,
+                                     int startingOffset,
+                                     int startingAnyNWx,
+                                     int startingAnyNWy,
+                                     int startingAnySEx,
+                                     int startingAnySEy) {
         if ((c == null) || !contains(c)) {
             return false;
         }
@@ -935,46 +1040,46 @@ public class Board implements Serializable {
 
         return switch (zoneType) {
             case START_ANY -> (((startingAnyNWx == Entity.STARTING_ANY_NONE) || (c.getX() >= startingAnyNWx))
-                  && ((startingAnySEx == Entity.STARTING_ANY_NONE) || (c.getX() <= startingAnySEx))
-                  && ((startingAnyNWy == Entity.STARTING_ANY_NONE) || (c.getY() >= startingAnyNWy))
-                  && ((startingAnySEy == Entity.STARTING_ANY_NONE) || (c.getY() <= startingAnySEy)));
+                               && ((startingAnySEx == Entity.STARTING_ANY_NONE) || (c.getX() <= startingAnySEx))
+                               && ((startingAnyNWy == Entity.STARTING_ANY_NONE) || (c.getY() >= startingAnyNWy))
+                               && ((startingAnySEy == Entity.STARTING_ANY_NONE) || (c.getY() <= startingAnySEy)));
             case START_NW -> ((c.getX() < (startingOffset + startingWidth)) && (c.getX() >= startingOffset) && (c.getY()
-                  >= startingOffset)
-                  && (c.getY() < (height / 2)))
-                  || ((c.getY() < (startingOffset + startingWidth)) && (c.getY() >= startingOffset) && (c.getX()
-                  >= startingOffset)
-                  && (c.getX() < (width / 2)));
+                                                                                                                >= startingOffset)
+                              && (c.getY() < (height / 2)))
+                             || ((c.getY() < (startingOffset + startingWidth)) && (c.getY() >= startingOffset) && (c.getX()
+                                                                                                                   >= startingOffset)
+                                 && (c.getX() < (width / 2)));
             case START_N -> (c.getY() < (startingOffset + startingWidth)) && (c.getY() >= startingOffset);
             case START_NE -> ((c.getX() >= (maxX - startingWidth)) && (c.getX() < maxX) && (c.getY() >= startingOffset)
-                  && (c.getY() < (height / 2)))
-                  || ((c.getY() < (startingOffset + startingWidth)) && (c.getY() >= startingOffset) && (c.getX()
-                  < maxX)
-                  && (c.getX() > (width / 2)));
+                              && (c.getY() < (height / 2)))
+                             || ((c.getY() < (startingOffset + startingWidth)) && (c.getY() >= startingOffset) && (c.getX()
+                                                                                                                   < maxX)
+                                 && (c.getX() > (width / 2)));
             case START_E -> (c.getX() >= (maxX - startingWidth)) && (c.getX() < maxX);
             case START_SE -> ((c.getX() >= (maxX - startingWidth)) && (c.getX() < maxX) && (c.getY() < maxy)
-                  && (c.getY() > (height / 2)))
-                  || ((c.getY() >= (maxy - startingWidth)) && (c.getY() < maxy) && (c.getX() < maxX)
-                  && (c.getX() > (width / 2)));
+                              && (c.getY() > (height / 2)))
+                             || ((c.getY() >= (maxy - startingWidth)) && (c.getY() < maxy) && (c.getX() < maxX)
+                                 && (c.getX() > (width / 2)));
             case START_S -> (c.getY() >= (maxy - startingWidth)) && (c.getY() < maxy);
             case START_SW -> ((c.getX() < (startingOffset + startingWidth)) && (c.getX() >= startingOffset) && (c.getY()
-                  < maxy)
-                  && (c.getY() > (height / 2)))
-                  || ((c.getY() >= (maxy - startingWidth)) && (c.getY() < maxy) && (c.getX() >= startingOffset)
-                  && (c.getX() < (width / 2)));
+                                                                                                                < maxy)
+                              && (c.getY() > (height / 2)))
+                             || ((c.getY() >= (maxy - startingWidth)) && (c.getY() < maxy) && (c.getX() >= startingOffset)
+                                 && (c.getX() < (width / 2)));
             case START_W -> (c.getX() < (startingOffset + startingWidth)) && (c.getX() >= startingOffset);
             case START_EDGE ->
-                  ((c.getX() < (startingOffset + startingWidth)) && (c.getX() >= startingOffset) && (c.getY()
-                        >= startingOffset) && (c.getY() < maxy))
-                        || ((c.getY() < (startingOffset + startingWidth)) && (c.getY() >= startingOffset) && (c.getX()
-                        >= startingOffset)
+                    ((c.getX() < (startingOffset + startingWidth)) && (c.getX() >= startingOffset) && (c.getY()
+                                                                                                       >= startingOffset) && (c.getY() < maxy))
+                    || ((c.getY() < (startingOffset + startingWidth)) && (c.getY() >= startingOffset) && (c.getX()
+                                                                                                          >= startingOffset)
                         && (c.getX() < maxX))
-                        || ((c.getX() >= (maxX - startingWidth)) && (c.getX() < maxX) && (c.getY() >= startingOffset)
+                    || ((c.getX() >= (maxX - startingWidth)) && (c.getX() < maxX) && (c.getY() >= startingOffset)
                         && (c.getY() < maxy))
-                        || ((c.getY() >= (maxy - startingWidth)) && (c.getY() < maxy) && (c.getX() >= startingOffset)
+                    || ((c.getY() >= (maxy - startingWidth)) && (c.getY() < maxy) && (c.getX() >= startingOffset)
                         && (c.getX() < maxX));
             case START_CENTER ->
-                  (c.getX() >= (width / 3)) && (c.getX() <= ((2 * width) / 3)) && (c.getY() >= (height / 3))
-                        && (c.getY() <= ((2 * height) / 3));
+                    (c.getX() >= (width / 3)) && (c.getX() <= ((2 * width) / 3)) && (c.getY() >= (height / 3))
+                    && (c.getY() <= ((2 * height) / 3));
             default -> {
                 Set<Coords> customDeploymentZone = getCustomDeploymentZone(decodeCustomDeploymentZoneID(zoneType));
                 yield customDeploymentZone.contains(c);
@@ -987,7 +1092,6 @@ public class Board implements Serializable {
      * East)
      *
      * @param cardinalEdge The edge to return the opposite of
-     *
      * @return Constant representing the opposite edge
      */
     public int getOppositeEdge(int cardinalEdge) {
@@ -1035,7 +1139,8 @@ public class Board implements Serializable {
         load(is, null, false);
     }
 
-    public void load(String boardString, @Nullable List<String> errors) {
+    public void load(String boardString,
+                     @Nullable List<String> errors) {
         try (InputStream is = new ByteArrayInputStream(boardString.getBytes(StandardCharsets.UTF_8))) {
             load(is, errors, false);
         } catch (IOException ex) {
@@ -1044,7 +1149,9 @@ public class Board implements Serializable {
         }
     }
 
-    public void load(InputStream is, @Nullable List<String> errors, boolean continueLoadOnError) {
+    public void load(InputStream is,
+                     @Nullable List<String> errors,
+                     boolean continueLoadOnError) {
         int nw = 0, nh = 0, di = 0;
         Hex[] nd = new Hex[0];
         int index = 0;
@@ -1071,7 +1178,7 @@ public class Board implements Serializable {
         }
 
         try (InputStreamReader isr = new InputStreamReader(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)));
-              BufferedReader br = new BufferedReader(isr)) {
+             BufferedReader br = new BufferedReader(isr)) {
             StreamTokenizer st = new StreamTokenizer(br);
             st.eolIsSignificant(true);
             st.commentChar('#');
@@ -1083,7 +1190,7 @@ public class Board implements Serializable {
                     String[] args = { "0", "0" };
                     int i = 0;
                     while ((st.nextToken() == StreamTokenizer.TT_WORD) || (st.ttype == '"')
-                          || (st.ttype == StreamTokenizer.TT_NUMBER)) {
+                           || (st.ttype == StreamTokenizer.TT_NUMBER)) {
                         args[i++] = st.ttype == StreamTokenizer.TT_NUMBER ? (int) st.nval + "" : st.sval;
                     }
                     nw = Integer.parseInt(args[0]);
@@ -1094,7 +1201,7 @@ public class Board implements Serializable {
                     String[] args = { "", "" };
                     int i = 0;
                     while ((st.nextToken() == StreamTokenizer.TT_WORD) || (st.ttype == '"')
-                          || (st.ttype == StreamTokenizer.TT_NUMBER)) {
+                           || (st.ttype == StreamTokenizer.TT_NUMBER)) {
                         args[i++] = st.ttype == StreamTokenizer.TT_NUMBER ? (int) st.nval + "" : st.sval;
                     }
                     // Only expect certain options.
@@ -1106,7 +1213,7 @@ public class Board implements Serializable {
                     String[] args = { "", "0", "", "" };
                     int i = 0;
                     while ((st.nextToken() == StreamTokenizer.TT_WORD) || (st.ttype == '"')
-                          || (st.ttype == StreamTokenizer.TT_NUMBER)) {
+                           || (st.ttype == StreamTokenizer.TT_NUMBER)) {
                         args[i++] = st.ttype == StreamTokenizer.TT_NUMBER ? (int) st.nval + "" : st.sval;
                     }
                     int elevation = Integer.parseInt(args[1]);
@@ -1117,7 +1224,7 @@ public class Board implements Serializable {
                     st.nextToken();
                     if (st.ttype == '"') {
                         String d = getDescription();
-                        if (null == d) {
+                        if (d == null) {
                             setDescription(st.sval);
                         } else {
                             setDescription(d + "\n\n" + st.sval);
@@ -1183,7 +1290,10 @@ public class Board implements Serializable {
         return isValid(data, width, height, errors);
     }
 
-    private boolean isValid(Hex[] data, int width, int height, @Nullable List<String> errors) {
+    private boolean isValid(Hex[] data,
+                            int width,
+                            int height,
+                            @Nullable List<String> errors) {
         List<String> newErrors = new ArrayList<>();
         // Search for black-listed hexes
         for (int x = 0; x < width; x++) {
@@ -1206,22 +1316,22 @@ public class Board implements Serializable {
                     for (int dir = 0; dir < 6; dir++) {
                         Hex adjHex = getHexInDir(x, y, dir);
                         if ((adjHex != null)
-                              && adjHex.containsTerrain(Terrains.BUILDING)
-                              && hex.containsTerrainExit(Terrains.BUILDING, dir)) {
+                            && adjHex.containsTerrain(Terrains.BUILDING)
+                            && hex.containsTerrainExit(Terrains.BUILDING, dir)) {
                             if (adjHex.getTerrain(Terrains.BUILDING).getLevel() != hex.getTerrain(Terrains.BUILDING)
-                                  .getLevel()) {
+                                                                                      .getLevel()) {
                                 hexErrors.add("Building has an exit to a building of another Building Type " +
-                                      "(Light, Medium...).");
+                                              "(Light, Medium...).");
                             }
                             int thisClass = hex.containsTerrain(Terrains.BLDG_CLASS)
-                                  ? hex.getTerrain(Terrains.BLDG_CLASS).getLevel()
-                                  : 0;
+                                            ? hex.getTerrain(Terrains.BLDG_CLASS).getLevel()
+                                            : 0;
                             int adjClass = adjHex.containsTerrain(Terrains.BLDG_CLASS)
-                                  ? adjHex.getTerrain(Terrains.BLDG_CLASS).getLevel()
-                                  : 0;
+                                           ? adjHex.getTerrain(Terrains.BLDG_CLASS).getLevel()
+                                           : 0;
                             if (thisClass != adjClass) {
                                 hexErrors.add("Building has an exit in direction " + dir + " to a building of " +
-                                      "another Building Class.");
+                                              "another Building Class.");
                             }
                         }
                     }
@@ -1263,7 +1373,8 @@ public class Board implements Serializable {
      * @param os             the OutputStream to write to
      * @param includeLicense if true, writes the CC BY-NC-SA 4.0 license header at the start of the file
      */
-    public void save(OutputStream os, boolean includeLicense) {
+    public void save(OutputStream os,
+                     boolean includeLicense) {
         try (Writer w = new OutputStreamWriter(os)) {
             if (includeLicense) {
                 int currentYear = Calendar.getInstance().get(Calendar.YEAR);
@@ -1307,7 +1418,7 @@ public class Board implements Serializable {
                         hexBuff.append(terrain);
                         // Do something funky to save building exits.
                         if (((Terrains.BUILDING == terrType) || (terrType == Terrains.FUEL_TANK))
-                              && !terrain.hasExitsSpecified() && (terrain.getExits() != 0)) {
+                            && !terrain.hasExitsSpecified() && (terrain.getExits() != 0)) {
                             hexBuff.append(":").append(terrain.getExits());
                         }
                         firstTerrain = false;
@@ -1335,10 +1446,11 @@ public class Board implements Serializable {
      * @param coords the <code>Coords</code> of the hit.
      * @param round  the kind of round that hit the hex.
      * @param hits   the <code>int</code> number of rounds that hit
-     *
      * @throws IllegalArgumentException if the hits number is negative
      */
-    public void addInfernoTo(Coords coords, Inferno round, int hits) {
+    public void addInfernoTo(Coords coords,
+                             Inferno round,
+                             int hits) {
         // Make sure the # of hits is valid.
         if (hits < 0) {
             throw new IllegalArgumentException("Board can't track negative hits. ");
@@ -1370,9 +1482,43 @@ public class Board implements Serializable {
         infernos.remove(coords);
     }
 
+    /**
+     * Record that a fire at the given coordinates was started by a fuel-fed flamer (TO:AuE p.153). Such fires are
+     * harder for firefighting engineers to extinguish.
+     *
+     * @param coords the <code>Coords</code> of the flamer-started fire
+     */
+    public void markFlamerStartedFire(Coords coords) {
+        if (contains(coords)) {
+            if (flamerStartedFires == null) {
+                flamerStartedFires = new HashSet<>();
+            }
+            flamerStartedFires.add(coords);
+        }
+    }
+
+    /**
+     * Clear the flamer-started fire marker for the given coordinates, e.g. when the fire goes out.
+     *
+     * @param coords the <code>Coords</code> to clear
+     */
+    public void removeFlamerStartedFire(Coords coords) {
+        if (flamerStartedFires != null) {
+            flamerStartedFires.remove(coords);
+        }
+    }
+
+    /**
+     * @param coords the <code>Coords</code> being checked
+     * @return true if the fire at these coordinates was started by a fuel-fed flamer
+     */
+    public boolean isFlamerStartedFire(Coords coords) {
+        return (flamerStartedFires != null) && flamerStartedFires.contains(coords);
+    }
+
     public void removeBombIconsFrom(Coords coords) {
         // Do nothing if the coords aren't on this board.
-        if (!this.contains(coords) || null == specialHexes.get(coords)) {
+        if (!this.contains(coords) || specialHexes.get(coords) == null) {
             return;
         }
 
@@ -1390,9 +1536,8 @@ public class Board implements Serializable {
      * Determine if the given coordinates has a burning inferno.
      *
      * @param coords - the <code>Coords</code> being checked.
-     *
      * @return <code>true</code> if those coordinates have a burning inferno
-     *       round. <code>false</code> if no inferno has hit those coordinates or if it has burned out.
+     * round. <code>false</code> if no inferno has hit those coordinates or if it has burned out.
      */
     public boolean isInfernoBurning(Coords coords) {
         boolean result = false;
@@ -1401,7 +1546,7 @@ public class Board implements Serializable {
         // Get the tracker for those coordinates
         // and see if the fire is still burning.
         tracker = infernos.get(coords);
-        if (null != tracker) {
+        if (tracker != null) {
             if (tracker.isStillBurning()) {
                 result = true;
             }
@@ -1447,9 +1592,8 @@ public class Board implements Serializable {
      * Get the building at the given coordinates.
      *
      * @param coords the <code>Coords</code> being examined.
-     *
      * @return a <code>Building</code> object, if there is one at the given coordinates, otherwise a
-     *       <code>null</code> will be returned.
+     * <code>null</code> will be returned.
      */
     public @Nullable IBuilding getBuildingAt(Coords coords) {
         return bldgByCoords.get(coords);
@@ -1461,9 +1605,8 @@ public class Board implements Serializable {
      *
      * @param other - a <code>Building</code> object which may or may not be represented on this board. This value may
      *              be <code>null</code> .
-     *
      * @return The local <code>Building</code> object if we can find a match. If the other building is not on this
-     *       board, a <code>null</code> is returned instead.
+     * board, a <code>null</code> is returned instead.
      */
     private IBuilding getLocalBuilding(IBuilding other) {
         return buildings.stream().filter(building -> building.equals(other)).findFirst().orElse(null);
@@ -1525,6 +1668,8 @@ public class Board implements Serializable {
         curHex.removeTerrain(Terrains.BRIDGE);
         curHex.removeTerrain(Terrains.BRIDGE_CF);
         curHex.removeTerrain(Terrains.BRIDGE_ELEV);
+        // A destroyed section drops its field-repair badge along with the bridge terrain.
+        curHex.removeTerrain(Terrains.BRIDGE_REPAIRED);
 
         // Add rubble terrain that matches the building type.
         if (type > 0) {
@@ -1611,7 +1756,7 @@ public class Board implements Serializable {
             localBuilding.setPhaseCF(receivedBuilding.getPhaseCF(coords), coords);
             localBuilding.setArmor(receivedBuilding.getArmor(coords), coords);
             localBuilding.setBasement(coords,
-                  BasementType.getType(getHex(coords).terrainLevel(Terrains.BLDG_BASEMENT_TYPE)));
+                                      BasementType.getType(getHex(coords).terrainLevel(Terrains.BLDG_BASEMENT_TYPE)));
             localBuilding.setBasementCollapsed(coords, receivedBuilding.getBasementCollapsed(coords));
             localBuilding.setDemolitionCharges(receivedBuilding.getDemolitionCharges());
         }
@@ -1621,8 +1766,8 @@ public class Board implements Serializable {
      * Get the current value of the "road auto-exit" option.
      *
      * @return <code>true</code> if roads should automatically exit onto all
-     *       adjacent pavement hexes.
-     *       <code>false</code> otherwise.
+     * adjacent pavement hexes.
+     * <code>false</code> otherwise.
      */
     public boolean getRoadsAutoExit() {
         return roadsAutoExit;
@@ -1760,7 +1905,7 @@ public class Board implements Serializable {
 
     /**
      * @return Special events that should be marked on hexes, such as artillery fire as well as notes players can leave
-     *       manually on hexes. Always returns at least an empty list, never null.
+     * manually on hexes. Always returns at least an empty list, never null.
      */
     public Collection<SpecialHexDisplay> getSpecialHexDisplay(Coords coords) {
         return specialHexes.getOrDefault(coords, Collections.emptyList());
@@ -1774,7 +1919,9 @@ public class Board implements Serializable {
      * @param shd       The SpecialHexDisplay to add
      * @param fireEvent When true, a BoardEvent is fired for the affected coords
      */
-    public void addSpecialHexDisplay(Coords coords, SpecialHexDisplay shd, boolean fireEvent) {
+    public void addSpecialHexDisplay(Coords coords,
+                                     SpecialHexDisplay shd,
+                                     boolean fireEvent) {
         Collection<SpecialHexDisplay> col;
         if (!specialHexes.containsKey(coords)) {
             col = new LinkedList<>();
@@ -1800,7 +1947,8 @@ public class Board implements Serializable {
      * @param coords The position of the SHD on this board
      * @param shd    The SpecialHexDisplay to add
      */
-    public void addSpecialHexDisplay(Coords coords, SpecialHexDisplay shd) {
+    public void addSpecialHexDisplay(Coords coords,
+                                     SpecialHexDisplay shd) {
         addSpecialHexDisplay(coords, shd, false);
     }
 
@@ -1810,7 +1958,8 @@ public class Board implements Serializable {
      * @param coords The position of the SHD on this board
      * @param shd    The SpecialHexDisplay to remove
      */
-    public void removeSpecialHexDisplay(Coords coords, SpecialHexDisplay shd) {
+    public void removeSpecialHexDisplay(Coords coords,
+                                        SpecialHexDisplay shd) {
         removeSpecialHexDisplay(coords, shd, false);
     }
 
@@ -1820,7 +1969,9 @@ public class Board implements Serializable {
      * @param coords The position of the SHD on this board
      * @param shd    The SpecialHexDisplay to remove
      */
-    public void removeSpecialHexDisplay(Coords coords, SpecialHexDisplay shd, boolean fireEvent) {
+    public void removeSpecialHexDisplay(Coords coords,
+                                        SpecialHexDisplay shd,
+                                        boolean fireEvent) {
         Collection<SpecialHexDisplay> col = specialHexes.get(coords);
         if (col != null) {
             col.remove(shd);
@@ -1846,7 +1997,7 @@ public class Board implements Serializable {
         specialHexes = shd;
         toRedraw.addAll(shd.keySet());
         toRedraw.forEach(coords ->
-              processBoardEvent(new BoardEvent(this, coords, BoardEvent.BOARD_CHANGED_HEX)));
+                                 processBoardEvent(new BoardEvent(this, coords, BoardEvent.BOARD_CHANGED_HEX)));
         //TODO: Add a BoardEvent for a set of coords to avoid many events
     }
 
@@ -1949,7 +2100,6 @@ public class Board implements Serializable {
      * Gets the annotations associated with a hex.
      *
      * @param c Coordinates of the hex.
-     *
      * @return A collection of annotations for the hex.
      */
     public Collection<String> getAnnotations(Coords c) {
@@ -1962,8 +2112,9 @@ public class Board implements Serializable {
      * @param c Coordinates of the hex to apply the annotations to.
      * @param a A collection of annotations to assign to the hex. This may be null.
      */
-    public void setAnnotations(Coords c, @Nullable Collection<String> a) {
-        if (null == a || a.isEmpty()) {
+    public void setAnnotations(Coords c,
+                               @Nullable Collection<String> a) {
+        if (a == null || a.isEmpty()) {
             annotations.remove(c);
         } else {
             annotations.put(c, a);
@@ -1992,10 +2143,11 @@ public class Board implements Serializable {
      */
     public boolean isOnBoardEdge(Coords coords) {
         return (coords.getX() == 0) || (coords.getY() == 0) || (coords.getX() == (width - 1)) || (coords.getY() == (
-              height - 1));
+                height - 1));
     }
 
-    public static Board createEmptyBoard(int width, int height) {
+    public static Board createEmptyBoard(int width,
+                                         int height) {
         Hex[] hexes = new Hex[width * height];
         for (int i = 0; i < width * height; i++) {
             hexes[i] = new Hex();
@@ -2010,7 +2162,9 @@ public class Board implements Serializable {
         tags.add(newTag);
     }
 
-    /** Removes the given tag string from the board's tags list. */
+    /**
+     * Removes the given tag string from the board's tags list.
+     */
 
     public void removeTag(String tag) {
         tags.remove(tag);
@@ -2023,7 +2177,9 @@ public class Board implements Serializable {
         return Collections.unmodifiableSet(tags);
     }
 
-    /** @return The name of this map; this is meant to be displayed in the GUI. */
+    /**
+     * @return The name of this map; this is meant to be displayed in the GUI.
+     */
     public String getBoardName() {
         return mapName;
     }
@@ -2034,7 +2190,7 @@ public class Board implements Serializable {
 
     /**
      * @return Given an "exits" value, returns it in a list form. (i.e. exits value of 4 returns {3}, exit value of 5
-     *       returns {1, 3}
+     * returns {1, 3}
      */
     public static List<Integer> exitsAsIntList(int exits) {
         List<Integer> results = new ArrayList<>();
@@ -2087,7 +2243,8 @@ public class Board implements Serializable {
      * Converts a custom deployment zone from the hex area definition to board hexes; also translates the ID. Note that
      * the deploymentZones field must not be null.
      */
-    private void convertDeploymentZone(int zoneId, HexArea hexArea) {
+    private void convertDeploymentZone(int zoneId,
+                                       HexArea hexArea) {
         deploymentZones.put(zoneId - NUM_ZONES_X2, hexArea.getCoords(this));
     }
 
@@ -2100,7 +2257,8 @@ public class Board implements Serializable {
      * @param zoneId  The zone Id
      * @param hexArea The hexes comprising this deployment zone
      */
-    public void addDeploymentZone(int zoneId, HexArea hexArea) {
+    public void addDeploymentZone(int zoneId,
+                                  HexArea hexArea) {
         areas.put(zoneId, hexArea);
     }
 
@@ -2169,7 +2327,9 @@ public class Board implements Serializable {
         enclosingBoard = enclosingBoardId;
     }
 
-    /** @return The ID of the enclosing board of this board, or -1 if it has no enclosing board. */
+    /**
+     * @return The ID of the enclosing board of this board, or -1 if it has no enclosing board.
+     */
     public int getEnclosingBoardId() {
         return enclosingBoard;
     }
@@ -2180,10 +2340,10 @@ public class Board implements Serializable {
      *
      * @param boardId The board ID to embed
      * @param coords  The location to place the given board
-     *
      * @throws IllegalArgumentException When this board does not contain the given coords
      */
-    public void setEmbeddedBoard(int boardId, Coords coords) {
+    public void setEmbeddedBoard(int boardId,
+                                 Coords coords) {
         if (contains(coords)) {
             embeddedBoards.put(coords, boardId);
         } else {
@@ -2218,7 +2378,7 @@ public class Board implements Serializable {
 
     /**
      * @return True if this board is a low altitude (a.k.a. atmospheric) board, either with terrain or without terrain
-     *       ("sky").
+     * ("sky").
      */
     public boolean isLowAltitude() {
         return boardType.isLowAltitude();
@@ -2233,7 +2393,7 @@ public class Board implements Serializable {
 
     /**
      * @return True if this board is a space board, either close to a planet with some atmospheric hexes ("high
-     *       altitude") or in deeper space.
+     * altitude") or in deeper space.
      */
     public boolean isSpace() {
         return boardType.isSpace();
@@ -2241,7 +2401,7 @@ public class Board implements Serializable {
 
     /**
      * @return True if this board is a high altitude board, i.e. a space board close to a planet with some atmospheric
-     *       hexes.
+     * hexes.
      */
     public boolean isHighAltitude() {
         return boardType.isHighAltitude();
