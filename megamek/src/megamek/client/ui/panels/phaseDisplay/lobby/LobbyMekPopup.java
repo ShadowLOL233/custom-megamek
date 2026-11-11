@@ -220,7 +220,7 @@ class LobbyMekPopup {
 
         // All command strings should follow the layout COMMAND|INFO|ID1,ID2,I3...
         // and use -1 when something is not needed (COMMAND|-1|-1)
-        String eId = "|" + (entities.isEmpty() ? "-1" : entities.get(0).getId());
+        String eId = "|" + (entities.isEmpty() ? "-1" : entities.getFirst().getId());
         String eIds = enToken(entities);
         String seIds = enToken(joinedEntities);
 
@@ -267,7 +267,7 @@ class LobbyMekPopup {
         popup.add(changeOwnerMenu(!entities.isEmpty() || !forces.isEmpty(), clientGui, listener, entities, forces));
         popup.add(loadMenu(clientGui, true, listener, joinedEntities));
         if (entities.size() == 1) {
-            popup.add(towMenu(clientGui, true, listener, entities.get(0)));
+            popup.add(towMenu(clientGui, true, listener, entities.getFirst()));
         }
 
         if (accessibleCarriers) {
@@ -303,7 +303,7 @@ class LobbyMekPopup {
         popup.add(menuItem("View AlphaStrike Stats", LMP_ALPHA_STRIKE + NO_INFO + seIds, true, listener));
 
         if (oneSelected) {
-            popup.add(exportEntitySpriteMenu(clientGui.getFrame(), entities.get(0)));
+            popup.add(exportEntitySpriteMenu(clientGui.getFrame(), entities.getFirst()));
         }
 
         popup.add(menuItem("Convert to SBF Formation", LMP_SBF_FORMATION + "|" + foToken(forces) + eIds,
@@ -331,7 +331,7 @@ class LobbyMekPopup {
 
         // If exactly one force is selected, offer force options
         if ((forces.size() == 1) && entities.isEmpty()) {
-            Force force = forces.get(0);
+            Force force = forces.getFirst();
             boolean editable = lobby.lobbyActions.isEditable(force);
             String fId = "|" + force.getId();
             menu.add(menuItem("Add Sub force...", LMP_F_CREATE_SUB + fId + NO_INFO, editable, listener));
@@ -377,7 +377,7 @@ class LobbyMekPopup {
 
         // If exactly one force is selected, offer force options
         if ((forces.size() == 1) && entities.isEmpty()) {
-            Force force = forces.get(0);
+            Force force = forces.getFirst();
             boolean editable = lobby.lobbyActions.isEditable(force);
             menu.add(menuItem("Delete empty Force...", LMP_FC_DELETE_EMPTY + "|" + foToken(forces) + NO_INFO,
                   (editable && force.getChildCount() == 0), listener));
@@ -473,7 +473,7 @@ class LobbyMekPopup {
                               if (t.canLoad(transportedUnit)) {
                                   // FIXME #7640: Update once we can properly specify any transporter an entity has, and properly load into that transporter.
                                   loaderMenu.add(menuItem(
-                                        "Onto " + t.toString(),
+                                        "Onto " + t,
                                         LMP_LOAD + "|" + e.getId() + ":" + (Integer.MAX_VALUE
                                               - e.getTransports().indexOf(t)) + enToken(entities),
                                         true, listener));
@@ -887,8 +887,8 @@ class LobbyMekPopup {
     }
 
     /**
-     * @return the "Equipment" submenu, allowing hot loading LRMs, setting MGs to rapid fire mode,
-     *         Variable Range Targeting mode selection, and Enhanced Imaging mode selection
+     * @return the "Equipment" submenu, allowing hot loading LRMs, setting MGs to rapid fire mode, Variable Range
+     *       Targeting mode selection, and Enhanced Imaging mode selection
      */
     private static JMenu equipMenu(boolean anyRFOn, boolean anyRFOff, boolean anyHLOn,
           boolean anyHLOff, boolean anyVRTLong, boolean anyVRTShort, boolean anyVRT,

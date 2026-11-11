@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2000-2005 Ben Mazur (bmazur@sev.org)
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -370,6 +370,7 @@ public class MoveStep implements Serializable {
         this.mf = mf;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static MoveStep createChangeBoardMoveStep(MovePath path, Coords finalPosition, int finalBoardId) {
         MoveStep newStep = new MoveStep(path, MoveStepType.CHANGE_BOARD);
         newStep.boardId = finalBoardId;
@@ -575,7 +576,7 @@ public class MoveStep implements Serializable {
             if ((entity instanceof Infantry) && !grdDropship) {
                 // infantry can jump into a building
                 // Maybe this line is a bit too much, but it seems to work by coincidence
-                setElevation(Math.max(depth, Math.min(building, maxElevation)));
+                setElevation(Math.clamp(building, depth, maxElevation));
             } else {
                 int subDepth = Math.max(depth, building);
 
@@ -816,8 +817,7 @@ public class MoveStep implements Serializable {
 
         } else if (prev.isFirstStep()
               && prev.isTurning
-              && entity instanceof Infantry infantry
-              && !entity.isBattleArmor()
+              && entity instanceof ConvInfantry infantry
               && !infantry.hasActiveFieldArtillery()) {
             // For CI, turning is only a graphical distinction unless they are field artillery
             setFirstStep();
@@ -1736,7 +1736,8 @@ public class MoveStep implements Serializable {
         } // end AERO stuff
 
         if (isInfantry && isJumping() && stepType == MoveStepType.DOWN) {
-            if (game.getBoard(boardId).getHex(curPos).containsTerrain(Terrains.BUILDING)) {
+            Hex curHex = game.getBoard(boardId).getHex(curPos);
+            if (curHex.containsTerrain(Terrains.BUILDING)) {
                 Coords startingPosition = entity.getPosition();
                 Coords adjacentCoords = curPos.translated(curPos.direction(startingPosition));
                 Hex adjacentHex = game.getHex(adjacentCoords, boardId);
@@ -1745,7 +1746,7 @@ public class MoveStep implements Serializable {
                       entity,
                       new FloorTarget(curPos, game.getBoard(boardId), getElevation())).canSee();
 
-                if (adjacentHex.ceiling() >= getElevation() || !hasLOS) {
+                if (adjacentHex.ceiling() >= getElevation() + curHex.getLevel() || !hasLOS) {
                     return; // can't enter the building from this direction
                 } else {
                     // we can enter the building, but we need to roll anti-mek skill
@@ -2350,7 +2351,7 @@ public class MoveStep implements Serializable {
                         curPos = getTargetPosition();
                     }
                     // Infantry with jump capability or glider wings dismounting from VTOLs
-                    // land at ground level, not VTOL elevation (TW p.31, IO p.85)
+                    // land at ground level, not VTOL elevation (TW p.31, IO:AE p.79)
                     int unloadElevation = getElevation();
                     if (entity instanceof VTOL && other.isInfantry()) {
                         Infantry inf = (Infantry) other;
@@ -2512,7 +2513,7 @@ public class MoveStep implements Serializable {
                 Hex prevHex = game.getBoard(boardId).getHex(lastPos);
                 // Check if we're climbing from outside/below onto the building top
                 if (!prevHex.containsTerrain(Terrains.BUILDING) ||
-                    prevHex.terrainLevel(Terrains.BLDG_ELEV) < curHex.terrainLevel(Terrains.BLDG_ELEV)) {
+                      prevHex.terrainLevel(Terrains.BLDG_ELEV) < curHex.terrainLevel(Terrains.BLDG_ELEV)) {
                     int prevAbsoluteElev = prevHex.getLevel() + prev.getElevation();
                     int curAbsoluteElev = curHex.getLevel() + getElevation();
                     int elevChange = curAbsoluteElev - prevAbsoluteElev;
@@ -2909,29 +2910,36 @@ public class MoveStep implements Serializable {
 
         // non-WIGEs pay for elevation differences
         if ((nSrcEl != nDestEl) && (moveMode != EntityMovementMode.WIGE)) {
-            int delta_e = Math.abs(nSrcEl - nDestEl);
+            int deltaElevation = Math.abs(nSrcEl - nDestEl);
             if (game.getOptions().booleanOption(OptionsConstants.ADVANCED_GROUND_MOVEMENT_TAC_OPS_LEAPING) &&
                   isMek &&
-                  (delta_e > 2) &&
+                  (deltaElevation > 2) &&
                   (nDestEl < nSrcEl)) {
                 // leaping (moving down more than 2 hexes) always costs 4 mp
                 // regardless of anything else
                 mp = 4;
                 return;
             }
-            // non-flying Infantry and ground vehicles are charged double.
-            if ((isInfantry &&
+            // Mountain Troops only expend 1 MP per 2 levels moved up or down (TO:AUE p.153).
+            // This stacks with the Mountaineer ability (PILOT_TM_MOUNTAINEER) which reduces
+            // elevation cost by 1 MP. Combined, a 1-level change can cost 0 MP elevation.
+            boolean isMountainTroop = entity instanceof ConvInfantry convInfantry
+                  && convInfantry.hasSpecialization(ConvInfantry.MOUNTAIN_TROOPS);
+            if (isMountainTroop) {
+                deltaElevation = (int) Math.ceil(deltaElevation / 2.0);
+            } else if ((isInfantry &&
                   !((getMovementType(false) == EntityMovementType.MOVE_VTOL_WALK) ||
                         (getMovementType(false) == EntityMovementType.MOVE_VTOL_RUN))) ||
                   ((moveMode == EntityMovementMode.TRACKED) ||
                         (moveMode == EntityMovementMode.WHEELED) ||
                         (moveMode == EntityMovementMode.HOVER))) {
-                delta_e *= 2;
+                // non-flying Infantry and ground vehicles are charged double.
+                deltaElevation *= 2;
             }
             if (entity.hasAbility(OptionsConstants.PILOT_TM_MOUNTAINEER)) {
-                mp += delta_e - 1;
+                mp += deltaElevation - 1;
             } else {
-                mp += delta_e;
+                mp += deltaElevation;
             }
         }
 
@@ -2978,8 +2986,8 @@ public class MoveStep implements Serializable {
             } else if (isMechanizedInfantry) {
                 // mechanized infantry pays 1 extra
                 mp += 1;
-            } else if (isInfantry && (((Infantry) entity).getMount() != null)) {
-                mp += ((Infantry) entity).getMount().size().buildingMP;
+            } else if (entity instanceof ConvInfantry convInfantry && (convInfantry.getMount() != null)) {
+                mp += convInfantry.getMount().size().buildingMP;
             }
         }
 
@@ -3243,7 +3251,7 @@ public class MoveStep implements Serializable {
         // Check if using VTOL-style flight (either VTOL mode or VTOL movement type)
         // Also explicitly check for powered flight infantry as a fallback in case getMovementMode()
         // doesn't return VTOL (e.g., if crew/abilities aren't accessible during validation)
-        boolean hasPoweredFlight = (entity instanceof Infantry infantry) && infantry.hasVTOLMovementCapability();
+        boolean hasPoweredFlight = (entity instanceof ConvInfantry infantry) && infantry.hasVTOLMovementCapability();
         boolean isVTOLFlight = (nMove == EntityMovementMode.VTOL) ||
               hasPoweredFlight ||
               (movementType == EntityMovementType.MOVE_VTOL_WALK) ||
@@ -3292,9 +3300,9 @@ public class MoveStep implements Serializable {
         // cross sheer cliffs at all except for Mountain Troops across a level 1 cliff.
         // Flying VTOL infantry (native VTOL, powered flight) can bypass cliffs.
         // Note: Glider infantry cannot traverse cliffs - they only get fall damage protection.
-        if (entity instanceof Infantry infantry && (isUpCliff || isDownCliff) && !isPavementStep && !isVTOLFlight) {
+        if (entity instanceof ConvInfantry infantry && (isUpCliff || isDownCliff) && !isPavementStep && !isVTOLFlight) {
 
-            boolean isMountainTroop = infantry.hasSpecialization(Infantry.MOUNTAIN_TROOPS);
+            boolean isMountainTroop = infantry.hasSpecialization(ConvInfantry.MOUNTAIN_TROOPS);
             if (!isMountainTroop || stepHeight == 2) {
                 return false;
             }

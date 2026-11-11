@@ -91,6 +91,9 @@ public class AdvancedSearchDialog extends AbstractButtonDialog {
     @Override
     public void setVisible(boolean b) {
         alphaStrikeTab.saveValues();
+        if (b) {
+            setLocationRelativeTo(getOwner());
+        }
         super.setVisible(b);
     }
 
@@ -171,7 +174,7 @@ public class AdvancedSearchDialog extends AbstractButtonDialog {
             throw new IllegalArgumentException("Cannot create a filename from a null or empty name");
         }
         String sanitized = name;
-        sanitized = sanitized.replaceAll("[\\<>:\"/\\\\|?*\\p{Cntrl}]", "");
+        sanitized = sanitized.replaceAll("[<>:\"/\\\\|?*\\p{Cntrl}]", "");
         sanitized = sanitized.replaceAll("[. ]+$", "");
         sanitized = sanitized.replaceAll("^_|_$", "");
         if (sanitized.isEmpty()) {

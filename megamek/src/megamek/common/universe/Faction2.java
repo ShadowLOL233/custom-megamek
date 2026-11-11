@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -71,15 +71,14 @@ import megamek.common.annotations.Nullable;
  * avoid repetition.
  */
 @SuppressWarnings("unused") // Class fields are assigned when factions are loaded from YAML files
-// Tolerate faction YAML fields this class does not (yet) model - e.g. sucsCodes carried by newer
-// unified-faction data. Without this, a single unknown field makes Jackson reject the whole file,
-// and if every faction file carries it the RAT generator faction list ends up empty, which crashes
-// hosting (NPE on getFaction("IS")) in the random army dialog.
+// Tolerate faction YAML fields this class does not (yet) model. Without this, a single unknown field
+// makes Jackson reject the whole file, and if every faction file carries it the RAT generator faction
+// list ends up empty, which crashes hosting (NPE on getFaction("IS")) in the random army dialog.
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonPropertyOrder({ "key", "name", "nameChanges", "capital", "capitalChanges", "yearsActive", "successor", "tags",
-                     "color", "logo", "background", "camos", "camosChanges", "nameGenerator", "eraMods", "ratingLevels",
-                     "fallBackFactions", "preInvasionHonorRating", "postInvasionHonorRating", "formationBaseSize",
-                     "formationGrouping", "rankSystem", "factionLeaders" })
+@JsonPropertyOrder({ "key", "name", "sucsCodes", "nameChanges", "capital", "capitalChanges", "yearsActive", "successor",
+                     "tags", "color", "logo", "background", "camos", "camosChanges", "nameGenerator", "eraMods",
+                     "ratingLevels", "fallBackFactions", "preInvasionHonorRating", "postInvasionHonorRating",
+                     "formationBaseSize", "formationGrouping", "rankSystem", "factionLeaders" })
 public class Faction2 {
     private static final int UNKNOWN = -1;
     private static final String DEFAULT_RANK_SYSTEM_INNER_SPHERE = "SLDF";
@@ -87,6 +86,7 @@ public class Faction2 {
 
     private String key;
     private String name;
+    private final Set<String> sucsCodes = new LinkedHashSet<>();
     private final NavigableMap<Integer, String> nameChanges = new TreeMap<>();
     private String capital;
     private final NavigableMap<Integer, String> capitalChanges = new TreeMap<>();
@@ -128,6 +128,21 @@ public class Faction2 {
     public String getName(int year) {
         final Map.Entry<Integer, String> nameByYear = nameChanges.floorEntry(year);
         return (nameByYear == null) ? name : nameByYear.getValue();
+    }
+
+    /**
+     * Returns the SUCS (Sarna Unified Cartography Kit) faction codes that map to this MegaMek faction. A single MegaMek
+     * faction may correspond to multiple SUCS codes when SUCS uses different identifiers across historical eras of the
+     * same political entity (e.g. {@code LC} for the Lyran Commonwealth and {@code LA} for its successor the Lyran
+     * Alliance, both of which map to MegaMek's {@code LA}).
+     *
+     * <p>Used by SUCS data import tooling to translate SUCS faction codes into MegaMek codes. An empty set means no
+     * SUCS equivalent has been identified.</p>
+     *
+     * @return The SUCS codes that map to this faction, in insertion order. Never {@code null}.
+     */
+    public Set<String> getSucsCodes() {
+        return sucsCodes;
     }
 
     public Set<FactionTag> getTags() {
@@ -427,7 +442,7 @@ public class Faction2 {
         SimpleModule module = new SimpleModule();
         module.addSerializer(Color.class, new ColorSerializer());
         yamlMapper.registerModule(module);
-        yamlMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+        yamlMapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_EMPTY);
         yamlMapper.writeValue(file, this);
     }
 

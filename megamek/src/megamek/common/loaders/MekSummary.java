@@ -88,6 +88,8 @@ public class MekSummary implements Serializable, ASCardDisplayable {
     private int tankTurrets;
     private File sourceFile;
     private String source;
+    private String published;
+    private boolean nonCanonBySource;
     private boolean invalid;
     private String techLevel;
     private int techLevelCode;
@@ -102,6 +104,7 @@ public class MekSummary implements Serializable, ASCardDisplayable {
     private double tons;
     private int weightClass;
     private int bv;
+    private int genericBattleValue;
 
     /** The full cost of the unit (including ammo). */
     private long cost;
@@ -328,7 +331,19 @@ public class MekSummary implements Serializable, ASCardDisplayable {
     }
 
     public String getSource() {
-        return source;
+        return (source != null) ? source : "";
+    }
+
+    public String getPublished() {
+        return (published != null) ? published : "";
+    }
+
+    public boolean hasPublishedRecordSheet() {
+        return !getPublished().isBlank();
+    }
+
+    public boolean isNonCanonBySource() {
+        return nonCanonBySource;
     }
 
     public String getEntryName() {
@@ -541,6 +556,10 @@ public class MekSummary implements Serializable, ASCardDisplayable {
         return bv;
     }
 
+    public int getGenericBattleValue() {
+        return genericBattleValue;
+    }
+
     public long getCost() {
         return cost;
     }
@@ -561,10 +580,12 @@ public class MekSummary implements Serializable, ASCardDisplayable {
         return level;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getAdvancedTechYear() {
         return advTechYear;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getStandardTechYear() {
         return stdTechYear;
     }
@@ -896,6 +917,14 @@ public class MekSummary implements Serializable, ASCardDisplayable {
         this.source = sSource;
     }
 
+    public void setPublished(String published) {
+        this.published = published;
+    }
+
+    public void setNonCanonBySource(boolean nonCanonBySource) {
+        this.nonCanonBySource = nonCanonBySource;
+    }
+
     public void setEntryName(String sEntryName) {
         this.entryName = sEntryName;
     }
@@ -938,6 +967,10 @@ public class MekSummary implements Serializable, ASCardDisplayable {
 
     public void setBV(int nBV) {
         this.bv = nBV;
+    }
+
+    public void setGenericBattleValue(int genericBattleValue) {
+        this.genericBattleValue = genericBattleValue;
     }
 
     public void setModified(long lModified) {

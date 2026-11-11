@@ -77,6 +77,7 @@ import megamek.client.ui.clientGUI.boardview.sprite.isometric.IsometricWreckSpri
 import megamek.client.ui.clientGUI.boardview.toolTip.BoardViewTooltipProvider;
 import megamek.client.ui.dialogs.phaseDisplay.EntityChoiceDialog;
 import megamek.client.ui.tileset.TilesetManager;
+import megamek.client.ui.util.EntityWreckHelper;
 import megamek.client.ui.util.FontHandler;
 import megamek.client.ui.util.ImageCache;
 import megamek.client.ui.util.KeyBindReceiver;
@@ -1061,7 +1062,7 @@ public final class BoardView extends AbstractBoardView
             ghostEntitySprites.add(ghostSprite);
 
             // Center on the starting hex of the moving unit.
-            UnitLocation loc = movePath.get(0);
+            UnitLocation loc = movePath.getFirst();
 
             if (GUIP.getAutoCenter()) {
                 centerOnHex(loc.coords());
@@ -1442,20 +1443,22 @@ public final class BoardView extends AbstractBoardView
     }
 
     /**
-     * Draws the wreck sprites for the given hex. This function is used by the isometric rendering process so that
-     * sprites are drawn in the order that hills are rendered to create the appearance that the sprite is behind the
-     * hill.
+     * Draws the wreck sprites for the given hex, optionally filtered by whether the wrecked entity was on a bridge.
+     * Splitting the pass by bridge state lets callers draw under-bridge wrecks beneath the bridge orthograph and
+     * on-bridge wrecks above it.
      *
      * @param coords          The Coordinates of the hex that the sprites should be drawn for.
      * @param graphics2D      The Graphics object for this board.
-     * @param spriteArrayList The complete list of all IsometricSprite on the board.
+     * @param spriteArrayList The complete list of all IsometricWreckSprite on the board.
+     * @param onBridge        When true, only draw wrecks of entities on a bridge; when false, only draw the rest.
      */
     private synchronized void drawIsometricWreckSpritesForHex(Coords coords, Graphics2D graphics2D,
-          ArrayList<IsometricWreckSprite> spriteArrayList) {
+          ArrayList<IsometricWreckSprite> spriteArrayList, boolean onBridge) {
         Rectangle view = graphics2D.getClipBounds();
         for (IsometricWreckSprite sprite : spriteArrayList) {
             Coords spritePosition = sprite.getPosition();
-            if (spritePosition.equals(coords) && view.intersects(sprite.getBounds()) && !sprite.isHidden()) {
+            if (spritePosition.equals(coords) && view.intersects(sprite.getBounds()) && !sprite.isHidden()
+                  && EntityWreckHelper.entityOnBridge(sprite.getEntity()) == onBridge) {
                 if (!sprite.isReady()) {
                     sprite.prepare();
                 }
@@ -1739,11 +1742,11 @@ public final class BoardView extends AbstractBoardView
             Point hexPos = getHexLocation(hex);
             Shape hexBorder = HexDrawUtilities.getHexFullBorderLine(0);
             Shape scaled = AffineTransform
-                    .getScaleInstance(scale, scale)
-                    .createTransformedShape(hexBorder);
+                  .getScaleInstance(scale, scale)
+                  .createTransformedShape(hexBorder);
             Shape translated = AffineTransform
-                    .getTranslateInstance(hexPos.x, hexPos.y)
-                    .createTransformedShape(scaled);
+                  .getTranslateInstance(hexPos.x, hexPos.y)
+                  .createTransformedShape(scaled);
             graphics.draw(translated);
         }
     }
@@ -1896,7 +1899,7 @@ public final class BoardView extends AbstractBoardView
                       font_minefield,
                       graphics2D);
             } else if (numberOfMinefields == 1) {
-                Minefield minefield = game.getMinefields(coords).get(0);
+                Minefield minefield = game.getMinefields(coords).getFirst();
 
                 switch (minefield.getType()) {
                     case Minefield.TYPE_CONVENTIONAL:
@@ -2078,23 +2081,23 @@ public final class BoardView extends AbstractBoardView
                     // For s == 0 the x coordinate MUST be an even number to get correct occlusion; drawX may be
                     // any int though
                     Coords coords = new Coords(x + drawX / 2 * 2, y + drawY);
-                    if (board.getHex(coords) != null) {
+                    Hex hex = board.getHex(coords);
+                    if (hex != null) {
                         drawHex(coords, graphics2D, saveBoardImage);
                         drawOrthograph(coords, graphics2D);
+                        // Under-bridge / no-bridge wrecks: drawn before the iso entity sprite (so a unit on the
+                        // wreck paints on top) and before the second drawOrthograph (so a bridge deck paints over).
+                        if (!saveBoardImage && GUIP.getShowWrecks()) {
+                            drawIsometricWreckSpritesForHex(coords, graphics2D, isometricWreckSprites, false);
+                        }
                         drawHexSpritesForHex(coords, graphics2D, behindTerrainHexSprites);
                         drawDeployment(graphics2D, coords);
                         drawOrthograph(coords, graphics2D);
-                    }
-                }
-            }
-
-            for (int x = 0; x < drawWidth; x++) {
-                Coords coords = new Coords(x + drawX, y + drawY);
-                if (board.getHex(coords) != null) {
-                    if (!saveBoardImage) {
-                        if (GUIP.getShowWrecks()) {
-                            drawIsometricWreckSpritesForHex(coords, graphics2D, isometricWreckSprites);
+                        // On-bridge wrecks: drawn after the bridge orthograph so they sit on the deck.
+                        if (!saveBoardImage && GUIP.getShowWrecks()) {
+                            drawIsometricWreckSpritesForHex(coords, graphics2D, isometricWreckSprites, true);
                         }
+                        drawHexText(coords, hex, board, graphics2D);
                     }
                 }
             }
@@ -2132,15 +2135,6 @@ public final class BoardView extends AbstractBoardView
         }
 
         int level = hex.getLevel();
-        int depth = hex.depth(false);
-
-        Terrain basement = hex.getTerrain(Terrains.BLDG_BASEMENT_TYPE);
-        if (basement != null) {
-            depth = 0;
-        }
-
-        int height = Math.max(hex.terrainLevel(Terrains.BLDG_ELEV), hex.terrainLevel(Terrains.BRIDGE_ELEV));
-        height = Math.max(height, hex.terrainLevel(Terrains.INDUSTRIAL));
 
         // get the base tile image
         Image baseImage = tileManager.baseFor(hex);
@@ -2322,7 +2316,7 @@ public final class BoardView extends AbstractBoardView
         // Check for buildings and woods buried under their own shadows.
         if ((supers != null) && supersUnderShadow && (hex.containsTerrain(Terrains.BUILDING) || hex.containsTerrain(
               Terrains.WOODS))) {
-            Image lastSuper = supers.get(supers.size() - 1);
+            Image lastSuper = supers.getLast();
             scaledImage = getScaledImage(lastSuper, true);
             graphics2D.drawImage(scaledImage, 0, 0, boardPanel);
         }
@@ -2509,56 +2503,8 @@ public final class BoardView extends AbstractBoardView
             return;
         }
 
-        // write hex coordinate unless deactivated or scale factor too small
-        if (GUIP.getCoordsEnabled() && (scale >= 0.5)) {
-            drawCenteredString(coords.getBoardNum(), 0, (int) (12 * scale), font_hexNumber, graphics2D);
-        }
-
-        if (displayInvalidHexInfo && !hex.isValid(null)) {
-            Point hexCenter = new Point((int) (HEX_W / 2.0f * scale), (int) (HEX_H / 2.0f * scale));
-            invalidString.at(hexCenter).fontSize(14.0f * scale).outline(Color.WHITE, scale / 2).draw(graphics2D);
-        }
-
-        // write terrain level / water depth / building height
-        if (scale > 0.5f) {
-            int yPosition = HEX_H - 2;
-            if (level != 0) {
-                drawCenteredString(Messages.getString("BoardView1.LEVEL") + level,
-                      0,
-                      (int) (yPosition * scale),
-                      font_elev,
-                      graphics2D);
-                yPosition -= 10;
-            }
-
-            if (depth != 0) {
-                drawCenteredString(Messages.getString("BoardView1.DEPTH") + depth,
-                      0,
-                      (int) (yPosition * scale),
-                      font_elev,
-                      graphics2D);
-                yPosition -= 10;
-            }
-
-            if (height > 0) {
-                graphics2D.setColor(GUIP.getBuildingTextColor());
-                drawCenteredString(Messages.getString("BoardView1.HEIGHT") + height,
-                      0,
-                      (int) (yPosition * scale),
-                      font_elev,
-                      graphics2D);
-                yPosition -= 10;
-            }
-
-            if (hex.terrainLevel(Terrains.FOLIAGE_ELEV) == 1) {
-                graphics2D.setColor(GUIP.getLowFoliageColor());
-                drawCenteredString(Messages.getString("BoardView1.LowFoliage"),
-                      0,
-                      (int) (yPosition * scale),
-                      font_elev,
-                      graphics2D);
-            }
-        }
+        // Hex text (coordinates, level/depth/height) is drawn separately in drawHexText()
+        // so that it renders on top of bridge orthographs
 
         // Used to make the following draw calls shorter
         int s21 = (int) (21 * scale);
@@ -2726,6 +2672,84 @@ public final class BoardView extends AbstractBoardView
 
                 // draw orthogonal
                 boardGraph.drawImage(scaledImage, orthogonalX, orthogonalY, boardPanel);
+            }
+        }
+    }
+
+    /**
+     * Draws hex text overlays (coordinates, level, depth, height, foliage, invalid hex info) directly to the board
+     * graphics. This is called after drawOrthograph so that text renders on top of bridge images.
+     */
+    private void drawHexText(Coords coords, Hex hex, Board board, Graphics2D boardGraph) {
+        final Point hexLocation = getHexLocation(coords);
+        int hexX = hexLocation.x;
+        int hexY = hexLocation.y;
+
+        // Set the text color according to Preferences or Light Gray in space
+        boardGraph.setColor(GUIP.getBoardTextColor());
+        if (board.isSpace()) {
+            boardGraph.setColor(GUIP.getBoardSpaceTextColor());
+        }
+
+        // write hex coordinate unless deactivated or scale factor too small
+        if (GUIP.getCoordsEnabled() && (scale >= 0.5)) {
+            drawCenteredString(coords.getBoardNum(), hexX, hexY + (int) (12 * scale), font_hexNumber, boardGraph);
+        }
+
+        if (displayInvalidHexInfo && !hex.isValid(null)) {
+            Point hexCenter = new Point(hexX + (int) (HEX_W / 2.0f * scale), hexY + (int) (HEX_H / 2.0f * scale));
+            invalidString.at(hexCenter).fontSize(14.0f * scale).outline(Color.WHITE, scale / 2).draw(boardGraph);
+        }
+
+        // write terrain level / water depth / building height
+        if (scale > 0.5f) {
+            int level = hex.getLevel();
+            int depth = hex.depth(false);
+
+            Terrain basement = hex.getTerrain(Terrains.BLDG_BASEMENT_TYPE);
+            if (basement != null) {
+                depth = 0;
+            }
+
+            int height = Math.max(hex.terrainLevel(Terrains.BLDG_ELEV), hex.terrainLevel(Terrains.BRIDGE_ELEV));
+            height = Math.max(height, hex.terrainLevel(Terrains.INDUSTRIAL));
+
+            int yPosition = HEX_H - 2;
+            if (level != 0) {
+                drawCenteredString(Messages.getString("BoardView1.LEVEL") + level,
+                        hexX,
+                        hexY + (int) (yPosition * scale),
+                        font_elev,
+                        boardGraph);
+                yPosition -= 10;
+            }
+
+            if (depth != 0) {
+                drawCenteredString(Messages.getString("BoardView1.DEPTH") + depth,
+                        hexX,
+                        hexY + (int) (yPosition * scale),
+                        font_elev,
+                        boardGraph);
+                yPosition -= 10;
+            }
+
+            if (height > 0) {
+                boardGraph.setColor(GUIP.getBuildingTextColor());
+                drawCenteredString(Messages.getString("BoardView1.HEIGHT") + height,
+                        hexX,
+                        hexY + (int) (yPosition * scale),
+                        font_elev,
+                        boardGraph);
+                yPosition -= 10;
+            }
+
+            if (hex.terrainLevel(Terrains.FOLIAGE_ELEV) == 1) {
+                boardGraph.setColor(GUIP.getLowFoliageColor());
+                drawCenteredString(Messages.getString("BoardView1.LowFoliage"),
+                        hexX,
+                        hexY + (int) (yPosition * scale),
+                        font_elev,
+                        boardGraph);
             }
         }
     }
@@ -3705,7 +3729,7 @@ public final class BoardView extends AbstractBoardView
                   || (step.getType() == MoveStepType.DECELERATION))) {
                 // Mark the previous elevation change sprite hidden so that we can draw a new one in its place
                 // without having overlap.
-                pathSprites.get(pathSprites.size() - 1).setHidden(true);
+                pathSprites.getLast().setHidden(true);
             }
 
             if (previousStep != null
@@ -3717,7 +3741,7 @@ public final class BoardView extends AbstractBoardView
                   || (step.getType() == MoveStepType.CONVERT_MODE
                   && previousStep.getType() == MoveStepType.CONVERT_MODE)
                   || step.getType() == MoveStepType.BOOTLEGGER)) {
-                pathSprites.get(pathSprites.size() - 1).setHidden(true);
+                pathSprites.getLast().setHidden(true);
             }
 
             pathSprites.add(new StepSprite(this, step, movePath.isEndStep(step)));
@@ -4218,12 +4242,12 @@ public final class BoardView extends AbstractBoardView
                     movingSomething = true;
                     Entity entity = game.getEntity(move.entity.getId());
                     if (!move.path.isEmpty()) {
-                        UnitLocation loc = move.path.get(0);
+                        UnitLocation loc = move.path.getFirst();
 
                         if (entity != null) {
                             redrawMovingEntity(move.entity, loc.coords(), loc.facing(), loc.elevation());
                         }
-                        move.path.remove(0);
+                        move.path.removeFirst();
                     } else {
                         if (entity != null) {
                             redrawEntity(entity);
@@ -4485,9 +4509,8 @@ public final class BoardView extends AbstractBoardView
     }
 
     /**
-     * Highlights multiple entities on the board view.
-     * All entities in the provided list will be highlighted.
-     * All other entities will be unhighlighted.
+     * Highlights multiple entities on the board view. All entities in the provided list will be highlighted. All other
+     * entities will be unhighlighted.
      *
      * @param entities List of entities to highlight (can be empty to clear all highlights)
      */
@@ -4498,8 +4521,8 @@ public final class BoardView extends AbstractBoardView
     }
 
     /**
-     * Sets the hexes to highlight with white borders (for Nova CEWS network dialog).
-     * Draws white hexagon borders around the specified hex coordinates.
+     * Sets the hexes to highlight with white borders (for Nova CEWS network dialog). Draws white hexagon borders around
+     * the specified hex coordinates.
      *
      * @param hexes List of hex coordinates to highlight (can be empty to clear all highlights)
      */
@@ -4912,6 +4935,7 @@ public final class BoardView extends AbstractBoardView
      *
      * @param position - the <code>Coords</code> containing targets.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     private Entity chooseEntity(Coords position) {
         // Assume that we have *no* choice.
         Entity choice = null;
@@ -4922,7 +4946,7 @@ public final class BoardView extends AbstractBoardView
         // Do we have a single choice?
         if (entities.size() == 1) {
             // Return that choice.
-            choice = entities.get(0);
+            choice = entities.getFirst();
         } else if (entities.size() > 1) {
             // If we have multiple choices, display a selection dialog.
             choice = EntityChoiceDialog.showSingleChoiceDialog(clientgui.getFrame(),
@@ -4963,7 +4987,7 @@ public final class BoardView extends AbstractBoardView
             File file;
 
             if (!bvSkinSpec.backgrounds.isEmpty()) {
-                file = new MegaMekFile(Configuration.widgetsDir(), bvSkinSpec.backgrounds.get(0)).getFile();
+                file = new MegaMekFile(Configuration.widgetsDir(), bvSkinSpec.backgrounds.getFirst()).getFile();
                 if (!file.exists()) {
                     LOGGER.error("BoardView1 Error: Background 0 icon doesn't exist: {}", file.getAbsolutePath());
                 } else {

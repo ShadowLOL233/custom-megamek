@@ -41,18 +41,28 @@ import megamek.common.board.Coords;
  * Immutable data model for rendering a LOS elevation diagram between two hexes. Decoupled from the game state so the
  * rendering panel does not depend on game logic.
  *
- * @param hexPath           the ordered list of hex data along the LOS path (attacker to target)
- * @param attackerAbsHeight the attacker's absolute height (hex floor + unit height)
- * @param targetAbsHeight   the target's absolute height (hex floor + unit height)
- * @param attackPos         the attacker's hex coordinates
- * @param targetPos         the target's hex coordinates
- * @param losBlocked        whether LOS is completely blocked along this path
- * @param attackerUnitType    the attacker's unit type for silhouette rendering
- * @param targetUnitType      the target's unit type for silhouette rendering
- * @param attackerIsHullDown  whether the attacker is hull-down (reduces LOS profile by 1 TW level)
- * @param targetIsHullDown    whether the target is hull-down (reduces LOS profile by 1 TW level)
- * @param attackerName        display name of the attacker entity, or empty if none
- * @param targetName          display name of the target entity, or empty if none
+ * @param hexPath            the ordered list of hex data along the LOS path (attacker to target)
+ * @param attackerAbsHeight  the attacker's absolute height (hex floor + unit height)
+ * @param targetAbsHeight    the target's absolute height (hex floor + unit height)
+ * @param attackPos          the attacker's hex coordinates
+ * @param targetPos          the target's hex coordinates
+ * @param losBlocked         whether LOS is completely blocked along this path
+ * @param attackerUnitType   the attacker's unit type for silhouette rendering
+ * @param targetUnitType     the target's unit type for silhouette rendering
+ * @param attackerIsHullDown whether the attacker is hull-down (reduces LOS profile by 1 TW level)
+ * @param targetIsHullDown   whether the target is hull-down (reduces LOS profile by 1 TW level)
+ * @param attackerName       display name of the attacker entity, or empty if none
+ * @param targetName         display name of the target entity, or empty if none
+ * @param losRuleMode        the active LOS rule set; drives the per-hex comparison level used to flag
+ *                           blockers (BMM adjacency rule for {@link LosRuleMode#STANDARD} and
+ *                           {@link LosRuleMode#DEAD_ZONE}, linear interp matching the engine's
+ *                           {@code losElevation} for {@link LosRuleMode#DIAGRAMMED}). The line itself is
+ *                           drawn straight from eye level to eye level in every mode
+ * @param deadZone           true if the engine flagged this LOS as blocked by a TacOps dead-zone shadow
+ *                           (see {@link megamek.common.LosEffects#isBlockedByDeadZone()}). The panel
+ *                           hatches the lower endpoint's hex column as a marker
+ * @param deadZoneVictimPos  the lower-elevation endpoint - the unit sitting inside the dead-zone shadow.
+ *                           {@code null} when {@code deadZone} is false
  */
 record LOSDiagramData(
       List<HexRow> hexPath,
@@ -65,8 +75,13 @@ record LOSDiagramData(
       DiagramUnitType targetUnitType,
       boolean attackerIsHullDown,
       boolean targetIsHullDown,
+      boolean attackerAtAltitude,
+      boolean targetAtAltitude,
       String attackerName,
-      String targetName
+      String targetName,
+      LosRuleMode losRuleMode,
+      boolean deadZone,
+      @Nullable Coords deadZoneVictimPos
 ) {
 
     /**
@@ -74,6 +89,7 @@ record LOSDiagramData(
      *
      * @return true if the attacker unit type is a Mek
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean attackerIsMek() {
         return attackerUnitType.isMek();
     }
@@ -83,6 +99,7 @@ record LOSDiagramData(
      *
      * @return true if the target unit type is a Mek
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean targetIsMek() {
         return targetUnitType.isMek();
     }
@@ -102,6 +119,7 @@ record LOSDiagramData(
      * @param hasScreen        true if a smoke/ECM screen is present
      * @param hasFields        true if planted fields are present
      * @param hasFire          true if the hex is on fire
+     * @param eruptingGeyser   true if an erupting geyser is present (its plume blocks LOS as ultra-heavy woods)
      * @param splitHex         true if this hex was part of a split LOS path (line along hex edge)
      * @param splitAlternate   the alternate hex coordinates if this is a split hex, null otherwise
      * @param blocksLOS        true if this specific hex blocks the LOS line
@@ -120,6 +138,7 @@ record LOSDiagramData(
           boolean hasScreen,
           boolean hasFields,
           boolean hasFire,
+          boolean eruptingGeyser,
           boolean splitHex,
           @Nullable Coords splitAlternate,
           boolean blocksLOS,
@@ -152,7 +171,7 @@ record LOSDiagramData(
          */
         public boolean hasLosModifiers() {
             return hasWoodsOrJungle() || smokeLevel > 0 || hasScreen || hasFields
-                  || hasFire || industrialHeight > 0;
+                  || hasFire || industrialHeight > 0 || eruptingGeyser;
         }
     }
 }

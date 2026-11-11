@@ -55,7 +55,9 @@ import javax.swing.KeyStroke;
 
 import megamek.MMConstants;
 import megamek.MegaMek;
+import megamek.client.ui.CopySystemDataAction;
 import megamek.client.ui.Messages;
+import megamek.client.ui.ShowBugReportDialogAction;
 import megamek.client.ui.util.KeyCommandBind;
 import megamek.common.KeyBindParser;
 import megamek.common.enums.GamePhase;
@@ -246,6 +248,8 @@ public class CommonMenuBar extends JMenuBar implements ActionListener, IPreferen
 
         JMenuItem fileRefreshCache = new JMenuItem(getString("CommonMenuBar.fileUnitsRefreshUnitCache"));
         initMenuItem(fileRefreshCache, menu, FILE_REFRESH_CACHE);
+        JMenuItem fileRebuildCache = new JMenuItem(getString("CommonMenuBar.fileUnitsRebuildUnitCache"));
+        initMenuItem(fileRebuildCache, menu, FILE_REBUILD_CACHE);
         initMenuItem(fileUnitsBrowse, menu, FILE_UNITS_BROWSE);
         // The accelerator overlaps with that for changing label style, but they are never active at the same time
         fileUnitsBrowse.setAccelerator(KeyStroke.getKeyStroke(VK_B, CTRL_DOWN_MASK));
@@ -374,7 +378,14 @@ public class CommonMenuBar extends JMenuBar implements ActionListener, IPreferen
         initMenuItem(helpContents, menu, HELP_CONTENTS);
         JMenuItem helpSkinning = new JMenuItem(getString("CommonMenuBar.helpSkinning"));
         initMenuItem(helpSkinning, menu, HELP_SKINNING);
+
         menu.addSeparator();
+
+        menu.add(new ShowBugReportDialogAction(this, new CopySystemDataAction()));
+        menu.add(new CopySystemDataAction());
+
+        menu.addSeparator();
+
         JMenuItem helpAbout = new JMenuItem(getString("CommonMenuBar.helpAbout"));
         initMenuItem(helpAbout, menu, HELP_ABOUT);
 

@@ -35,6 +35,7 @@ package megamek.common;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -51,6 +52,7 @@ import megamek.common.options.GameOptions;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
+import megamek.common.rolls.TargetRoll;
 import megamek.common.units.BipedMek;
 import megamek.common.units.BuildingEntity;
 import megamek.common.units.Crew;
@@ -100,6 +102,59 @@ public class LosEffectsTest extends GameBoardTestCase {
               end"""
         );
 
+        // Board with 1 light woods + 2 light smoke intervening (bug #8167 scenario)
+        initializeBoard("01_BY_05_WOODS_SMOKE_COMBINED", """
+              size 1 5
+              hex 0101 0 "" ""
+              hex 0102 0 "woods:1;foliage_elev:2" ""
+              hex 0103 0 "smoke:1" ""
+              hex 0104 0 "smoke:1" ""
+              hex 0105 0 "" ""
+              end"""
+        );
+
+        // Board with 3 light woods intervening
+        initializeBoard("01_BY_05_THREE_LIGHT_WOODS", """
+              size 1 5
+              hex 0101 0 "" ""
+              hex 0102 0 "woods:1;foliage_elev:2" ""
+              hex 0103 0 "woods:1;foliage_elev:2" ""
+              hex 0104 0 "woods:1;foliage_elev:2" ""
+              hex 0105 0 "" ""
+              end"""
+        );
+
+        // Board with 3 light smoke intervening
+        initializeBoard("01_BY_05_THREE_LIGHT_SMOKE", """
+              size 1 5
+              hex 0101 0 "" ""
+              hex 0102 0 "smoke:1" ""
+              hex 0103 0 "smoke:1" ""
+              hex 0104 0 "smoke:1" ""
+              hex 0105 0 "" ""
+              end"""
+        );
+
+        // Board with 1 light woods + 1 light smoke (should NOT block)
+        initializeBoard("01_BY_04_WOODS_SMOKE_PARTIAL", """
+              size 1 4
+              hex 0101 0 "" ""
+              hex 0102 0 "woods:1;foliage_elev:2" ""
+              hex 0103 0 "smoke:1" ""
+              hex 0104 0 "" ""
+              end"""
+        );
+
+        // Board with 1 heavy woods + 1 light smoke (combined = 3, should block)
+        initializeBoard("01_BY_04_HEAVY_WOODS_LIGHT_SMOKE", """
+              size 1 4
+              hex 0101 0 "" ""
+              hex 0102 0 "woods:2;foliage_elev:2" ""
+              hex 0103 0 "smoke:1" ""
+              hex 0104 0 "" ""
+              end"""
+        );
+
         initializeBoard("03_BY_05_CENTER_HILLS", """
               size 3 5
               hex 0101 0 "" ""
@@ -117,6 +172,39 @@ public class LosEffectsTest extends GameBoardTestCase {
               hex 0105 0 "" ""
               hex 0205 0 "" ""
               hex 0305 0 "" ""
+              end"""
+        );
+
+        // Board with an erupting geyser (level 2) in the intervening hex 0103
+        initializeBoard("01_BY_05_ERUPTING_GEYSER_INTERVENING", """
+              size 1 5
+              hex 0101 0 "" ""
+              hex 0102 0 "" ""
+              hex 0103 0 "geyser:2" ""
+              hex 0104 0 "" ""
+              hex 0105 0 "" ""
+              end"""
+        );
+
+        // Board with a dormant geyser (level 1) in the intervening hex 0103
+        initializeBoard("01_BY_05_DORMANT_GEYSER_INTERVENING", """
+              size 1 5
+              hex 0101 0 "" ""
+              hex 0102 0 "" ""
+              hex 0103 0 "geyser:1" ""
+              hex 0104 0 "" ""
+              hex 0105 0 "" ""
+              end"""
+        );
+
+        // Board with an erupting geyser (level 2) in the target's own hex 0105
+        initializeBoard("01_BY_05_ERUPTING_GEYSER_AT_TARGET", """
+              size 1 5
+              hex 0101 0 "" ""
+              hex 0102 0 "" ""
+              hex 0103 0 "" ""
+              hex 0104 0 "" ""
+              hex 0105 0 "geyser:2" ""
               end"""
         );
     }
@@ -394,6 +482,145 @@ public class LosEffectsTest extends GameBoardTestCase {
     }
 
     /**
+     * Tests for woods and smoke combined LOS blocking (issue #8167). TW rules: woods and smoke modifiers are combined
+     * for the blocking threshold. LOS is blocked when (lightWoods + lightSmoke) + ((heavyWoods + heavySmoke) * 2) +
+     * (ultraWoods * 3) >= 3.
+     */
+    @Nested
+    @DisplayName("Woods and Smoke Combined LOS Blocking Tests (Issue #8167)")
+    class WoodsSmokeBlockingTests {
+
+        @BeforeEach
+        void setUp() {
+        }
+
+        private LosEffects.AttackInfo buildGroundAttackInfo(Coords attackPos, Coords targetPos) {
+            LosEffects.AttackInfo ai = new LosEffects.AttackInfo();
+            ai.attackPos = attackPos;
+            ai.targetPos = targetPos;
+            ai.attackAbsHeight = 0;
+            ai.targetAbsHeight = 0;
+            ai.attOnLand = true;
+            ai.targetOnLand = true;
+            ai.targetEntity = true;
+            return ai;
+        }
+
+        @Test
+        @DisplayName("1 light wood + 2 light smoke should block LOS (combined = 3)")
+        void shouldBlockLos_WoodsAndSmokeCombined() {
+            // This is the exact scenario from bug #8167
+            setBoard("01_BY_05_WOODS_SMOKE_COMBINED");
+            LosEffects.AttackInfo ai = buildGroundAttackInfo(new Coords(0, 0), new Coords(0, 4));
+
+            LosEffects result = LosEffects.calculateLos(game, ai);
+
+            assertNotNull(result);
+            assertEquals(1, result.lightWoods, "Should count 1 light woods");
+            assertEquals(2, result.lightSmoke, "Should count 2 light smoke");
+            assertFalse(result.hasLoS, "hasLoS should be false (combined woods+smoke = 3)");
+
+            // The critical check: losModifiers must also return IMPOSSIBLE
+            ToHitData thd = result.losModifiers(game);
+            assertEquals(TargetRoll.IMPOSSIBLE, thd.getValue(),
+                  "losModifiers should return IMPOSSIBLE when combined woods+smoke >= 3");
+        }
+
+        @Test
+        @DisplayName("3 light woods should block LOS (woods alone = 3)")
+        void shouldBlockLos_ThreeLightWoods() {
+            setBoard("01_BY_05_THREE_LIGHT_WOODS");
+            LosEffects.AttackInfo ai = buildGroundAttackInfo(new Coords(0, 0), new Coords(0, 4));
+
+            LosEffects result = LosEffects.calculateLos(game, ai);
+
+            assertNotNull(result);
+            assertEquals(3, result.lightWoods, "Should count 3 light woods");
+            assertFalse(result.hasLoS, "hasLoS should be false (3 light woods)");
+
+            ToHitData thd = result.losModifiers(game);
+            assertEquals(TargetRoll.IMPOSSIBLE, thd.getValue(),
+                  "losModifiers should return IMPOSSIBLE for 3 light woods");
+        }
+
+        @Test
+        @DisplayName("3 light smoke should block LOS (smoke alone = 3)")
+        void shouldBlockLos_ThreeLightSmoke() {
+            setBoard("01_BY_05_THREE_LIGHT_SMOKE");
+            LosEffects.AttackInfo ai = buildGroundAttackInfo(new Coords(0, 0), new Coords(0, 4));
+
+            LosEffects result = LosEffects.calculateLos(game, ai);
+
+            assertNotNull(result);
+            assertEquals(3, result.lightSmoke, "Should count 3 light smoke");
+            assertFalse(result.hasLoS, "hasLoS should be false (3 light smoke)");
+
+            ToHitData thd = result.losModifiers(game);
+            assertEquals(TargetRoll.IMPOSSIBLE, thd.getValue(),
+                  "losModifiers should return IMPOSSIBLE for 3 light smoke");
+        }
+
+        @Test
+        @DisplayName("1 light wood + 1 light smoke should NOT block LOS (combined = 2)")
+        void shouldNotBlockLos_WoodsAndSmokePartial() {
+            setBoard("01_BY_04_WOODS_SMOKE_PARTIAL");
+            LosEffects.AttackInfo ai = buildGroundAttackInfo(new Coords(0, 0), new Coords(0, 3));
+
+            LosEffects result = LosEffects.calculateLos(game, ai);
+
+            assertNotNull(result);
+            assertEquals(1, result.lightWoods, "Should count 1 light woods");
+            assertEquals(1, result.lightSmoke, "Should count 1 light smoke");
+            assertTrue(result.hasLoS, "hasLoS should be true (combined woods+smoke = 2)");
+
+            ToHitData thd = result.losModifiers(game);
+            assertNotEquals(TargetRoll.IMPOSSIBLE,
+                  thd.getValue(),
+                  "losModifiers should NOT return IMPOSSIBLE when combined < 3");
+        }
+
+        @Test
+        @DisplayName("1 heavy wood + 1 light smoke should block LOS (combined = 3)")
+        void shouldBlockLos_HeavyWoodsAndLightSmoke() {
+            setBoard("01_BY_04_HEAVY_WOODS_LIGHT_SMOKE");
+            LosEffects.AttackInfo ai = buildGroundAttackInfo(new Coords(0, 0), new Coords(0, 3));
+
+            LosEffects result = LosEffects.calculateLos(game, ai);
+
+            assertNotNull(result);
+            assertEquals(1, result.heavyWoods, "Should count 1 heavy woods");
+            assertEquals(1, result.lightSmoke, "Should count 1 light smoke");
+            assertFalse(result.hasLoS,
+                  "hasLoS should be false (1 heavy woods * 2 + 1 light smoke = 3)");
+
+            ToHitData thd = result.losModifiers(game);
+            assertEquals(TargetRoll.IMPOSSIBLE, thd.getValue(),
+                  "losModifiers should return IMPOSSIBLE when combined >= 3");
+        }
+
+        @Test
+        @DisplayName("hasLoS and losModifiers should agree on blocking decision")
+        void hasLoSAndLosModifiersShouldAgree() {
+            // Test the exact bug: hasLoS says blocked but losModifiers says not blocked
+            setBoard("01_BY_05_WOODS_SMOKE_COMBINED");
+            LosEffects.AttackInfo ai = buildGroundAttackInfo(new Coords(0, 0), new Coords(0, 4));
+
+            LosEffects result = LosEffects.calculateLos(game, ai);
+            ToHitData thd = result.losModifiers(game);
+
+            // These MUST agree - this is the core of bug #8167
+            if (!result.hasLoS) {
+                assertEquals(TargetRoll.IMPOSSIBLE, thd.getValue(),
+                      "When hasLoS is false, losModifiers must return IMPOSSIBLE. "
+                            + "Combined woods+smoke: lightWoods=" + result.lightWoods
+                            + " heavyWoods=" + result.heavyWoods
+                            + " lightSmoke=" + result.lightSmoke
+                            + " heavySmoke=" + result.heavySmoke);
+            }
+        }
+    }
+
+    /**
      * Tests for
      * {@link LosEffects#calculateLOS(Game, Entity, megamek.common.units.Targetable, Coords, Coords, int, int,
      * boolean)}
@@ -537,6 +764,93 @@ public class LosEffectsTest extends GameBoardTestCase {
             assertNotNull(result, "LosEffects should not be null");
             assertFalse(result.blocked, "LOS should not be blocked by level 3 terrain when firing from level 4");
             assertTrue(result.hasLoS, "Should have line of sight");
+        }
+    }
+
+    /**
+     * Tests for the TacOps erupting-geyser rule: an erupting geyser is treated as ultra-heavy woods for the purpose of
+     * determining line of sight into or through its hex.
+     */
+    @Nested
+    @DisplayName("Erupting Geyser LOS Blocking Tests")
+    class EruptingGeyserBlockingTests {
+
+        private LosEffects.AttackInfo buildGroundAttackInfo(Coords attackPos, Coords targetPos,
+              int attackAbsHeight, int targetAbsHeight) {
+            LosEffects.AttackInfo ai = new LosEffects.AttackInfo();
+            ai.attackPos = attackPos;
+            ai.targetPos = targetPos;
+            ai.attackAbsHeight = attackAbsHeight;
+            ai.targetAbsHeight = targetAbsHeight;
+            ai.attOnLand = true;
+            ai.targetOnLand = true;
+            ai.targetEntity = true;
+            return ai;
+        }
+
+        @Test
+        @DisplayName("erupting geyser in an intervening hex blocks LOS (treated as ultra-heavy woods)")
+        void shouldBlockLos_EruptingGeyserIntervening() {
+            setBoard("01_BY_05_ERUPTING_GEYSER_INTERVENING");
+            LosEffects.AttackInfo ai = buildGroundAttackInfo(new Coords(0, 0), new Coords(0, 4), 0, 0);
+
+            LosEffects result = LosEffects.calculateLos(game, ai);
+
+            assertNotNull(result);
+            assertEquals(1, result.ultraWoods, "Erupting geyser should count as 1 ultra woods");
+            assertFalse(result.hasLoS, "hasLoS should be false through an erupting geyser");
+
+            ToHitData thd = result.losModifiers(game);
+            assertEquals(TargetRoll.IMPOSSIBLE, thd.getValue(),
+                  "losModifiers should return IMPOSSIBLE through an erupting geyser");
+        }
+
+        @Test
+        @DisplayName("dormant geyser in an intervening hex does NOT block LOS")
+        void shouldNotBlockLos_DormantGeyserIntervening() {
+            setBoard("01_BY_05_DORMANT_GEYSER_INTERVENING");
+            LosEffects.AttackInfo ai = buildGroundAttackInfo(new Coords(0, 0), new Coords(0, 4), 0, 0);
+
+            LosEffects result = LosEffects.calculateLos(game, ai);
+
+            assertNotNull(result);
+            assertEquals(0, result.ultraWoods, "Dormant geyser should not count as ultra woods");
+            assertTrue(result.hasLoS, "hasLoS should be true through a dormant geyser");
+
+            ToHitData thd = result.losModifiers(game);
+            assertNotEquals(TargetRoll.IMPOSSIBLE, thd.getValue(),
+                  "losModifiers should NOT return IMPOSSIBLE through a dormant geyser");
+        }
+
+        @Test
+        @DisplayName("target standing in an erupting geyser cannot be seen (LOS into the hex blocked)")
+        void shouldBlockLos_TargetInEruptingGeyser() {
+            setBoard("01_BY_05_ERUPTING_GEYSER_AT_TARGET");
+            LosEffects.AttackInfo ai = buildGroundAttackInfo(new Coords(0, 0), new Coords(0, 4), 0, 0);
+
+            LosEffects result = LosEffects.calculateLos(game, ai);
+
+            assertNotNull(result);
+            assertEquals(1, result.ultraWoods, "Target's own erupting geyser should count as 1 ultra woods");
+            assertFalse(result.hasLoS, "hasLoS should be false for a target engulfed by an erupting geyser");
+
+            ToHitData thd = result.losModifiers(game);
+            assertEquals(TargetRoll.IMPOSSIBLE, thd.getValue(),
+                  "losModifiers should return IMPOSSIBLE for a target engulfed by an erupting geyser");
+        }
+
+        @Test
+        @DisplayName("target raised above the geyser plume remains visible")
+        void shouldNotBlockLos_TargetAboveEruptingGeyserPlume() {
+            setBoard("01_BY_05_ERUPTING_GEYSER_AT_TARGET");
+            // Plume rises 3 levels above the hex (level 0), so a unit at absolute height 4 is above it.
+            LosEffects.AttackInfo ai = buildGroundAttackInfo(new Coords(0, 0), new Coords(0, 4), 4, 4);
+
+            LosEffects result = LosEffects.calculateLos(game, ai);
+
+            assertNotNull(result);
+            assertEquals(0, result.ultraWoods, "A target above the plume should not be engulfed");
+            assertTrue(result.hasLoS, "hasLoS should be true for a target raised above the geyser plume");
         }
     }
 }

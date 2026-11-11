@@ -81,6 +81,9 @@ public record TWPhasePreparationManager(TWGameManager gameManager) {
                 // Formation Bonuses (Campaign Ops / Alpha Strike port): re-evaluate each force's formation and
                 // grant/revoke the corresponding free SPAs to member crews for this round.
                 megamek.common.force.FormationBonusType.refresh(gameManager.getGame());
+                // Set clearingWoods flag on entities that declared clearing last round
+                // (for firing penalty this round). Must be set before firing phase.
+                gameManager.applyClearingWoodsFlags();
                 gameManager.resetEntityPhase(phase);
                 gameManager.checkForObservers();
                 gameManager.transmitAllPlayerUpdates();
@@ -196,6 +199,7 @@ public record TWPhasePreparationManager(TWGameManager gameManager) {
                 gameManager.addReport(gameManager.checkForTraitors());
                 // write End Phase header
                 gameManager.addReport(new Report(5005, Report.PUBLIC));
+                gameManager.reportGhostTargetModeChanges();
                 gameManager.addReport(gameManager.resolveInternalBombHits());
                 gameManager.checkLayExplosives();
                 gameManager.resolveInfantryActions();
@@ -255,6 +259,8 @@ public record TWPhasePreparationManager(TWGameManager gameManager) {
                 break;
             case VICTORY:
                 gameManager.resetPlayersDone();
+                //finalize all ammo dumps now so they don't carry back into MHQ and get acted out in the next scenario
+                gameManager.resolveAmmoDumps();
                 gameManager.clearReports();
                 gameManager.send(gameManager.createAllReportsPacket());
                 gameManager.prepareVictoryReport();

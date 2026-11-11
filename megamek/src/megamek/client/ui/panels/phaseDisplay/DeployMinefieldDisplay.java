@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2003, 2004 Ben Mazur (bmazur@sev.org)
- * Copyright (C) 2003-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2003-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -42,12 +42,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.function.Supplier;
 import javax.swing.JOptionPane;
 
 import megamek.client.event.BoardViewEvent;
 import megamek.client.ui.Messages;
 import megamek.client.ui.clientGUI.ClientGUI;
 import megamek.client.ui.clientGUI.boardview.IBoardView;
+import megamek.client.ui.clientGUI.boardview.overlay.ToastLevel;
 import megamek.client.ui.dialogs.phaseDisplay.EMPMineSettingDialog;
 import megamek.client.ui.dialogs.phaseDisplay.MineDensityDialog;
 import megamek.client.ui.dialogs.phaseDisplay.SeaMineDepthDialog;
@@ -100,7 +102,9 @@ public class DeployMinefieldDisplay extends StatusBarPhaseDisplay {
 
         /**
          * Given a string, figure out the command value
-         * @param command                   String name of the requested command
+         *
+         * @param command String name of the requested command
+         *
          * @return DeployMinefieldCommand   found command or COMMAND_NONE
          */
         public static DeployMinefieldCommand fromString(String command) {
@@ -324,14 +328,18 @@ public class DeployMinefieldDisplay extends StatusBarPhaseDisplay {
         } else if (currentCommand == DeployMinefieldCommand.DEPLOY_CARRYABLE) {
             List<ICarryable> groundObjects = p.getGroundObjectsToPlace();
 
-            ICarryable toDeploy = groundObjects.get(0);
+            ICarryable toDeploy = groundObjects.getFirst();
 
             if (groundObjects.size() > 1) {
                 String title = "Choose Cargo to Place";
                 String body = "Choose the cargo to place:";
-                toDeploy = (ICarryable) JOptionPane.showInputDialog(clientgui.getFrame(),
-                      body, title, JOptionPane.QUESTION_MESSAGE, null,
-                      groundObjects.toArray(), groundObjects.get(0));
+                toDeploy = runWithSuspendedTooltips(() ->
+                      (ICarryable) JOptionPane.showInputDialog(clientgui.getFrame(),
+                            body, title, JOptionPane.QUESTION_MESSAGE, null,
+                            groundObjects.toArray(), groundObjects.getFirst()));
+                if (toDeploy == null) {
+                    return;
+                }
             }
 
             game.placeGroundObject(coords, toDeploy);
@@ -354,7 +362,7 @@ public class DeployMinefieldDisplay extends StatusBarPhaseDisplay {
                       || (deployingActiveMinefields() && (mf.getType() == Minefield.TYPE_ACTIVE))
                       || (deployingInfernoMinefields() && (mf.getType() == Minefield.TYPE_INFERNO))
                       || (deployingEMPMinefields() && (mf.getType() == Minefield.TYPE_EMP))) {
-                    clientgui.doAlertDialog(Messages.getString("DeployMinefieldDisplay.IllegalPlacement"),
+                    clientgui.addToast(ToastLevel.ERROR,
                           Messages.getString("DeployMinefieldDisplay.DuplicateMinefield"));
                     return;
                 }
@@ -362,7 +370,7 @@ public class DeployMinefieldDisplay extends StatusBarPhaseDisplay {
 
             Minefield mf = null;
             if (sea && !(deployingConventionalMinefields() || deployingInfernoMinefields())) {
-                clientgui.doAlertDialog(Messages.getString("DeployMinefieldDisplay.IllegalPlacement"),
+                clientgui.addToast(ToastLevel.ERROR,
                       Messages.getString("DeployMinefieldDisplay.WaterPlacement"));
                 return;
             }
@@ -371,12 +379,15 @@ public class DeployMinefieldDisplay extends StatusBarPhaseDisplay {
                 if (sea) {
                     SeaMineDepthDialog smd = new SeaMineDepthDialog(
                           clientgui.getFrame(), hex.depth());
-                    smd.setVisible(true);
+                    runWithSuspendedTooltips(() -> smd.setVisible(true));
 
                     depth = smd.getDepth();
+                    if (depth < 0) {
+                        return;
+                    }
                 }
                 MineDensityDialog mfd = new MineDensityDialog(clientgui.getFrame());
-                mfd.setVisible(true);
+                runWithSuspendedTooltips(() -> mfd.setVisible(true));
 
                 if (mfd.getDensity() > 0) {
                     mf = Minefield.createMinefield(coords, p.getId(),
@@ -390,7 +401,7 @@ public class DeployMinefieldDisplay extends StatusBarPhaseDisplay {
                 }
             } else if (deployingCommandMinefields()) {
                 MineDensityDialog mfd = new MineDensityDialog(clientgui.getFrame());
-                mfd.setVisible(true);
+                runWithSuspendedTooltips(() -> mfd.setVisible(true));
 
                 if (mfd.getDensity() > 0) {
                     mf = Minefield.createMinefield(coords, p.getId(),
@@ -404,7 +415,7 @@ public class DeployMinefieldDisplay extends StatusBarPhaseDisplay {
                 }
             } else if (deployingActiveMinefields()) {
                 MineDensityDialog mfd = new MineDensityDialog(clientgui.getFrame());
-                mfd.setVisible(true);
+                runWithSuspendedTooltips(() -> mfd.setVisible(true));
 
                 if (mfd.getDensity() > 0) {
                     mf = Minefield.createMinefield(coords, p.getId(),
@@ -417,7 +428,7 @@ public class DeployMinefieldDisplay extends StatusBarPhaseDisplay {
                 }
             } else if (deployingInfernoMinefields()) {
                 MineDensityDialog mfd = new MineDensityDialog(clientgui.getFrame());
-                mfd.setVisible(true);
+                runWithSuspendedTooltips(() -> mfd.setVisible(true));
 
                 if (mfd.getDensity() > 0) {
                     mf = Minefield.createMinefield(coords, p.getId(),
@@ -431,11 +442,11 @@ public class DeployMinefieldDisplay extends StatusBarPhaseDisplay {
                 }
             } else if (deployingVibrabombMinefields()) {
                 MineDensityDialog mfd = new MineDensityDialog(clientgui.getFrame());
-                mfd.setVisible(true);
+                runWithSuspendedTooltips(() -> mfd.setVisible(true));
 
                 VibrabombSettingDialog vsd = new VibrabombSettingDialog(
                       clientgui.getFrame());
-                vsd.setVisible(true);
+                runWithSuspendedTooltips(() -> vsd.setVisible(true));
 
                 if (mfd.getDensity() > 0) {
                     mf = Minefield.createMinefield(coords, p.getId(),
@@ -450,13 +461,13 @@ public class DeployMinefieldDisplay extends StatusBarPhaseDisplay {
             } else if (deployingEMPMinefields()) {
                 // EMP mines cannot be placed in water
                 if (sea) {
-                    clientgui.doAlertDialog(Messages.getString("DeployMinefieldDisplay.IllegalPlacement"),
+                    clientgui.addToast(ToastLevel.ERROR,
                           Messages.getString("DeployMinefieldDisplay.WaterPlacement"));
                     return;
                 }
                 // Get weight threshold setting from dialog
                 EMPMineSettingDialog esd = new EMPMineSettingDialog(clientgui.getFrame());
-                esd.setVisible(true);
+                runWithSuspendedTooltips(() -> esd.setVisible(true));
 
                 if (esd.getSetting() > 0) {
                     // Fixed density of 5 since EMP mines are one-use
@@ -597,6 +608,34 @@ public class DeployMinefieldDisplay extends StatusBarPhaseDisplay {
         clientgui.getClient().sendDeployGroundObjects(clientgui.getClient().getGame().getGroundObjects());
         clientgui.getClient().sendDeployMinefields(deployedMinefields);
         clientgui.getClient().sendPlayerInfo();
+    }
+
+    /**
+     * Suspends BoardView hex tooltips for the duration of the given action so they cannot draw over a modal dialog, and
+     * re-activates them when the action returns.
+     */
+    private void runWithSuspendedTooltips(Runnable action) {
+        clientgui.suspendBoardTooltips();
+        try {
+            action.run();
+        } finally {
+            clientgui.activateBoardTooltips();
+        }
+    }
+
+    /**
+     * Suspends BoardView hex tooltips for the duration of the given action so they cannot draw over a modal dialog, and
+     * re-activates them when the action returns.
+     *
+     * @return the value supplied by the action
+     */
+    private <T> T runWithSuspendedTooltips(Supplier<T> action) {
+        clientgui.suspendBoardTooltips();
+        try {
+            return action.get();
+        } finally {
+            clientgui.activateBoardTooltips();
+        }
     }
 
     private void setConventionalEnabled(int nbr) {

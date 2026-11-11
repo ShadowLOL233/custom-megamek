@@ -126,6 +126,7 @@ public final class Forces implements Serializable {
     /**
      * Returns the number of top-level forces present, i.e. forces with no parent force.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public int getTopLevelForceCount() {
         return getTopLevelForces().size();
     }
@@ -373,6 +374,7 @@ public final class Forces implements Serializable {
     /**
      * For the given player, returns a list of forces that are his own or belong to his team.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public ArrayList<Force> getAvailableForces(Player player) {
         ArrayList<Force> result = new ArrayList<>();
         for (Force force : getTopLevelForces()) {
@@ -618,6 +620,7 @@ public final class Forces implements Serializable {
      * Removes the given force from these forces if it is empty. Returns a list of affected forces which contains the
      * parent if the deleted force was a sub force and is empty otherwise.
      */
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public ArrayList<Force> deleteForce(int forceId) {
         ArrayList<Force> result = new ArrayList<>();
         if (contains(forceId) && getForce(forceId).getChildCount() == 0) {

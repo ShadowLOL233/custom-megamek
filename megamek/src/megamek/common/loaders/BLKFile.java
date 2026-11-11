@@ -49,6 +49,7 @@ import java.util.Vector;
 import java.util.stream.Collectors;
 
 import megamek.common.QuirkEntry;
+import megamek.common.SourceBooks;
 import megamek.common.TechConstants;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.bays.*;
@@ -138,7 +139,11 @@ public class BLKFile {
         }
 
         if (dataFile.exists("source")) {
-            entity.setSource(dataFile.getDataAsString("source")[0]);
+            entity.setSource(SourceBooks.formatSourceList(List.of(dataFile.getDataAsString("source"))));
+        }
+
+        if (dataFile.exists("published")) {
+            entity.setPublished(SourceBooks.formatSourceList(List.of(dataFile.getDataAsString("published"))));
         }
 
         if (dataFile.exists("faction")) {
@@ -211,7 +216,7 @@ public class BLKFile {
 
     protected void loadEquipment(Entity t, String sName, int nLoc) throws EntityLoadingException {
         String[] saEquip = dataFile.getDataAsString(sName + " Equipment");
-        if (saEquip == null) {
+        if (saEquip == null || saEquip.length == 0 || saEquip[0].isEmpty()) {
             return;
         }
 
@@ -414,6 +419,9 @@ public class BLKFile {
                 }
                 equipName = equipName.substring(0, sizeIdx).trim();
             }
+            // Upstream v0.51.0: backward compatibility strip for older :Body/:LA/:RA/:TU/:OMNI suffixes.
+            equipName = equipName.replace(":Body", "").replace(":LA", "")
+                  .replace(":RA", "").replace(":TU", "").replace(":OMNI", "");
 
             EquipmentType etype = EquipmentType.get(equipName);
             if (etype == null) {
@@ -431,13 +439,13 @@ public class BLKFile {
                     }
                 }
                 try {
-                    Mounted<?> m = t.addEquipment(etype, Entity.LOC_NONE);
-                    if ((numShots != 0) && (m.getType() instanceof AmmoType ammo)) {
-                        m.setShotsLeft(numShots);
-                        m.setOriginalShots(numShots);
-                        m.setSize(numShots * ammo.getKgPerShot() / 1000.0);
+                    Mounted<?> mount = t.addEquipment(etype, Entity.LOC_NONE);
+                    if ((numShots != 0) && (mount.getType() instanceof AmmoType ammo)) {
+                        mount.setShotsLeft(numShots);
+                        mount.setOriginalShots(numShots);
+                        mount.setSize(numShots * ammo.getKgPerShot() / 1000.0);
                     } else if (etype.isVariableSize() && (size != 0)) {
-                        m.setSize(size);
+                        mount.setSize(size);
                     }
                 } catch (LocationFullException ex) {
                     throw new EntityLoadingException(ex.getMessage());
@@ -628,6 +636,10 @@ public class BLKFile {
         }
         e.setYear(dataFile.getDataAsInt("year")[0]);
 
+        if (dataFile.exists("originalBuildYear")) {
+            e.setOriginalBuildYear(dataFile.getDataAsInt("originalBuildYear")[0]);
+        }
+        
         if (!dataFile.exists("type")) {
             throw new EntityLoadingException("Could not find type block.");
         }
@@ -792,7 +804,7 @@ public class BLKFile {
             blk.writeBlockData(MtfFile.MUL_ID, t.getMulId());
         }
         blk.writeBlockData("year", t.getYear());
-        if (t.getOriginalBuildYear() >= 0) {
+        if (t.getOriginalBuildYear() > 0 && t.getOriginalBuildYear() != t.getYear()) {
             blk.writeBlockData("originalBuildYear", t.getOriginalBuildYear());
         }
         String type = getType(t);
@@ -829,8 +841,8 @@ public class BLKFile {
             blk.writeBlockData("weaponQuirks", String.join("\n", weaponQuirkList));
         }
 
-        if ((t instanceof Infantry) && ((Infantry) t).getMount() != null) {
-            blk.writeBlockData("motion_type", ((Infantry) t).getMount().toString());
+        if ((t instanceof ConvInfantry infantry) && infantry.isMounted()) {
+            blk.writeBlockData("motion_type", infantry.getMount().toString());
         } else if (!t.isHandheldWeapon() && !(t instanceof GunEmplacement)) {
             blk.writeBlockData("motion_type", t.getMovementModeAsString());
         }
@@ -1024,13 +1036,18 @@ public class BLKFile {
             blk.writeBlockData(t.getLocationName(i) + " Equipment", eq.get(i));
         }
 
-        // Write slotless equipment (LOC_NONE) - e.g., cockpit modifications like DNI
+        // Write slotless equipment (LOC_NONE) - e.g., cockpit modifications like DNI.
+        // Use the internal name only; positional suffixes like :Shots#, :Body, :LA
+        // are not meaningful for LOC_NONE and loadSlotlessEquipment() does not expect them.
+        // Skip auto-created one-shot ammo (linkedBy != null) since it is recreated by
+        // addOneShotAmmo() when the parent weapon loads.
         Vector<String> slotlessEquipment = new Vector<>();
         for (Mounted<?> m : t.getEquipment()) {
             if (m.getLocation() == Entity.LOC_NONE && !m.isWeaponGroup() && !m.isAPMMounted()
                   && !(m.getType() instanceof InfantryAttack)
-                  && !(m.getType() instanceof BayWeapon)) {
-                slotlessEquipment.add(encodeEquipmentLine(m));
+                  && !(m.getType() instanceof BayWeapon)
+                  && !(m.getType() instanceof AmmoType && m.getLinkedBy() != null)) {
+                slotlessEquipment.add(m.getType().getInternalName());
             }
         }
         if (!slotlessEquipment.isEmpty()) {
@@ -1112,6 +1129,10 @@ public class BLKFile {
             blk.writeBlockData("source", t.getSource());
         }
 
+        if (!t.getPublished().isBlank()) {
+            blk.writeBlockData("published", t.getPublished());
+        }
+
         if (t.getTechFaction() != Faction.NONE) {
             blk.writeBlockData("faction", t.getTechFaction().getCode());
         }
@@ -1134,7 +1155,7 @@ public class BLKFile {
             blk.writeBlockData("armor", new int[] { ba.getArmor(1) });
             blk.writeBlockData("Trooper Count", (int) t.getWeight());
             blk.writeBlockData("weightclass", ba.getWeightClass());
-        } else if (t instanceof Infantry infantry) {
+        } else if (t instanceof ConvInfantry infantry) {
             blk.writeBlockData("squad_size", infantry.getSquadSize());
             blk.writeBlockData("squadn", infantry.getSquadCount());
             if (infantry.getSecondaryWeaponsPerSquad() > 0) {

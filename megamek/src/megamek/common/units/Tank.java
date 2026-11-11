@@ -294,10 +294,12 @@ public class Tank extends Entity {
         potCrit = crit;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean getOverThresh() {
         return overThresh;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setOverThresh(boolean tf) {
         overThresh = tf;
     }
@@ -466,6 +468,12 @@ public class Tank extends Entity {
         return movementMode == EntityMovementMode.TRACKED ||
               movementMode == EntityMovementMode.WHEELED ||
               movementMode == EntityMovementMode.HOVER;
+    }
+
+    @Override
+    public boolean hasFrontMountedSaw() {
+        return hasWorkingMisc(MiscType.F_CLUB, MiscTypeFlag.S_CHAINSAW, Tank.LOC_FRONT)
+              || hasWorkingMisc(MiscType.F_CLUB, MiscTypeFlag.S_DUAL_SAW, Tank.LOC_FRONT);
     }
 
     public boolean isTurretLocked(int turret) {
@@ -716,9 +724,9 @@ public class Tank extends Entity {
     }
 
     /**
-     * Per https://bg.battletech.com/forums/index.php/topic,78336.msg1869386.html#msg1869386 CVs with working engines
-     * and Jump Jets should still have the option to jump during the movement phase, even if reduced to 0 MP by motive
-     * hits, or rolling 12 on the Motive System Damage table.
+     * Per <a href="https://bg.battletech.com/forums/index.php/topic,78336.msg1869386.html#msg1869386">BT Forums</a> CVs
+     * with working engines and Jump Jets should still have the option to jump during the movement phase, even if
+     * reduced to 0 MP by motive hits, or rolling 12 on the Motive System Damage table.
      */
     @Override
     public boolean isImmobileForJump() {
@@ -1459,11 +1467,6 @@ public class Tank extends Entity {
     }
 
     @Override
-    public int getMaxElevationChange() {
-        return 1;
-    }
-
-    @Override
     public int getMaxElevationDown(int currElevation) {
         // WIGEs can go down as far as they want
         // 50 is a pretty arbitrary max amount, but that's also the
@@ -1751,6 +1754,7 @@ public class Tank extends Entity {
         return infernoFire;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isLocationBurning(int location) {
         int flag = (1 << location);
         return (burningLocations & flag) == flag;
@@ -1817,11 +1821,6 @@ public class Tank extends Entity {
 
     public boolean hasHeavyMovementDamage() {
         return heavyMovementDamage;
-    }
-
-    @Override
-    public boolean isNuclearHardened() {
-        return true;
     }
 
     @Override
@@ -2308,6 +2307,7 @@ public class Tank extends Entity {
         return super.getRearArc();
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean hasMovementDamage() {
         return motivePenalty > 0;
     }
@@ -2579,7 +2579,7 @@ public class Tank extends Entity {
                       (mpBoosters.hasSupercharger() ?
                             " Supercharger:" +
                                   getSuperchargerTurns() +
-                                  (armed.hasSupercharger() ? "(" + getSuperchargerTarget() + "+)" : "(NA)") :
+                            (armed.hasSupercharger() ? "(" + getSuperchargerTarget() + "+)" : "(NA)") :
                             "");
             }
             return str;
@@ -3192,10 +3192,6 @@ public class Tank extends Entity {
         }
 
         // Vehicle must not already be destroyed
-        if (isDestroyed() || isDoomed()) {
-            return false;
-        }
-
-        return true;
+        return !isDestroyed() && !isDoomed();
     }
 }
