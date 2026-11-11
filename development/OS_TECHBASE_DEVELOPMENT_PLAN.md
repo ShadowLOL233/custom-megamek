@@ -23,6 +23,7 @@ Quick index — jump to a section instead of scanning the whole file.
 - **Section 9 — OS Modular Electronics: BCS & CCS** [active/DESIGN]: two systems — **BCS** (Battle Computer System: info/command/EW, Tacticon B-2500 lineage, modular track + Advance specialized cores C-X280/Raven/G-X100) and **CCS** (Combat Computer System: single-mech fire control, C-2500 core + weapon-type modules + Composite). Dissolves canon AES⊥TC / AES⊥MASC / standalone-C3 into a modular ecosystem balanced by a two-core tonnage tax. **§9.6** adds a C3-network target-designator sub-family (Kestrel / Shrike / Lodestar).
 - **OS missile munitions + range redesign (2026-07-31):** SRM/LRM/MRM special munitions **✅ done**; the SRM/MRM/LRM range-specialization triad (MRM medium -1 / LRM long -1) **✅ done**. Detail under "⭐ Development priority" below.
 - **Section 11 — OS Actuator & Motive Systems (AES-I & AMS-I)** [design, not coded]: Improve-tier AMS-I (vehicle, −2 motive-crit, lighter) + a reconceived Mek-only AES-I (mobility/handling: −1 to-hit when run/jump, offsets Hardened/Modular Armor MP penalties; no TC/BCS/CCS/MASC exclusion).
+- **Section 12 — 集束激光系 + 高能激光系 modular architecture** [design 2026-11-08, not coded]: splits the former "异种集束激光系" into two independent tech lines. Base Binary/Trinary (Resonance stripped) + 3 optional modules (RM / LEM / LEC, all 2t/2c, RM ⊥ LEM). Hyper Laser repositioned as Experimental ultra-long-range sniper with mandatory HSM + C-2500 components and new range-based precision (Long −2 / Extreme −3). ER Binary/Trinary deleted; Hyper PPC deferred to a separate "Heavy PPC super-heavy evolution" batch. Supersedes 2026-11-07 PLM/ACJ designs (both superseded/废弃).
 
 Shelved ideas are parked in **[OS_SHELVED_IDEAS.md](OS_SHELVED_IDEAS.md)**. Splitting this plan into
 per-topic files (weapons / units / equipment) is **deferred** until it grows further.
@@ -1248,3 +1249,98 @@ applies; decision 3 also requires no BCS/CCS conflict. *(MASC compatibility = co
 `EquipmentTypeLookup.OS_IMPROVED_AES`; to-hit hook in `ComputeAttackerToHitMods`; MP-offset hooks in the Mek MP path;
 `createOSImprovedArmoredMotiveSystem()` for AMS-I (pure stat item, reuses the existing `F_ARMORED_MOTIVE_SYSTEM`
 mechanic — no engine work).
+
+---
+
+## 12. 集束激光系 + 高能激光系 modular architecture (added 2026-11-08, design only, no code)
+
+**Supersedes** the 2026-11-07 Hyper Laser + PLM/ACJ/HSM proposal. The new architecture splits what was a single
+"异种集束激光系" (Binary/Trinary/Hyper family) into **two independent technology lines**, with modular components.
+
+Reference doc: `OS_WEAPONS_VALUES_AND_MECHANICS.md` → "📐 2026-11-08 架构重构决议".
+
+### 12.1 Scope summary
+
+- **集束激光系** (modular Advance tier medium-range platform):
+  - Base weapons (Resonance stripped): Binary Laser System, Trinary Laser System
+  - 3 optional modules (all 2t/2c, Advance, TR F, 3060/3070/3080):
+    - **Resonance Module (RM)**: ×1.30/1.50 vs standard armor, +2/+4 extra heat on trigger
+    - **Laser Energy Modulator (LEM)**: REL-effect — bypasses special-armor damage reductions
+    - **Laser Energy Capacitor (LEC)**: charge-then-fire for +5 dmg / +5 heat, explosive
+  - Compatibility: RM ⊥ LEM (both modify optics); LEC compatible with either
+- **高能激光系** (Experimental tier ultra-long-range sniper):
+  - Hyper Laser (existing `OSHyperLaserLarge`, repositioned)
+  - **Mandatory** components for firing: HSM (Hyper Stabilization Module, 2t/2c) + C-2500 Combat Computer Core (1t/2c)
+  - **Optional** component: CCS Energy FCM Module (additional −1 to-hit, uses §9.2 infrastructure)
+  - New signature: range-based precision (Long −2 / Extreme −3)
+- **Deletions**: `OSERBinaryLaserSystem`, `OSERTrinaryLaserSystem` (long-range niche absorbed by Hyper Laser)
+- **Deferred**: `OSHyperPPC` repositioning (future → Heavy PPC's super-heavy mech evolution, parallel to Improve
+  Heavy Gauss Rifle — not an Experimental-tier Hyper-laser peer)
+- **Superseded**: 2026-11-07 PLM and ACJ designs (PLM replaced by LEC; ACJ replaced by LEM)
+
+### 12.2 Lore/narrative justification
+
+Two canon lineages, cleanly separated:
+- **集束激光** = multi-barrel coherent resonance, indigenous RoOS tech, Advance tier, OS "modular + serviceable"
+  design philosophy fully realized through 3-module system
+- **高能激光** = naval laser micro-ization, Experimental tier. Canon supports asymmetry: sub-capital lasers exist
+  in BT canon (SCL/1-3, Word of Blake 3073), but **sub-capital PPCs do NOT exist in canon** — only mech-scale PPCs
+  down from naval. Naval PPC miniaturization is historically harder than naval laser (standard PPC introduced
+  160 years after standard laser; Light PPC took 600 years to reach mech-scale). This is why **Hyper Laser is
+  OS's naval-laser micro-ization** while Hyper PPC must take a different path (= Heavy PPC super-heavy evolution).
+
+### 12.3 Compatibility matrix (summary)
+
+| Build | vs Standard armor | vs Special (HHFL ×0.4) armor | Role |
+|---|---|---|---|
+| Binary base | 16 | 6.4 | Neutral platform |
+| Binary + RM | **21** (×1.30) | 6.4 (削减照常) | Anti-standard specialist |
+| Binary + LEM | 16 | **16** (bypass) | Anti-elite specialist |
+| Binary + LEC (burst) | 21 (16 + 5) | 11.4 (6.4 + 5) | Tempo burst |
+| Binary + RM + LEC | **26** burst | 11.4 burst | Anti-std burst |
+| Binary + LEM + LEC | 21 burst | **21** burst | Anti-elite burst |
+| Binary + RM + LEM | **INVALID** (optics mutex) | — | — |
+
+Trinary scales similarly at 24 dmg base.
+
+### 12.4 Hyper Laser full system cost
+
+- Hyper Laser base: 8t / 6c / BV ~900
+- HSM (mandatory): 2t / 2c / ~40 BV
+- C-2500 core (mandatory): 1t / 2c / ~60 BV
+- **Minimum firing config**: 11t / 10c / ~1000 BV
+- Optional Energy FCM: +~1t / 1c / ~80 BV → **full system 12t / 11c / ~1080 BV**
+
+Natural chassis lockout: only 80t+ assault/superheavy mechs can afford this plus required DHS.
+
+### 12.5 Implementation route (coding phases)
+
+| Phase | Scope | Est. complexity |
+|---|---|---|
+| **P1** | New 3 MiscType modules + flags (`F_OS_LASER_RESONANCE` / `F_OS_LASER_EM_MODULATOR` / `F_OS_LASER_ENERGY_CAPACITOR`); mount constraints | Medium |
+| **P2** | Binary/Trinary handler: strip Resonance from base, add mount-based trigger (fires ×1.30/1.50 only if host weapon has RM mounted) | Medium |
+| **P3** | LEM handler (bypasses `TWDamageManager` reduction map for RM-flagged attacks); LEC handler (charge state, extends PPCCapacitorHandler pattern) | Medium-high |
+| **P4** | Hyper Laser: remove `−1` inner precision, add range-based `ComputeToHit` block (Long −2 / Extreme −3); mandatory-component gate in `TestMek` (if no HSM AND C-2500 → Hyper Laser illegal) | Medium |
+| **P5** | Delete `OSERBinaryLaserSystem` / `OSERTrinaryLaserSystem`; register `addLookupName` for save-compat; compile + MML lint + playtest | Low |
+
+### 12.6 Open implementation questions (defer until P1 planned)
+
+- **Mandatory component gate**: enforce in `TestMek` construction (illegal design) or at firing time (soft lockout)?
+  Recommend construction-time — if you can't fire it, you shouldn't be able to field it.
+- **LEC charge state persistence**: canon PPC Capacitor state is per-game-round; LEC should match.
+- **RM trigger detection**: cheapest path is `weapon.getLinkedBy()` or mount adjacency check. Confirm what the
+  existing Artemis / TC linking uses as precedent.
+- **BV bookkeeping for modular weapons**: when a module is attached, add module's BV contribution + optionally
+  multiplier on weapon base BV. LEM should apply BV ×1.15 on the weapon (per `OS_WEAPONS_VALUES_AND_MECHANICS.md`
+  §2.2). RM and LEC add flat module BV only.
+
+### 12.7 Relationship to other OS systems
+
+- **CCS (§9.2)**: Hyper Laser's mandatory C-2500 core + optional Energy FCM module exercises the existing CCS
+  infrastructure. No new CCS work needed; just adds Hyper Laser to the list of weapons that can host an
+  Energy FCM linking.
+- **HSM (2026-11-07 design, retained)**: already specced at 2t/2c, Advance TR F SL ADVANCED, intro 3045/3050/3055.
+  Flag `F_OS_HSM` can stay in the current spec; semantic change is "optional → mandatory" for Hyper Laser
+  (enforced at `TestMek` construction).
+- **PLM / ACJ**: **DELETED from plan**. Any historical references in this plan doc or in `OS_WEAPONS_VALUES_AND_MECHANICS.md`
+  should treat them as superseded (not implemented in code).

@@ -117,11 +117,17 @@ BV 不含 ammo / crit / 爆炸风险。WSC 跟 BV 的排序**不应该脱节**�
 
 ---
 
-## 能量 — 异种集束激光系（Binary / Trinary / Hyper，共 5 件）
+## 能量 — 异种集束激光系(Binary / Trinary / Hyper,共 5 件代码态;新架构拆分为两条技术线)
 
-> 术语注：本段"集束"沿用旧用法指 Binary/Trinary/Hyper 的"多镜筒并打"；2026-11-07 决议里"集束激光"另指 Pulse Laser 家族，待后续文档澄清。
+> 术语注:本段"集束"指 Binary/Trinary 的"多镜筒并打";"Hyper"系自 2026-11-08 起独立为**高能激光系**(海军激光 micro-化),跟"集束激光系"分家。
+>
+> **架构总览(2026-11-08)**:
+> - **集束激光系** = Binary + Trinary(base 无 Resonance)+ 3 可选模组(RM / LEM / LEC),Advance tier,中距多功能 modular 平台
+> - **高能激光系** = Hyper Laser + 必需支援组件(HSM + C-2500 Combat Computer Core),Experimental tier,超远距狙击件
+> - **ER Binary / ER Trinary 删除**(职能并入 Hyper Laser 的长距签名)
+> - 下方 "当前代码数值" 表反映**尚未变更的现状**,新架构见"📐 2026-11-08 架构重构决议"子段
 
-集束型激光把多个镜筒并成一次打击；**Resonance Tuning** 只对基础标准装甲加成，遇 Ferro-Fibrous 及一切先进/特种装甲失效。
+集束型激光把多个镜筒并成一次打击;**Resonance Tuning**(当前 base 内建)只对基础标准装甲加成,遇 Ferro-Fibrous 及一切先进/特种装甲失效 — **新架构将 Resonance 剥离为可选模组 RM**。
 
 ### 当前代码数值
 
@@ -140,110 +146,210 @@ BV 不含 ammo / crit / 爆炸风险。WSC 跟 BV 的排序**不应该脱节**�
 
 **⚠³** `Binary / Trinary / ER Binary / ER Trinary` 全部挂在 Advance 带（3060），但 Hyper（同族顶点）在 Experimental（3045），中间断档。tier 从没正式拍定过。
 
-### 📐 **2026-11-07 重设计决议（代码未实施，仅记录设计意图）**
+### 📐 **2026-11-08 架构重构决议(代码未实施,supersedes 2026-11-07)**
 
-本段记录 2026-11-07 敲定的 Hyper Laser + Binary/Trinary 重设计方案。代码落地分阶段执行，本文档仅作设计意图权威。
+> 2026-11-08 架构重构:原"异种集束激光系"(含 Binary/Trinary/ER 变体/Hyper 5 件)**拆分为两条独立技术线**:
+> - **集束激光系**:Binary + Trinary **base 剥离 Resonance**,配 **3 可选模组(RM / LEM / LEC)** 构成模组化 Advance tier 中距多功能平台
+> - **高能激光系**:Hyper Laser 独立出来作为 Experimental tier 超远距狙击件,**必需 HSM + C-2500 Combat Computer Core 两件支援才能开火**
+>
+> **supersedes 2026-11-07 决议**(PLM 删除;ACJ 从未实施,废弃;HSM 保留;Hyper Laser 机制调整)
+> **删除**:ER Binary Laser System / ER Trinary Laser System(长距职能并入 Hyper Laser)
+> **搁置**:Hyper PPC(未来重定位为 Heavy PPC 的超重机甲恐龙化演进,非 Experimental Hyper 系)
 
-#### Hyper Laser 重设计（身位：突击级/超重级机甲专属 单巨型武器）
+#### 架构对照表
 
-**设计哲学**：Hyper Laser 本质是 **"海军激光的 micro-再-micro-化"**——不应该塞进标准机甲的武器。设计目的是让 80t+ 突击/超重机甲**替代"塞多把小武器"的构建**，以"**单一巨型武器 + 单部位 20+ 伤集中打击**"换"多武器 alpha-strike 的伤害分布"。身位参照 Fafnir (Heavy Gauss) / Marauder IIC：**少数超级武器**而非**多数通用武器**。**不加 mass minimum 硬限制**，用经济学自然限制于 80t+ 机甲（55t 中型机装它占 67% crit，自动劝退）。
+| 维度 | 2026-11-07 决议 | **2026-11-08 新决议** |
+|---|---|---|
+| Binary/Trinary base | 含 Resonance ×1.3/1.5 内建 | **Resonance 剥离,base 中性平台** |
+| ER Binary/ER Trinary | 保留 | **删除,职能并入 Hyper Laser** |
+| 集束激光可选模组 | PLM(pulse 精度)+ ACJ(热管理) 互斥 2 件 | **RM(共振)+ LEM(破甲)+ LEC(电容) 3 件** |
+| 模组互斥规则 | PLM ⊥ ACJ | **RM ⊥ LEM(光学二选一);LEC 跟 RM/LEM 均兼容** |
+| PLM | 2t/2c −2 命中 ×0.8 热 | **删除**(被 LEC 替代) |
+| ACJ | 2t/2c 消 Resonance 热 + 缓冲 | **废弃**(被 LEM 替代) |
+| Hyper Laser 机制 | 28 伤每回合 + 2d6 失控 + HSM 可选 | **保留** + **必需 HSM + C-2500** + 精度加成(Long −2 / Extreme −3) |
+| HSM | Hyper 可选组件 | **保留,升为必需** |
+| Hyper PPC | 跟 Hyper Laser 同步重设计 | **搁置**(未来 → Heavy PPC 超重演进,非 Experimental) |
 
-| 字段 | 当前 | **新目标** | 备注 |
+---
+
+### 一、集束激光系 — Base 武器 (2 件)
+
+剥离 Resonance 后,Binary 和 Trinary 是**无偏好的中性平台**,对所有装甲平等输出。玩家通过挂不同模组定义 build 哲学。
+
+| tier | 武器 | Intro | TR·SL | dmg | heat | S/M/L/E | t/c | WSC_t | WSC_c | BV | 机制 |
+|---|---|:--:|:--:|--:|--:|:--:|:--:|--:|--:|--:|---|
+| ADV | Binary Laser System | 3060/3070/3080 | F·STD | 16 | 16 | 5/10/15/20 | 7/4 | 15 | 28 | 246 | 双筒并一击;**无 Resonance**(base 中性);base BV 不含模组加成 |
+| ADV | Trinary Laser System | 3060/3070/3080 | F·STD | 24 | 24 | 5/10/15/20 | 11/6 | 23 | 42 | 369 | 三筒并一击;**无 Resonance**(base 中性) |
+
+---
+
+### 二、集束激光系 — 3 可选模组 (全 2t/2c,Advance,TR F,SL STANDARD,3060/3070/3080)
+
+#### 2.1 Resonance Module (RM)
+
+| 属性 | 草案 |
+|---|---|
+| 内部名 | `OSLaserResonanceModule` |
+| 吨位 / Crit | **2 吨 / 2 crit** |
+| 兼容 | Binary / Trinary(每武器配 1 个) |
+| 跟 LEM | **互斥**(都改武器光学 configuration) |
+| 跟 LEC | 兼容 |
+| 装填约束 | 跟对应武器**同躯干部位** |
+| 效果 ① vs 标装 | Binary **×1.30** / Trinary **×1.50** 伤害 |
+| 效果 ② vs 特种装甲 | **无 bonus**(Resonance 对非标装失效) |
+| 代价 | **Resonance 触发回合额外热** Binary **+2** / Trinary **+4** |
+
+**叙事**:启用镜筒间的相干共振耦合调节器,对标装硬的"频率共振穿透"bonus。先进装甲的层状复合或散射结构打破了共振条件,bonus 失效。
+
+#### 2.2 Laser Energy Modulator (LEM)
+
+| 属性 | 草案 |
+|---|---|
+| 内部名 | `OSLaserEnergyModulator` |
+| 吨位 / Crit | **2 吨 / 2 crit** |
+| 兼容 | Binary / Trinary |
+| 跟 RM | **互斥**(光学二选一) |
+| 跟 LEC | 兼容 |
+| 装填约束 | 跟对应武器**同躯干部位** |
+| 效果 (核心) | **Armor Reconfiguration**:攻击时**将目标装甲视为 Standard Armor 做伤害计算**,绕过 Reflective / Reactive(激光部分)/ Hardened / Ferro-Lamellor / Ballistic-Reinforced / OS 变体(HFL / HHFL)/ Energy Absorption 的**伤害削减属性** |
+| 不绕过 | Stealth / Null Sig / Void Sig / Chameleon LPS(to-hit 修正不是伤害削减) |
+| BV 修正 | 挂武器 BV **×1.15** |
+
+**叙事**:深度介入激光的 photonic 结构,频率调制让光束穿透特种装甲的反射/吸收/吸能机制。tech lineage 参照 canon Re-Engineered Laser,但是以**模组形式挂在集束激光系**上。
+
+**对装甲场景快表**(Binary 为例,16 dmg):
+
+| 目标装甲 | 裸 Binary | Binary + LEM | LEM 收益 |
 |---|---|---|---|
-| dmg | 25 | **28** | 对标 Hyper PPC 30 略低（PPC 应更强）|
-| heat | 25 | **32**（前 2 回合固定）/ **32 + 1d6**（第 3 回合起）| RNG 热是"武器不稳定性"叙事核心 |
-| range | 12/24/36/50 | 保持 | 海军激光 micro-化保留极距 |
-| 命中加成 | −1 内建 | **取消**（0）| 突击机狙击武器不需要内建精度 |
-| 开火周期 | 隔回合（充能）| **每回合可射**（取消充能）| 每回合可射是核心提升 |
-| 稳定/失控 | 无 | 前 2 回合完全稳定；**第 3 回合起每次开火 2d6 ≥ 8 失控（42%）**→ 开火失败 + **28 内构 + 殉爆风险**。不开火回合 → 稳定计数器**归零**（允许冷却）| 代替隔回合限制 |
-| 失控上限 | 无 | **无 6 回合强制爆炸**（Crit 投入本身就是平衡机制）| 用户决策 |
-| 爆炸物殉爆 | 25 | **28**（跟新伤害同步）| crit sensitive |
-| t·c | 8t / 6c | 保持 | 不动 |
-| BV | 620 | **~900（+45%）** | 补偿每回合可射 + 更高伤害 |
+| Standard | 16 | 16 | 0% |
+| Reflective (激光 ×0.5) | 8 | **16** | **+100%** |
+| Hardened (×0.5) | 8 | **16** | **+100%** |
+| Ferro-Lamellor (×0.8) | 12.8 | **16** | **+25%** |
+| OS HHFL (×0.4) | 6.4 | **16** | **+150%** |
+| OS Energy Absorption | ~8 | **16** | **+100%** |
 
-**完整 WSC 分析**（OS Clan 规格 DHS 1t/2c，engine 自带 10 DHS）：
-- 前 2 回合（固定 32 热）：武器 8t/6c + 6 DHS 外接（6t/12c）+ HSM 2t/2c = **16t / 20c for 28 伤 → Crit 占比 42%**
-- 第 3+ 回合（32+1d6 ≈ 35.5 热）：+2 DHS → 18t / 24c → Crit 占比 51%
-- **节奏管理**：玩家应"打 2 冷 1"或"打 2 冷 2"保持前 2 回合稳定窗口
-
-#### Hyper Stabilization Module (HSM) — 新 MiscType 组件
+#### 2.3 Laser Energy Capacitor (LEC)
 
 | 属性 | 草案 |
 |---|---|
-| 技术等级 | Advance / `TR F` / `SL ADVANCED` |
-| Intro Date | 3045/3050/3055（对齐 Hyper 系）|
-| 吨位 | **2 吨** |
-| Crit | **2 crit** |
-| 兼容 | Hyper Laser Large、Hyper PPC（每把武器配 1 个）|
-| 效果 ① | 稳定延长：2 回合 → **3 回合** |
-| 效果 ② | 失控门槛：2d6 ≥ 8 → **2d6 ≥ 9**（失控 42% → 28%）|
-| 效果 ③ | 过热后果：28 内构 → **15 内构** |
-| 不抵消 | 1d6 额外热（RNG 核心保留）|
-| 装填约束 | 跟 Hyper 武器**同躯干部位** |
+| 内部名 | `OSLaserEnergyCapacitor` |
+| 吨位 / Crit | **2 吨 / 2 crit** |
+| 兼容 | Binary / Trinary |
+| 跟 RM | 兼容(独立电容系统,跟光学无关) |
+| 跟 LEM | 兼容 |
+| 装填约束 | 跟对应武器**同躯干部位** |
+| 充能机制 | 开火前 1 回合充能(占 crit 不允许开火),充能完成后下次开火 **+5 dmg / +5 heat** |
+| 殉爆敏感 | 充能状态下被爆头 → **5 伤 + 2d6 crit 投掷**(类 canon PPC Capacitor 殉爆) |
 
-#### Binary / Trinary 重设计（身位：模组化集束激光 — 可配 PLM 或 ACJ 做差异化构建）
+**叙事**:大型电容器组,充能 1 回合储存额外能量,下次开火 pump 额外 5 dmg。canon PPC Capacitor 的激光系对应件。玩家节奏控制 — 预判时机充能,避开爆头回合。
 
-**核心变化**：
-- **取消** 之前讨论的 SFM/CFM 内置机制（简化为单一开火模式："全功率 multi-barrel 合一击"）
-- **Resonance Tuning 触发时才加额外热**（不改基础 heat）：Binary +2 热（Resonance 触发）/ Trinary +4 热（触发时）
-- 加两个**外置模组**做差异化：**PLM**（脉冲模组）和 **ACJ**（冷却夹克）**互斥二选一**
+---
 
-| 武器 | 基础 heat | Resonance 触发额外热 | 其他 |
+### 三、集束激光系 — 模组兼容矩阵
+
+| 配置 | RM | LEM | LEC | Binary 期望输出 vs std | Binary 期望输出 vs 特种(HHFL) | 定位 |
+|---|:---:|:---:|:---:|---|---|---|
+| 裸装 | ✗ | ✗ | ✗ | 16 (无 bonus) | 6.4 (被 ×0.4 削减) | 中性平台,无 build commitment |
+| +RM | ✓ | ✗ | ✗ | **21** (×1.3) | 6.4 (削减照常) | **反标装专家** |
+| +LEM | ✗ | ✓ | ✗ | 16 | **16** (绕过削减) | **反精英装甲专家** |
+| +LEC | ✗ | ✗ | ✓ | 21 burst (充能后 +5) | 11.4 burst (6.4+5) | **节奏炸点手** |
+| +RM +LEC | ✓ | ✗ | ✓ | **26 burst** (×1.3 + 5) | 6.4 burst / 11.4 burst | 反标装 + 爆发 |
+| +LEM +LEC | ✗ | ✓ | ✓ | 21 burst (16 + 5) | **21 burst** (16 + 5) | 反精英 + 爆发 |
+| +RM +LEM | — | — | — | **非法**(光学互斥) | — | — |
+
+**构型意义**:3 模组的 2 × 3 兼容矩阵给玩家 5 种 build 哲学(含裸装)。每种有独立 meta 场景。
+
+---
+
+### 四、高能激光系 — Hyper Laser 独立出来
+
+#### 4.1 主武器规格
+
+| 属性 | 草案 |
+|---|---|
+| 内部名 | `OSHyperLaserLarge`(当前已存在) |
+| tier | Experimental |
+| 技术等级 | Advance+ / TR G / SL EXPERIMENTAL |
+| Intro | 3045/3050/3055(当前) |
+| dmg / heat | **28 / 32**(前 2 回合固定),**32 + 1d6**(第 3 回合起) |
+| range | **12/24/36/50**(S/M/L/E) |
+| 精度加成(新) | **Short 0 / Medium 0 / Long −2 / Extreme −3**(自己有,**base 加成**,独立于外接 Energy FCM) |
+| 稳定/失控 | 前 2 回合完全稳定;第 3 回合起 **2d6 ≥ 8 失控**(42%)→ 开火失败 + **28 内构 + 殉爆风险**。不开火回合 → 稳定计数器**归零** |
+| 失控上限 | 无强制爆炸(Crit 投入本身就是平衡器) |
+| 爆炸物殉爆 | 28(跟新伤害同步) |
+| t·c | **8t / 6c** |
+| BV | **~900**(base,不含必需组件) |
+
+#### 4.2 必需组件(两件缺一不可 → 武器硬 lockout 无法开火)
+
+| 组件 | 职责 | 吨位 / Crit | 备注 |
 |---|---|---|---|
-| Binary Laser | 16（不变）| **+2 热** | Resonance ×1.30 vs 标装甲 |
-| ER Binary Laser | 20（不变）| **+2 热** | Resonance ×1.30 |
-| Trinary Laser | 24（不变）| **+4 热** | Resonance ×1.50 |
-| ER Trinary Laser | 32（不变）| **+4 热** | Resonance ×1.50 |
+| **HSM**(Hyper Stabilization Module)| 稳定延长 2→3 回合 + 失控门槛 ≥8→≥9 + 过热内构 28→15 | 2t / 2c | 跟 Hyper 武器同躯干部位 |
+| **C-2500 Combat Computer Core** | 火控核心,见 §9.2 | 1t / 2c | 整机唯一,挂在躯干 |
 
-**哲学**：Resonance = 对装甲共振频率的精调，技术上是"激进开火模式"→ 产生额外热。打先进装甲目标时 Resonance 不触发 → 无额外热。装 ACJ 消此加热。装 PLM 永久失效 Resonance → 永无额外热。
+**系统工程总代价**:Hyper Laser 8t/6c + HSM 2t/2c + C-2500 1t/2c = **11t / 10c**(不含必需的 DHS 散热池)。
 
-#### Pulse Laser Module (PLM) — 新 MiscType 组件
+#### 4.3 可选组件(非必需,玩家按需装)
 
-| 属性 | 草案 |
-|---|---|
-| 技术等级 | Advance / `TR F` / `SL STANDARD` |
-| Intro Date | 3060/3070/3080（对齐 Binary/Trinary 系）|
-| 吨位 | **2 吨** |
-| Crit | **2 crit** |
-| 兼容 | Binary / ER Binary / Trinary / ER Trinary Laser System（每武器配 1 个）|
-| 效果 ① | **−2 to-hit**（pulse 式）|
-| 效果 ② | 开火热 **×0.8**（round up）|
-| 效果 ③ | 射程保持原值 |
-| 失去 ① | **Resonance Tuning**（无加成系数）|
-| 失去 ② | 原 multi-barrel 合一击机制 → 变 pulse 式单一发射（技术上仍 2/3 镜筒但以 pulse 调相位输出）|
-| 跟 ACJ | **互斥**（同武器不能同时装）|
-| 装填约束 | 跟对应武器同躯干部位 |
+| 组件 | 职责 | 吨位 / Crit | 备注 |
+|---|---|---|---|
+| CCS Energy FCM Module | 额外 −1 命中 + Aimed Shot 能力(§9.2) | ~1t / 1c(按武器吨位 ÷ 10) | 专用模块,挂在 C-2500 核心上 |
+| 额外 DHS | 处理 32-38 热的持续开火 | 1t/3c 每 2 热 | 装 10 DHS engine-free 后外接 ~3-4 DHS |
 
-**定位**：**精度导向**配置——牺牲反标装 bonus 换 pulse 式稳定输出。对**先进装甲目标**（FF 等）比 ACJ 更划算。
+装满可选 → **12t / 11c** 系统工程,BV **~1060-1080**。
 
-#### Advance Cooling Jacket (ACJ) — 新 MiscType 组件
+#### 4.4 精度加成数学
 
-| 属性 | 草案 |
-|---|---|
-| 技术等级 | Advance / `TR F` / `SL STANDARD` |
-| Intro Date | 3060/3070/3080 |
-| 吨位 | **2 吨** |
-| Crit | **2 crit** |
-| 兼容 | Binary / ER Binary / Trinary / ER Trinary Laser System（每武器配 1 个）|
-| 效果 ① | 消 Resonance 触发的额外热（Binary +2、Trinary +4 热被抵消 → 0）|
-| 效果 ② | **过热缓冲池 +3**（每回合可额外吸收 3 热）|
-| 效果 ③ | **Resonance Tuning 扩展到所有装甲类型**（原仅对基础标装）；对非标装系数减半（Binary ×1.15 / Trinary ×1.25）|
-| 跟 PLM | **互斥** |
-| 装填约束 | 跟对应武器同躯干部位 |
+Hyper Laser 的 range-based 精度加成等效于"把远距的 range 罚压缩到跟近距一样":
 
-**定位**：**灵活打击**配置——保留并扩展 Resonance，对**所有装甲类型**都有 bonus，热经济更稳定。
+| Range Bracket | 标准武器 命中罚 | **Hyper Laser 加成** | **净 to-hit 修正** | 等效 |
+|---|:---:|:---:|:---:|---|
+| Short (0-12) | 0 | 0 | **0** | 等效短距 |
+| Medium (13-24) | +2 | 0 | **+2** | 等效中距 |
+| Long (25-36) | +4 | **−2** | **+2** | **等效中距**(命中率 flat) |
+| Extreme (37-50) | +6 | **−3** | **+3** | **等效长距**(比普通长距命中率高) |
 
-#### PLM vs ACJ 玩家决策矩阵
+装 Energy FCM 后再 −1 → Long 净 **+1**(等效短距)/ Extreme 净 **+2**(等效中距),**全文档唯一能在 50 hex 保持短中距命中率的武器**。
 
-| 配置 | 命中 | 热 | Resonance | 适用 |
+#### 4.5 WSC 分析
+
+| 配置 | WSC_t | 期望伤 / turn | t/dmg | 备注 |
 |---|---|---|---|---|
-| **无模组** | 0 | 基础 | ×1.3/×1.5 vs 标装 only | 散热盈余机 + 打标装敌人 |
-| **装 PLM**（2t/2c）| **−2** | **×0.8** | **失去** | 精度导向 + 打先进装甲敌人 |
-| **装 ACJ**（2t/2c）| 0 | 消 Resonance 加热 + 缓冲+3 | **×1.15–1.25 全装甲** | 热紧张机 + 通用打击 |
+| Hyper Laser 本体 | 8 + 16(32 热 / 2)= **24** | 28 | **0.86** | base |
+| + HSM | 24 + 2 = **26** | 28(稳定性延长至 3 turn) | **0.93** | 必需 |
+| + C-2500 核心 | 26 + 1 = **27** | 28 | **0.96** | 必需 |
+| 完整必需系统 | **27 WSC_t** | 28 | **0.96** | 比 ER Trinary 旧的 27/24 = **1.13** 要省 |
 
-#### Hyper PPC — 待后续同步
+跟 2026-11-07 Hyper Laser 对比:旧的 t/dmg 1.64 → 新的 0.96 — **效率翻倍**,但以 11t 系统工程为门槛。
 
-> ⏳ **待后续批次**（Hyper Laser 落地验证后同步）：Hyper PPC 应用同样的"取消充能 + 每回合可射 + 1d6 额外热 + 2d6 失控 + HSM 兼容"机制。当前代码保留现状不动。本文档的 PPC 段 Hyper PPC 行也已标注"待更新"。
+---
+
+### 五、删除/迁移清单(代码落地时执行)
+
+| 件 | 操作 | 存档兼容 |
+|---|---|---|
+| `OSERBinaryLaserSystem` | **删除** | `addLookupName("ER Binary Laser System")` 保留,load 时转向 null + warn |
+| `OSERTrinaryLaserSystem` | **删除** | 同上 |
+| 原 PLM 设计(2026-11-07) | **废弃**(未实施,无代码) | — |
+| 原 ACJ 设计(2026-11-07) | **废弃**(未实施,无代码) | — |
+| Binary/Trinary 的 Resonance 内建 | **剥离**(改为由 RM 模组触发) | handler 改造 |
+| HSM(2026-11-07 设计) | **保留**,升为 Hyper Laser 必需组件 | 无变 |
+| Hyper Laser `−1` 内建命中 | **删除**,改为 range-based 精度加成(Long −2 / Extreme −3) | handler 改造 |
+| Hyper PPC(`OSHyperPPC`) | **本轮不动**(未来 → Heavy PPC 超重演进,非 Experimental) | — |
+
+---
+
+### 六、实施路线(代码批次规划)
+
+**预估复杂度:中-高**。推荐分 5 阶段:
+
+- **Phase 1** — 新 3 模组 MiscType + flag(`F_OS_LASER_RESONANCE` / `F_OS_LASER_EM_MODULATOR` / `F_OS_LASER_ENERGY_CAPACITOR`),装备入库 + mount 约束
+- **Phase 2** — Binary/Trinary handler 剥离 Resonance(改为 mount-based 条件触发,检查武器挂 RM 才给 ×1.30/1.50)
+- **Phase 3** — LEM handler(新 `OSBinaryLEMHandler` / `OSTrinaryLEMHandler`,绕过装甲减伤)+ LEC handler(充能态,参考 PPC Capacitor 现有 handler)
+- **Phase 4** — Hyper Laser 改造:删 `−1` 内建,加 range-based 精度 block 到 `ComputeToHit`,必需组件校验加入 `TestMek`
+- **Phase 5** — 删 ER Binary/ER Trinary 源文件 + lookup 兼容 + 编译 + MML 构型验证 + playtest 基准
+
+**预估总工:5-7 个工作会话**,分散在数批次。本次只落**文档**,代码留后批。
 
 ---
 
