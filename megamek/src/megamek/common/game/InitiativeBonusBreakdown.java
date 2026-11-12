@@ -82,16 +82,6 @@ public record InitiativeBonusBreakdown(
     }
 
     /**
-     * Legacy 10-arg constructor without the BCS coordination field. Insert bcs=0 to delegate to the 11-arg
-     * primary constructor. Kept for backwards compatibility with upstream callers and tests that pre-date the
-     * OS BCS field.
-     */
-    public InitiativeBonusBreakdown(int hq, int quirk, String quirkName, int console, int crewCommand, int tcp,
-          int constant, int compensation, int crew, int gamemaster) {
-        this(hq, quirk, quirkName, console, crewCommand, tcp, 0, constant, compensation, crew, gamemaster);
-    }
-
-    /**
      * Creates a breakdown with all zeros.
      */
     public static InitiativeBonusBreakdown zero() {
@@ -103,7 +93,7 @@ public record InitiativeBonusBreakdown(
      * "constant" component.
      */
     public static InitiativeBonusBreakdown fromTotal(int total) {
-        return new InitiativeBonusBreakdown(0, 0, null, 0, 0, 0, 0, 0, total, 0, 0);
+        return new InitiativeBonusBreakdown(0, 0, null, 0, 0, 0, 0, total, 0, 0, 0);
     }
 
     /**

@@ -187,9 +187,10 @@ public class OSBattleComputerInitiativeTest {
     /** The bcs component participates in the breakdown total and display, and does not stack with other positives. */
     @Test
     void testBreakdownIntegration() {
-        // bcs alone contributes +2 to the total
+        // bcs alone contributes +2 to the total — bcs slot is position 7 in the 11-arg primary ctor,
+        // which is where the +2 lands below (hq=0, quirk=0, qname=null, console=0, cmd=0, tcp=0, bcs=2, ...).
         InitiativeBonusBreakdown bcsOnly =
-              new InitiativeBonusBreakdown(0, 0, null, 0, 0, 0, 2, 0, 0, 0);
+              new InitiativeBonusBreakdown(0, 0, null, 0, 0, 0, 2, 0, 0, 0, 0);
         assertEquals(2, bcsOnly.total(), "a lone +2 BCS bonus should total +2");
         assertTrue(bcsOnly.toBreakdownString().contains("BCS")
                     || bcsOnly.toBreakdownString().contains("Coordination"),
@@ -197,12 +198,13 @@ public class OSBattleComputerInitiativeTest {
 
         // Positives do not stack: +2 BCS alongside +2 console still totals +2
         InitiativeBonusBreakdown bcsAndConsole =
-              new InitiativeBonusBreakdown(0, 0, null, 2, 0, 0, 2, 0, 0, 0);
+              new InitiativeBonusBreakdown(0, 0, null, 2, 0, 0, 2, 0, 0, 0, 0);
         assertEquals(2, bcsAndConsole.total(), "two +2 positives should not stack (highest applies)");
 
-        // Negatives stack cumulatively with the highest positive
+        // Negatives stack cumulatively with the highest positive. Here -1 sits in the constant slot
+        // (position 8) because the primary ctor is (..., tcp, bcs, constant, comp, crew, gm).
         InitiativeBonusBreakdown bcsWithPenalty =
-              new InitiativeBonusBreakdown(0, 0, null, 0, 0, 0, 2, -1, 0, 0);
+              new InitiativeBonusBreakdown(0, 0, null, 0, 0, 0, 2, -1, 0, 0, 0);
         assertEquals(1, bcsWithPenalty.total(), "+2 BCS with a -1 constant should total +1");
     }
 }
