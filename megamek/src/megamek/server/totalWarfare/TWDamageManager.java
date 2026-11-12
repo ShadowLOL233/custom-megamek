@@ -3471,6 +3471,19 @@ public class TWDamageManager implements IDamageManager {
     }
 
     /**
+     * Adds a yellow in-battle notice naming the Outer Sphere armor whose damage-mitigation layer just engaged,
+     * mirroring the Hardened Heavy Ferro-Lamellor notice (report 1275) so premium OS armor is visibly credited
+     * whenever its reduction actually applies.
+     */
+    private void addOuterSphereArmorNotice(Vector<Report> reportVec, int entityId, int armorType) {
+        Report report = new Report(1276);
+        report.subject = entityId;
+        report.indent(3);
+        report.add(EquipmentType.getArmorTypeName(armorType));
+        reportVec.addElement(report);
+    }
+
+    /**
      * Apply damage to the armor in the hit location; remaining damage will be applied elsewhere.
      *
      * @param entity        Entity being damaged
@@ -3507,10 +3520,11 @@ public class TWDamageManager implements IDamageManager {
         if (!ammoExplosion && (entity.getArmor(hit) > 0) && !damageIS) {
             int tmpDamageHold = -1;
             int origDamage = damage;
+            int armorTypeAtLoc = entity.getArmorType(hit.getLocation());
 
             // Hardened Heavy Ferro-Lamellor: flag (in yellow) that both special defensive layers are engaging,
             // unless the hit ignores damage reduction (AP / AP-missile / ignores-reduction).
-            if ((entity.getArmorType(hit.getLocation()) == EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FERRO_LAMELLOR)
+            if ((armorTypeAtLoc == EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FERRO_LAMELLOR)
                   && (hit.getGeneralDamageType() != HitData.DAMAGE_ARMOR_PIERCING)
                   && (hit.getGeneralDamageType() != HitData.DAMAGE_ARMOR_PIERCING_MISSILE)
                   && (hit.getGeneralDamageType() != HitData.DAMAGE_IGNORES_DMG_REDUCTION)) {
@@ -3525,6 +3539,11 @@ public class TWDamageManager implements IDamageManager {
                 (hit.getGeneralDamageType() != HitDamageType.DAMAGE_ARMOR_PIERCING_MISSILE) &&
                 (hit.getGeneralDamageType() != HitDamageType.DAMAGE_IGNORES_DMG_REDUCTION) &&
                 (hit.getGeneralDamageType() != HitDamageType.DAMAGE_AX)) {
+                // HHFL (68) is announced by report 1275 above; the plain OS Ferro-Lamellor variants get their own notice.
+                if ((armorTypeAtLoc == EquipmentType.T_ARMOR_OS_FERRO_LAMELLOR)
+                      || (armorTypeAtLoc == EquipmentType.T_ARMOR_OS_HEAVY_FERRO_LAMELLOR)) {
+                    addOuterSphereArmorNotice(reportVec, entityId, armorTypeAtLoc);
+                }
                 tmpDamageHold = damage;
                 damage = (int) Math.floor((((double) damage) * 4) / 5);
                 if (damage <= 0) {
@@ -3544,6 +3563,9 @@ public class TWDamageManager implements IDamageManager {
                         //AX doesn't affect ballistic-reinforced armor, TO:AUE (6th), pg. 179
                         ||
                         (hit.getGeneralDamageType() == HitDamageType.DAMAGE_MISSILE))) {
+                if (armorTypeAtLoc == EquipmentType.T_ARMOR_OS_BALLISTIC_REINFORCED) {
+                    addOuterSphereArmorNotice(reportVec, entityId, armorTypeAtLoc);
+                }
                 tmpDamageHold = damage;
                 damage = Game.rulesManager.getRulesArmor().ballisticReinforcedArmorReduction(damage);
                 report = new Report(6088);
@@ -3597,6 +3619,9 @@ public class TWDamageManager implements IDamageManager {
                        ((hit.getGeneralDamageType() == HitDamageType.DAMAGE_MISSILE) ||
                         (hit.getGeneralDamageType() == HitDamageType.DAMAGE_ARMOR_PIERCING_MISSILE) ||
                         areaSatArty)) {
+                if (armorTypeAtLoc == EquipmentType.T_ARMOR_OS_REACTIVE) {
+                    addOuterSphereArmorNotice(reportVec, entityId, armorTypeAtLoc);
+                }
                 tmpDamageHold = damage;
                 damage = Game.rulesManager.getRulesArmor().reactiveArmorReduction(damage);
                 if (tmpDamageHold == 1) {
@@ -3612,6 +3637,7 @@ public class TWDamageManager implements IDamageManager {
                         (hit.getGeneralDamageType() == HitData.DAMAGE_ARMOR_PIERCING_MISSILE) ||
                         areaSatArty)) {
                 // Imp. Reactive (OS): 55% damage reduction vs missiles/artillery
+                addOuterSphereArmorNotice(reportVec, entityId, armorTypeAtLoc);
                 tmpDamageHold = damage;
                 damage = Math.max(1, (int) Math.floor(damage * 0.45));
                 report = new Report(6257);
@@ -3622,6 +3648,7 @@ public class TWDamageManager implements IDamageManager {
             } else if (energyAbsorptionArmor &&
                   (hit.getGeneralDamageType() == HitData.DAMAGE_ENERGY)) {
                 // Energy Absorption (OS): 50% reduction vs all energy weapons
+                addOuterSphereArmorNotice(reportVec, entityId, armorTypeAtLoc);
                 tmpDamageHold = damage;
                 damage = (int) Math.floor(((double) damage) / 2);
                 if (tmpDamageHold == 1) {
@@ -3635,6 +3662,7 @@ public class TWDamageManager implements IDamageManager {
             } else if (laserReflectiveArmor &&
                   (hit.getGeneralDamageType() == HitData.DAMAGE_ENERGY)) {
                 // Laser Reflective (OS): 65% reduction vs energy weapons
+                addOuterSphereArmorNotice(reportVec, entityId, armorTypeAtLoc);
                 tmpDamageHold = damage;
                 damage = Math.max(1, (int) Math.floor(damage * 0.35));
                 report = new Report(6259);
@@ -3703,6 +3731,13 @@ public class TWDamageManager implements IDamageManager {
                 }
 
                 reportVec.addElement(report);
+                // HHFL (68) is announced by report 1275 above; the plain OS Hardened variants get their own notice.
+                if ((armorTypeAtLoc == EquipmentType.T_ARMOR_OS_IMP_HARDENED)
+                      || (armorTypeAtLoc == EquipmentType.T_ARMOR_OS_HARDENED_FF)
+                      || (armorTypeAtLoc == EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FF)
+                      || (armorTypeAtLoc == EquipmentType.T_ARMOR_OS_ADV_HARDENED_FF)) {
+                    addOuterSphereArmorNotice(reportVec, entityId, armorTypeAtLoc);
+                }
             }
 
             if (armorThreshold >= damage) {
