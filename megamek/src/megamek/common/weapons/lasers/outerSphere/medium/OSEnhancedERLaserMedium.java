@@ -50,8 +50,6 @@ public class OSEnhancedERLaserMedium extends LaserWeapon {
         longAV = 8;
         maxRange = RANGE_LONG;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
               .setISAdvancement(3000, 3025, 3050, DATE_NONE, DATE_NONE)

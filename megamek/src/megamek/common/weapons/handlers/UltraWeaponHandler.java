@@ -163,30 +163,8 @@ public class UltraWeaponHandler extends AmmoWeaponHandler {
         }
 
         // The standard Ultra AC jam-on-a-natural-2 (double-tap mode) has been removed to align with the latest core
-        // rules — Ultra ACs no longer jam. BV and cost are unchanged. The opt-in PLAYTEST3 caseless-ammo
-        // explosion/jam rule is a separate, deliberately-enabled experimental ruleset and is kept as-is.
-        if (game.getOptions().booleanOption(OptionsConstants.PLAYTEST_3)) {
-            // PLAYTEST3 Caseless ammo support: potentially explodes when rolling a 2; can still jam if not blowing up.
-            if ((roll.getIntValue() <= 2) && !attackingEntity.isConventionalInfantry()
-                  && ammoType.getMunitionType().contains(AmmoType.Munitions.M_CASELESS)) {
-                Roll diceRoll = Compute.rollD6(2);
-
-                Report r = new Report(3164);
-                r.subject = subjectId;
-                r.add(diceRoll);
-
-                if (diceRoll.getIntValue() >= 8) {
-                    // Round explodes destroying weapon
-                    weapon.setDestroyed(true);
-                    r.choose(false);
-                } else {
-                    // Just a jam
-                    weapon.setJammed(true);
-                    r.choose(true);
-                }
-                vPhaseReport.addElement(r);
-            }
-        }
+        // rules — Ultra ACs no longer jam. BV and cost are unchanged. Caseless-ammo explosion/jam rule still
+        // applies regardless and is handled below.
         // Only will apply if Caseless ammo is used, which is not typical with a UAC.
         // Will potentially explode when rolling a 2. Can still jam if not blowing up.
         if ((roll.getIntValue() <= 2) && !attackingEntity.isConventionalInfantry()

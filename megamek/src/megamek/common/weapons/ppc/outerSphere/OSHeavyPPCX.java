@@ -17,9 +17,9 @@ import megamek.common.weapons.ppc.PPCXWeapon;
 
 /**
  * Outer Sphere Heavy PPC-X
- * Cluster: 6 sub-beams × 4 damage = 24 max / Heat 15 / Range 7-10-13 / no min, 8t / 4 crit
+ * Cluster: 6 sub-beams Ã— 4 damage = 24 max / Heat 15 / Range 7-10-13 / no min, 8t / 4 crit
  *
- * Heavy variant of the PPC-X — same cluster mechanic, doubled per-beam damage.
+ * Heavy variant of the PPC-X â€” same cluster mechanic, doubled per-beam damage.
  */
 public class OSHeavyPPCX extends PPCXWeapon {
     @Serial
@@ -52,8 +52,6 @@ public class OSHeavyPPCX extends PPCXWeapon {
         explosive = true;
         atClass = CLASS_PPC;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
               .setISAdvancement(3060, 3070, 3080, DATE_NONE, DATE_NONE)

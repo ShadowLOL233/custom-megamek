@@ -19,7 +19,7 @@ import megamek.common.equipment.Mounted;
 import megamek.common.weapons.autoCannons.ACWeapon;
 
 /**
- * Outer Sphere Standard AC/2 — RoOS-manufactured replica of the upstream IS AC/2.
+ * Outer Sphere Standard AC/2 â€” RoOS-manufactured replica of the upstream IS AC/2.
  * Stats identical to the IS reference; differentiated only by tech base.
  */
 public class OSAC2 extends ACWeapon {
@@ -54,8 +54,6 @@ public class OSAC2 extends ACWeapon {
         maxRange = RANGE_LONG;
         explosionDamage = damage;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.D, AvailabilityValue.C)
               .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)

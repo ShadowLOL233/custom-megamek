@@ -15,7 +15,7 @@ import megamek.common.enums.TechBase;
 import megamek.common.enums.TechRating;
 
 /**
- * Outer Sphere Improve MRM 20 — OS medium-range specialist: a huge medium bracket (short 3 / medium 13 /
+ * Outer Sphere Improve MRM 20 â€” OS medium-range specialist: a huge medium bracket (short 3 / medium 13 /
  * long 16, no minimum range), accurate with a -1 to-hit inside the medium bracket (wired in ComputeToHit via
  * F_OS_MRM_MEDIUM_SPEC; a linked Diana III FCS adds a further -1 there).
  */
@@ -47,8 +47,6 @@ public class OSImproveMRM20 extends OSMRMWeapon {
         maxRange = RANGE_LONG;
         flags = flags.or(F_OS_MRM_MEDIUM_SPEC);
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(2900, 2930, 2960, DATE_NONE, DATE_NONE)

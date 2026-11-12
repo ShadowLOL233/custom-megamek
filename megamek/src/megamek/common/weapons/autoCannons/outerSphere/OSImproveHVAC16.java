@@ -16,10 +16,10 @@ import megamek.common.enums.TechRating;
 import megamek.common.equipment.Mounted;
 
 /**
- * Outer Sphere Improve HVAC/16 — Improve-tier long-barrel precision anti-armor autocannon. Single-slug,
- * high-velocity; the to-hit bonus grows with range (medium/long −1, extreme −2, applied in ComputeToHit). Pays a
+ * Outer Sphere Improve HVAC/16 â€” Improve-tier long-barrel precision anti-armor autocannon. Single-slug,
+ * high-velocity; the to-hit bonus grows with range (medium/long âˆ’1, extreme âˆ’2, applied in ComputeToHit). Pays a
  * mech-level tax in heavy tonnage, high crit count and low ammo/ton, and carries a high BV for the accuracy.
- * Aerospace-capable (AV = damage across all brackets, maxRange = extreme); electromagnetic-chemical — no cook-off.
+ * Aerospace-capable (AV = damage across all brackets, maxRange = extreme); electromagnetic-chemical â€” no cook-off.
  */
 public class OSImproveHVAC16 extends OSHVACWeapon {
     @Serial
@@ -49,8 +49,6 @@ public class OSImproveHVAC16 extends OSHVACWeapon {
         extAV = 16;
         maxRange = RANGE_EXT;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(2900, 2930, 2960, DATE_NONE, DATE_NONE)

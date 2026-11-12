@@ -3525,9 +3525,9 @@ public class TWDamageManager implements IDamageManager {
             // Hardened Heavy Ferro-Lamellor: flag (in yellow) that both special defensive layers are engaging,
             // unless the hit ignores damage reduction (AP / AP-missile / ignores-reduction).
             if ((armorTypeAtLoc == EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FERRO_LAMELLOR)
-                  && (hit.getGeneralDamageType() != HitData.DAMAGE_ARMOR_PIERCING)
-                  && (hit.getGeneralDamageType() != HitData.DAMAGE_ARMOR_PIERCING_MISSILE)
-                  && (hit.getGeneralDamageType() != HitData.DAMAGE_IGNORES_DMG_REDUCTION)) {
+                  && (hit.getGeneralDamageType() != HitDamageType.DAMAGE_ARMOR_PIERCING)
+                  && (hit.getGeneralDamageType() != HitDamageType.DAMAGE_ARMOR_PIERCING_MISSILE)
+                  && (hit.getGeneralDamageType() != HitDamageType.DAMAGE_IGNORES_DMG_REDUCTION)) {
                 report = new Report(1275);
                 report.subject = entityId;
                 report.indent(3);
@@ -3633,8 +3633,8 @@ public class TWDamageManager implements IDamageManager {
                 report.add(damage);
                 reportVec.addElement(report);
             } else if (impReactiveArmor &&
-                  ((hit.getGeneralDamageType() == HitData.DAMAGE_MISSILE) ||
-                        (hit.getGeneralDamageType() == HitData.DAMAGE_ARMOR_PIERCING_MISSILE) ||
+                  ((hit.getGeneralDamageType() == HitDamageType.DAMAGE_MISSILE) ||
+                        (hit.getGeneralDamageType() == HitDamageType.DAMAGE_ARMOR_PIERCING_MISSILE) ||
                         areaSatArty)) {
                 // Imp. Reactive (OS): 55% damage reduction vs missiles/artillery
                 addOuterSphereArmorNotice(reportVec, entityId, armorTypeAtLoc);
@@ -3646,7 +3646,7 @@ public class TWDamageManager implements IDamageManager {
                 report.add(damage);
                 reportVec.addElement(report);
             } else if (energyAbsorptionArmor &&
-                  (hit.getGeneralDamageType() == HitData.DAMAGE_ENERGY)) {
+                  (hit.getGeneralDamageType() == HitDamageType.DAMAGE_ENERGY)) {
                 // Energy Absorption (OS): 50% reduction vs all energy weapons
                 addOuterSphereArmorNotice(reportVec, entityId, armorTypeAtLoc);
                 tmpDamageHold = damage;
@@ -3660,7 +3660,7 @@ public class TWDamageManager implements IDamageManager {
                 report.add(damage);
                 reportVec.addElement(report);
             } else if (laserReflectiveArmor &&
-                  (hit.getGeneralDamageType() == HitData.DAMAGE_ENERGY)) {
+                  (hit.getGeneralDamageType() == HitDamageType.DAMAGE_ENERGY)) {
                 // Laser Reflective (OS): 65% reduction vs energy weapons
                 addOuterSphereArmorNotice(reportVec, entityId, armorTypeAtLoc);
                 tmpDamageHold = damage;

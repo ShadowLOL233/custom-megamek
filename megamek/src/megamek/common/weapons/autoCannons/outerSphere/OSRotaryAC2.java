@@ -42,8 +42,6 @@ public class OSRotaryAC2 extends RACWeapon {
         cost = 200000;
         explosionDamage = damage;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)

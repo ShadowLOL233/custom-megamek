@@ -23,7 +23,7 @@ import megamek.common.weapons.srms.SRMWeapon;
 import megamek.server.totalWarfare.TWGameManager;
 
 /**
- * Outer Sphere Heavy SRM 8 — Single / Ultra fire modes, extended 4/8/12 range. Ultra fires two volleys in
+ * Outer Sphere Heavy SRM 8 â€” Single / Ultra fire modes, extended 4/8/12 range. Ultra fires two volleys in
  * one turn (2x ammo, 2x heat) and can jam on a natural-2 attack roll; Single is a plain SRM 8 (one volley).
  */
 public class OSHeavySRM8 extends SRMWeapon {
@@ -53,8 +53,6 @@ public class OSHeavySRM8 extends SRMWeapon {
         maxRange = RANGE_MED;
         flags = flags.andNot(F_PROTO_WEAPON).or(F_OS_SRM_SHORT_SPEC);
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)

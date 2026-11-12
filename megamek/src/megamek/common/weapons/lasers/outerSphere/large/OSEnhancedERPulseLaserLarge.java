@@ -50,8 +50,6 @@ public class OSEnhancedERPulseLaserLarge extends PulseLaserWeapon {
         longAV = 14;
         maxRange = RANGE_LONG;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.G)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
               .setISAdvancement(3000, 3025, 3050, DATE_NONE, DATE_NONE)

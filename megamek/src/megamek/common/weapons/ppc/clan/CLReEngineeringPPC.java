@@ -34,6 +34,7 @@
 package megamek.common.weapons.ppc.clan;
 
 import java.io.Serial;
+import java.util.List;
 
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Faction;
@@ -43,7 +44,7 @@ import megamek.common.SimpleTechLevel;
 import megamek.common.weapons.ppc.PPCWeapon;
 
 /**
- * Clan Re-Engineering PPC — a refined Clan particle cannon trading some range and a short
+ * Clan Re-Engineering PPC â€” a refined Clan particle cannon trading some range and a short
  * minimum-range deadzone for a heavier, harder-hitting, cooler-running design than the ER PPC.
  */
 public class CLReEngineeringPPC extends PPCWeapon {
@@ -76,10 +77,8 @@ public class CLReEngineeringPPC extends PPCWeapon {
         this.medAV = 12;
         this.longAV = 12;
         this.maxRange = RANGE_LONG;
-        rulesRefs = "Custom (Outer Sphere AU)";
+        rulesRefs = List.of();
         techAdvancement.setTechBase(TechBase.CLAN)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
               .setClanAdvancement(3065, 3070, 3075, DATE_NONE, DATE_NONE)

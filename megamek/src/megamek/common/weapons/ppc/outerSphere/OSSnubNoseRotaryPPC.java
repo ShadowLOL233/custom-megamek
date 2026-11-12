@@ -16,14 +16,14 @@ import megamek.common.enums.TechRating;
 import megamek.common.weapons.ppc.PPCRotaryWeapon;
 
 /**
- * Outer Sphere Rotary Snub-Nose PPC (RSPPC) — short-range cluster rotary.
+ * Outer Sphere Rotary Snub-Nose PPC (RSPPC) â€” short-range cluster rotary.
  *
  * Combines the Snub-Nose's range-graded damage falloff (8/6/4) with the Rotary mode-dial
  * (1-4 shots). Per-bolt damage drops with range, so 4-shot at short can produce 32 max
  * damage while 4-shot at long produces 16 max. 8 heat per shot / Range 8-12-15 no min /
  * 10t / 6 crit / BV ~360.
  *
- * The first three shots are self-cooled and pod-free, each costing ⌈8/3⌉ = 3 suppressed heat;
+ * The first three shots are self-cooled and pod-free, each costing âŒˆ8/3âŒ‰ = 3 suppressed heat;
  * only the 4th shot draws one RPPC Coolant Pod charge. Dialing 4-shot without sufficient
  * coolant triggers Capacitor Overload.
  */
@@ -63,12 +63,10 @@ public class OSSnubNoseRotaryPPC extends PPCRotaryWeapon {
         // Gauss-style catastrophic explosion: critical hit triggers simultaneous discharge
         // across all four short-barrel capacitor stages. RSPPC's larger Snub-Nose geometry
         // stores more potential energy per stage than RLPPC, producing a larger blast (18 vs
-        // 15). Gated through EquipmentType.isExplosive()'s F_PPC_ROTARY bypass — fires
+        // 15). Gated through EquipmentType.isExplosive()'s F_PPC_ROTARY bypass â€” fires
         // unconditionally on weapon-crit without needing a PPC Capacitor module.
         explosionDamage = 18;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
               .setISAdvancement(3060, 3070, 3080, DATE_NONE, DATE_NONE)

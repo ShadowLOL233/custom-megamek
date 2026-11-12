@@ -9,6 +9,7 @@ package megamek.common.weapons.autoCannons.innerSphere;
 import java.io.Serial;
 
 import megamek.common.alphaStrike.AlphaStrikeElement;
+import megamek.common.SimpleTechLevel;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.TechBase;
 import megamek.common.enums.TechRating;
@@ -50,7 +51,7 @@ public class ISBurstFireAC2 extends ISBurstFireACWeapon {
         maxRange = RANGE_LONG;
         explosionDamage = damage;
         techAdvancement.setTechBase(TechBase.IS)
-              .setIntroLevel(true)
+              .setStaticTechLevel(SimpleTechLevel.INTRO)
               .setTechRating(TechRating.C)
               .setAvailability(AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.D, AvailabilityValue.D)
               .setISAdvancement(2290, 2300, 2305, DATE_NONE, DATE_NONE)

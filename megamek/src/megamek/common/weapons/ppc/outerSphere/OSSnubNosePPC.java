@@ -18,7 +18,7 @@ import megamek.common.weapons.ppc.PPCWeapon;
 /**
  * Outer Sphere Snub-Nose PPC
  * Damage 10/8/6 by range / Heat 10 / Range 9-13-15 / no min, 6t / 2 crit
- * Slightly better long-range damage than IS Snub-Nose (5 → 6).
+ * Slightly better long-range damage than IS Snub-Nose (5 â†’ 6).
  */
 public class OSSnubNosePPC extends PPCWeapon {
     @Serial
@@ -53,8 +53,6 @@ public class OSSnubNosePPC extends PPCWeapon {
         medAV = 8;
         explosive = true;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
               .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)

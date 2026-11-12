@@ -45,8 +45,6 @@ public class OSEnhancedLRM20 extends LRMWeapon {
         maxRange = RANGE_LONG;
         flags = flags.andNot(F_PROTO_WEAPON).or(F_OS_LRM_LONG_SPEC);
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(3000, 3025, 3050, DATE_NONE, DATE_NONE)

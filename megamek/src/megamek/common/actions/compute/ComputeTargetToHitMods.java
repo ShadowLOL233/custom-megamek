@@ -266,7 +266,7 @@ public class ComputeTargetToHitMods {
             // precision ammo reduces this modifier
             else if ((ammoType != null)
                   && ammoType.getAmmoType().isAnyOf(AC, LAC, AC_IMP, PAC, AC_ULTRA, EM_LANCE_OS)
-                  && (munition.contains(AmmoType.Munitions.M_PRECISION) || munition.contains(AmmoType.Munitions.M_PRECISION_PLAYTEST))) {
+                  && munition.contains(AmmoType.Munitions.M_PRECISION)) {
                 int nAdjust = Math.min(2, thTemp.getValue());
                 if (nAdjust > 0) {
                     toHit.append(new ToHitData(-nAdjust, Messages.getString("WeaponAttackAction.Precision")));

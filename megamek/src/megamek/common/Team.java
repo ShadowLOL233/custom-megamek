@@ -285,7 +285,8 @@ public final class Team extends TurnOrdered {
               bcsBonus,
               constantBonus,
               compensationBonus,
-              0  // crew bonus is for individual initiative mode only
+              0,  // crew bonus is for individual initiative mode only
+              0   // gamemaster bonus is for individual initiative mode only
         );
     }
 

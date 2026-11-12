@@ -16,7 +16,7 @@ import megamek.common.enums.TechRating;
 import megamek.common.weapons.ppc.PPCWeapon;
 
 /**
- * Outer Sphere Standard ER PPC — RoOS-manufactured replica of the upstream IS ER PPC.
+ * Outer Sphere Standard ER PPC â€” RoOS-manufactured replica of the upstream IS ER PPC.
  * Stats identical to the IS reference; differentiated only by tech base.
  */
 public class OSERPPC extends PPCWeapon {
@@ -50,8 +50,6 @@ public class OSERPPC extends PPCWeapon {
         maxRange = RANGE_LONG;
         explosive = true;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.D, AvailabilityValue.C)
               .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)

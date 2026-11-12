@@ -30,7 +30,7 @@ import megamek.common.weapons.ppc.PPCXWeapon;
 
 /**
  * Inner Sphere PPC-X
- * Cluster: 5 sub-beams × 2 damage = 10 max / Heat 10 / Range 6-12-18 / no min, 7t / 3 crit
+ * Cluster: 5 sub-beams Ã— 2 damage = 10 max / Heat 10 / Range 6-12-18 / no min, 7t / 3 crit
  *
  * The IS-tech precursor to the OS PPC-X. Shares the cluster-dispersion mechanic
  * (LB-X style number-of-hits roll) and the -1/+0/+1 range-bracket ToHit gradient,
@@ -68,8 +68,6 @@ public class ISPPCX extends PPCXWeapon {
         explosive = true;
         atClass = CLASS_PPC;
         techAdvancement.setTechBase(TechBase.IS)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
               .setISAdvancement(3095, 3105, 3120, DATE_NONE, DATE_NONE)

@@ -2147,7 +2147,7 @@ public class ArmorType extends MiscType {
         armor.cost = 20000.0;
         armor.criticalSlots = 9;
         armor.flags = armor.flags.or(F_FERRO_FIBROUS).or(F_MEK_EQUIPMENT);
-        armor.rulesRefs = "OS Custom";
+        armor.rulesRefs = List.of();
         armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C)
               .setISAdvancement(2820, 2825, 2832).setStaticTechLevel(SimpleTechLevel.STANDARD);
@@ -2171,7 +2171,7 @@ public class ArmorType extends MiscType {
         armor.cost = 28000.0;
         armor.criticalSlots = 7;
         armor.flags = armor.flags.or(F_FERRO_FIBROUS).or(F_MEK_EQUIPMENT);
-        armor.rulesRefs = "OS Custom";
+        armor.rulesRefs = List.of();
         armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
               .setISAdvancement(3000, 3025, 3050).setStaticTechLevel(SimpleTechLevel.ADVANCED);
@@ -2190,7 +2190,7 @@ public class ArmorType extends MiscType {
         armor.cost = 25000.0;
         armor.criticalSlots = 15;
         armor.flags = armor.flags.or(F_HEAVY_FERRO).or(F_MEK_EQUIPMENT);
-        armor.rulesRefs = "OS Custom";
+        armor.rulesRefs = List.of();
         armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C)
               .setISAdvancement(2824, 2830, 2838).setStaticTechLevel(SimpleTechLevel.ADVANCED);
@@ -2212,7 +2212,7 @@ public class ArmorType extends MiscType {
         armor.cost = 32000.0;
         armor.criticalSlots = 13;
         armor.flags = armor.flags.or(F_HEAVY_FERRO).or(F_MEK_EQUIPMENT);
-        armor.rulesRefs = "OS Custom";
+        armor.rulesRefs = List.of();
         armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
               .setISAdvancement(2848, 2856, 2866).setStaticTechLevel(SimpleTechLevel.STANDARD);
@@ -2234,7 +2234,7 @@ public class ArmorType extends MiscType {
         armor.cost = 18000.0;
         armor.criticalSlots = 6;
         armor.flags = armor.flags.or(F_FERRO_FIBROUS).or(F_MEK_EQUIPMENT);
-        armor.rulesRefs = "OS Custom";
+        armor.rulesRefs = List.of();
         armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C)
               .setISAdvancement(2828, 2834, 2842).setStaticTechLevel(SimpleTechLevel.STANDARD);
@@ -2258,7 +2258,7 @@ public class ArmorType extends MiscType {
         armor.spreadable = true;
         armor.tankSlots = 1;
         armor.flags = armor.flags.or(F_HARDENED_ARMOR).or(F_MEK_EQUIPMENT).or(F_TANK_EQUIPMENT);
-        armor.rulesRefs = "OS Custom";
+        armor.rulesRefs = List.of();
         armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
               .setISAdvancement(2850, 2860, 2872).setStaticTechLevel(SimpleTechLevel.STANDARD);
@@ -2276,7 +2276,7 @@ public class ArmorType extends MiscType {
         armor.cost = 30000.0;
         armor.criticalSlots = 14;
         armor.flags = armor.flags.or(F_HARDENED_ARMOR).or(F_FERRO_FIBROUS).or(F_MEK_EQUIPMENT);
-        armor.rulesRefs = "OS Custom";
+        armor.rulesRefs = List.of();
         armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
               .setISAdvancement(2860, 2870, 2882).setStaticTechLevel(SimpleTechLevel.ADVANCED);
@@ -2295,7 +2295,7 @@ public class ArmorType extends MiscType {
         armor.cost = 45000.0;
         armor.criticalSlots = 16;
         armor.flags = armor.flags.or(F_HARDENED_ARMOR).or(F_HEAVY_FERRO).or(F_MEK_EQUIPMENT);
-        armor.rulesRefs = "OS Custom";
+        armor.rulesRefs = List.of();
         armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
               .setISAdvancement(2875, 2888, 2900).setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
@@ -2319,7 +2319,7 @@ public class ArmorType extends MiscType {
         armor.cost = 38000.0;
         armor.criticalSlots = 14;
         armor.flags = armor.flags.or(F_HARDENED_ARMOR).or(F_FERRO_FIBROUS).or(F_MEK_EQUIPMENT);
-        armor.rulesRefs = "OS Custom";
+        armor.rulesRefs = List.of();
         armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
               .setISAdvancement(3000, 3025, 3050).setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
@@ -2339,7 +2339,7 @@ public class ArmorType extends MiscType {
         armor.criticalSlots = 12;
         armor.tankSlots = 1;
         armor.flags = armor.flags.or(F_REACTIVE).or(F_MEK_EQUIPMENT).or(F_TANK_EQUIPMENT).or(F_VTOL_EQUIPMENT);
-        armor.rulesRefs = "OS Custom";
+        armor.rulesRefs = List.of();
         armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
               .setISAdvancement(2840, 2850, 2862).setStaticTechLevel(SimpleTechLevel.ADVANCED);
@@ -2361,7 +2361,7 @@ public class ArmorType extends MiscType {
         armor.criticalSlots = 5;
         armor.tankSlots = 1;
         armor.flags = armor.flags.or(F_REACTIVE).or(F_MEK_EQUIPMENT).or(F_TANK_EQUIPMENT).or(F_VTOL_EQUIPMENT);
-        armor.rulesRefs = "OS Custom";
+        armor.rulesRefs = List.of();
         armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
               .setISAdvancement(2870, 2882, 2896).setStaticTechLevel(SimpleTechLevel.STANDARD);
@@ -2379,7 +2379,7 @@ public class ArmorType extends MiscType {
         armor.cost = 35000.0;
         armor.criticalSlots = 9;
         armor.flags = armor.flags.or(F_REFLECTIVE).or(F_MEK_EQUIPMENT);
-        armor.rulesRefs = "OS Custom";
+        armor.rulesRefs = List.of();
         armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
               .setISAdvancement(2855, 2865, 2878).setStaticTechLevel(SimpleTechLevel.ADVANCED);
@@ -2398,7 +2398,7 @@ public class ArmorType extends MiscType {
         armor.cost = 30000.0;
         armor.criticalSlots = 7;
         armor.flags = armor.flags.or(F_REFLECTIVE).or(F_MEK_EQUIPMENT);
-        armor.rulesRefs = "OS Custom";
+        armor.rulesRefs = List.of();
         armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
               .setISAdvancement(2848, 2858, 2870).setStaticTechLevel(SimpleTechLevel.ADVANCED);
@@ -2417,7 +2417,7 @@ public class ArmorType extends MiscType {
         armor.cost = 25000.0;
         armor.criticalSlots = 7;
         armor.flags = armor.flags.or(F_BALLISTIC_REINFORCED).or(F_MEK_EQUIPMENT).or(F_TANK_EQUIPMENT);
-        armor.rulesRefs = "OS Custom";
+        armor.rulesRefs = List.of();
         armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
               .setISAdvancement(2845, 2855, 2868).setStaticTechLevel(SimpleTechLevel.ADVANCED);
@@ -2437,7 +2437,7 @@ public class ArmorType extends MiscType {
         armor.criticalSlots = CRITICAL_SLOTS_VARIABLE;
         armor.tankSlots = 1;
         armor.flags = armor.flags.or(F_FERRO_LAMELLOR).or(F_MEK_EQUIPMENT).or(F_TANK_EQUIPMENT);
-        armor.rulesRefs = "OS Custom";
+        armor.rulesRefs = List.of();
         armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
               .setISAdvancement(2878, 2892, 2910).setStaticTechLevel(SimpleTechLevel.ADVANCED);
@@ -2457,7 +2457,7 @@ public class ArmorType extends MiscType {
         armor.criticalSlots = 16;
         armor.tankSlots = 1;
         armor.flags = armor.flags.or(F_FERRO_LAMELLOR).or(F_MEK_EQUIPMENT).or(F_TANK_EQUIPMENT);
-        armor.rulesRefs = "OS Custom";
+        armor.rulesRefs = List.of();
         armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
               .setISAdvancement(2890, 2905, 2922).setStaticTechLevel(SimpleTechLevel.ADVANCED);
@@ -2477,7 +2477,7 @@ public class ArmorType extends MiscType {
         armor.criticalSlots = 18;
         armor.tankSlots = 1;
         armor.flags = armor.flags.or(F_HARDENED_ARMOR).or(F_FERRO_LAMELLOR).or(F_MEK_EQUIPMENT);
-        armor.rulesRefs = "OS Custom";
+        armor.rulesRefs = List.of();
         armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
               .setISAdvancement(2905, 2920, 2940).setStaticTechLevel(SimpleTechLevel.EXPERIMENTAL);
@@ -2501,7 +2501,7 @@ public class ArmorType extends MiscType {
         armor.setModes(saModes);
         armor.setInstantModeSwitch(false);
         armor.bv = 0;
-        armor.rulesRefs = "OS Custom";
+        armor.rulesRefs = List.of();
         armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D)
               .setISAdvancement(2852, 2862, 2875).setStaticTechLevel(SimpleTechLevel.ADVANCED);
@@ -2521,7 +2521,7 @@ public class ArmorType extends MiscType {
         armor.criticalSlots = 6;
         armor.tankSlots = 1;
         armor.flags = armor.flags.or(F_ANTI_PENETRATIVE_ABLATIVE).or(F_MEK_EQUIPMENT).or(F_TANK_EQUIPMENT);
-        armor.rulesRefs = "OS Custom";
+        armor.rulesRefs = List.of();
         armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C)
               .setISAdvancement(2830, 2840, 2852).setStaticTechLevel(SimpleTechLevel.ADVANCED);
@@ -2548,7 +2548,7 @@ public class ArmorType extends MiscType {
         armor.setModes(saModes);
         armor.setInstantModeSwitch(false);
         armor.bv = 0;
-        armor.rulesRefs = "OS Custom";
+        armor.rulesRefs = List.of();
         armor.techAdvancement.setTechBase(TechBase.OUTER_SPHERE).setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
               .setISAdvancement(2878, 2892, 2910).setStaticTechLevel(SimpleTechLevel.STANDARD);

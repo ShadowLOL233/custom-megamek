@@ -60,8 +60,6 @@ public class OSImproveLaserSmall extends LaserWeapon {
         shortAV = 4;
         maxRange = RANGE_SHORT;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
               .setISAdvancement(2900, 2930, 2960, DATE_NONE, DATE_NONE)

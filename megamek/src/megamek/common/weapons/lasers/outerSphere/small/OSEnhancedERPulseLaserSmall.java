@@ -49,8 +49,6 @@ public class OSEnhancedERPulseLaserSmall extends PulseLaserWeapon {
         medAV = 5;
         maxRange = RANGE_MED;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.G)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
               .setISAdvancement(3000, 3025, 3050, DATE_NONE, DATE_NONE)

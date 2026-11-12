@@ -44,8 +44,6 @@ public class OSMuninBeacon extends NarcWeapon {
         cost = 250000;
         maxRange = RANGE_LONG;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(3060, 3070, 3080, DATE_NONE, DATE_NONE)

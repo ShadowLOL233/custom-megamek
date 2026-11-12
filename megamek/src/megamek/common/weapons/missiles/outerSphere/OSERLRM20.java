@@ -39,8 +39,6 @@ public class OSERLRM20 extends ExtendedLRMWeapon {
         extAV = 12;
         flags = flags.or(F_ARTEMIS_COMPATIBLE);
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(3060, 3070, 3080, DATE_NONE, DATE_NONE)

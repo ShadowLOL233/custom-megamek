@@ -23,6 +23,7 @@
 package megamek.common.weapons.c3;
 
 import java.io.Serial;
+import java.util.List;
 
 import megamek.common.SimpleTechLevel;
 import megamek.common.enums.AvailabilityValue;
@@ -63,7 +64,7 @@ public class OSC3Node extends TAGWeapon {
         mediumRange = 9;
         longRange = 15;
         extremeRange = 18;
-        rulesRefs = "AU";
+        rulesRefs = List.of();
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)

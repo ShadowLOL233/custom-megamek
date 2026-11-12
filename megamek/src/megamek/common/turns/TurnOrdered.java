@@ -467,6 +467,7 @@ public abstract class TurnOrdered implements ITurnOrdered {
                                   p.getBcsCoordinationInitBonus(),
                                   p.getConstantInitBonus(),
                                   bInitCompBonus ? p.getInitCompensationBonus() : 0,
+                                  0,
                                   0
                             );
                         });

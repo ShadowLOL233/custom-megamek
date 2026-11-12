@@ -7,6 +7,7 @@
 package megamek.common.weapons.c3;
 
 import java.io.Serial;
+import java.util.List;
 
 import megamek.common.SimpleTechLevel;
 import megamek.common.ToHitData;
@@ -56,7 +57,7 @@ public class OSShrikeDesignator extends TAGWeapon {
         mediumRange = 12;
         longRange = 15;
         extremeRange = 17;
-        rulesRefs = "AU";
+        rulesRefs = List.of();
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)

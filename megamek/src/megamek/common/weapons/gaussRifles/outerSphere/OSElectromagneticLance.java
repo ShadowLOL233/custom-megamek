@@ -13,7 +13,7 @@ import java.io.Serial;
 import megamek.common.SimpleTechLevel;
 import megamek.common.ToHitData;
 import megamek.common.actions.WeaponAttackAction;
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
@@ -34,15 +34,15 @@ import megamek.common.weapons.handlers.ac.OSEMLancePrecisionHandler;
 import megamek.server.totalWarfare.TWGameManager;
 
 /**
- * Outer Sphere Electromagnetic Lance — Advance-tier coil-accelerated ferrous-slug supergun (see
- * OS_TECHBASE_DEVELOPMENT_PLAN §8). The flexible-premium counterpart to the Coil Augmented Railgun: it trades
+ * Outer Sphere Electromagnetic Lance â€” Advance-tier coil-accelerated ferrous-slug supergun (see
+ * OS_TECHBASE_DEVELOPMENT_PLAN Â§8). The flexible-premium counterpart to the Coil Augmented Railgun: it trades
  * the railgun's raw single-slug apex for munition variety via a power-gate.
  *
  * <p><b>Power-gate:</b> the loaded round selects the coil's output. <b>Full power</b> keeps the long reach and
- * carries inherent armor-piercing (through-armor crit, via {@link ACAPHandler}) — the default kinetic slug plus
+ * carries inherent armor-piercing (through-armor crit, via {@link ACAPHandler}) â€” the default kinetic slug plus
  * the APDS discarding-sabot penetrator (~80% damage, stronger penetration). <b>Low power</b> lets fragile
- * payload rounds survive the launch — Flak (anti-air fragments), Flechette (anti-infantry), Precision (cancels
- * up to −2 of the target movement modifier) and Incendiary/HE (sets fires) — but both range and damage drop,
+ * payload rounds survive the launch â€” Flak (anti-air fragments), Flechette (anti-infantry), Precision (cancels
+ * up to âˆ’2 of the target movement modifier) and Incendiary/HE (sets fires) â€” but both range and damage drop,
  * and there is no AP. The range profile is switched in {@link #getRanges}; the low-power damage penalty lives in
  * the payload handlers.
  */
@@ -77,8 +77,6 @@ public class OSElectromagneticLance extends GaussWeapon {
         maxRange = RANGE_EXT;
         explosionDamage = 20;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(3060, 3070, 3080, DATE_NONE, DATE_NONE)

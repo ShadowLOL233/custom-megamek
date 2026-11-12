@@ -11,7 +11,7 @@ import java.io.Serial;
 import megamek.common.SimpleTechLevel;
 import megamek.common.ToHitData;
 import megamek.common.actions.WeaponAttackAction;
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
@@ -26,10 +26,10 @@ import megamek.common.weapons.handlers.OSCoilAugmentedRailgunHandler;
 import megamek.server.totalWarfare.TWGameManager;
 
 /**
- * Outer Sphere Coil Augmented Railgun — Advance-tier apex kinetic (see OS_TECHBASE_DEVELOPMENT_PLAN §8).
+ * Outer Sphere Coil Augmented Railgun â€” Advance-tier apex kinetic (see OS_TECHBASE_DEVELOPMENT_PLAN Â§8).
  *
  * <p>Coilgun pre-accelerator + short rail final stage: the longest-reaching, hardest-hitting single-slug
- * kinetic in the OS line, with inherent armor-piercing. A pure penetrator — one AP munition, no variety.
+ * kinetic in the OS line, with inherent armor-piercing. A pure penetrator â€” one AP munition, no variety.
  *
  * <p><b>Long-barrel</b> (default): 30 flat, inherent AP (through-armor crit); the barrel fires stably for
  * {@link #STABLE_SHOTS} shots per battle, after which it takes +2 to-hit and jams on a natural-2 attack roll,
@@ -42,7 +42,7 @@ public class OSCoilAugmentedRailgun extends GaussWeapon {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /** Shots fired stably per battle before the barrel wears (tunable within 9–12). */
+    /** Shots fired stably per battle before the barrel wears (tunable within 9â€“12). */
     public static final int STABLE_SHOTS = 12;
     /** Barrel-wear degradation stack at which the weapon is scrapped. */
     public static final int SCRAP_AT = 5;
@@ -76,8 +76,6 @@ public class OSCoilAugmentedRailgun extends GaussWeapon {
         explosionDamage = 30;
         setModes(new String[] { "Normal", MODE_SHED });
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(3060, 3070, 3080, DATE_NONE, DATE_NONE)
@@ -88,7 +86,7 @@ public class OSCoilAugmentedRailgun extends GaussWeapon {
     }
 
     /**
-     * @return {@code true} if this mounted railgun is running without its rail barrel — either committed
+     * @return {@code true} if this mounted railgun is running without its rail barrel â€” either committed
      *       (one-way flag set after firing shed) or with the {@value #MODE_SHED} mode currently selected.
      */
     public static boolean isBarrelShed(Mounted<?> mounted) {

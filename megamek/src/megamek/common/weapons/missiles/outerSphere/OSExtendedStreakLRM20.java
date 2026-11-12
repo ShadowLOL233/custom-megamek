@@ -44,8 +44,6 @@ public class OSExtendedStreakLRM20 extends StreakLRMWeapon {
         extAV = 20;
         maxRange = RANGE_EXT;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.G)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.F)
               .setISAdvancement(3045, 3050, 3055, DATE_NONE, DATE_NONE)

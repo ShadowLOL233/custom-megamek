@@ -41,8 +41,6 @@ public class OSImproveUltraAC20 extends UACWeapon {
         bv = 337;
         cost = 625000;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(2900, 2930, 2960, DATE_NONE, DATE_NONE)

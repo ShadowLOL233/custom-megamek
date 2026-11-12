@@ -17,7 +17,7 @@ import megamek.common.weapons.ppc.PPCXWeapon;
 
 /**
  * Outer Sphere PPC-X
- * Cluster: 6 sub-beams × 2 damage = 12 max / Heat 10 / Range 7-10-13 / no min, 6t / 3 crit
+ * Cluster: 6 sub-beams Ã— 2 damage = 12 max / Heat 10 / Range 7-10-13 / no min, 6t / 3 crit
  *
  * Adapts LB-X autocannon cluster mechanics to particle weapons. Number of sub-beams
  * that hit is determined by the missile cluster hit table. Suffers a -1/+0/+1 ToHit
@@ -54,8 +54,6 @@ public class OSPPCX extends PPCXWeapon {
         explosive = true;
         atClass = CLASS_PPC;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(3060, 3070, 3080, DATE_NONE, DATE_NONE)

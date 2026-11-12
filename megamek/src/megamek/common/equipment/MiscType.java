@@ -35,6 +35,7 @@
 package megamek.common.equipment;
 
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.Map;
 
 import megamek.common.Messages;
@@ -502,7 +503,7 @@ public class MiscType extends EquipmentType {
     }
 
     /**
-     * @return True for the OS Combat Computer System modules (dev plan §9.2) whose critical-slot footprint is derived
+     * @return True for the OS Combat Computer System modules (dev plan Â§9.2) whose critical-slot footprint is derived
      *       from the mech's weapon loadout. Like the targeting computer, these must be loaded slot-by-slot instead of
      *       allocating all their slots up front, because the loadout isn't fully assembled while the crit slots are
      *       parsed.
@@ -683,7 +684,7 @@ public class MiscType extends EquipmentType {
                 return defaultRounding.round(entity.getWeight() * 0.15, entity);
             }
         } else if (hasFlag(MiscTypeFlag.F_OS_AES)) {
-            // OS Improved AES (dev plan §11): whole-Mek install at 5% of chassis tonnage.
+            // OS Improved AES (dev plan Â§11): whole-Mek install at 5% of chassis tonnage.
             return defaultRounding.round(entity.getWeight() * 0.05, entity);
         } else if (hasFlag(F_TARGETING_COMPUTER)) {
             // Upstream v0.51.0 refactored TC weight into a helper; OS RISC_LASER_PULSE_MODULE handling is folded
@@ -691,8 +692,8 @@ public class MiscType extends EquipmentType {
             double relevantEquipmentWeight = targetingComputerRelevantEquipmentWeight(entity);
             return RoundWeight.nextTon(relevantEquipmentWeight / (isClan() ? 5.0 : 4.0));
         } else if (hasFlag(MiscTypeFlag.F_OS_CC_BALLISTIC)) {
-            // OS CC modules (dev plan §9.2): max(1t, ceil(that weapon family's tonnage / ratio)); ballistic /8,
-            // missile /9, energy /10 — each lighter than the T-1800 (/5) so core + one module beats it.
+            // OS CC modules (dev plan Â§9.2): max(1t, ceil(that weapon family's tonnage / ratio)); ballistic /8,
+            // missile /9, energy /10 â€” each lighter than the T-1800 (/5) so core + one module beats it.
             double t = 0.0;
             for (Mounted<?> m : entity.getWeaponList()) {
                 if (((WeaponType) m.getType()).hasFlag(WeaponType.F_BALLISTIC)) {
@@ -717,8 +718,8 @@ public class MiscType extends EquipmentType {
             }
             return Math.max(1.0, Math.ceil(t / 9.0));
         } else if (hasFlag(MiscTypeFlag.F_OS_COMPOSITE_TC)) {
-            // OS T-1800 Composite Fire Control Module (dev plan §9.2): all weapon types, total tonnage / 5
-            // (Clan-TC rate). Standalone — no C-2500 core required.
+            // OS T-1800 Composite Fire Control Module (dev plan Â§9.2): all weapon types, total tonnage / 5
+            // (Clan-TC rate). Standalone â€” no C-2500 core required.
             double fTons = 0.0;
             for (Mounted<?> m : entity.getWeaponList()) {
                 fTons += m.getTonnage();
@@ -1843,27 +1844,27 @@ public class MiscType extends EquipmentType {
         EquipmentType.addType(MiscType.createOSSuperCharger());
         EquipmentType.addType(MiscType.createOSImproveSuperCharger());
         EquipmentType.addType(MiscType.createOSHeavyDutySuperCharger());
-        // OS Modular Electronics (dev plan §9) — Combat Computer System (CCS)
+        // OS Modular Electronics (dev plan Â§9) â€” Combat Computer System (CCS)
         EquipmentType.addType(MiscType.createOSCombatComputerCore());
         EquipmentType.addType(MiscType.createOSCCBallisticModule());
         EquipmentType.addType(MiscType.createOSCCEnergyModule());
         EquipmentType.addType(MiscType.createOSCCMissileModule());
         EquipmentType.addType(MiscType.createOSCompositeTargetingComputer());
-        // OS Modular Electronics (dev plan §9) — Battle Computer System (BCS)
+        // OS Modular Electronics (dev plan Â§9) â€” Battle Computer System (BCS)
         EquipmentType.addType(MiscType.createOSBattleComputerCore());
         EquipmentType.addType(MiscType.createOSGuardianECM());
         EquipmentType.addType(MiscType.createOSImproveGuardianECM());
         EquipmentType.addType(MiscType.createOSImproveAngleECM());
         EquipmentType.addType(MiscType.createOSC3Point());
         EquipmentType.addType(MiscType.createOSImproveC3Point());
-        // OS Modular Electronics (dev plan §9) — BCS Advance specialized cores
+        // OS Modular Electronics (dev plan Â§9) â€” BCS Advance specialized cores
         EquipmentType.addType(MiscType.createOSCrowNest());
         EquipmentType.addType(MiscType.createOSRavenCEWS());
         EquipmentType.addType(MiscType.createOSGhostCore());
-        // OS Owl Tactical Network (dev plan §9.7)
+        // OS Owl Tactical Network (dev plan Â§9.7)
         EquipmentType.addType(MiscType.createOSTacticalNetworkUplink());
         EquipmentType.addType(MiscType.createOSAegoliusCompiler());
-        // OS Actuator & Motive Systems (dev plan §11)
+        // OS Actuator & Motive Systems (dev plan Â§11)
         EquipmentType.addType(MiscType.createOSImprovedAES());
         EquipmentType.addType(MiscType.createOSImprovedArmoredMotiveSystem());
         EquipmentType.addType(MiscType.createISMediumShield());
@@ -2525,7 +2526,7 @@ public class MiscType extends EquipmentType {
         misc.omniFixedOnly = true;
         misc.bv = 0;
         misc.setModes(new String[] { "Armed", "Off" });
-        misc.rulesRefs = "AU";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
@@ -2550,7 +2551,7 @@ public class MiscType extends EquipmentType {
         misc.omniFixedOnly = true;
         misc.bv = 0;
         misc.setModes(new String[] { "Armed", "Off" });
-        misc.rulesRefs = "AU";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
@@ -2575,7 +2576,7 @@ public class MiscType extends EquipmentType {
         misc.omniFixedOnly = true;
         misc.bv = 0;
         misc.setModes(new String[] { "Armed", "Off" });
-        misc.rulesRefs = "AU";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
@@ -2602,7 +2603,7 @@ public class MiscType extends EquipmentType {
               MiscTypeFlag.S_SUPERCHARGER);
         misc.bv = 0;
         misc.setModes(new String[] { "Armed", "Off" });
-        misc.rulesRefs = "AU";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
@@ -2626,7 +2627,7 @@ public class MiscType extends EquipmentType {
               MiscTypeFlag.S_SUPERCHARGER, MiscTypeFlag.S_OS_IMPROVE);
         misc.bv = 0;
         misc.setModes(new String[] { "Armed", "Off" });
-        misc.rulesRefs = "AU";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
@@ -2650,7 +2651,7 @@ public class MiscType extends EquipmentType {
               MiscTypeFlag.S_SUPERCHARGER, MiscTypeFlag.S_OS_HEAVY_DUTY);
         misc.bv = 0;
         misc.setModes(new String[] { "Armed", "Off" });
-        misc.rulesRefs = "AU";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
@@ -2662,7 +2663,7 @@ public class MiscType extends EquipmentType {
         return misc;
     }
 
-    // ===== OS Modular Electronics (dev plan §9) — Combat Computer System (CCS) =====
+    // ===== OS Modular Electronics (dev plan Â§9) â€” Combat Computer System (CCS) =====
     // C-2500 core = prerequisite + aiming brain (grants Aimed Shot). Weapon-type modules supply the -1 to-hit
     // (wired in ComputeAttackerToHitMods in a later pass). Composite covers all weapon types at Clan-standard weight.
 
@@ -2678,7 +2679,7 @@ public class MiscType extends EquipmentType {
               F_SUPPORT_TANK_EQUIPMENT, F_FIGHTER_EQUIPMENT);
         misc.setModes(new String[] { "Normal", "Aimed shot" });
         misc.bv = 0;
-        misc.rulesRefs = "AU";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
@@ -2701,7 +2702,7 @@ public class MiscType extends EquipmentType {
         misc.flags = misc.flags.or(MiscTypeFlag.F_OS_CC_BALLISTIC, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT,
               F_SUPPORT_TANK_EQUIPMENT, F_FIGHTER_EQUIPMENT);
         misc.bv = 0;
-        misc.rulesRefs = "AU";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
@@ -2724,7 +2725,7 @@ public class MiscType extends EquipmentType {
         misc.flags = misc.flags.or(MiscTypeFlag.F_OS_CC_ENERGY, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT,
               F_SUPPORT_TANK_EQUIPMENT, F_FIGHTER_EQUIPMENT);
         misc.bv = 0;
-        misc.rulesRefs = "AU";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
@@ -2747,7 +2748,7 @@ public class MiscType extends EquipmentType {
         misc.flags = misc.flags.or(MiscTypeFlag.F_OS_CC_MISSILE, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT,
               F_SUPPORT_TANK_EQUIPMENT, F_FIGHTER_EQUIPMENT);
         misc.bv = 0;
-        misc.rulesRefs = "AU";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
@@ -2773,7 +2774,7 @@ public class MiscType extends EquipmentType {
               F_SUPPORT_TANK_EQUIPMENT, F_FIGHTER_EQUIPMENT);
         misc.setModes(new String[] { "Normal", "Aimed shot" });
         misc.bv = 0;
-        misc.rulesRefs = "AU";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
@@ -2785,7 +2786,7 @@ public class MiscType extends EquipmentType {
         return misc;
     }
 
-    // ===== OS Modular Electronics (dev plan §9) — Battle Computer System (BCS) =====
+    // ===== OS Modular Electronics (dev plan Â§9) â€” Battle Computer System (BCS) =====
     // B-2500 core = prerequisite + command/coordination (Tactical Coordination roll + initiative wired in a later
     // pass). Designation B-3000 reserved for a future evolved core. OS ECM reuses F_ECM/F_ANGEL_ECM, OS-lightened.
 
@@ -2799,7 +2800,7 @@ public class MiscType extends EquipmentType {
         misc.cost = 1000000;
         misc.flags = misc.flags.or(MiscTypeFlag.F_OS_BATTLE_COMPUTER, F_MEK_EQUIPMENT);
         misc.bv = 0;
-        misc.rulesRefs = "AU";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
@@ -2823,7 +2824,7 @@ public class MiscType extends EquipmentType {
         misc.bv = 61;
         misc.setModes("ECM");
         misc.setInstantModeSwitch(false);
-        misc.rulesRefs = "AU";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
@@ -2847,7 +2848,7 @@ public class MiscType extends EquipmentType {
         misc.bv = 61;
         misc.setModes("ECM");
         misc.setInstantModeSwitch(false);
-        misc.rulesRefs = "AU";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
@@ -2872,7 +2873,7 @@ public class MiscType extends EquipmentType {
         misc.bv = 100;
         misc.setModes("ECM");
         misc.setInstantModeSwitch(false);
-        misc.rulesRefs = "AU";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
@@ -2884,7 +2885,7 @@ public class MiscType extends EquipmentType {
         return misc;
     }
 
-    // BCS C3 Point — a Boosted (ECM-resistant) C3 slave equivalent. The C3 Node (master) is a weapon (OSC3Node).
+    // BCS C3 Point â€” a Boosted (ECM-resistant) C3 slave equivalent. The C3 Node (master) is a weapon (OSC3Node).
     public static MiscType createOSC3Point() {
         MiscType misc = new MiscType();
         misc.name = "B-2500 C3 Point";
@@ -2897,7 +2898,7 @@ public class MiscType extends EquipmentType {
         misc.flags = misc.flags.or(F_C3SBS, MiscTypeFlag.ANY_C3, MiscTypeFlag.F_OS_BCS_MODULE, F_MEK_EQUIPMENT,
               F_TANK_EQUIPMENT);
         misc.bv = 0;
-        misc.rulesRefs = "AU";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
@@ -2909,7 +2910,7 @@ public class MiscType extends EquipmentType {
         return misc;
     }
 
-    // BCS Improve C3 Point (dev plan §9.1) — the Improve-tier boosted C3 slave with focus-fire: while on a C3 network,
+    // BCS Improve C3 Point (dev plan Â§9.1) â€” the Improve-tier boosted C3 slave with focus-fire: while on a C3 network,
     // network units attacking a target the network has TAG'd get -1 (F_OS_C3_FOCUS_FIRE, routed through the non-stacking
     // network-coordination cap). Modeled as a MiscType C3 slave (canon C3 slaves are MiscType); its built-in TAG is
     // network-TAG-driven for now (see the flag doc). Requires a B-2500 core (F_OS_BCS_MODULE).
@@ -2925,7 +2926,7 @@ public class MiscType extends EquipmentType {
         misc.flags = misc.flags.or(F_C3SBS, MiscTypeFlag.ANY_C3, MiscTypeFlag.F_OS_BCS_MODULE,
               MiscTypeFlag.F_OS_C3_FOCUS_FIRE, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT);
         misc.bv = 0;
-        misc.rulesRefs = "AU";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
@@ -2937,10 +2938,10 @@ public class MiscType extends EquipmentType {
         return misc;
     }
 
-    // ===== BCS Advance specialized cores (dev plan §9) — self-contained combined EW; single-core, mutually
+    // ===== BCS Advance specialized cores (dev plan Â§9) â€” self-contained combined EW; single-core, mutually
     // exclusive with the B-2500 (enforced in TestMek). Distinctive behaviors: Crow Nest's full +2 command is wired
     // (Player.getBcsCoordinationInitBonus); Ghost's stealth-system coexistence holds by construction (it carries only
-    // ECM — no C3/C3i/probe — so it trips none of the null-sig / Chameleon-LPS exclusions). Still mechanics-remaining:
+    // ECM â€” no C3/C3i/probe â€” so it trips none of the null-sig / Chameleon-LPS exclusions). Still mechanics-remaining:
     // Crow Nest's pre-battle C3/Raven network lock (+ its integrated C3-Node), Raven's C3i-style 6-unit egalitarian net
     // and built-in Light TAG.
 
@@ -2956,7 +2957,7 @@ public class MiscType extends EquipmentType {
         misc.bv = 68;
         misc.setModes("ECM");
         misc.setInstantModeSwitch(false);
-        misc.rulesRefs = "AU";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
@@ -2980,7 +2981,7 @@ public class MiscType extends EquipmentType {
         misc.bv = 68;
         misc.setModes("ECM");
         misc.setInstantModeSwitch(false);
-        misc.rulesRefs = "AU";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
@@ -3004,7 +3005,7 @@ public class MiscType extends EquipmentType {
         misc.bv = 61;
         misc.setModes("ECM");
         misc.setInstantModeSwitch(false);
-        misc.rulesRefs = "AU";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
@@ -3016,10 +3017,10 @@ public class MiscType extends EquipmentType {
         return misc;
     }
 
-    // ===== OS Owl Tactical Network (dev plan §9.7) — an anti-jam designator datalink. The designators
+    // ===== OS Owl Tactical Network (dev plan Â§9.7) â€” an anti-jam designator datalink. The designators
     // (Kestrel/Shrike/Lodestar) collect the data; the Owl TNU relays it under jamming (immune to standard Guardian
     // ECM); the Aegolius Compiler, hosted on a C3-Node, compiles up to 6 TNU feeds into the C3 network. Zero
-    // to-hit — pure infrastructure. Sub-network + designator-bridge + ECM semantics are a later pass.
+    // to-hit â€” pure infrastructure. Sub-network + designator-bridge + ECM semantics are a later pass.
 
     public static MiscType createOSTacticalNetworkUplink() {
         MiscType misc = new MiscType();
@@ -3033,7 +3034,7 @@ public class MiscType extends EquipmentType {
         misc.flags = misc.flags.or(MiscTypeFlag.F_OS_TNU, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT,
               F_SUPPORT_TANK_EQUIPMENT, F_FIGHTER_EQUIPMENT);
         misc.bv = 50;
-        misc.rulesRefs = "AU";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
@@ -3057,7 +3058,7 @@ public class MiscType extends EquipmentType {
         misc.flags = misc.flags.or(MiscTypeFlag.F_OS_TNU_COMPILER, F_MEK_EQUIPMENT, F_TANK_EQUIPMENT,
               F_SUPPORT_TANK_EQUIPMENT, F_FIGHTER_EQUIPMENT);
         misc.bv = 110;
-        misc.rulesRefs = "AU";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
@@ -5671,8 +5672,6 @@ public class MiscType extends EquipmentType {
         misc.cost = 50000;
         misc.bv = 0;
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.D, AvailabilityValue.C)
               .setISAdvancement(2824, 2825, 2828)
@@ -7711,10 +7710,8 @@ public class MiscType extends EquipmentType {
               F_SUPPORT_TANK_EQUIPMENT,
               F_FIGHTER_EQUIPMENT,
               F_HEAVY_EQUIPMENT);
-        misc.rulesRefs = "206, TM";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -7726,7 +7723,7 @@ public class MiscType extends EquipmentType {
     }
 
     // Outer Sphere (OS) Artemis V FCS: the premium LRM/SRM fire-control. Like Artemis IV it grants +2 to the
-    // cluster roll, but ADDS an extra -1 to-hit — both only when firing Artemis V-capable rounds. The cluster
+    // cluster roll, but ADDS an extra -1 to-hit â€” both only when firing Artemis V-capable rounds. The cluster
     // half is applied in MissileWeaponHandler; the to-hit half in ComputeToHit.
     public static MiscType createOSArtemisV() {
         MiscType misc = new MiscType();
@@ -7745,10 +7742,8 @@ public class MiscType extends EquipmentType {
               F_SUPPORT_TANK_EQUIPMENT,
               F_FIGHTER_EQUIPMENT,
               F_HEAVY_EQUIPMENT);
-        misc.rulesRefs = "OS";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(2830, 2845, 2865, DATE_NONE, DATE_NONE)
@@ -7780,10 +7775,8 @@ public class MiscType extends EquipmentType {
               F_SUPPORT_TANK_EQUIPMENT,
               F_FIGHTER_EQUIPMENT,
               F_HEAVY_EQUIPMENT);
-        misc.rulesRefs = "OS";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -7795,7 +7788,7 @@ public class MiscType extends EquipmentType {
     }
 
     // Outer Sphere (OS) Diana IV FCS: the premium MRM fire-control. Like Diana III it grants +2 to the cluster
-    // roll, but ADDS an extra -1 to-hit — both only when firing Diana IV-capable MRM rounds. The cluster half is
+    // roll, but ADDS an extra -1 to-hit â€” both only when firing Diana IV-capable MRM rounds. The cluster half is
     // applied in MissileWeaponHandler; the to-hit half in ComputeToHit.
     public static MiscType createOSDianaIV() {
         MiscType misc = new MiscType();
@@ -7815,10 +7808,8 @@ public class MiscType extends EquipmentType {
               F_SUPPORT_TANK_EQUIPMENT,
               F_FIGHTER_EQUIPMENT,
               F_HEAVY_EQUIPMENT);
-        misc.rulesRefs = "OS";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(2830, 2845, 2865, DATE_NONE, DATE_NONE)
@@ -7849,10 +7840,8 @@ public class MiscType extends EquipmentType {
               F_SUPPORT_TANK_EQUIPMENT,
               F_FIGHTER_EQUIPMENT,
               F_HEAVY_EQUIPMENT);
-        misc.rulesRefs = "OS";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(3060, 3070, 3080, DATE_NONE, DATE_NONE)
@@ -8229,7 +8218,7 @@ public class MiscType extends EquipmentType {
         misc.flags = misc.flags.or(F_DOUBLE_HEAT_SINK);
         misc.bv = 0;
         misc.cost = 6000;
-        misc.rulesRefs = "OS Custom";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setISAdvancement(2835, 2845, 2860)
               .setTechRating(TechRating.E)
@@ -8249,7 +8238,7 @@ public class MiscType extends EquipmentType {
         misc.flags = misc.flags.or(F_TRIPLE_HEAT_SINK);
         misc.bv = 0;
         misc.cost = 10500;
-        misc.rulesRefs = "OS Custom";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setISAdvancement(2850, 2870, 2880)
               .setTechRating(TechRating.E)
@@ -8269,7 +8258,7 @@ public class MiscType extends EquipmentType {
         misc.flags = misc.flags.or(F_QUAD_HEAT_SINK);
         misc.bv = 0;
         misc.cost = 16000;
-        misc.rulesRefs = "OS Custom";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setISAdvancement(2895, 2905, 2920)
               .setTechRating(TechRating.F)
@@ -8294,7 +8283,7 @@ public class MiscType extends EquipmentType {
         misc.flags = misc.flags.or(F_DOUBLE_HEAT_SINK, F_COMPACT_HEAT_SINK);
         misc.bv = 0;
         misc.cost = 6000;
-        misc.rulesRefs = "OS Custom";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setISAdvancement(3000, 3025, 3050)
               .setTechRating(TechRating.F)
@@ -11691,16 +11680,16 @@ public class MiscType extends EquipmentType {
     }
 
     // ----------------------------------------------------------------------------------------------------------------
-    // OS Actuator & Motive Systems (dev plan §11) — Improve tier
+    // OS Actuator & Motive Systems (dev plan Â§11) â€” Improve tier
     // ----------------------------------------------------------------------------------------------------------------
 
     /**
      * OS Improve-tier Actuator Enhancement System (AES-I). Reconceived as a whole-Mek mobility/handling system, NOT
      * the canon per-limb to-hit item: the new {@link MiscTypeFlag#F_OS_AES} flag deliberately triggers none of the
-     * canon per-limb/physical logic, the AES⊥TC/⊥MASC validator, or {@code hasFunctionalArmAES}. Its effects — −1 to
-     * the attacker's move-based to-hit when it RAN/JUMPED, and offsetting the Hardened/Modular Armor MP penalties —
-     * are wired in {@code ComputeAttackerToHitMods} and the {@code Mek} MP path. Weight = tonnage × 0.05, crits by
-     * weight class (L1/M2/H3/A4), cost = tonnage × 4,000; BV TBD.
+     * canon per-limb/physical logic, the AESâŠ¥TC/âŠ¥MASC validator, or {@code hasFunctionalArmAES}. Its effects â€” âˆ’1 to
+     * the attacker's move-based to-hit when it RAN/JUMPED, and offsetting the Hardened/Modular Armor MP penalties â€”
+     * are wired in {@code ComputeAttackerToHitMods} and the {@code Mek} MP path. Weight = tonnage Ã— 0.05, crits by
+     * weight class (L1/M2/H3/A4), cost = tonnage Ã— 4,000; BV TBD.
      */
     public static MiscType createOSImprovedAES() {
         MiscType misc = new MiscType();
@@ -11713,8 +11702,8 @@ public class MiscType extends EquipmentType {
         misc.cost = COST_VARIABLE;
         misc.flags = misc.flags.or(MiscTypeFlag.F_OS_AES, F_MEK_EQUIPMENT);
         misc.omniFixedOnly = true;
-        misc.bv = 0;   // BV TBD (modest); see dev plan §11
-        misc.rulesRefs = "AU";
+        misc.bv = 0;   // BV TBD (modest); see dev plan Â§11
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.F, AvailabilityValue.E, AvailabilityValue.D, AvailabilityValue.D)
@@ -11727,9 +11716,9 @@ public class MiscType extends EquipmentType {
     }
 
     /**
-     * OS Improve-tier Armored Motive System (AMS-I) — combat/support vehicle chassis mod. Reuses the canon
-     * {@link MiscTypeFlag#F_ARMORED_MOTIVE_SYSTEM} mechanic (−2 to the motive-system damage roll) but is lighter
-     * (tonnage × 0.10, matching Clan) and costs tonnage × 120,000. NOT the Anti-Missile System.
+     * OS Improve-tier Armored Motive System (AMS-I) â€” combat/support vehicle chassis mod. Reuses the canon
+     * {@link MiscTypeFlag#F_ARMORED_MOTIVE_SYSTEM} mechanic (âˆ’2 to the motive-system damage roll) but is lighter
+     * (tonnage Ã— 0.10, matching Clan) and costs tonnage Ã— 120,000. NOT the Anti-Missile System.
      */
     public static MiscType createOSImprovedArmoredMotiveSystem() {
         MiscType misc = new MiscType();
@@ -11744,7 +11733,7 @@ public class MiscType extends EquipmentType {
         misc.omniFixedOnly = true;
         misc.flags = misc.flags.or(F_ARMORED_MOTIVE_SYSTEM, F_TANK_EQUIPMENT, F_SUPPORT_TANK_EQUIPMENT);
         misc.bv = 0;
-        misc.rulesRefs = "AU";
+        misc.rulesRefs = List.of();
         misc.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.F, AvailabilityValue.E, AvailabilityValue.D, AvailabilityValue.D)
@@ -14319,7 +14308,7 @@ public class MiscType extends EquipmentType {
      * Weight: 3 tons fixed. 5 crit slots spread across CT, RT, LT, RA, LA.
      * Effect: PPC -50%, other energy weapons -10% (min 1) while in "On" mode.
      * After 8 consecutive rounds of use, must roll each round to avoid failure.
-     * Any crit slot destroyed → entire system fails.
+     * Any crit slot destroyed â†’ entire system fails.
      */
     public static MiscType createOSPFD() {
         MiscType misc = new MiscType();
@@ -14353,7 +14342,7 @@ public class MiscType extends EquipmentType {
      * Weight: 0 tons. 5 crit slots spread across CT, RT, LT, RA, LA.
      * Effect: PPC-type weapons -50% (min 1), other energy weapons -20% (min 1) while in "On" mode.
      * After 8 consecutive rounds of use, must roll each round to avoid failure.
-     * Any crit slot destroyed → entire system fails.
+     * Any crit slot destroyed â†’ entire system fails.
      */
     public static MiscType createOSAdvPFD() {
         MiscType misc = new MiscType();

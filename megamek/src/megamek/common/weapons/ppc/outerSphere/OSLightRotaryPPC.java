@@ -16,12 +16,12 @@ import megamek.common.enums.TechRating;
 import megamek.common.weapons.ppc.PPCRotaryWeapon;
 
 /**
- * Outer Sphere Rotary Light PPC (RLPPC) — the standard entry in the Rotary PPC family.
+ * Outer Sphere Rotary Light PPC (RLPPC) â€” the standard entry in the Rotary PPC family.
  *
  * Mode-dial cluster PPC: 5 damage per sub-bolt across 1-5 firing modes / 5 heat per shot /
  * Range 6-12-18 no min / 7t / 5 crit / BV ~280.
  *
- * The first three shots are self-cooled and pod-free, each costing ⌈5/3⌉ = 2 suppressed heat;
+ * The first three shots are self-cooled and pod-free, each costing âŒˆ5/3âŒ‰ = 2 suppressed heat;
  * only the 4th and 5th shots draw one charge each from an installed RPPC Coolant Pod. Dialing
  * 4+ shot without sufficient coolant triggers Capacitor Overload: weapon destroyed, entity heat
  * +15, and 15 points of internal damage to the mounting location.
@@ -61,8 +61,6 @@ public class OSLightRotaryPPC extends PPCRotaryWeapon {
         // capacitor requirement, so this damage is applied unconditionally on weapon-crit.
         explosionDamage = 15;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
               .setISAdvancement(3060, 3070, 3080, DATE_NONE, DATE_NONE)

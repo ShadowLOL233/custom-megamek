@@ -11,6 +11,7 @@ import java.util.Vector;
 
 import megamek.common.Hex;
 import megamek.common.HitData;
+import megamek.common.enums.HitDamageType;
 import megamek.common.Report;
 import megamek.common.ToHitData;
 import megamek.common.actions.WeaponAttackAction;
@@ -37,7 +38,7 @@ public class OSUltraAPDSHandler extends UltraWeaponHandler {
     public OSUltraAPDSHandler(ToHitData t, WeaponAttackAction w, Game g, TWGameManager m)
           throws EntityLoadingException {
         super(t, w, g, m);
-        generalDamageType = HitData.DAMAGE_ARMOR_PIERCING;
+        generalDamageType = HitDamageType.DAMAGE_ARMOR_PIERCING;
     }
 
     @Override
@@ -115,11 +116,7 @@ public class OSUltraAPDSHandler extends UltraWeaponHandler {
             if (bDirect) {
                 critModifier += toHit.getMoS() / 3;
             }
-            if (!game.getOptions().booleanOption(OptionsConstants.PLAYTEST_3)) {
-                hit.makeArmorPiercing(ammoType, critModifier);
-            } else {
-                hit.makeArmorPiercingPlaytest(ammoType, critModifier);
-            }
+            hit.makeArmorPiercing(ammoType, critModifier);
             vPhaseReport.addAll(gameManager.damageEntity(entityTarget, hit, nDamage, false,
                   attackingEntity.getSwarmTargetId() == entityTarget.getId() ? DamageType.IGNORE_PASSENGER : damageType,
                   false, false, throughFront, underWater));

@@ -23,6 +23,7 @@
 package megamek.common.weapons.c3;
 
 import java.io.Serial;
+import java.util.List;
 
 import megamek.common.SimpleTechLevel;
 import megamek.common.ToHitData;
@@ -74,7 +75,7 @@ public class OSDemonHackingSystem extends TAGWeapon {
         mediumRange = 9;
         longRange = 15;
         extremeRange = 18;
-        rulesRefs = "AU";
+        rulesRefs = List.of();
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)

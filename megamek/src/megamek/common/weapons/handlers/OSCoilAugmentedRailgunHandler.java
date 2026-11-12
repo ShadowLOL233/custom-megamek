@@ -10,6 +10,7 @@ import java.io.Serial;
 import java.util.Vector;
 
 import megamek.common.HitData;
+import megamek.common.enums.HitDamageType;
 import megamek.common.Report;
 import megamek.common.ToHitData;
 import megamek.common.actions.WeaponAttackAction;
@@ -62,7 +63,7 @@ public class OSCoilAugmentedRailgunHandler extends ACAPHandler {
         boolean shed = weapon.isRailgunBarrelShed();
 
         // AP is velocity-driven: present with the rail barrel, gone once shed.
-        generalDamageType = shed ? HitData.DAMAGE_NONE : HitData.DAMAGE_ARMOR_PIERCING;
+        generalDamageType = shed ? HitDamageType.DAMAGE_NONE : HitDamageType.DAMAGE_ARMOR_PIERCING;
 
         if (super.doChecks(vPhaseReport)) {
             weapon.incrementRailgunShotsFired();

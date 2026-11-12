@@ -16,10 +16,10 @@ import megamek.common.enums.TechRating;
 import megamek.common.equipment.Mounted;
 
 /**
- * Outer Sphere Enhanced HVAC/16 — Enhanced-tier refinement of the Improve precision HVAC: same firepower,
- * reach and range-scaling accuracy (medium/long −1, extreme −2), but −2 t, −2 crit and −1 heat. Shares the Improve
+ * Outer Sphere Enhanced HVAC/16 â€” Enhanced-tier refinement of the Improve precision HVAC: same firepower,
+ * reach and range-scaling accuracy (medium/long âˆ’1, extreme âˆ’2), but âˆ’2 t, âˆ’2 crit and âˆ’1 heat. Shares the Improve
  * BV (damage/range/accuracy are identical; the lighter/cooler build is the mech-level advantage).
- * Aerospace-capable (AV = damage, maxRange = extreme); electromagnetic-chemical action — no cook-off.
+ * Aerospace-capable (AV = damage, maxRange = extreme); electromagnetic-chemical action â€” no cook-off.
  */
 public class OSEnhancedHVAC16 extends OSHVACWeapon {
     @Serial
@@ -49,8 +49,6 @@ public class OSEnhancedHVAC16 extends OSHVACWeapon {
         extAV = 16;
         maxRange = RANGE_EXT;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(3000, 3025, 3050, DATE_NONE, DATE_NONE)

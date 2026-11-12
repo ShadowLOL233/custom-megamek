@@ -13,7 +13,7 @@ import java.io.Serial;
 import megamek.common.SimpleTechLevel;
 import megamek.common.ToHitData;
 import megamek.common.actions.WeaponAttackAction;
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
@@ -26,7 +26,7 @@ import megamek.common.weapons.ppc.PPCWeapon;
 import megamek.server.totalWarfare.TWGameManager;
 
 /**
- * Outer Sphere Hyper PPC — the apex energy weapon of the OS arsenal.
+ * Outer Sphere Hyper PPC â€” the apex energy weapon of the OS arsenal.
  *
  * Damage 30 / Heat 30 (fire) + 10 (charge) / Range 12-24-36 / min 3, -1 ToHit, 10t / 7 crit.
  *
@@ -34,7 +34,7 @@ import megamek.server.totalWarfare.TWGameManager;
  * generates charge heat each subsequent turn while charging, fires for full damage when
  * discharged, then enters a 1-turn cooldown before being usable again.
  *
- * Range 12-24-36 matches Large Hyper Laser — both share the "naval pocket version"
+ * Range 12-24-36 matches Large Hyper Laser â€” both share the "naval pocket version"
  * lore that justifies extreme range relative to ground-scale weapons.
  */
 public class OSHyperPPC extends PPCWeapon {
@@ -76,8 +76,6 @@ public class OSHyperPPC extends PPCWeapon {
         setModes("Off", "Charging");
         setInstantModeSwitch(false);
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.G)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
               .setISAdvancement(3045, 3050, 3055, DATE_NONE, DATE_NONE)

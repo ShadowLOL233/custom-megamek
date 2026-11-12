@@ -14664,14 +14664,11 @@ public class TWGameManager extends AbstractGameManager {
                   (lanceArmorType != EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FF) &&
                   (lanceArmorType != EquipmentType.T_ARMOR_OS_ADV_HARDENED_FF) &&
                   (lanceArmorType != EquipmentType.T_ARMOR_OS_HARDENED_HEAVY_FERRO_LAMELLOR)) {
-                // PLAYTEST3 Ferro_Lam does not block the lance in playtest3, but APA/ABA does.
+                // Ferro-Lamellor blocks the lance per standard rules.
                 // OS Ferro-Lamellor variants follow standard Ferro-Lamellor behavior.
-                if ((!game.getOptions().booleanOption(OptionsConstants.PLAYTEST_3)
-                      && lanceArmorType != EquipmentType.T_ARMOR_FERRO_LAMELLOR
+                if (lanceArmorType != EquipmentType.T_ARMOR_FERRO_LAMELLOR
                       && lanceArmorType != EquipmentType.T_ARMOR_OS_FERRO_LAMELLOR
-                      && lanceArmorType != EquipmentType.T_ARMOR_OS_HEAVY_FERRO_LAMELLOR)
-                      || (game.getOptions().booleanOption(OptionsConstants.PLAYTEST_3)
-                      && lanceArmorType != EquipmentType.T_ARMOR_ANTI_PENETRATIVE_ABLATION)) {
+                      && lanceArmorType != EquipmentType.T_ARMOR_OS_HEAVY_FERRO_LAMELLOR) {
                     Roll diceRoll2 = Compute.rollD6(2);
                     // Pierce checking report
                     r = new Report(4021);

@@ -7,6 +7,7 @@
 package megamek.common.weapons.c3;
 
 import java.io.Serial;
+import java.util.List;
 
 import megamek.common.SimpleTechLevel;
 import megamek.common.enums.AvailabilityValue;
@@ -57,7 +58,7 @@ public class OSKestrelDesignator extends TAGWeapon {
         mediumRange = 16;
         longRange = 17;
         extremeRange = 18;
-        rulesRefs = "AU";
+        rulesRefs = List.of();
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)

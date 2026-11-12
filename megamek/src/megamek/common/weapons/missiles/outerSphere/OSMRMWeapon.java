@@ -12,13 +12,13 @@ import java.io.Serial;
 
 import megamek.common.ToHitData;
 import megamek.common.actions.WeaponAttackAction;
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import megamek.common.equipment.AmmoType;
 import megamek.common.game.Game;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.units.Entity;
 import megamek.common.weapons.handlers.AttackHandler;
-import megamek.common.weapons.handlers.MRMHandler;
+import megamek.common.weapons.handlers.mrm.MRMHandler;
 import megamek.common.weapons.handlers.MissileMineClearanceHandler;
 import megamek.common.weapons.handlers.lrm.LRMAntiTSMHandler;
 import megamek.common.weapons.handlers.lrm.LRMDeadFireHandler;

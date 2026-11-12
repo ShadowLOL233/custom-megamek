@@ -239,11 +239,11 @@ public class AmmoType extends EquipmentType {
         // OS HVAC repurposed to a long-barrel precision anti-armor AC. Dedicated enum so the new calibers
         // 10/12/14/16 do not cross-load with the canon HYPER_VELOCITY HVAC 2/5/10 (esp. the shared caliber
         // 10). Single-slug (uses ACWeaponHandler, no cook-off handler keyed to HYPER_VELOCITY), so a custom
-        // enum is behaviourally safe — matches the AC_STD_OS "behaviour-simple -> dedicated *_OS" rule.
+        // enum is behaviourally safe â€” matches the AC_STD_OS "behaviour-simple -> dedicated *_OS" rule.
         HVAC_OS(139, "High-Velocity Autocannon (OS)", AmmoCategory.Ballistic),
-        // Electromagnetic Lance (Advance) — a power-gated coil supergun. Dedicated enum for its full-power
+        // Electromagnetic Lance (Advance) â€” a power-gated coil supergun. Dedicated enum for its full-power
         // kinetic slug plus throttled-down payload munitions (Flak/Flechette), whose loaded round selects the
-        // range/damage profile. See OSElectromagneticLance and OS_TECHBASE_DEVELOPMENT_PLAN §8.
+        // range/damage profile. See OSElectromagneticLance and OS_TECHBASE_DEVELOPMENT_PLAN Â§8.
         EM_LANCE_OS(140, "Electromagnetic Lance (OS)", AmmoCategory.Ballistic),
         // Upstream v0.51.0 canon addition; ordinal shifted from 114 (collides with OS PPC_COOLANT) to 141.
         NLRM_TORPEDO(141, "NLRM Torpedo", AmmoCategory.Missile),
@@ -496,14 +496,13 @@ public class AmmoType extends EquipmentType {
                 .setStaticTechLevel(SimpleTechLevel.STANDARD),
           rulesRefs(SourceBookCode.TM, 230));
 
-    // Outer Sphere (OS) Artemis IV-capable munition mutator — same M_ARTEMIS_CAPABLE effect, but on the OS tech
+    // Outer Sphere (OS) Artemis IV-capable munition mutator â€” same M_ARTEMIS_CAPABLE effect, but on the OS tech
     // base and dated to the OS Standard tier (matching the OS Artemis IV FCS), so OS missile ammo stays OS-native.
     private static final MunitionMutator OS_ARTEMIS_CAPABLE_MUNITION_MUTATOR = new MunitionMutator("Artemis IV-capable",
           "Artemis IV",
           1,
           Munitions.M_ARTEMIS_CAPABLE,
-          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
-                .setUnofficial(false)
+          new TechAdvancement(TechBase.OUTER_SPHERE)
                 .setTechRating(TechRating.E)
                 .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
                 .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -511,17 +510,16 @@ public class AmmoType extends EquipmentType {
                 .setPrototypeFactions(Faction.LEGION)
                 .setProductionFactions(Faction.LEGION)
                 .setStaticTechLevel(SimpleTechLevel.STANDARD),
-          "AU");
+          List.of());
 
-    // Outer Sphere (OS) Diana III-capable MRM munition mutator — the dedicated round the Diana III MRM FCS keys
+    // Outer Sphere (OS) Diana III-capable MRM munition mutator â€” the dedicated round the Diana III MRM FCS keys
     // off of (mirrors Artemis IV-capable). Only Diana III-capable MRM rounds unlock the FCS's +2 cluster bonus;
     // plain MRM rounds still fire but get no FCS benefit. Dated to the Diana III FCS.
     private static final MunitionMutator OS_DIANA_CAPABLE_MUNITION_MUTATOR = new MunitionMutator("Diana III-capable",
           "Diana III",
           1,
           Munitions.M_DIANA_CAPABLE,
-          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
-                .setUnofficial(false)
+          new TechAdvancement(TechBase.OUTER_SPHERE)
                 .setTechRating(TechRating.E)
                 .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
                 .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -529,16 +527,15 @@ public class AmmoType extends EquipmentType {
                 .setPrototypeFactions(Faction.LEGION)
                 .setProductionFactions(Faction.LEGION)
                 .setStaticTechLevel(SimpleTechLevel.STANDARD),
-          "AU");
+          List.of());
 
-    // Outer Sphere (OS) Artemis V-capable munition mutator — the premium LRM/SRM round the Artemis V FCS keys off
+    // Outer Sphere (OS) Artemis V-capable munition mutator â€” the premium LRM/SRM round the Artemis V FCS keys off
     // of. Distinct from Artemis IV-capable: unlocks Artemis V's +2 cluster AND -1 to-hit. Dated to Artemis V.
     private static final MunitionMutator OS_ARTEMIS_V_CAPABLE_MUNITION_MUTATOR = new MunitionMutator("Artemis V-capable",
           "Artemis V",
           1,
           Munitions.M_OS_ARTEMIS_V_CAPABLE,
-          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
-                .setUnofficial(false)
+          new TechAdvancement(TechBase.OUTER_SPHERE)
                 .setTechRating(TechRating.E)
                 .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
                 .setISAdvancement(2830, 2845, 2865, DATE_NONE, DATE_NONE)
@@ -546,16 +543,15 @@ public class AmmoType extends EquipmentType {
                 .setPrototypeFactions(Faction.LEGION)
                 .setProductionFactions(Faction.LEGION)
                 .setStaticTechLevel(SimpleTechLevel.STANDARD),
-          "AU");
+          List.of());
 
-    // Outer Sphere (OS) Diana IV-capable MRM munition mutator — the premium MRM round the Diana IV FCS keys off
+    // Outer Sphere (OS) Diana IV-capable MRM munition mutator â€” the premium MRM round the Diana IV FCS keys off
     // of. Distinct from Diana III-capable: unlocks Diana IV's +2 cluster AND -1 to-hit. Dated to Diana IV.
     private static final MunitionMutator OS_DIANA_IV_CAPABLE_MUNITION_MUTATOR = new MunitionMutator("Diana IV-capable",
           "Diana IV",
           1,
           Munitions.M_OS_DIANA_IV_CAPABLE,
-          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
-                .setUnofficial(false)
+          new TechAdvancement(TechBase.OUTER_SPHERE)
                 .setTechRating(TechRating.E)
                 .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
                 .setISAdvancement(2830, 2845, 2865, DATE_NONE, DATE_NONE)
@@ -563,13 +559,12 @@ public class AmmoType extends EquipmentType {
                 .setPrototypeFactions(Faction.LEGION)
                 .setProductionFactions(Faction.LEGION)
                 .setStaticTechLevel(SimpleTechLevel.STANDARD),
-          "AU");
+          List.of());
 
     private static final MunitionMutator OS_INFERNO_MUNITION_MUTATOR = new MunitionMutator("Inferno",
           1,
           Munitions.M_INFERNO,
-          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
-                .setUnofficial(false)
+          new TechAdvancement(TechBase.OUTER_SPHERE)
                 .setTechRating(TechRating.E)
                 .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
                 .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -577,15 +572,14 @@ public class AmmoType extends EquipmentType {
                 .setPrototypeFactions(Faction.LEGION)
                 .setProductionFactions(Faction.LEGION)
                 .setStaticTechLevel(SimpleTechLevel.STANDARD),
-          "AU");
+          List.of());
 
-    // OS missile munition mutators — canon M_* mechanics on the OS tech base, all at the OS Standard tier
+    // OS missile munition mutators â€” canon M_* mechanics on the OS tech base, all at the OS Standard tier
     // (2805/2820/2840, rating E, Faction.LEGION). Weight ratios mirror canon. Shared by the SRM & LRM sets.
     private static final MunitionMutator OS_FRAGMENTATION_MUNITION_MUTATOR = new MunitionMutator("Fragmentation", "Frag",
           1,
           Munitions.M_FRAGMENTATION,
-          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
-                .setUnofficial(false)
+          new TechAdvancement(TechBase.OUTER_SPHERE)
                 .setTechRating(TechRating.E)
                 .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
                 .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -593,13 +587,12 @@ public class AmmoType extends EquipmentType {
                 .setPrototypeFactions(Faction.LEGION)
                 .setProductionFactions(Faction.LEGION)
                 .setStaticTechLevel(SimpleTechLevel.STANDARD),
-          "AU");
+          List.of());
 
     private static final MunitionMutator OS_SMOKE_MUNITION_MUTATOR = new MunitionMutator("Smoke",
           1,
           Munitions.M_SMOKE_WARHEAD,
-          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
-                .setUnofficial(false)
+          new TechAdvancement(TechBase.OUTER_SPHERE)
                 .setTechRating(TechRating.E)
                 .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
                 .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -607,13 +600,12 @@ public class AmmoType extends EquipmentType {
                 .setPrototypeFactions(Faction.LEGION)
                 .setProductionFactions(Faction.LEGION)
                 .setStaticTechLevel(SimpleTechLevel.STANDARD),
-          "AU");
+          List.of());
 
     private static final MunitionMutator OS_TANDEM_CHARGE_MUNITION_MUTATOR = new MunitionMutator("Tandem-Charge", "Tandem",
           2,
           Munitions.M_TANDEM_CHARGE,
-          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
-                .setUnofficial(false)
+          new TechAdvancement(TechBase.OUTER_SPHERE)
                 .setTechRating(TechRating.E)
                 .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
                 .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -621,13 +613,12 @@ public class AmmoType extends EquipmentType {
                 .setPrototypeFactions(Faction.LEGION)
                 .setProductionFactions(Faction.LEGION)
                 .setStaticTechLevel(SimpleTechLevel.STANDARD),
-          "AU");
+          List.of());
 
     private static final MunitionMutator OS_NARC_CAPABLE_MUNITION_MUTATOR = new MunitionMutator("Narc-capable", "Narc",
           1,
           Munitions.M_NARC_CAPABLE,
-          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
-                .setUnofficial(false)
+          new TechAdvancement(TechBase.OUTER_SPHERE)
                 .setTechRating(TechRating.E)
                 .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
                 .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -635,13 +626,12 @@ public class AmmoType extends EquipmentType {
                 .setPrototypeFactions(Faction.LEGION)
                 .setProductionFactions(Faction.LEGION)
                 .setStaticTechLevel(SimpleTechLevel.STANDARD),
-          "AU");
+          List.of());
 
     private static final MunitionMutator OS_HEAT_SEEKING_MUNITION_MUTATOR = new MunitionMutator("Heat-Seeking", "HS",
           2,
           Munitions.M_HEAT_SEEKING,
-          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
-                .setUnofficial(false)
+          new TechAdvancement(TechBase.OUTER_SPHERE)
                 .setTechRating(TechRating.E)
                 .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
                 .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -649,13 +639,12 @@ public class AmmoType extends EquipmentType {
                 .setPrototypeFactions(Faction.LEGION)
                 .setProductionFactions(Faction.LEGION)
                 .setStaticTechLevel(SimpleTechLevel.STANDARD),
-          "AU");
+          List.of());
 
     private static final MunitionMutator OS_LISTEN_KILL_MUNITION_MUTATOR = new MunitionMutator("Listen-Kill",
           1,
           Munitions.M_LISTEN_KILL,
-          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
-                .setUnofficial(false)
+          new TechAdvancement(TechBase.OUTER_SPHERE)
                 .setTechRating(TechRating.E)
                 .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
                 .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -663,13 +652,12 @@ public class AmmoType extends EquipmentType {
                 .setPrototypeFactions(Faction.LEGION)
                 .setProductionFactions(Faction.LEGION)
                 .setStaticTechLevel(SimpleTechLevel.STANDARD),
-          "AU");
+          List.of());
 
     private static final MunitionMutator OS_MINE_CLEARANCE_MUNITION_MUTATOR = new MunitionMutator("Mine Clearance", "MC",
           1,
           Munitions.M_MINE_CLEARANCE,
-          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
-                .setUnofficial(false)
+          new TechAdvancement(TechBase.OUTER_SPHERE)
                 .setTechRating(TechRating.E)
                 .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
                 .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -677,13 +665,12 @@ public class AmmoType extends EquipmentType {
                 .setPrototypeFactions(Faction.LEGION)
                 .setProductionFactions(Faction.LEGION)
                 .setStaticTechLevel(SimpleTechLevel.STANDARD),
-          "AU");
+          List.of());
 
     private static final MunitionMutator OS_ANTI_TSM_MUNITION_MUTATOR = new MunitionMutator("Anti-TSM",
           1,
           Munitions.M_ANTI_TSM,
-          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
-                .setUnofficial(false)
+          new TechAdvancement(TechBase.OUTER_SPHERE)
                 .setTechRating(TechRating.E)
                 .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
                 .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -691,13 +678,12 @@ public class AmmoType extends EquipmentType {
                 .setPrototypeFactions(Faction.LEGION)
                 .setProductionFactions(Faction.LEGION)
                 .setStaticTechLevel(SimpleTechLevel.STANDARD),
-          "AU");
+          List.of());
 
     private static final MunitionMutator OS_DEAD_FIRE_MUNITION_MUTATOR = new MunitionMutator("Dead-Fire",
           1,
           Munitions.M_DEAD_FIRE,
-          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
-                .setUnofficial(false)
+          new TechAdvancement(TechBase.OUTER_SPHERE)
                 .setTechRating(TechRating.E)
                 .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
                 .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -705,13 +691,12 @@ public class AmmoType extends EquipmentType {
                 .setPrototypeFactions(Faction.LEGION)
                 .setProductionFactions(Faction.LEGION)
                 .setStaticTechLevel(SimpleTechLevel.STANDARD),
-          "AU");
+          List.of());
 
     private static final MunitionMutator OS_ARAD_MUNITION_MUTATOR = new MunitionMutator("Anti-Radiation", "AR",
           1,
           Munitions.M_ARAD,
-          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
-                .setUnofficial(false)
+          new TechAdvancement(TechBase.OUTER_SPHERE)
                 .setTechRating(TechRating.E)
                 .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
                 .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -719,13 +704,12 @@ public class AmmoType extends EquipmentType {
                 .setPrototypeFactions(Faction.LEGION)
                 .setProductionFactions(Faction.LEGION)
                 .setStaticTechLevel(SimpleTechLevel.STANDARD),
-          "AU");
+          List.of());
 
     private static final MunitionMutator OS_ACID_MUNITION_MUTATOR = new MunitionMutator("Acid",
           2,
           Munitions.M_AX_HEAD,
-          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
-                .setUnofficial(false)
+          new TechAdvancement(TechBase.OUTER_SPHERE)
                 .setTechRating(TechRating.E)
                 .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
                 .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -733,9 +717,9 @@ public class AmmoType extends EquipmentType {
                 .setPrototypeFactions(Faction.LEGION)
                 .setProductionFactions(Faction.LEGION)
                 .setStaticTechLevel(SimpleTechLevel.STANDARD),
-          "AU");
+          List.of());
 
-    // OS LRM-specific munition mutators — canon M_* mechanics on the OS tech base at the OS Standard tier
+    // OS LRM-specific munition mutators â€” canon M_* mechanics on the OS tech base at the OS Standard tier
     // (2805/2820/2840, rating E, Faction.LEGION; weight ratios mirror canon). The shared munitions
     // (Fragmentation/Smoke/Narc/Heat-Seeking/Listen-Kill/Mine-Clearance/Anti-TSM/Dead-Fire/ARAD/Artemis) reuse
     // the OS mutators defined above; these are the LRM-only additions. Tandem-Charge/Acid are SRM-only in canon
@@ -744,8 +728,7 @@ public class AmmoType extends EquipmentType {
           "Follow The Leader", "FTL",
           2,
           Munitions.M_FOLLOW_THE_LEADER,
-          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
-                .setUnofficial(false)
+          new TechAdvancement(TechBase.OUTER_SPHERE)
                 .setTechRating(TechRating.E)
                 .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
                 .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -753,13 +736,12 @@ public class AmmoType extends EquipmentType {
                 .setPrototypeFactions(Faction.LEGION)
                 .setProductionFactions(Faction.LEGION)
                 .setStaticTechLevel(SimpleTechLevel.STANDARD),
-          "AU");
+          List.of());
 
     private static final MunitionMutator OS_SEMI_GUIDED_MUNITION_MUTATOR = new MunitionMutator("Semi-Guided", "SG",
           1,
           Munitions.M_SEMIGUIDED,
-          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
-                .setUnofficial(false)
+          new TechAdvancement(TechBase.OUTER_SPHERE)
                 .setTechRating(TechRating.E)
                 .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
                 .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -767,13 +749,12 @@ public class AmmoType extends EquipmentType {
                 .setPrototypeFactions(Faction.LEGION)
                 .setProductionFactions(Faction.LEGION)
                 .setStaticTechLevel(SimpleTechLevel.STANDARD),
-          "AU");
+          List.of());
 
     private static final MunitionMutator OS_SWARM_MUNITION_MUTATOR = new MunitionMutator("Swarm",
           1,
           Munitions.M_SWARM,
-          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
-                .setUnofficial(false)
+          new TechAdvancement(TechBase.OUTER_SPHERE)
                 .setTechRating(TechRating.E)
                 .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
                 .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -781,13 +762,12 @@ public class AmmoType extends EquipmentType {
                 .setPrototypeFactions(Faction.LEGION)
                 .setProductionFactions(Faction.LEGION)
                 .setStaticTechLevel(SimpleTechLevel.STANDARD),
-          "AU");
+          List.of());
 
     private static final MunitionMutator OS_SWARM_I_MUNITION_MUTATOR = new MunitionMutator("Swarm-I",
           1,
           Munitions.M_SWARM_I,
-          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
-                .setUnofficial(false)
+          new TechAdvancement(TechBase.OUTER_SPHERE)
                 .setTechRating(TechRating.E)
                 .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
                 .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -795,13 +775,12 @@ public class AmmoType extends EquipmentType {
                 .setPrototypeFactions(Faction.LEGION)
                 .setProductionFactions(Faction.LEGION)
                 .setStaticTechLevel(SimpleTechLevel.STANDARD),
-          "AU");
+          List.of());
 
     private static final MunitionMutator OS_THUNDER_MUNITION_MUTATOR = new MunitionMutator("Thunder",
           1,
           Munitions.M_THUNDER,
-          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
-                .setUnofficial(false)
+          new TechAdvancement(TechBase.OUTER_SPHERE)
                 .setTechRating(TechRating.E)
                 .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
                 .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -809,14 +788,13 @@ public class AmmoType extends EquipmentType {
                 .setPrototypeFactions(Faction.LEGION)
                 .setProductionFactions(Faction.LEGION)
                 .setStaticTechLevel(SimpleTechLevel.STANDARD),
-          "AU");
+          List.of());
 
     private static final MunitionMutator OS_THUNDER_ACTIVE_MUNITION_MUTATOR = new MunitionMutator("Thunder-Active",
           "T-Act",
           2,
           Munitions.M_THUNDER_ACTIVE,
-          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
-                .setUnofficial(false)
+          new TechAdvancement(TechBase.OUTER_SPHERE)
                 .setTechRating(TechRating.E)
                 .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
                 .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -824,14 +802,13 @@ public class AmmoType extends EquipmentType {
                 .setPrototypeFactions(Faction.LEGION)
                 .setProductionFactions(Faction.LEGION)
                 .setStaticTechLevel(SimpleTechLevel.STANDARD),
-          "AU");
+          List.of());
 
     private static final MunitionMutator OS_THUNDER_AUGMENTED_MUNITION_MUTATOR = new MunitionMutator(
           "Thunder-Augmented", "T-Aug",
           2,
           Munitions.M_THUNDER_AUGMENTED,
-          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
-                .setUnofficial(false)
+          new TechAdvancement(TechBase.OUTER_SPHERE)
                 .setTechRating(TechRating.E)
                 .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
                 .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -839,14 +816,13 @@ public class AmmoType extends EquipmentType {
                 .setPrototypeFactions(Faction.LEGION)
                 .setProductionFactions(Faction.LEGION)
                 .setStaticTechLevel(SimpleTechLevel.STANDARD),
-          "AU");
+          List.of());
 
     private static final MunitionMutator OS_THUNDER_VIBRABOMB_MUNITION_MUTATOR = new MunitionMutator(
           "Thunder-Vibrabomb", "T-Vbb",
           2,
           Munitions.M_THUNDER_VIBRABOMB,
-          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
-                .setUnofficial(false)
+          new TechAdvancement(TechBase.OUTER_SPHERE)
                 .setTechRating(TechRating.E)
                 .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
                 .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -854,14 +830,13 @@ public class AmmoType extends EquipmentType {
                 .setPrototypeFactions(Faction.LEGION)
                 .setProductionFactions(Faction.LEGION)
                 .setStaticTechLevel(SimpleTechLevel.STANDARD),
-          "AU");
+          List.of());
 
     private static final MunitionMutator OS_THUNDER_INFERNO_MUNITION_MUTATOR = new MunitionMutator("Thunder-Inferno",
           "T-Inf",
           2,
           Munitions.M_THUNDER_INFERNO,
-          new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
-                .setUnofficial(false)
+          new TechAdvancement(TechBase.OUTER_SPHERE)
                 .setTechRating(TechRating.E)
                 .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.E, AvailabilityValue.D)
                 .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -869,7 +844,7 @@ public class AmmoType extends EquipmentType {
                 .setPrototypeFactions(Faction.LEGION)
                 .setProductionFactions(Faction.LEGION)
                 .setStaticTechLevel(SimpleTechLevel.STANDARD),
-          "AU");
+          List.of());
 
     private static final MunitionMutator DEAD_FIRE_MUNITION_MUTATOR = new MunitionMutator("Dead-Fire",
           1,
@@ -1559,8 +1534,7 @@ public class AmmoType extends EquipmentType {
     // available from the OSAC intro (2805) so there is no ammo gap. Precision is intentionally excluded
     // (reserved for the Enhanced tier per the OS munition policy). Rocket-Propelled is an OS-original round.
     private static TechAdvancement osAcMunitionTech(TechRating rating) {
-        return new TechAdvancement(TechBase.OUTER_SPHERE).setIntroLevel(false)
-              .setUnofficial(false)
+        return new TechAdvancement(TechBase.OUTER_SPHERE)
               .setTechRating(rating)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -1571,17 +1545,17 @@ public class AmmoType extends EquipmentType {
     }
 
     private static final MunitionMutator OS_AC_ARMOR_PIERCING_MUTATOR = new MunitionMutator("Armor-Piercing", "AP",
-          2, Munitions.M_ARMOR_PIERCING, osAcMunitionTech(TechRating.E), "OS AU");
+          2, Munitions.M_ARMOR_PIERCING, osAcMunitionTech(TechRating.E), List.of());
     private static final MunitionMutator OS_AC_CASELESS_MUTATOR = new MunitionMutator("Caseless",
-          1, Munitions.M_CASELESS, osAcMunitionTech(TechRating.D), "OS AU");
+          1, Munitions.M_CASELESS, osAcMunitionTech(TechRating.D), List.of());
     private static final MunitionMutator OS_AC_FLAK_MUTATOR = new MunitionMutator("Flak",
-          1, Munitions.M_FLAK, osAcMunitionTech(TechRating.B), "OS AU");
+          1, Munitions.M_FLAK, osAcMunitionTech(TechRating.B), List.of());
     private static final MunitionMutator OS_AC_FLECHETTE_MUTATOR = new MunitionMutator("Flechette",
-          1, Munitions.M_FLECHETTE, osAcMunitionTech(TechRating.E), "OS AU");
+          1, Munitions.M_FLECHETTE, osAcMunitionTech(TechRating.E), List.of());
     private static final MunitionMutator OS_AC_TRACER_MUTATOR = new MunitionMutator("Tracer",
-          1, Munitions.M_TRACER, osAcMunitionTech(TechRating.B), "OS AU");
+          1, Munitions.M_TRACER, osAcMunitionTech(TechRating.B), List.of());
     private static final MunitionMutator OS_AC_ROCKET_PROPELLED_MUTATOR = new MunitionMutator("Rocket-Propelled", "RP",
-          1, Munitions.M_ROCKET_PROPELLED, osAcMunitionTech(TechRating.F), "OS AU");
+          1, Munitions.M_ROCKET_PROPELLED, osAcMunitionTech(TechRating.F), List.of());
 
     private static final MunitionMutator CLAN_IMPROVED_ARMOR_PIERCING_MUNITION_MUTATOR = new MunitionMutator(
           "Armor-Piercing", "AP",
@@ -2475,11 +2449,11 @@ public class AmmoType extends EquipmentType {
         // kind of refactoring
         M_FAE,
 
-        // OS Lodestar guidance beacon (dev plan §9.6) — an iNarc-attach beacon read by a networked Kestrel NTD.
+        // OS Lodestar guidance beacon (dev plan Â§9.6) â€” an iNarc-attach beacon read by a networked Kestrel NTD.
         // Appended at the end to keep existing ordinals stable.
         M_LODESTAR,
 
-        // OS Diana III-capable MRM round — the special munition the Diana III FCS keys off of. The FCS cluster
+        // OS Diana III-capable MRM round â€” the special munition the Diana III FCS keys off of. The FCS cluster
         // bonus only applies when a Diana III-capable MRM round is loaded (mirrors how Artemis needs
         // Artemis-capable ammo). Appended at the end to keep existing ordinals stable.
         M_DIANA_CAPABLE,
@@ -4259,7 +4233,7 @@ public class AmmoType extends EquipmentType {
         munitions.add(OS_ARTEMIS_V_CAPABLE_MUNITION_MUTATOR);
         AmmoType.createMunitions(osArtemisMissileAmmos, munitions);
 
-        // OS SRM special munitions — full canon SRM munition set at OS Standard tier (reuses canon M_* mechanics).
+        // OS SRM special munitions â€” full canon SRM munition set at OS Standard tier (reuses canon M_* mechanics).
         // Applied to SRM 2/4/6 + MML-SRM racks; Streak / Heavy-SRM excluded. Torpedo (naval) deferred.
         ArrayList<AmmoType> osSrmMunitionAmmos = new ArrayList<>();
         osSrmMunitionAmmos.add(AmmoType.createOSSRM2Ammo());
@@ -4287,7 +4261,7 @@ public class AmmoType extends EquipmentType {
         munitions.add(OS_ACID_MUNITION_MUTATOR);
         AmmoType.createMunitions(osSrmMunitionAmmos, munitions);
 
-        // OS LRM special munitions — canon LRM munition set at OS Standard tier (reuses canon M_* mechanics).
+        // OS LRM special munitions â€” canon LRM munition set at OS Standard tier (reuses canon M_* mechanics).
         // Applied to LRM 5/10/15/20/30 + MML-LRM racks; ER-LRM / MRM excluded. Incendiary LRM deferred (canon
         // builds it as separate ammo via createIncendiaryVariants, not a mutator). Artemis already applied above.
         ArrayList<AmmoType> osLrmMunitionAmmos = new ArrayList<>();
@@ -4324,7 +4298,7 @@ public class AmmoType extends EquipmentType {
         munitions.add(OS_ARAD_MUNITION_MUTATOR);
         AmmoType.createMunitions(osLrmMunitionAmmos, munitions);
 
-        // OS MRM special munitions — an OS-original subset (canon MRM has no special munitions), reusing the
+        // OS MRM special munitions â€” an OS-original subset (canon MRM has no special munitions), reusing the
         // shared OS mutators. Applied to Improve MRM 10/20/30/40; Streak MRM excluded. Effect dispatch is wired
         // in OSMRMWeapon (reusing the LRM cluster-missile handlers). Thunder/FASCAM stays LRM-only.
         ArrayList<AmmoType> osMrmMunitionAmmos = new ArrayList<>();
@@ -5360,7 +5334,7 @@ public class AmmoType extends EquipmentType {
 
     // AUTOCANNON AND RIFLE AMMO
 
-    // Dedicated Burst-Fire / Rapid-Fire AC ammo — a plain AC round in its own bin (own AmmoTypeEnum, so it
+    // Dedicated Burst-Fire / Rapid-Fire AC ammo â€” a plain AC round in its own bin (own AmmoTypeEnum, so it
     // is not interchangeable with standard AC or Rotary AC). Stats mirror the standard AC ammo of the same
     // caliber; tag is "BF" or "RF".
     private static AmmoType createDedicatedACAmmo(AmmoTypeEnum type, String tag, int rackSize, int shots,
@@ -5377,7 +5351,7 @@ public class AmmoType extends EquipmentType {
         ammo.bv = bv;
         ammo.cost = cost;
         ammo.techAdvancement.setTechBase(TechBase.ALL)
-              .setIntroLevel(true)
+              .setStaticTechLevel(SimpleTechLevel.INTRO)
               .setTechRating(TechRating.B)
               .setAvailability(AvailabilityValue.C, AvailabilityValue.C, AvailabilityValue.D, AvailabilityValue.D)
               .setISAdvancement(intro1, intro2, intro3, DATE_NONE, DATE_NONE)
@@ -5696,7 +5670,7 @@ public class AmmoType extends EquipmentType {
         return ammo;
     }
 
-    // Outer Sphere precision HVAC ammo — dedicated HVAC_OS rounds for the repurposed precision AC (calibers
+    // Outer Sphere precision HVAC ammo â€” dedicated HVAC_OS rounds for the repurposed precision AC (calibers
     // 10/12/14/16). Uses its own enum (not canon HYPER_VELOCITY) so caliber 10 does not cross-load with the
     // canon HVAC/10; low shots/ton is part of the weapon's mechanical tax. Single-slug (no cook-off).
     private static AmmoType createOSHVACAmmo(int rackSize, int shots, int bv, int cost) {
@@ -5713,11 +5687,9 @@ public class AmmoType extends EquipmentType {
         ammo.cost = cost;
         // Intro 2900 so the Improve-tier OS HVAC (2900) has ammo from the start; the Enhanced tier (3000)
         // shares the same HVAC_OS bin (same rackSize), so one ammo line per caliber covers both. STANDARD
-        // static level — the lower of the two weapon tiers — so the ammo is visible whenever the Standard-tier
+        // static level â€” the lower of the two weapon tiers â€” so the ammo is visible whenever the Standard-tier
         // Improve HVAC is legal (an ADVANCED-static ammo would vanish from MML at the Standard rules level).
         ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(2900, 2930, 2960, DATE_NONE, DATE_NONE)
@@ -13104,8 +13076,6 @@ public class AmmoType extends EquipmentType {
         ammo.cost = 30000;
         ammo.explosive = false;
         ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -13130,8 +13100,6 @@ public class AmmoType extends EquipmentType {
         ammo.cost = 45000;
         ammo.explosive = false;
         ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(3045, 3050, 3055, DATE_NONE, DATE_NONE)
@@ -13157,8 +13125,6 @@ public class AmmoType extends EquipmentType {
         ammo.explosive = false;
         ammo.kgPerShot = 100;
         ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -13184,8 +13150,6 @@ public class AmmoType extends EquipmentType {
         ammo.explosive = false;
         ammo.kgPerShot = 100;
         ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(3045, 3050, 3055, DATE_NONE, DATE_NONE)
@@ -13211,8 +13175,6 @@ public class AmmoType extends EquipmentType {
         ammo.explosive = false;
         ammo.kgPerShot = 100;
         ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(3045, 3050, 3055, DATE_NONE, DATE_NONE)
@@ -13240,8 +13202,6 @@ public class AmmoType extends EquipmentType {
         ammo.bv = bv;
         ammo.cost = cost;
         ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -13421,8 +13381,6 @@ public class AmmoType extends EquipmentType {
         ammo.flags = ammo.flags.or(F_HOTLOAD);
         ammo.setModes("", "HotLoad");
         ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -13497,8 +13455,6 @@ public class AmmoType extends EquipmentType {
         ammo.flags = ammo.flags.or(F_HOTLOAD).or(lrm ? F_MML_LRM : F_MML_SRM);
         ammo.setModes("", "HotLoad");
         ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -13553,8 +13509,6 @@ public class AmmoType extends EquipmentType {
         ammo.bv = bv;
         ammo.cost = cost;
         ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -13598,8 +13552,6 @@ public class AmmoType extends EquipmentType {
         ammo.bv = bv;
         ammo.cost = cost;
         ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -13665,8 +13617,6 @@ public class AmmoType extends EquipmentType {
         ammo.bv = 0;
         ammo.cost = cost;
         ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -13681,7 +13631,7 @@ public class AmmoType extends EquipmentType {
     private static AmmoType createOSMuninECMAmmo()     { return makeOSBeaconAmmo("Munin ECM Pods",     "Munin ECM",     "OSMuninECMPods",     AmmoTypeEnum.INARC, Munitions.M_ECM,     3, 4, 15000); }
     private static AmmoType createOSMuninHaywireAmmo() { return makeOSBeaconAmmo("Munin Haywire Pods", "Munin Haywire", "OSMuninHaywirePods", AmmoTypeEnum.INARC, Munitions.M_HAYWIRE, 3, 4, 20000); }
     private static AmmoType createOSMuninNemesisAmmo() { return makeOSBeaconAmmo("Munin Nemesis Pods", "Munin Nemesis", "OSMuninNemesisPods", AmmoTypeEnum.INARC, Munitions.M_NEMESIS, 3, 4, 10000); }
-    // OS Lodestar guidance beacon (dev plan §9.6): a Munin-launcher (iNarc) special pod. On attach it is a passive
+    // OS Lodestar guidance beacon (dev plan Â§9.6): a Munin-launcher (iNarc) special pod. On attach it is a passive
     // beacon a networked Kestrel NTD reads (grants the network -1 direct-fire vs the beaconed target within Kestrel
     // range, no LOS needed). Fired from the OS Narc / Munin launcher.
     private static AmmoType createOSLodestarAmmo()     { return makeOSBeaconAmmo("Lodestar Beacon Pods", "Lodestar", "OSLodestarPods", AmmoTypeEnum.INARC, Munitions.M_LODESTAR, 3, 4, 12000); }
@@ -13788,8 +13738,6 @@ public class AmmoType extends EquipmentType {
         ammo.cost = cost;
         ammo.explosive = false;
         ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
@@ -13859,8 +13807,6 @@ public class AmmoType extends EquipmentType {
         ammo.cost = cost;
         ammo.explosive = false;
         ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(3060, 3070, 3080, DATE_NONE, DATE_NONE)
@@ -17145,7 +17091,7 @@ public class AmmoType extends EquipmentType {
     // Misc Stuff. (Pods)
 
     /**
-     * Outer Sphere RPPC Coolant Pod — feeds the Rotary PPC family (RLPPC + RSPPC).
+     * Outer Sphere RPPC Coolant Pod â€” feeds the Rotary PPC family (RLPPC + RSPPC).
      * 18 shots per pod, treated like RAC ammunition. Consumed whenever a Rotary PPC
      * fires in 2-shot mode or higher (one charge per shot beyond the first). Pods are
      * pooled across the entity (shared ammo-bay model); any Rotary PPC may draw from
@@ -17175,10 +17121,8 @@ public class AmmoType extends EquipmentType {
         ammo.tonnage = 1.0;
         ammo.kgPerShot = 56;
         ammo.explosive = true;
-        ammo.rulesRefs = "OS Custom";
+        ammo.rulesRefs = List.of();
         ammo.techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F)
               .setISAdvancement(3130, 3135, 3140, DATE_NONE, DATE_NONE)
@@ -18437,9 +18381,7 @@ public class AmmoType extends EquipmentType {
                   (munition.getAmmoType() == AmmoTypeEnum.AC_STD_OS) ||
                   (munition.getAmmoType() == AmmoTypeEnum.PAC) ||
                   (munition.getAmmoType() == AmmoTypeEnum.AC_ROTARY)) {
-                // PLAYTEST3 ammo changes
-                if (munition.getMunitionType().contains(Munitions.M_ARMOR_PIERCING) || munition.getMunitionType()
-                      .contains(Munitions.M_ARMOR_PIERCING_PLAYTEST)) {
+                if (munition.getMunitionType().contains(Munitions.M_ARMOR_PIERCING)) {
                     cost *= 4;
                 } else if ((munition.getMunitionType().contains(Munitions.M_FLECHETTE)) ||
                       (munition.getMunitionType().contains(Munitions.M_FLAK))) {

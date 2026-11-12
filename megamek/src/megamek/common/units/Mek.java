@@ -2479,13 +2479,9 @@ public abstract class Mek extends Entity implements Fortifiable, RubbleClearer, 
                   || miscType.hasFlag(MiscType.F_IS_DOUBLE_HEAT_SINK_PROTOTYPE)) {
                 capacity += 2;
                 isDoubleHeatSink = true;
-            } else if ((activeCount > 0)
-                  && mounted.getType().hasFlag(MiscType.F_TRIPLE_HEAT_SINK)) {
-                activeCount--;
+            } else if (mounted.getType().hasFlag(MiscType.F_TRIPLE_HEAT_SINK)) {
                 capacity += 3;
-            } else if ((activeCount > 0)
-                  && mounted.getType().hasFlag(MiscType.F_QUAD_HEAT_SINK)) {
-                activeCount--;
+            } else if (mounted.getType().hasFlag(MiscType.F_QUAD_HEAT_SINK)) {
                 capacity += 4;
             } else if (includePartialWing
                   && miscType.hasFlag(MiscType.F_PARTIAL_WING)

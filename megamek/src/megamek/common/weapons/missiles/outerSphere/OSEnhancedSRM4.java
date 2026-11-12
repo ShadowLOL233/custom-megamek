@@ -43,8 +43,6 @@ public class OSEnhancedSRM4 extends SRMWeapon {
         maxRange = RANGE_SHORT;
         flags = flags.andNot(F_PROTO_WEAPON).or(F_OS_SRM_SHORT_SPEC);
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.F)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.F, AvailabilityValue.E)
               .setISAdvancement(3000, 3025, 3050, DATE_NONE, DATE_NONE)

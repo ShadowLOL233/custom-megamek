@@ -16,7 +16,7 @@ import megamek.common.enums.TechRating;
 import megamek.common.weapons.lasers.LaserWeapon;
 
 /**
- * Outer Sphere Standard Small Laser — RoOS-manufactured replica of the upstream IS Small Laser.
+ * Outer Sphere Standard Small Laser â€” RoOS-manufactured replica of the upstream IS Small Laser.
  * Stats identical to the IS reference; differentiated only by tech base.
  */
 public class OSLaserSmall extends LaserWeapon {
@@ -49,8 +49,6 @@ public class OSLaserSmall extends LaserWeapon {
         maxRange = RANGE_SHORT;
         atClass = CLASS_POINT_DEFENSE;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.D, AvailabilityValue.C)
               .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)

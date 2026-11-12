@@ -12,6 +12,7 @@ import java.util.Vector;
 import megamek.MMConstants;
 import megamek.common.EMPEffectFormatter;
 import megamek.common.HitData;
+import megamek.common.enums.HitDamageType;
 import megamek.common.Report;
 import megamek.common.ToHitData;
 import megamek.common.actions.WeaponAttackAction;
@@ -48,7 +49,7 @@ public class OSEMPPlasmaHandler extends AmmoWeaponHandler {
     public OSEMPPlasmaHandler(ToHitData toHit, WeaponAttackAction waa, Game g, TWGameManager m)
           throws EntityLoadingException {
         super(toHit, waa, g, m);
-        generalDamageType = HitData.DAMAGE_ENERGY;
+        generalDamageType = HitDamageType.DAMAGE_ENERGY;
     }
 
     @Override

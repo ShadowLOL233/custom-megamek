@@ -17,7 +17,7 @@ import megamek.common.equipment.AmmoType;
 import megamek.common.weapons.autoCannons.ACWeapon;
 
 /**
- * Outer Sphere Standard AC/5 — RoOS-manufactured replica of the upstream IS AC/5.
+ * Outer Sphere Standard AC/5 â€” RoOS-manufactured replica of the upstream IS AC/5.
  * Stats identical to the IS reference; differentiated only by tech base.
  */
 public class OSAC5 extends ACWeapon {
@@ -50,8 +50,6 @@ public class OSAC5 extends ACWeapon {
         maxRange = RANGE_MED;
         explosionDamage = damage;
         techAdvancement.setTechBase(TechBase.OUTER_SPHERE)
-              .setIntroLevel(false)
-              .setUnofficial(false)
               .setTechRating(TechRating.E)
               .setAvailability(AvailabilityValue.X, AvailabilityValue.X, AvailabilityValue.D, AvailabilityValue.C)
               .setISAdvancement(2805, 2820, 2840, DATE_NONE, DATE_NONE)
