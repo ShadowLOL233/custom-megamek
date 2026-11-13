@@ -166,7 +166,9 @@ BV 不含 ammo / crit / 爆炸风险。WSC 跟 BV 的排序**不应该脱节**�
 | 模组互斥规则 | PLM ⊥ ACJ | **RM ⊥ LEM(光学二选一);LEC 跟 RM/LEM 均兼容** |
 | PLM | 2t/2c −2 命中 ×0.8 热 | **删除**(被 LEC 替代) |
 | ACJ | 2t/2c 消 Resonance 热 + 缓冲 | **废弃**(被 LEM 替代) |
-| Hyper Laser 机制 | 28 伤每回合 + 2d6 失控 + HSM 可选 | **保留** + **必需 HSM + C-2500** + 精度加成(Long −2 / Extreme −3) |
+| Hyper Laser 机制 | 28 伤每回合 + 2d6 失控 + HSM 可选 | **3 变体**(ER / EXR / Heavy)+ **必需 HSM + C-2500** + **BCS 网络激活** 精度加成(各变体独立分布,见 §4.4) |
+| Hyper Laser 血统 | 海军激光 micro-化 | **Binary + Heavy 工艺 hybrid 反 Ascended 武器**(2026-11-13 refinement) |
+| Hyper Laser 精度来源 | 武器自带 range-based | **BCS 网络激活** — 入网才有,不入网 = 零加成 |
 | HSM | Hyper 可选组件 | **保留,升为必需** |
 | Hyper PPC | 跟 Hyper Laser 同步重设计 | **搁置**(未来 → Heavy PPC 超重演进,非 Experimental) |
 
@@ -261,66 +263,144 @@ BV 不含 ammo / crit / 爆炸风险。WSC 跟 BV 的排序**不应该脱节**�
 
 ---
 
-### 四、高能激光系 — Hyper Laser 独立出来
+### 四、高能激光系 — Hyper Laser 3 变体 + BCS 协同签名(2026-11-13 refinement)
 
-#### 4.1 主武器规格
+#### 4.0 背景与叙事(2026-11-13 更新)
 
-| 属性 | 草案 |
-|---|---|
-| 内部名 | `OSHyperLaserLarge`(当前已存在) |
-| tier | Experimental |
-| 技术等级 | Advance+ / TR G / SL EXPERIMENTAL |
-| Intro | 3045/3050/3055(当前) |
-| dmg / heat | **28 / 32**(前 2 回合固定),**32 + 1d6**(第 3 回合起) |
-| range | **12/24/36/50**(S/M/L/E) |
-| 精度加成(新) | **Short 0 / Medium 0 / Long −2 / Extreme −3**(自己有,**base 加成**,独立于外接 Energy FCM) |
-| 稳定/失控 | 前 2 回合完全稳定;第 3 回合起 **2d6 ≥ 8 失控**(42%)→ 开火失败 + **28 内构 + 殉爆风险**。不开火回合 → 稳定计数器**归零** |
-| 失控上限 | 无强制爆炸(Crit 投入本身就是平衡器) |
-| 爆炸物殉爆 | 28(跟新伤害同步) |
-| t·c | **8t / 6c** |
-| BV | **~900**(base,不含必需组件) |
+**血统 pivot**:原"海军激光 micro-化"叙事**废弃**。新定位:
 
-#### 4.2 必需组件(两件缺一不可 → 武器硬 lockout 无法开火)
+> **Hyper Laser 以 OSR 的 Binary 多筒共振激光系统 + Heavy 激光工艺为基础研发的最新锐反 Ascended 能量武器**。作战目的在于依靠 OSR 先进的 **C3 系统**与 **BCS**,透过部队之间的连携,最大程度发挥**远距离火力**,以压制 **The Ascended 大规模使用的无人机甲与载具**。
+
+**机制叙事意义**:
+1. Hyper Laser 的"精度加成"**不再是武器自带**(海军光学 narrative 废弃),而是 **OSR 网络协同的产物** — 入 BCS 网络激活,不入网 = 零加成
+2. 武器是 "**网络增幅器**",不是"独立狙击枪" — 鼓励玩家组 OSR C3/BCS build
+3. 跟 Ascended drone swarm 对战的 doctrine: OSR 用网络精确狙击替代单机对决
+
+#### 4.1 主武器 3 变体规格
+
+| 变体 | 内部名 | dmg | heat (基础) | S/M/L/E | t/c | BV (base) | 变体 signature |
+|---|---|---|---|---|---|---|---|
+| **Hyper Laser (ER)** | `OSHyperLaserLarge` | **28** | 32 + 1d6 t3+ | **12/24/36/50** | 8 / 6 | **900** | base — 均衡远距,全距离 BCS 协同 |
+| **Hyper Laser EXR** | `OSHyperLaserLargeEXR` | 24 | 28 + 1d6 t3+ | **14/28/42/60** | 8 / 6 | **780** | 延伸射程 + 降功率 (热账可控),长极距 BCS 协同 |
+| **Hyper Laser Heavy** | `OSHyperLaserLargeHeavy` | **36** | 32 + 1d6 t3+ | **8/16/24/32** | 10 / 7 | **1050** | 更强发射源 + 能量集中 (工程避免 shutdown),短中距 BCS 协同 |
+
+**三变体共性**:
+- **tier**:Experimental,TR G,SL EXPERIMENTAL
+- **Intro**:全部 3045/3050/3055(同期研发)
+- **失控机制**:前 2 回合完全稳定;第 3 回合起 **2d6 ≥ 8 失控**(42%)→ 开火失败 + 内构 + 殉爆风险;HSM 降至 ≥9
+- **过热**:第 3 回合起 **+1d6 额外热**(RNG 不稳定性叙事)
+- **爆炸物殉爆**:等同 dmg 值(28/24/36)
+- **必需组件**:HSM + C-2500 Combat Computer Core(缺一武器硬 lockout 无法开火)
+- **可选组件**:CCS Energy FCM Module(额外 −1 命中,标准 FCM 加成)
+
+**变体差异叙事**:
+- **ER**:原始 Hyper Laser。Binary 多筒共振 + Heavy 激光工艺的综合体,综合性能
+- **EXR**:延伸射程 + 降低功率确保**热账可控** — 代价 −4 dmg / −4 heat,换 +10 格极距(60 格,全文档最远武器)
+- **Heavy**:更强发射源 + 更集中能量,牺牲射程换更高输出功率。工程上**避免 shutdown**(保持 heat 32 不升),通过能量集中实现 +8 dmg — 代价 −4 格每档射程,受损最大的变体(Extreme 32 格,不是远距武器)
+
+#### 4.2 必需组件(两件缺一武器硬 lockout)
 
 | 组件 | 职责 | 吨位 / Crit | 备注 |
 |---|---|---|---|
-| **HSM**(Hyper Stabilization Module)| 稳定延长 2→3 回合 + 失控门槛 ≥8→≥9 + 过热内构 28→15 | 2t / 2c | 跟 Hyper 武器同躯干部位 |
+| **HSM**(Hyper Stabilization Module)| 稳定延长 2→3 回合 + 失控门槛 ≥8→≥9 + 过热内构 28→15 | 2t / 2c | 跟 Hyper 武器同躯干部位,3 变体通用 |
 | **C-2500 Combat Computer Core** | 火控核心,见 §9.2 | 1t / 2c | 整机唯一,挂在躯干 |
 
-**系统工程总代价**:Hyper Laser 8t/6c + HSM 2t/2c + C-2500 1t/2c = **11t / 10c**(不含必需的 DHS 散热池)。
+**系统工程基础代价**:武器本体 + HSM 2t/2c + C-2500 1t/2c = **武器 + 3t / 4c** 必需堆(不含 DHS 散热池)。
 
-#### 4.3 可选组件(非必需,玩家按需装)
+**各变体系统总工程**:
+- ER:8 + 3 = **11t / 10c**
+- EXR:8 + 3 = **11t / 10c**(同 ER)
+- Heavy:10 + 3 = **13t / 11c**
+
+#### 4.3 可选组件
 
 | 组件 | 职责 | 吨位 / Crit | 备注 |
 |---|---|---|---|
-| CCS Energy FCM Module | 额外 −1 命中 + Aimed Shot 能力(§9.2) | ~1t / 1c(按武器吨位 ÷ 10) | 专用模块,挂在 C-2500 核心上 |
-| 额外 DHS | 处理 32-38 热的持续开火 | 1t/3c 每 2 热 | 装 10 DHS engine-free 后外接 ~3-4 DHS |
+| CCS Energy FCM Module | 额外 −1 命中 + Aimed Shot 能力(§9.2) | ~1t / 1c | 专用模块,挂在 C-2500 核心上。**跟 BCS 精度加成叠加**(都是 to-hit mod) |
+| 额外 DHS | 处理 32/28 + 1d6 热的持续开火 | 1t/3c 每 2 热 | engine-free 10 DHS 后外接 ~3-5 DHS |
 
-装满可选 → **12t / 11c** 系统工程,BV **~1060-1080**。
+**非必需 BCS 组件**(入网解锁精度加成,见 4.4):
+- B-2500 BCS Core(或衍生核心 Crow Nest / Raven / Ghost,见 §9.1):**整机 build 层的 BCS 节点**,或作为网络 subordinate 的 C3 Slave
 
-#### 4.4 精度加成数学
+#### 4.4 BCS 网络精度加成签名(2026-11-13 新机制)
 
-Hyper Laser 的 range-based 精度加成等效于"把远距的 range 罚压缩到跟近距一样":
+**取代** 2026-11-08 的 "range-based 内建精度"。精度加成**不再是武器自带**,而是**OSR 网络协同的产物**:只有武器所在机体接入 **BCS 活跃网络** 并处于**非 ECM 压制态**时激活。
 
-| Range Bracket | 标准武器 命中罚 | **Hyper Laser 加成** | **净 to-hit 修正** | 等效 |
-|---|:---:|:---:|:---:|---|
-| Short (0-12) | 0 | 0 | **0** | 等效短距 |
-| Medium (13-24) | +2 | 0 | **+2** | 等效中距 |
-| Long (25-36) | +4 | **−2** | **+2** | **等效中距**(命中率 flat) |
-| Extreme (37-50) | +6 | **−3** | **+3** | **等效长距**(比普通长距命中率高) |
+**每变体精度加成分布**:
 
-装 Energy FCM 后再 −1 → Long 净 **+1**(等效短距)/ Extreme 净 **+2**(等效中距),**全文档唯一能在 50 hex 保持短中距命中率的武器**。
+| 变体 | Short (0..) | Medium | Long | Extreme |
+|---|:---:|:---:|:---:|:---:|
+| **Hyper Laser (ER)** | **−1** | **−1** | **−1** | **−1** |
+| **Hyper Laser EXR** | 0 | 0 | **−1** | **−2** |
+| **Hyper Laser Heavy** | **−2** | **−1** | 0 | 0 |
 
-#### 4.5 WSC 分析
+**不入网态**:精度加成**全部消失**,武器可开火但只有标准 BT range 罚 +0/+2/+4/+6。
 
-| 配置 | WSC_t | 期望伤 / turn | t/dmg | 备注 |
-|---|---|---|---|---|
-| Hyper Laser 本体 | 8 + 16(32 热 / 2)= **24** | 28 | **0.86** | base |
-| + HSM | 24 + 2 = **26** | 28(稳定性延长至 3 turn) | **0.93** | 必需 |
-| + C-2500 核心 | 26 + 1 = **27** | 28 | **0.96** | 必需 |
-| 完整必需系统 | **27 WSC_t** | 28 | **0.96** | 比 ER Trinary 旧的 27/24 = **1.13** 要省 |
+**叙事统一**:
+- **ER**(全距离 −1):**coordinated engagement** 均衡覆盖全距离 — 反各距 drone swarm
+- **EXR**(长 −1 / 极 −2):**sniper network** 配合前哨侦察网 — 反极远距 drone / 载具
+- **Heavy**(短 −2 / 中 −1):**close-range coordinated strike** 近距定点清除 — 反近距 drone 突入
 
-跟 2026-11-07 Hyper Laser 对比:旧的 t/dmg 1.64 → 新的 0.96 — **效率翻倍**,但以 11t 系统工程为门槛。
+**跟 Energy FCM 叠加**:装 CCS Energy FCM(可选 −1 命中)跟 BCS 精度加成**独立叠加**(不同系统来源)。极端 Heavy + BCS 短距 −2 + Energy FCM −1 = **短距净 −3 命中**(等于 Enhanced ER Pulse Laser 水平)。
+
+**跟 §9.6 Kestrel NTD / Shrike 等 network coordination bonus 的互动**:Hyper Laser 的 BCS 精度加成**独立于**网络 coordination cap(不走 `networkCoordinationToHit` 路径)。它是**单武器专属加成**,不受 §9.3 的 −2 总上限约束,但仍可以跟 CCS 模块 −1 叠加到更深命中带 — 这是 Hyper Laser 作为 Experimental 件的"破上限 privilege"。
+
+#### 4.5 精度加成数学(各变体 × range × 网络条件)
+
+**gunnery 4 基线 2d6 命中率**(简化表):
+
+| Range Bracket | 标准 TN | 命中率 base | −1 modifier TN | 命中率 (−1) | 增量 | −2 modifier TN | 命中率 (−2) | 增量 |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| Short | 4 | **91.7%** | 3 | 97.2% | +5.5% | 2 | 100% | +8.3% |
+| Medium | 6 | **72.2%** | 5 | 83.3% | +11.1% | 4 | 91.7% | +19.5% |
+| Long | 8 | **41.7%** | 7 | 58.3% | +16.6% | 6 | 72.2% | +30.5% |
+| Extreme | 10 | **16.7%** | 9 | 27.8% | +11.1% | 8 | 41.7% | +25.0% |
+
+**变体 × range 的 BCS 增益**(expected hit rate 变化):
+- **ER (全距离 −1)**:Short +5.5% / Med +11.1% / Long +16.6% / Ext +11.1% — **长距增益最大**
+- **EXR (Long −1 / Ext −2)**:Long +16.6% / Ext +25.0% — **极距增益最大**,**全文档唯一** 60 格还能维持 41.7% 命中率的武器
+- **Heavy (Short −2 / Med −1)**:Short +8.3% / Med +11.1% — **近距稳定** 100% / 83% 命中率
+
+**对标 Clan ER PPC**(canon,23 格极距命中率 +6 全额,gunnery 4 TN=10 命中 16.7%):
+- Hyper Laser EXR + BCS 在 60 格极距:TN=10 − 2 = 8,命中率 **41.7%** → **是 Clan ER PPC 的 2.5 倍**,且距离更远 2.6 倍
+
+#### 4.6 完整 WSC 分析
+
+**本体 WSC**(武器 only,不含必需堆):
+
+| 变体 | t/c | heat | WSC_t | WSC_c | dmg (期望) | t/dmg (base) |
+|---|---|---|---|---|---|---|
+| ER | 8/6 | 32 | **24** | **54** | 28 | **0.86** |
+| EXR | 8/6 | 28 | **22** | **48** | 24 | **0.92** |
+| Heavy | 10/7 | 32 | **26** | **55** | 36 | **0.72** |
+
+**完整系统 WSC**(武器 + HSM 2t/2c + C-2500 1t/2c = **+3t / +4c**):
+
+| 变体 | 系统 WSC_t | 系统 WSC_c | 无网络 t/dmg | **BCS 激活** 期望伤 | **BCS 激活** t/dmg | BV | BV/WSC_t |
+|---|---|---|---|---|---|---|---|
+| **ER** | 27 | 60 | **0.96** | 28 × 1.20 = 33.6 | **0.80** | 900 | **33.3** |
+| **EXR** | 25 | 54 | **1.04** | 24 × 1.20 = 28.8 | **0.87** | 780 | **31.2** |
+| **Heavy** | 29 | 61 | **0.81** | 36 × 1.20 = 43.2 | **0.67** | 1050 | **36.2** |
+
+> **×1.20 系数的来源**:BCS 入网后,三变体在各自 sweet spot(ER 全距离 / EXR 长极距 / Heavy 短中距)blended 期望命中率 +~20%。计算基于 gunnery 4 基线。
+
+**Experimental tier 对标**:
+
+| 参照 | tier | t/dmg | BV/WSC_t |
+|---|---|---|---|
+| Enhanced ER PPC | ENH | 0.75 | 30.5 |
+| Enhanced Gauss Rifle | ENH | 0.83 | 29.6 |
+| Coil Augmented Railgun | ADV | 0.90 | 25.9 |
+| Super-Heavy Gauss | EXP | 0.88 | 22.0 |
+| **Hyper Laser ER + BCS** | EXP | **0.80** | **33.3** |
+| **Hyper Laser EXR + BCS** | EXP | **0.87** | **31.2** |
+| **Hyper Laser Heavy + BCS** | EXP | **0.67** | **36.2** |
+
+**结论**:
+- 三变体 BV/WSC_t 都落在 Experimental tier 合理带(30-40)
+- **Heavy + BCS 的 0.67 是最吨效单武器**,但受限于短距 32 格 + 必需 BCS + 10t 本体 + 必需 HSM/C-2500 四重约束,合理
+- **无网络惩罚**:三变体 t/dmg 0.81-1.04 下降到"下沿 Advance tier",仍可用但失去碾压力。这个梯度跟"武器是网络增幅器"的叙事完全对齐
+- 对比旧 Hyper Laser t/dmg 1.64(2026-11-07 以前) → 新三变体 0.67-1.04 — **效率显著提升**,但以 11-13t 系统工程 + BCS 入网 双门槛换取
 
 ---
 
@@ -334,7 +414,9 @@ Hyper Laser 的 range-based 精度加成等效于"把远距的 range 罚压缩�
 | 原 ACJ 设计(2026-11-07) | **废弃**(未实施,无代码) | — |
 | Binary/Trinary 的 Resonance 内建 | **剥离**(改为由 RM 模组触发) | handler 改造 |
 | HSM(2026-11-07 设计) | **保留**,升为 Hyper Laser 必需组件 | 无变 |
-| Hyper Laser `−1` 内建命中 | **删除**,改为 range-based 精度加成(Long −2 / Extreme −3) | handler 改造 |
+| Hyper Laser `−1` 内建命中 | **删除**,改为 **BCS 网络激活**的精度加成(各变体独立分布,见 §4.4) | handler 改造 + BCS 网络条件判定 |
+| Hyper Laser 单件 → 3 变体 | **扩展** `OSHyperLaserLarge`(ER 保持)+ 新 `OSHyperLaserLargeEXR` + `OSHyperLaserLargeHeavy` | 2 新武器类 + 跟 HSM 兼容扩展 |
+| Hyper Laser 血统 narrative | 从"海军激光 micro-化"改为 **"Binary + Heavy hybrid 反 Ascended"** | 代码无影响,只改 Javadoc 和 `equipmentmessages.properties` 的武器 info |
 | Hyper PPC(`OSHyperPPC`) | **本轮不动**(未来 → Heavy PPC 超重演进,非 Experimental) | — |
 
 ---
@@ -346,7 +428,12 @@ Hyper Laser 的 range-based 精度加成等效于"把远距的 range 罚压缩�
 - **Phase 1** — 新 3 模组 MiscType + flag(`F_OS_LASER_RESONANCE` / `F_OS_LASER_EM_MODULATOR` / `F_OS_LASER_ENERGY_CAPACITOR`),装备入库 + mount 约束
 - **Phase 2** — Binary/Trinary handler 剥离 Resonance(改为 mount-based 条件触发,检查武器挂 RM 才给 ×1.30/1.50)
 - **Phase 3** — LEM handler(新 `OSBinaryLEMHandler` / `OSTrinaryLEMHandler`,绕过装甲减伤)+ LEC handler(充能态,参考 PPC Capacitor 现有 handler)
-- **Phase 4** — Hyper Laser 改造:删 `−1` 内建,加 range-based 精度 block 到 `ComputeToHit`,必需组件校验加入 `TestMek`
+- **Phase 4** — Hyper Laser 三变体改造:
+  - **P4a** 新建 `OSHyperLaserLargeEXR` + `OSHyperLaserLargeHeavy` 武器类(复用 `OSHyperLaserLarge` 基类的失控/HSM/C-2500 机制)
+  - **P4b** 删 `−1` 内建命中;加 **BCS 网络条件判定 + 变体独立精度加成** 到 `ComputeToHit`(复用 §9.1 BCS 网络判定 + §9.6 network coordination 逻辑)
+  - **P4c** 必需组件校验加入 `TestMek`(三变体通用:缺 HSM 或 C-2500 → 构型非法)
+  - **P4d** HSM 兼容范围扩展为三变体(通过 flag `F_OS_HSM_COMPATIBLE` 或武器基类判定)
+  - **P4e** 更新 `equipmentmessages.properties` 的武器 info 文案(新血统叙事 + 反 Ascended doctrine)
 - **Phase 5** — 删 ER Binary/ER Trinary 源文件 + lookup 兼容 + 编译 + MML 构型验证 + playtest 基准
 
 **预估总工:5-7 个工作会话**,分散在数批次。本次只落**文档**,代码留后批。

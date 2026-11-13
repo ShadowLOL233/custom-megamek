@@ -23,7 +23,7 @@ Quick index — jump to a section instead of scanning the whole file.
 - **Section 9 — OS Modular Electronics: BCS & CCS** [active/DESIGN]: two systems — **BCS** (Battle Computer System: info/command/EW, Tacticon B-2500 lineage, modular track + Advance specialized cores C-X280/Raven/G-X100) and **CCS** (Combat Computer System: single-mech fire control, C-2500 core + weapon-type modules + Composite). Dissolves canon AES⊥TC / AES⊥MASC / standalone-C3 into a modular ecosystem balanced by a two-core tonnage tax. **§9.6** adds a C3-network target-designator sub-family (Kestrel / Shrike / Lodestar).
 - **OS missile munitions + range redesign (2026-07-31):** SRM/LRM/MRM special munitions **✅ done**; the SRM/MRM/LRM range-specialization triad (MRM medium -1 / LRM long -1) **✅ done**. Detail under "⭐ Development priority" below.
 - **Section 11 — OS Actuator & Motive Systems (AES-I & AMS-I)** [design, not coded]: Improve-tier AMS-I (vehicle, −2 motive-crit, lighter) + a reconceived Mek-only AES-I (mobility/handling: −1 to-hit when run/jump, offsets Hardened/Modular Armor MP penalties; no TC/BCS/CCS/MASC exclusion).
-- **Section 12 — 集束激光系 + 高能激光系 modular architecture** [design 2026-11-08, not coded]: splits the former "异种集束激光系" into two independent tech lines. Base Binary/Trinary (Resonance stripped) + 3 optional modules (RM / LEM / LEC, all 2t/2c, RM ⊥ LEM). Hyper Laser repositioned as Experimental ultra-long-range sniper with mandatory HSM + C-2500 components and new range-based precision (Long −2 / Extreme −3). ER Binary/Trinary deleted; Hyper PPC deferred to a separate "Heavy PPC super-heavy evolution" batch. Supersedes 2026-11-07 PLM/ACJ designs (both superseded/废弃).
+- **Section 12 — 集束激光系 + 高能激光系 modular architecture** [design 2026-11-08, refined 2026-11-13, not coded]: splits the former "异种集束激光系" into two independent tech lines. Base Binary/Trinary (Resonance stripped) + 3 optional modules (RM / LEM / LEC, all 2t/2c, RM ⊥ LEM). **Hyper Laser repositioned as 3-variant Experimental anti-Ascended coordination weapon** (ER base / EXR extended-range / Heavy close-punch, lineage changed from "naval micro-ization" to "Binary + Heavy hybrid"), each with mandatory HSM + C-2500 components, and **BCS network-activated precision** (not inherent; ER −1 all brackets / EXR Long −1 Ext −2 / Heavy Short −2 Med −1). ER Binary/Trinary deleted; Hyper PPC deferred to a separate "Heavy PPC super-heavy evolution" batch. Supersedes 2026-11-07 PLM/ACJ designs (both superseded/废弃).
 
 Shelved ideas are parked in **[OS_SHELVED_IDEAS.md](OS_SHELVED_IDEAS.md)**. Splitting this plan into
 per-topic files (weapons / units / equipment) is **deferred** until it grows further.
@@ -1268,11 +1268,17 @@ Reference doc: `OS_WEAPONS_VALUES_AND_MECHANICS.md` → "📐 2026-11-08 架构�
     - **Laser Energy Modulator (LEM)**: REL-effect — bypasses special-armor damage reductions
     - **Laser Energy Capacitor (LEC)**: charge-then-fire for +5 dmg / +5 heat, explosive
   - Compatibility: RM ⊥ LEM (both modify optics); LEC compatible with either
-- **高能激光系** (Experimental tier ultra-long-range sniper):
-  - Hyper Laser (existing `OSHyperLaserLarge`, repositioned)
-  - **Mandatory** components for firing: HSM (Hyper Stabilization Module, 2t/2c) + C-2500 Combat Computer Core (1t/2c)
+- **高能激光系** (Experimental tier, 3 variants — 2026-11-13 refinement):
+  - **Hyper Laser (ER)** — `OSHyperLaserLarge` (existing, base variant): 28 dmg / 32 heat / 12/24/36/50
+  - **Hyper Laser EXR** — `OSHyperLaserLargeEXR` (new): 24 dmg / 28 heat / **14/28/42/60** (延伸射程 + 降功率)
+  - **Hyper Laser Heavy** — `OSHyperLaserLargeHeavy` (new, 10t/7c): 36 dmg / 32 heat / **8/16/24/32** (近距 punch,更强发射源)
+  - **Mandatory** components for all 3 variants: HSM (Hyper Stabilization Module, 2t/2c) + C-2500 Combat Computer Core (1t/2c)
   - **Optional** component: CCS Energy FCM Module (additional −1 to-hit, uses §9.2 infrastructure)
-  - New signature: range-based precision (Long −2 / Extreme −3)
+  - **NEW signature (replaces range-based inherent precision)**: **BCS network-activated precision** —
+    - **ER**: −1 to-hit **at all brackets** when host is on active BCS network
+    - **EXR**: Long −1 / Extreme −2 when networked
+    - **Heavy**: Short −2 / Medium −1 when networked
+    - **Not networked** = **no precision bonus** (standard BT range penalties apply)
 - **Deletions**: `OSERBinaryLaserSystem`, `OSERTrinaryLaserSystem` (long-range niche absorbed by Hyper Laser)
 - **Deferred**: `OSHyperPPC` repositioning (future → Heavy PPC's super-heavy mech evolution, parallel to Improve
   Heavy Gauss Rifle — not an Experimental-tier Hyper-laser peer)
@@ -1283,11 +1289,19 @@ Reference doc: `OS_WEAPONS_VALUES_AND_MECHANICS.md` → "📐 2026-11-08 架构�
 Two canon lineages, cleanly separated:
 - **集束激光** = multi-barrel coherent resonance, indigenous RoOS tech, Advance tier, OS "modular + serviceable"
   design philosophy fully realized through 3-module system
-- **高能激光** = naval laser micro-ization, Experimental tier. Canon supports asymmetry: sub-capital lasers exist
-  in BT canon (SCL/1-3, Word of Blake 3073), but **sub-capital PPCs do NOT exist in canon** — only mech-scale PPCs
-  down from naval. Naval PPC miniaturization is historically harder than naval laser (standard PPC introduced
-  160 years after standard laser; Light PPC took 600 years to reach mech-scale). This is why **Hyper Laser is
-  OS's naval-laser micro-ization** while Hyper PPC must take a different path (= Heavy PPC super-heavy evolution).
+- **高能激光** (2026-11-13 refinement): no longer "naval laser micro-ization". **New lineage**:
+  Hyper Laser is developed from **OSR's Binary multi-barrel coherent laser system + Heavy laser craftsmanship** as the
+  **最新锐反 Ascended 能量武器** (latest anti-Ascended energy weapon). Its combat purpose is to **leverage OSR's
+  advanced C3 system and BCS (Battle Computer System) coordination to maximize long-range firepower**, suppressing
+  **The Ascended's mass-deployed drone mechs and vehicles** (drone swarm doctrine).
+  - This narrative pivot replaces the earlier "naval → mech miniaturization" angle. The weapon is now an **indigenous
+    OSR synthesis** of two already-indigenous OSR laser lines (Binary + Heavy).
+  - The **precision bonus is NO LONGER inherent** to the weapon — it is an **OSR network coordination product**.
+    Hyper Laser is a **network amplifier, not an independent sniper rifle**, by design.
+  - Canon asymmetry note (still relevant for Hyper PPC positioning): sub-capital lasers exist in canon BT (SCL/1-3,
+    Word of Blake 3073), but **sub-capital PPCs do NOT exist in canon** — PPC miniaturization was historically
+    harder than laser miniaturization. This supports **Hyper PPC taking a different path** (= Heavy PPC super-heavy
+    mech evolution, parallel to Improve Heavy Gauss Rifle) rather than being an Experimental Hyper-laser peer.
 
 ### 12.3 Compatibility matrix (summary)
 
@@ -1303,15 +1317,29 @@ Two canon lineages, cleanly separated:
 
 Trinary scales similarly at 24 dmg base.
 
-### 12.4 Hyper Laser full system cost
+### 12.4 Hyper Laser 3-variant system cost (2026-11-13 refinement)
 
-- Hyper Laser base: 8t / 6c / BV ~900
-- HSM (mandatory): 2t / 2c / ~40 BV
-- C-2500 core (mandatory): 1t / 2c / ~60 BV
-- **Minimum firing config**: 11t / 10c / ~1000 BV
-- Optional Energy FCM: +~1t / 1c / ~80 BV → **full system 12t / 11c / ~1080 BV**
+Per-variant breakdown (武器 + mandatory HSM 2t/2c + C-2500 1t/2c = **+3t/+4c** 必需堆):
 
-Natural chassis lockout: only 80t+ assault/superheavy mechs can afford this plus required DHS.
+| Variant | 武器 t/c | 武器 BV | 系统总 t/c | 系统 WSC_t | 系统 BV (必需堆) | BCS 精度 |
+|---|---|---|---|---|---|---|
+| **ER** | 8/6 | 900 | **11/10** | 27 | ~1000 | −1 全距离 (入网) |
+| **EXR** | 8/6 | 780 | **11/10** | 25 | ~880 | Long −1 / Ext −2 (入网) |
+| **Heavy** | 10/7 | 1050 | **13/11** | 29 | ~1150 | Short −2 / Med −1 (入网) |
+
+Optional Energy FCM: +~1t / 1c / ~80 BV → **full system 12-14t / 11-12c / ~960-1230 BV**
+
+Natural chassis lockout:
+- **ER / EXR**: 80t+ assault/superheavy mechs (11t base + DHS)
+- **Heavy**: **90t+ super-heavy assault only** (13t base + DHS + BV premium)
+
+WSC analysis summary (期望伤 adjusted for BCS activation +~20%):
+
+| Variant | No-net t/dmg | **BCS activated t/dmg** | BV/WSC_t | 对标 |
+|---|---|---|---|---|
+| ER | 0.96 | **0.80** | 33.3 | ≈ Enhanced ER PPC (ENH, 0.75) |
+| EXR | 1.04 | **0.87** | 31.2 | ≈ Enhanced Gauss Rifle (ENH, 0.83) |
+| Heavy | 0.81 | **0.67** | 36.2 | **全文档最吨效**(受 32 hex max range + BCS 必需 双约束) |
 
 ### 12.5 Implementation route (coding phases)
 
@@ -1320,7 +1348,12 @@ Natural chassis lockout: only 80t+ assault/superheavy mechs can afford this plus
 | **P1** | New 3 MiscType modules + flags (`F_OS_LASER_RESONANCE` / `F_OS_LASER_EM_MODULATOR` / `F_OS_LASER_ENERGY_CAPACITOR`); mount constraints | Medium |
 | **P2** | Binary/Trinary handler: strip Resonance from base, add mount-based trigger (fires ×1.30/1.50 only if host weapon has RM mounted) | Medium |
 | **P3** | LEM handler (bypasses `TWDamageManager` reduction map for RM-flagged attacks); LEC handler (charge state, extends PPCCapacitorHandler pattern) | Medium-high |
-| **P4** | Hyper Laser: remove `−1` inner precision, add range-based `ComputeToHit` block (Long −2 / Extreme −3); mandatory-component gate in `TestMek` (if no HSM AND C-2500 → Hyper Laser illegal) | Medium |
+| **P4** | Hyper Laser 3-variant system: see breakdown below | Medium-high |
+| **P4a** | New weapon classes: `OSHyperLaserLargeEXR` (24/28, 14/28/42/60 range) + `OSHyperLaserLargeHeavy` (36/32 @ 10t/7c, 8/16/24/32 range); reuse `OSHyperLaserLarge` base class's instability/HSM/C-2500 machinery | Low |
+| **P4b** | Remove `−1` inner precision from existing Hyper Laser; add **BCS network condition check + per-variant precision block** to `ComputeToHit` (ER: −1 all brackets / EXR: Long −1 Ext −2 / Heavy: Short −2 Med −1). Reuse §9.1 BCS network detection + §9.6 `OSNetworkDesignators.networkCoordinationToHit` pattern | Medium |
+| **P4c** | Mandatory-component gate in `TestMek`: if no HSM AND no C-2500 core → **Hyper Laser (any variant) illegal construction** (not firing-time soft lockout, per §12.6 decision) | Medium |
+| **P4d** | HSM compatibility extension: current HSM spec lists only `OSHyperLaserLarge` + `OSHyperPPC` as compatible; add EXR and Heavy variants to compat list | Low |
+| **P4e** | `equipmentmessages.properties` info updates: new "Binary + Heavy hybrid anti-Ascended" narrative text for all 3 Hyper Laser variants + HSM | Low |
 | **P5** | Delete `OSERBinaryLaserSystem` / `OSERTrinaryLaserSystem`; register `addLookupName` for save-compat; compile + MML lint + playtest | Low |
 
 ### 12.6 Open implementation questions (defer until P1 planned)
